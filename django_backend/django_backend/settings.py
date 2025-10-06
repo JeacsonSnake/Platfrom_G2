@@ -155,3 +155,15 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
     }
 }
+
+# SWAGGER 相关设置
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,          # 关闭 Django 登录框
+    'JSON_EDITOR': True,
+    'SHOW_EXTENSIONS': True,
+    'SHOW_COMMON_EXTENSIONS': True,
+    # 允许自动扫描函数视图
+    'DEFAULT_AUTO_SCHEMA_CLASS': 'drf_yasg.inspectors.SwaggerAutoSchema',
+}
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
