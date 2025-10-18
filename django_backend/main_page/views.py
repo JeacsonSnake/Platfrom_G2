@@ -18,21 +18,6 @@ from .mqtt import client as mqtt_client
 import requests
 import base64
 
-# test swagger
-## import swagger tools
-from drf_yasg.utils import swagger_auto_schema
-## swaggerauto schema for function based views
-@swagger_auto_schema(
-    method='get',
-    operation_summary="测试接口",
-    responses={200: "ok"}
-)
-## define a test function
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def hello_swagger(request):
-    return Response({"msg": "hello swagger"})
-# end swagger test
 
 @api_view(['GET', 'POST'])
 def task_list(request):

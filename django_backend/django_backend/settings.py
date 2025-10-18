@@ -156,6 +156,11 @@ CHANNEL_LAYERS = {
     }
 }
 
+# DRF 配置
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.openapi.AutoSchema',
+}
+
 # SWAGGER 相关设置
 SWAGGER_SETTINGS = {
     'USE_SESSION_AUTH': False,          # 关闭 Django 登录框
