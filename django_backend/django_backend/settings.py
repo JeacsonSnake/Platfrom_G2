@@ -143,9 +143,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # MQTT 相关设置
-MQTT_SERVER = '192.168.31.18'
+# MQTT_SERVER = '192.168.31.18'
+MQTT_SERVER = '192.168.233.100'
 MQTT_PORT = 1883
 MQTT_KEEPALIVE = 60
+# MQTT 用户名&密码仅作节点识别，并非真实需要登陆
 MQTT_USER = 'Django'
 MQTT_PASSWORD = '123456'
 
