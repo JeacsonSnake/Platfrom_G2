@@ -73,7 +73,7 @@ void mqtt_init()
     esp_mqtt_client_config_t cfg = {
         .broker.address = {
             // EMQX 服务器主机IP地址
-            .uri = "mqtt://192.168.31.74",
+            .uri = "mqtt://192.168.233.100",
             .port = 1883,
             
         },

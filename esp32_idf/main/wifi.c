@@ -57,14 +57,26 @@ void wifi_init(void)
     // 启动阶段
     ESP_ERROR_CHECK(esp_wifi_start());
 
-    // 等待阶段
-    while (1)
+    // 等待阶段（添加30秒超时机制）
+    int retry_count = 0;
+    const int MAX_RETRY = 30;  // 30秒超时
+    bool connected = false;
+    
+    while (retry_count < MAX_RETRY)
     {
-        if (xSemaphoreTake(sem, portMAX_DELAY) == pdPASS)
+        if (xSemaphoreTake(sem, pdMS_TO_TICKS(1000)) == pdPASS)
         {
             ESP_LOGI(TAG, "Connected to ap!");
+            connected = true;
             break;
         }
+        retry_count++;
+        ESP_LOGW(TAG, "Waiting for WiFi connection... (%d/%d)", retry_count, MAX_RETRY);
+    }
+    
+    if (!connected) {
+        ESP_LOGE(TAG, "WiFi connection timeout! Check SSID and password.");
+        // 不阻塞程序，让后续模块有机会处理错误
     }
 
 }
