@@ -81,11 +81,26 @@ void mqtt_init()
             
         },
         .credentials = {
+            .client_id = "ESP32S3_7cdfa1e6d3cc",  // 固定唯一ClientID（使用MAC地址后6位）
             .username = "ESP32_1",
             
         },
         .credentials.authentication = {
             .password = "123456",
+        },
+        // 添加会话和网络配置以改善连接稳定性
+        .session = {
+            .keepalive = 60,               // 60秒 KeepAlive 间隔（禁用WiFi省电后，可恢复正常值）
+            .disable_keepalive = false,    // 启用 KeepAlive
+            .disable_clean_session = false, // 保留会话，断线重连后自动恢复订阅
+        },
+        .network = {
+            .reconnect_timeout_ms = 5000,  // 重连间隔 5秒
+            .timeout_ms = 10000,           // 网络操作超时 10秒
+        },
+        .buffer = {
+            .size = 1024,                  // 增加发送缓冲区
+            .out_size = 1024,              // 增加接收缓冲区
         }
     };
 
@@ -108,6 +123,6 @@ void mqtt_init()
             esp_mqtt_client_publish(mqtt_client, MQTT_HEARTBEAT_CHANNEL, buff, strlen(buff), 2, 0); 
         }
 
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(30000));  // 应用层心跳改为30秒，减轻网络负担
     }
 }

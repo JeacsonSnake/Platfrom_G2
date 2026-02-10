@@ -58,10 +58,13 @@ void wifi_init(void)
 
     // 启动阶段
     ESP_ERROR_CHECK(esp_wifi_start());
+    
+    // 禁用 WiFi 省电模式，确保 MQTT 连接稳定
+    ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE));
 
     // 等待阶段（添加30秒超时机制）
     int retry_count = 0;
-    const int MAX_RETRY = 30;  // 30秒超时
+    const int MAX_RETRY = 60;  // 60秒超时（WiFi连接较慢，增加等待时间）
     bool connected = false;
     
     while (retry_count < MAX_RETRY)
