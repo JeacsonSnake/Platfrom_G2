@@ -18,18 +18,20 @@
 #include "driver/ledc.h"
 #include "driver/pulse_cnt.h"
 #include "driver/gpio.h"
+#include "led_strip.h"
 
 
 //////////////////////////////////////////////////////////////
 //////////////////////// STATUS LED //////////////////////////
 //////////////////////////////////////////////////////////////
-// Status LED GPIO (ESP32-S3 开发板内置 LED)
-// 尝试 GPIO48（新版 ESP32-S3-DevKitC-1 的 RGB LED）
-// 如果无效，改回 GPIO2 或外接 LED
+// Status LED GPIO (ESP32-S3-DevKitC-1 RGB LED @ GPIO48)
 #define STATUS_LED_GPIO         GPIO_NUM_48
-#define STATUS_LED_ON()         gpio_set_level(STATUS_LED_GPIO, 1)
-#define STATUS_LED_OFF()        gpio_set_level(STATUS_LED_GPIO, 0)
-#define STATUS_LED_TOGGLE()     gpio_set_level(STATUS_LED_GPIO, !gpio_get_level(STATUS_LED_GPIO))
+
+// WS2812 RGB LED 颜色模式
+// LED_OFF:      熄灭
+// LED_BLINK_FAST (黄色):   WiFi 连接中 (100ms)
+// LED_BLINK_SLOW (蓝色):   MQTT 连接中 (500ms)  
+// LED_ON (绿色):           全部连接成功
 
 // LED 状态模式
 #define LED_OFF         0   // 系统未启动
@@ -47,8 +49,8 @@ void status_led_task(void *pvParameters);
 //////////////////////////////////////////////////////////////
 // WiFi SSID and Password
 // EMQX MQTT Server should be broadcasted within this network
-#define WIFI_SSID "去码头整点薯条"
-#define WIFI_PASS "Getfries0ndock"
+#define WIFI_SSID "WeShare-48"
+#define WIFI_PASS "1234567890"
 
 // WIFI Connection Function 初始化方法
 void wifi_init(void);
