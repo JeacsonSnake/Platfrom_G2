@@ -17,15 +17,41 @@
 #include "cJSON.h"
 #include "driver/ledc.h"
 #include "driver/pulse_cnt.h"
+#include "driver/gpio.h"
+#include "driver/rmt_tx.h"
+#include "led_strip_encoder.h"
 
+
+//////////////////////////////////////////////////////////////
+//////////////////////// STATUS LED //////////////////////////
+//////////////////////////////////////////////////////////////
+// Status LED GPIO (ESP32-S3-DevKitC-1 RGB LED @ GPIO48)
+#define STATUS_LED_GPIO         GPIO_NUM_48
+
+// WS2812 RGB LED 颜色模式
+// LED_OFF:      熄灭
+// LED_BLINK_FAST (黄色):   WiFi 连接中 (100ms)
+// LED_BLINK_SLOW (蓝色):   MQTT 连接中 (500ms)  
+// LED_ON (绿色):           全部连接成功
+
+// LED 状态模式
+#define LED_OFF         0   // 系统未启动
+#define LED_BLINK_FAST  1   // WiFi 连接中 (100ms)
+#define LED_BLINK_SLOW  2   // WiFi 已连接，MQTT 连接中 (500ms)
+#define LED_ON          3   // 全部连接成功
+
+// LED 状态初始化
+void status_led_init(void);
+void status_led_set_mode(int mode);
+void status_led_task(void *pvParameters);
 
 //////////////////////////////////////////////////////////////
 //////////////////////// WIFI ////////////////////////////////
 //////////////////////////////////////////////////////////////
 // WiFi SSID and Password
 // EMQX MQTT Server should be broadcasted within this network
-#define WIFI_SSID "去码头整点薯条"
-#define WIFI_PASS "Getfries0ndock"
+#define WIFI_SSID "WeShare-6148"
+#define WIFI_PASS "1234567890"
 
 // WIFI Connection Function 初始化方法
 void wifi_init(void);

@@ -11,12 +11,14 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
                                        event_id == WIFI_EVENT_STA_DISCONNECTED))
     {
         ESP_LOGI(TAG, "Begin to connect the AP");
+        status_led_set_mode(LED_BLINK_FAST);  // WiFi 连接中 - 快速闪烁
         esp_wifi_connect();
     }
     else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
     {
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
         ESP_LOGI(TAG, "Got ip:" IPSTR, IP2STR(&event->ip_info.ip));
+        status_led_set_mode(LED_BLINK_SLOW);  // WiFi 已连接，等待 MQTT - 慢速闪烁
         xSemaphoreGive(sem);
     }
 }
@@ -57,14 +59,26 @@ void wifi_init(void)
     // 启动阶段
     ESP_ERROR_CHECK(esp_wifi_start());
 
-    // 等待阶段
-    while (1)
+    // 等待阶段（添加30秒超时机制）
+    int retry_count = 0;
+    const int MAX_RETRY = 30;  // 30秒超时
+    bool connected = false;
+    
+    while (retry_count < MAX_RETRY)
     {
-        if (xSemaphoreTake(sem, portMAX_DELAY) == pdPASS)
+        if (xSemaphoreTake(sem, pdMS_TO_TICKS(1000)) == pdPASS)
         {
             ESP_LOGI(TAG, "Connected to ap!");
+            connected = true;
             break;
         }
+        retry_count++;
+        ESP_LOGW(TAG, "Waiting for WiFi connection... (%d/%d)", retry_count, MAX_RETRY);
+    }
+    
+    if (!connected) {
+        ESP_LOGE(TAG, "WiFi connection timeout! Check SSID and password.");
+        // 不阻塞程序，让后续模块有机会处理错误
     }
 
 }
