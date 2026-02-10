@@ -24,7 +24,9 @@
 //////////////////////// STATUS LED //////////////////////////
 //////////////////////////////////////////////////////////////
 // Status LED GPIO (ESP32-S3 开发板内置 LED)
-#define STATUS_LED_GPIO         GPIO_NUM_2
+// 尝试 GPIO48（新版 ESP32-S3-DevKitC-1 的 RGB LED）
+// 如果无效，改回 GPIO2 或外接 LED
+#define STATUS_LED_GPIO         GPIO_NUM_48
 #define STATUS_LED_ON()         gpio_set_level(STATUS_LED_GPIO, 1)
 #define STATUS_LED_OFF()        gpio_set_level(STATUS_LED_GPIO, 0)
 #define STATUS_LED_TOGGLE()     gpio_set_level(STATUS_LED_GPIO, !gpio_get_level(STATUS_LED_GPIO))
