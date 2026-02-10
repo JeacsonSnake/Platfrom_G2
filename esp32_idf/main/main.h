@@ -18,7 +18,8 @@
 #include "driver/ledc.h"
 #include "driver/pulse_cnt.h"
 #include "driver/gpio.h"
-#include "led_strip.h"
+#include "driver/rmt_tx.h"
+#include "led_strip_encoder.h"
 
 
 //////////////////////////////////////////////////////////////
@@ -49,7 +50,7 @@ void status_led_task(void *pvParameters);
 //////////////////////////////////////////////////////////////
 // WiFi SSID and Password
 // EMQX MQTT Server should be broadcasted within this network
-#define WIFI_SSID "WeShare-48"
+#define WIFI_SSID "WeShare-6148"
 #define WIFI_PASS "1234567890"
 
 // WIFI Connection Function 初始化方法

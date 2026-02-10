@@ -1,3 +1,2 @@
-idf_component_register(SRCS "led.c" "main.c" "wifi.c" "mqtt.c" "pwm.c" "pcnt.c" "pid.c"
-                    INCLUDE_DIRS "."
-                    REQUIRES led_strip)
+idf_component_register(SRCS "led.c" "led_strip_encoder.c" "main.c" "wifi.c" "mqtt.c" "pwm.c" "pcnt.c" "pid.c"
+                    INCLUDE_DIRS ".")
