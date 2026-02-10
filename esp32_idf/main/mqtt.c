@@ -75,8 +75,8 @@ void mqtt_init()
     // mqtt服务器的配置信息
     esp_mqtt_client_config_t cfg = {
         .broker.address = {
-            // EMQX 服务器主机IP地址
-            .uri = "mqtt://192.168.233.100",
+            // EMQX 服务器主机IP地址 (通过VMware NAT端口映射访问)
+            .uri = "mqtt://192.168.110.31",
             .port = 1883,
             
         },
