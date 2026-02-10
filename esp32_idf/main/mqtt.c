@@ -35,6 +35,7 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
         case MQTT_EVENT_CONNECTED:
             ESP_LOGI(TAG, "Connected to MQTT server.");
             connect_flag = true;
+            status_led_set_mode(LED_ON);  // MQTT 连接成功 - LED 常亮
             // 订阅MQTT 控制频道来接收指令
             esp_mqtt_client_subscribe(mqtt_client, MQTT_CONTROL_CHANNEL, 2);
             break;
@@ -42,6 +43,7 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
         case MQTT_EVENT_DISCONNECTED:
             ESP_LOGI(TAG, "Disconnected from MQTT server.");
             connect_flag = false;
+            status_led_set_mode(LED_BLINK_SLOW);  // MQTT 断开，回到慢速闪烁
             break;
 
         case MQTT_EVENT_DATA:
@@ -58,6 +60,7 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
         case MQTT_EVENT_ERROR:
             ESP_LOGE(TAG, "MQTT connection error");
             connect_flag = false;
+            status_led_set_mode(LED_BLINK_SLOW);  // MQTT 错误，回到慢速闪烁
             break;
 
         default:

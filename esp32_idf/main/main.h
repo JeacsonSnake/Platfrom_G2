@@ -17,7 +17,28 @@
 #include "cJSON.h"
 #include "driver/ledc.h"
 #include "driver/pulse_cnt.h"
+#include "driver/gpio.h"
 
+
+//////////////////////////////////////////////////////////////
+//////////////////////// STATUS LED //////////////////////////
+//////////////////////////////////////////////////////////////
+// Status LED GPIO (ESP32-S3 开发板内置 LED)
+#define STATUS_LED_GPIO         GPIO_NUM_2
+#define STATUS_LED_ON()         gpio_set_level(STATUS_LED_GPIO, 1)
+#define STATUS_LED_OFF()        gpio_set_level(STATUS_LED_GPIO, 0)
+#define STATUS_LED_TOGGLE()     gpio_set_level(STATUS_LED_GPIO, !gpio_get_level(STATUS_LED_GPIO))
+
+// LED 状态模式
+#define LED_OFF         0   // 系统未启动
+#define LED_BLINK_FAST  1   // WiFi 连接中 (100ms)
+#define LED_BLINK_SLOW  2   // WiFi 已连接，MQTT 连接中 (500ms)
+#define LED_ON          3   // 全部连接成功
+
+// LED 状态初始化
+void status_led_init(void);
+void status_led_set_mode(int mode);
+void status_led_task(void *pvParameters);
 
 //////////////////////////////////////////////////////////////
 //////////////////////// WIFI ////////////////////////////////
