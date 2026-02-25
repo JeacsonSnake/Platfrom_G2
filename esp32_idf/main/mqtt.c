@@ -1,4 +1,5 @@
 #include "main.h"
+#include "monitor.h"
 
 static char* TAG = "ESP32S3_MQTT_EVENT";
 static bool connect_flag = false; // 定义一个连接上mqtt服务器的flag
@@ -36,6 +37,8 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
             ESP_LOGI(TAG, "Connected to MQTT server.");
             connect_flag = true;
             status_led_set_mode(LED_ON);  // MQTT 连接成功 - LED 常亮
+            // 记录连接事件
+            monitor_record_connect();
             // 订阅MQTT 控制频道来接收指令
             esp_mqtt_client_subscribe(mqtt_client, MQTT_CONTROL_CHANNEL, 2);
             break;
@@ -44,6 +47,8 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
             ESP_LOGI(TAG, "Disconnected from MQTT server.");
             connect_flag = false;
             status_led_set_mode(LED_BLINK_SLOW);  // MQTT 断开，回到慢速闪烁
+            // 记录断开事件
+            monitor_record_disconnect("No PING_RESP / Connection reset");
             break;
 
         case MQTT_EVENT_DATA:
@@ -61,6 +66,8 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
             ESP_LOGE(TAG, "MQTT connection error");
             connect_flag = false;
             status_led_set_mode(LED_BLINK_SLOW);  // MQTT 错误，回到慢速闪烁
+            // 记录断开事件
+            monitor_record_disconnect("MQTT_EVENT_ERROR");
             break;
 
         default:

@@ -30,6 +30,9 @@ void app_main(void){
     // 创建LED状态指示任务（优先级设为5，高于其他任务）
     xTaskCreate(status_led_task, "LED_TASK", 4096, NULL, 5, NULL);
     
+    // 创建MQTT连接监控任务
+    xTaskCreate(monitor_task, "MONITOR_TASK", 4096, NULL, 2, NULL);
+    
     // 初始化WiFi，并等待WiFi连接
     wifi_init();
     vTaskDelay(5000 / portTICK_PERIOD_MS);

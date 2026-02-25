@@ -15,11 +15,13 @@
 #include "esp_http_client.h"
 #include "esp_partition.h"
 #include "cJSON.h"
+#include "esp_timer.h"
 #include "driver/ledc.h"
 #include "driver/pulse_cnt.h"
 #include "driver/gpio.h"
 #include "driver/rmt_tx.h"
 #include "led_strip_encoder.h"
+#include "monitor.h"
 
 
 //////////////////////////////////////////////////////////////
