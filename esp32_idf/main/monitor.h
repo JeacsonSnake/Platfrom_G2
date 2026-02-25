@@ -50,8 +50,8 @@ typedef struct {
     int64_t last_disconnect_time_ms; // 上次断开时间
 } mqtt_connection_stats_t;
 
-// 全局统计变量声明
-extern mqtt_connection_stats_t mqtt_stats;
+// 获取全局统计变量的函数声明（只读访问）
+const mqtt_connection_stats_t* monitor_get_stats(void);
 
 // 监控函数声明
 void monitor_init(void);

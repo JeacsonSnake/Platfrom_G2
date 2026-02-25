@@ -4,7 +4,7 @@
 static const char* TAG = "MQTT_MONITOR";
 
 // 全局统计变量定义
-mqtt_connection_stats_t mqtt_stats = {
+static mqtt_connection_stats_t mqtt_stats = {
     .time_synced = false,
     .boot_time_ms = 0,
     .boot_real_time = 0,
@@ -23,6 +23,43 @@ mqtt_connection_stats_t mqtt_stats = {
 // 同步信号量
 static SemaphoreHandle_t sntp_sync_sem = NULL;
 static bool sntp_initialized = false;
+static SemaphoreHandle_t stats_mutex = NULL;  // 互斥锁保护统计变量
+
+// 内部函数：初始化互斥锁
+static void init_stats_mutex(void) {
+    if (stats_mutex == NULL) {
+        stats_mutex = xSemaphoreCreateMutex();
+    }
+}
+
+// 获取全局统计变量（只读访问）
+const mqtt_connection_stats_t* monitor_get_stats(void) {
+    return &mqtt_stats;
+}
+
+// 内部函数：安全更新时间同步状态
+static void set_time_synced(bool synced) {
+    if (stats_mutex != NULL) {
+        xSemaphoreTake(stats_mutex, portMAX_DELAY);
+    }
+    mqtt_stats.time_synced = synced;
+    if (stats_mutex != NULL) {
+        xSemaphoreGive(stats_mutex);
+    }
+}
+
+// 内部函数：安全获取时间同步状态
+static bool get_time_synced(void) {
+    bool synced = false;
+    if (stats_mutex != NULL) {
+        xSemaphoreTake(stats_mutex, portMAX_DELAY);
+    }
+    synced = mqtt_stats.time_synced;
+    if (stats_mutex != NULL) {
+        xSemaphoreGive(stats_mutex);
+    }
+    return synced;
+}
 
 //////////////////////////////////////////////////////////////
 //////////////////// 时间同步回调 /////////////////////////////
@@ -39,13 +76,16 @@ static void sntp_sync_notification_cb(struct timeval *tv)
         ESP_LOGI(TAG, "已发送同步完成信号");
     }
     
-    // 立即更新同步状态
-    mqtt_stats.time_sync_time_ms = esp_timer_get_time() / 1000;
-    mqtt_stats.time_synced = true;
+    // 立即更新同步状态（使用互斥锁保护）
+    int64_t current_time = esp_timer_get_time() / 1000;
+    mqtt_stats.time_sync_time_ms = current_time;
     
     // 获取当前实际时间作为开机参考时间
     time_t now = time(NULL);
-    mqtt_stats.boot_real_time = now - (mqtt_stats.time_sync_time_ms / 1000);
+    mqtt_stats.boot_real_time = now - (current_time / 1000);
+    
+    // 使用互斥锁安全设置同步标志
+    set_time_synced(true);
     
     struct tm* tm_info = localtime(&now);
     char time_str[32];
@@ -71,12 +111,17 @@ void monitor_start_time_sync(void)
         return;
     }
     
+    // 初始化互斥锁
+    init_stats_mutex();
+    
     if (sntp_sync_sem == NULL) {
         sntp_sync_sem = xSemaphoreCreateBinary();
     }
     
     // 记录开机时间（系统启动时间）
     mqtt_stats.boot_time_ms = esp_timer_get_time() / 1000;
+    // 重置时间同步状态
+    mqtt_stats.time_synced = false;
     
     ESP_LOGI(TAG, "==============================================");
     ESP_LOGI(TAG, "正在启动 SNTP 时间同步...");
@@ -133,7 +178,7 @@ bool monitor_wait_time_sync(int timeout_ms)
 // 检查时间是否已同步
 bool monitor_is_time_synced(void)
 {
-    return mqtt_stats.time_synced;
+    return get_time_synced();
 }
 
 //////////////////////////////////////////////////////////////
@@ -143,7 +188,8 @@ bool monitor_is_time_synced(void)
 // 获取带偏移的当前实际时间字符串（考虑开机时间）
 void monitor_get_current_time_str(char* buffer, size_t buffer_size)
 {
-    if (mqtt_stats.time_synced) {
+    // 使用 getter 函数安全获取同步状态
+    if (get_time_synced()) {
         // 使用实际时间
         time_t now = time(NULL);
         struct tm* tm_info = localtime(&now);
@@ -185,6 +231,9 @@ void monitor_get_elapsed_time_str(char* buffer, size_t buffer_size)
 //////////////////////////////////////////////////////////////
 
 void monitor_init(void) {
+    // 初始化互斥锁
+    init_stats_mutex();
+    
     // 记录初始开机时间
     mqtt_stats.boot_time_ms = esp_timer_get_time() / 1000;
     
@@ -328,7 +377,7 @@ void monitor_report_statistics(void) {
     ESP_LOGI(TAG, "平均连接时长:   %s/次", avg_session_str);
     ESP_LOGI(TAG, "连接保持率:     %.2f%%", connection_rate);
     ESP_LOGI(TAG, "当前连接状态:   %s", mqtt_stats.is_connected ? "已连接" : "未连接");
-    ESP_LOGI(TAG, "时间同步状态:   %s", mqtt_stats.time_synced ? "已同步" : "未同步");
+    ESP_LOGI(TAG, "时间同步状态:   %s", get_time_synced() ? "已同步" : "未同步");
     
     // 打印最近断开事件
     if (mqtt_stats.log_count > 0) {
@@ -351,7 +400,7 @@ void monitor_report_statistics(void) {
             
             // 显示断开时间
             char disconnect_time_str[32];
-            if (mqtt_stats.time_synced) {
+            if (get_time_synced()) {
                 // 计算实际断开时间
                 time_t disconnect_real_time = mqtt_stats.boot_real_time + 
                     (event->disconnect_time_ms / 1000);
