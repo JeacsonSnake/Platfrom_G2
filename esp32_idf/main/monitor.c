@@ -22,6 +22,7 @@ mqtt_connection_stats_t mqtt_stats = {
 
 // 同步信号量
 static SemaphoreHandle_t sntp_sync_sem = NULL;
+static bool sntp_initialized = false;
 
 //////////////////////////////////////////////////////////////
 //////////////////// 时间同步回调 /////////////////////////////
@@ -30,10 +31,31 @@ static SemaphoreHandle_t sntp_sync_sem = NULL;
 // SNTP 同步完成回调函数
 static void sntp_sync_notification_cb(struct timeval *tv)
 {
+    ESP_LOGI(TAG, "==============================================");
+    ESP_LOGI(TAG, "NTP时间同步回调被触发！");
+    
     if (sntp_sync_sem != NULL) {
         xSemaphoreGive(sntp_sync_sem);
+        ESP_LOGI(TAG, "已发送同步完成信号");
     }
-    ESP_LOGI(TAG, "NTP时间同步完成");
+    
+    // 立即更新同步状态
+    mqtt_stats.time_sync_time_ms = esp_timer_get_time() / 1000;
+    mqtt_stats.time_synced = true;
+    
+    // 获取当前实际时间作为开机参考时间
+    time_t now = time(NULL);
+    mqtt_stats.boot_real_time = now - (mqtt_stats.time_sync_time_ms / 1000);
+    
+    struct tm* tm_info = localtime(&now);
+    char time_str[32];
+    strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", tm_info);
+    
+    ESP_LOGI(TAG, "时间同步完成！");
+    ESP_LOGI(TAG, "当前实际时间: %s", time_str);
+    ESP_LOGI(TAG, "开机时间戳: %lld ms", mqtt_stats.boot_time_ms);
+    ESP_LOGI(TAG, "实际开机时间: %s", ctime(&mqtt_stats.boot_real_time));
+    ESP_LOGI(TAG, "==============================================");
 }
 
 //////////////////////////////////////////////////////////////
@@ -43,6 +65,12 @@ static void sntp_sync_notification_cb(struct timeval *tv)
 // 启动时间同步
 void monitor_start_time_sync(void)
 {
+    // 防止重复初始化
+    if (sntp_initialized) {
+        ESP_LOGW(TAG, "SNTP 已经初始化，跳过");
+        return;
+    }
+    
     if (sntp_sync_sem == NULL) {
         sntp_sync_sem = xSemaphoreCreateBinary();
     }
@@ -50,8 +78,10 @@ void monitor_start_time_sync(void)
     // 记录开机时间（系统启动时间）
     mqtt_stats.boot_time_ms = esp_timer_get_time() / 1000;
     
+    ESP_LOGI(TAG, "==============================================");
     ESP_LOGI(TAG, "正在启动 SNTP 时间同步...");
     ESP_LOGI(TAG, "NTP服务器: %s", NTP_SERVER);
+    ESP_LOGI(TAG, "当前系统时间: %lld ms", mqtt_stats.boot_time_ms);
     
     // 配置 SNTP
     esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
@@ -59,6 +89,10 @@ void monitor_start_time_sync(void)
     esp_sntp_set_sync_mode(SNTP_SYNC_MODE_IMMED);
     esp_sntp_set_time_sync_notification_cb(sntp_sync_notification_cb);
     esp_sntp_init();
+    sntp_initialized = true;
+    
+    ESP_LOGI(TAG, "SNTP 初始化完成，等待时间同步...");
+    ESP_LOGI(TAG, "==============================================");
 }
 
 // 等待时间同步完成
@@ -358,12 +392,31 @@ void monitor_task(void *pvParameters) {
     // 初始化监控模块
     monitor_init();
     
-    // 注意：时间同步在WiFi连接成功后由wifi.c触发
-    // 这里等待一段时间确保同步完成
-    vTaskDelay(pdMS_TO_TICKS(5000));
+    // 等待 SNTP 同步完成（最多等待60秒）
+    ESP_LOGI(TAG, "等待 SNTP 时间同步完成...");
+    bool sync_success = false;
+    int wait_count = 0;
+    const int MAX_WAIT = 60; // 最多等待60秒
     
+    while (!sync_success && wait_count < MAX_WAIT) {
+        if (monitor_is_time_synced()) {
+            sync_success = true;
+            ESP_LOGI(TAG, "时间同步已完成，开始监控任务");
+            break;
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        wait_count++;
+        if (wait_count % 10 == 0) {
+            ESP_LOGW(TAG, "仍在等待时间同步... (%d/%d 秒)", wait_count, MAX_WAIT);
+        }
+    }
+    
+    if (!sync_success) {
+        ESP_LOGW(TAG, "时间同步超时，将继续使用系统时间进行监控");
+    }
+    
+    // 主循环：每4小时输出一次统计报告
     while (1) {
-        // 每4小时输出一次统计报告
         vTaskDelay(pdMS_TO_TICKS(MONITOR_REPORT_INTERVAL_MS));
         
         // 输出统计报告
