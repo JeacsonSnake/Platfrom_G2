@@ -79,7 +79,9 @@ typedef struct {
 - 监控模块头文件
 - 定义数据结构体和配置参数
 - 声明监控函数接口
-- **新增 SNTP 配置：NTP_SERVER = "pool.ntp.org"**
+- **新增 SNTP 配置：**
+  - `NTP_SERVER_PRIMARY`: `cn.pool.ntp.org`（国内NTP服务器）
+  - `NTP_SERVER_BACKUP`: `ntp.aliyun.com`（阿里云NTP服务器）
 
 #### `main/monitor.c`
 - 监控模块实现
@@ -92,6 +94,9 @@ typedef struct {
   - `monitor_is_time_synced()`: 检查同步状态
   - `monitor_get_current_time_str()`: 获取实际时间字符串
   - `monitor_get_elapsed_time_str()`: 获取运行时长
+- **新增互斥锁保护：**
+  - `stats_mutex`: 保护共享变量的互斥锁
+  - `set_time_synced()` / `get_time_synced()`: 安全访问同步状态
 
 ### 3.2 修改文件
 
@@ -145,7 +150,8 @@ WiFi 连接成功 → 启动 SNTP → 等待 NTP 响应 → 同步完成 → 开
 
 ```c
 // SNTP 配置
-#define NTP_SERVER "pool.ntp.org"
+#define NTP_SERVER_PRIMARY   "cn.pool.ntp.org"  // 国内NTP服务器
+#define NTP_SERVER_BACKUP    "ntp.aliyun.com"   // 阿里云NTP服务器
 #define TIME_SYNC_TIMEOUT_MS 30000
 
 // 启动时间同步
@@ -154,8 +160,15 @@ void monitor_start_time_sync(void)
     // 记录开机系统时间
     mqtt_stats.boot_time_ms = esp_timer_get_time() / 1000;
     
+    // 设置中国时区 (UTC+8)
+    setenv("TZ", "CST-8", 1);
+    tzset();
+    
+    // 配置 SNTP
     esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
-    esp_sntp_setservername(0, NTP_SERVER);
+    esp_sntp_setservername(0, NTP_SERVER_PRIMARY);
+    esp_sntp_setservername(1, NTP_SERVER_BACKUP);
+    esp_sntp_set_sync_mode(SNTP_SYNC_MODE_IMMED);
     esp_sntp_set_time_sync_notification_cb(sntp_sync_notification_cb);
     esp_sntp_init();
 }
@@ -163,8 +176,8 @@ void monitor_start_time_sync(void)
 // 同步完成回调
 static void sntp_sync_notification_cb(struct timeval *tv)
 {
-    mqtt_stats.time_synced = true;
     mqtt_stats.time_sync_time_ms = esp_timer_get_time() / 1000;
+    mqtt_stats.time_synced = true;
     
     // 计算实际开机时间
     time_t now = time(NULL);
@@ -287,6 +300,46 @@ git commit -m "fix(monitor): 添加 SNTP 时间同步功能
 
 ---
 
+### 第三次提交：互斥锁保护时间同步状态
+
+```bash
+# 修改监控模块
+git add main/monitor.c main/monitor.h
+
+# 提交
+git commit -m "fix(monitor): 添加互斥锁保护时间同步状态
+
+- 添加互斥锁保护 mqtt_stats.time_synced 变量
+- 使用 getter/setter 函数安全访问同步状态
+- 防止多任务竞争导致的状态不一致"
+```
+
+**提交信息**:  
+- Commit: `d2e7a07`  
+- 修改: 60 行（2个文件）
+
+---
+
+### 第四次提交：优化 NTP 服务器配置
+
+```bash
+# 修改 NTP 配置
+git add main/monitor.c main/monitor.h main/wifi.c
+
+# 提交
+git commit -m "fix(monitor): 优化 NTP 时间同步配置
+
+- 使用国内 NTP 服务器: cn.pool.ntp.org, ntp.aliyun.com
+- 添加中国时区设置 CST-8 (UTC+8)
+- WiFi 连接成功后等待 NTP 同步完成再返回"
+```
+
+**提交信息**:  
+- Commit: `2fdcb99`  
+- 修改: 23 行（3个文件）
+
+---
+
 ## 8. 使用说明
 
 ### 编译烧录
@@ -329,11 +382,32 @@ idf.py -p COM9 flash monitor
 **解决**: 通过 SNTP 同步网络时间，WiFi 连接成功后自动启动同步
 
 ### SNTP 同步实现细节
-- 使用 `pool.ntp.org` 作为 NTP 服务器
+- ~~使用 `pool.ntp.org` 作为 NTP 服务器~~ → 改用国内服务器 `cn.pool.ntp.org` 和 `ntp.aliyun.com`
 - 同步超时时间：30秒
 - 同步模式：`SNTP_SYNC_MODE_IMMED`（立即同步）
 - 运行模式：`SNTP_OPMODE_POLL`（轮询模式）
 - 通过回调函数 `sntp_sync_notification_cb` 通知同步完成
+- 时区设置：`CST-8` (UTC+8，中国标准时间)
+
+---
+
+### 问题：NTP 服务器无法访问
+**现象**: SNTP 启动后回调从未被触发，日志一直显示 `时间: 未同步 [运行 ...]`  
+**原因**: `pool.ntp.org` 在国内网络环境下无法访问或响应超时  
+**解决**: 
+1. 更换为国内 NTP 服务器：`cn.pool.ntp.org` 和 `ntp.aliyun.com`
+2. 添加中国时区设置 `setenv("TZ", "CST-8", 1)`
+3. 在 `wifi.c` 中 WiFi 连接成功后等待 NTP 同步完成
+
+---
+
+### 问题：时间同步状态竞争访问
+**现象**: SNTP 回调已触发（日志显示 `NTP时间同步完成`），但后续事件仍显示 `未同步`  
+**原因**: `time_synced` 变量在多任务环境中被竞争访问，SNTP 回调在中断上下文执行，与 MQTT 任务中的读取操作无同步机制  
+**解决**: 添加 FreeRTOS 互斥锁保护：
+- `stats_mutex`: 互斥锁保护统计变量
+- `set_time_synced()`: 安全设置同步状态
+- `get_time_synced()`: 安全获取同步状态
 
 ---
 
@@ -368,4 +442,5 @@ idf.py -p COM9 flash monitor
 ---
 
 **记录人**: Kimi Code CLI  
+**更新时间**: 2026-02-25 18:15
 **完成时间**: 2026-02-25 18:00
