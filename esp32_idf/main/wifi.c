@@ -1,4 +1,5 @@
 #include "main.h"
+#include "monitor.h"
 
 static char *TAG = "ESP32S3_WIFI_EVENT";
 
@@ -86,6 +87,15 @@ void wifi_init(void)
     if (!connected) {
         ESP_LOGE(TAG, "WiFi connection timeout! Check SSID and password.");
         // 不阻塞程序，让后续模块有机会处理错误
+    } else {
+        // WiFi 连接成功后，等待 NTP 时间同步完成
+        ESP_LOGI(TAG, "Waiting for NTP time sync...");
+        bool time_synced = monitor_wait_time_sync(TIME_SYNC_TIMEOUT_MS);
+        if (time_synced) {
+            ESP_LOGI(TAG, "NTP time sync completed successfully");
+        } else {
+            ESP_LOGW(TAG, "NTP time sync timeout, continuing with system time");
+        }
     }
 
 }

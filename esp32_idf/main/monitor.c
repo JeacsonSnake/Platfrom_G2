@@ -121,16 +121,23 @@ void monitor_start_time_sync(void)
     // 记录开机时间（系统启动时间）
     mqtt_stats.boot_time_ms = esp_timer_get_time() / 1000;
     // 重置时间同步状态
-    mqtt_stats.time_synced = false;
+    set_time_synced(false);
     
     ESP_LOGI(TAG, "==============================================");
     ESP_LOGI(TAG, "正在启动 SNTP 时间同步...");
-    ESP_LOGI(TAG, "NTP服务器: %s", NTP_SERVER);
+    ESP_LOGI(TAG, "NTP服务器1: %s", NTP_SERVER_PRIMARY);
+    ESP_LOGI(TAG, "NTP服务器2: %s", NTP_SERVER_BACKUP);
     ESP_LOGI(TAG, "当前系统时间: %lld ms", mqtt_stats.boot_time_ms);
+    
+    // 设置中国时区 (UTC+8)
+    setenv("TZ", "CST-8", 1);
+    tzset();
+    ESP_LOGI(TAG, "时区设置: CST-8 (UTC+8)");
     
     // 配置 SNTP
     esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
-    esp_sntp_setservername(0, NTP_SERVER);
+    esp_sntp_setservername(0, NTP_SERVER_PRIMARY);
+    esp_sntp_setservername(1, NTP_SERVER_BACKUP);
     esp_sntp_set_sync_mode(SNTP_SYNC_MODE_IMMED);
     esp_sntp_set_time_sync_notification_cb(sntp_sync_notification_cb);
     esp_sntp_init();
