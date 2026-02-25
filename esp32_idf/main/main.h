@@ -21,6 +21,7 @@
 #include "driver/gpio.h"
 #include "driver/rmt_tx.h"
 #include "led_strip_encoder.h"
+#include "esp_sntp.h"
 #include "monitor.h"
 
 
@@ -57,6 +58,9 @@ void status_led_task(void *pvParameters);
 
 // WIFI Connection Function 初始化方法
 void wifi_init(void);
+
+// SNTP Time Sync Function 时间同步方法（由WiFi连接成功后调用）
+void monitor_start_time_sync(void);
 
 
 //////////////////////////////////////////////////////////////

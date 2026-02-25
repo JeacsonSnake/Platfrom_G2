@@ -5,6 +5,10 @@ static const char* TAG = "MQTT_MONITOR";
 
 // 全局统计变量定义
 mqtt_connection_stats_t mqtt_stats = {
+    .time_synced = false,
+    .boot_time_ms = 0,
+    .boot_real_time = 0,
+    .time_sync_time_ms = 0,
     .total_connections = 0,
     .total_disconnects = 0,
     .first_connect_time_ms = 0,
@@ -15,6 +19,111 @@ mqtt_connection_stats_t mqtt_stats = {
     .is_connected = false,
     .last_disconnect_time_ms = 0
 };
+
+// 同步信号量
+static SemaphoreHandle_t sntp_sync_sem = NULL;
+
+//////////////////////////////////////////////////////////////
+//////////////////// 时间同步回调 /////////////////////////////
+//////////////////////////////////////////////////////////////
+
+// SNTP 同步完成回调函数
+static void sntp_sync_notification_cb(struct timeval *tv)
+{
+    if (sntp_sync_sem != NULL) {
+        xSemaphoreGive(sntp_sync_sem);
+    }
+    ESP_LOGI(TAG, "NTP时间同步完成");
+}
+
+//////////////////////////////////////////////////////////////
+//////////////////// 时间同步功能 /////////////////////////////
+//////////////////////////////////////////////////////////////
+
+// 启动时间同步
+void monitor_start_time_sync(void)
+{
+    if (sntp_sync_sem == NULL) {
+        sntp_sync_sem = xSemaphoreCreateBinary();
+    }
+    
+    // 记录开机时间（系统启动时间）
+    mqtt_stats.boot_time_ms = esp_timer_get_time() / 1000;
+    
+    ESP_LOGI(TAG, "正在启动 SNTP 时间同步...");
+    ESP_LOGI(TAG, "NTP服务器: %s", NTP_SERVER);
+    
+    // 配置 SNTP
+    esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
+    esp_sntp_setservername(0, NTP_SERVER);
+    esp_sntp_set_sync_mode(SNTP_SYNC_MODE_IMMED);
+    esp_sntp_set_time_sync_notification_cb(sntp_sync_notification_cb);
+    esp_sntp_init();
+}
+
+// 等待时间同步完成
+bool monitor_wait_time_sync(int timeout_ms)
+{
+    if (sntp_sync_sem == NULL) {
+        return false;
+    }
+    
+    // 等待同步完成信号
+    if (xSemaphoreTake(sntp_sync_sem, pdMS_TO_TICKS(timeout_ms)) == pdPASS) {
+        // 记录同步完成时间
+        mqtt_stats.time_sync_time_ms = esp_timer_get_time() / 1000;
+        mqtt_stats.time_synced = true;
+        
+        // 获取当前实际时间作为开机参考时间
+        time_t now = time(NULL);
+        mqtt_stats.boot_real_time = now - (mqtt_stats.time_sync_time_ms / 1000);
+        
+        struct tm* tm_info = localtime(&now);
+        char time_str[32];
+        strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", tm_info);
+        
+        ESP_LOGI(TAG, "==============================================");
+        ESP_LOGI(TAG, "时间同步成功！");
+        ESP_LOGI(TAG, "当前时间: %s", time_str);
+        ESP_LOGI(TAG, "开机时间戳: %lld ms", mqtt_stats.boot_time_ms);
+        ESP_LOGI(TAG, "实际开机时间: %s", ctime(&mqtt_stats.boot_real_time));
+        ESP_LOGI(TAG, "==============================================");
+        
+        return true;
+    }
+    
+    ESP_LOGW(TAG, "时间同步超时（%d ms），将继续使用系统时间", timeout_ms);
+    return false;
+}
+
+// 检查时间是否已同步
+bool monitor_is_time_synced(void)
+{
+    return mqtt_stats.time_synced;
+}
+
+//////////////////////////////////////////////////////////////
+//////////////////// 时间格式化辅助函数 ///////////////////////
+//////////////////////////////////////////////////////////////
+
+// 获取带偏移的当前实际时间字符串（考虑开机时间）
+void monitor_get_current_time_str(char* buffer, size_t buffer_size)
+{
+    if (mqtt_stats.time_synced) {
+        // 使用实际时间
+        time_t now = time(NULL);
+        struct tm* tm_info = localtime(&now);
+        strftime(buffer, buffer_size, "%Y-%m-%d %H:%M:%S", tm_info);
+    } else {
+        // 未同步时使用系统运行时间
+        int64_t uptime_ms = esp_timer_get_time() / 1000;
+        int64_t uptime_sec = uptime_ms / 1000;
+        int hours = uptime_sec / 3600;
+        int minutes = (uptime_sec % 3600) / 60;
+        int seconds = uptime_sec % 60;
+        snprintf(buffer, buffer_size, "未同步 [运行 %02d:%02d:%02d]", hours, minutes, seconds);
+    }
+}
 
 // 辅助函数：格式化毫秒时间为可读字符串
 static void format_duration(int64_t ms, char* buffer, size_t buffer_size) {
@@ -29,11 +138,12 @@ static void format_duration(int64_t ms, char* buffer, size_t buffer_size) {
     }
 }
 
-// 辅助函数：获取当前时间字符串
-static void get_current_time_str(char* buffer, size_t buffer_size) {
-    time_t now = time(NULL);
-    struct tm* tm_info = localtime(&now);
-    strftime(buffer, buffer_size, "%Y-%m-%d %H:%M:%S", tm_info);
+// 获取已运行时间字符串
+void monitor_get_elapsed_time_str(char* buffer, size_t buffer_size)
+{
+    int64_t current_time = esp_timer_get_time() / 1000;
+    int64_t elapsed_ms = current_time - mqtt_stats.boot_time_ms;
+    format_duration(elapsed_ms, buffer, buffer_size);
 }
 
 //////////////////////////////////////////////////////////////
@@ -41,6 +151,9 @@ static void get_current_time_str(char* buffer, size_t buffer_size) {
 //////////////////////////////////////////////////////////////
 
 void monitor_init(void) {
+    // 记录初始开机时间
+    mqtt_stats.boot_time_ms = esp_timer_get_time() / 1000;
+    
     ESP_LOGI(TAG, "MQTT连接监控模块已初始化");
     ESP_LOGI(TAG, "统计报告间隔: %d 小时", MONITOR_REPORT_INTERVAL_MS / (60 * 60 * 1000));
     
@@ -48,6 +161,7 @@ void monitor_init(void) {
     ESP_LOGI(TAG, "=================================================");
     ESP_LOGI(TAG, "      MQTT连接监控统计系统已启动");
     ESP_LOGI(TAG, "=================================================");
+    ESP_LOGI(TAG, "提示: 时间将在WiFi连接后通过NTP同步");
 }
 
 //////////////////////////////////////////////////////////////
@@ -55,7 +169,7 @@ void monitor_init(void) {
 //////////////////////////////////////////////////////////////
 
 void monitor_record_connect(void) {
-    int64_t current_time = esp_timer_get_time() / 1000; // 转换为毫秒
+    int64_t current_time = esp_timer_get_time() / 1000;
     
     // 更新统计
     mqtt_stats.total_connections++;
@@ -78,8 +192,8 @@ void monitor_record_connect(void) {
         mqtt_stats.last_disconnect_time_ms = 0;
     }
     
-    char time_str[32];
-    get_current_time_str(time_str, sizeof(time_str));
+    char time_str[64];
+    monitor_get_current_time_str(time_str, sizeof(time_str));
     
     ESP_LOGI(TAG, "[连接事件] #%d | 时间: %s", mqtt_stats.total_connections, time_str);
 }
@@ -89,7 +203,7 @@ void monitor_record_connect(void) {
 //////////////////////////////////////////////////////////////
 
 void monitor_record_disconnect(const char* reason) {
-    int64_t current_time = esp_timer_get_time() / 1000; // 转换为毫秒
+    int64_t current_time = esp_timer_get_time() / 1000;
     
     // 更新统计
     mqtt_stats.total_disconnects++;
@@ -114,8 +228,8 @@ void monitor_record_disconnect(const char* reason) {
         mqtt_stats.log_count++;
     }
     
-    char time_str[32];
-    get_current_time_str(time_str, sizeof(time_str));
+    char time_str[64];
+    monitor_get_current_time_str(time_str, sizeof(time_str));
     
     ESP_LOGW(TAG, "[断开事件] #%d | 时间: %s | 原因: %s", 
              mqtt_stats.total_disconnects, time_str, reason ? reason : "Unknown");
@@ -129,7 +243,7 @@ void monitor_report_statistics(void) {
     int64_t current_time = esp_timer_get_time() / 1000;
     
     // 计算总运行时间
-    int64_t total_runtime = current_time - mqtt_stats.first_connect_time_ms;
+    int64_t total_runtime = current_time - mqtt_stats.boot_time_ms;
     
     // 计算当前连接时长（如果已连接）
     int64_t current_session_duration = 0;
@@ -154,20 +268,33 @@ void monitor_report_statistics(void) {
     format_duration(total_connected, connected_str, sizeof(connected_str));
     format_duration((int64_t)(avg_session_duration * 1000), avg_session_str, sizeof(avg_session_str));
     
-    char time_str[32];
-    get_current_time_str(time_str, sizeof(time_str));
+    char time_str[64];
+    monitor_get_current_time_str(time_str, sizeof(time_str));
+    
+    char elapsed_str[32];
+    monitor_get_elapsed_time_str(elapsed_str, sizeof(elapsed_str));
     
     // 打印统计报告
     ESP_LOGI(TAG, "=================================================");
     ESP_LOGI(TAG, "           MQTT连接统计报告 [%s]", time_str);
     ESP_LOGI(TAG, "=================================================");
-    ESP_LOGI(TAG, "总运行时间:     %s", runtime_str);
+    
+    // 显示开机时间信息
+    if (mqtt_stats.time_synced) {
+        char boot_time_str[32];
+        struct tm* tm_info = localtime(&mqtt_stats.boot_real_time);
+        strftime(boot_time_str, sizeof(boot_time_str), "%Y-%m-%d %H:%M:%S", tm_info);
+        ESP_LOGI(TAG, "实际开机时间:   %s", boot_time_str);
+    }
+    ESP_LOGI(TAG, "系统运行时长:   %s", elapsed_str);
+    ESP_LOGI(TAG, "-------------------------------------------------");
     ESP_LOGI(TAG, "总连接次数:     %d", mqtt_stats.total_connections);
     ESP_LOGI(TAG, "总断开次数:     %d", mqtt_stats.total_disconnects);
     ESP_LOGI(TAG, "累计连接时长:   %s", connected_str);
     ESP_LOGI(TAG, "平均连接时长:   %s/次", avg_session_str);
     ESP_LOGI(TAG, "连接保持率:     %.2f%%", connection_rate);
     ESP_LOGI(TAG, "当前连接状态:   %s", mqtt_stats.is_connected ? "已连接" : "未连接");
+    ESP_LOGI(TAG, "时间同步状态:   %s", mqtt_stats.time_synced ? "已同步" : "未同步");
     
     // 打印最近断开事件
     if (mqtt_stats.log_count > 0) {
@@ -188,10 +315,22 @@ void monitor_report_statistics(void) {
                 snprintf(duration_str, sizeof(duration_str), "未恢复");
             }
             
-            char disconnect_time_str[20];
-            time_t t = event->disconnect_time_ms / 1000;
-            struct tm* tm_info = localtime(&t);
-            strftime(disconnect_time_str, sizeof(disconnect_time_str), "%H:%M:%S", tm_info);
+            // 显示断开时间
+            char disconnect_time_str[32];
+            if (mqtt_stats.time_synced) {
+                // 计算实际断开时间
+                time_t disconnect_real_time = mqtt_stats.boot_real_time + 
+                    (event->disconnect_time_ms / 1000);
+                struct tm* tm_info = localtime(&disconnect_real_time);
+                strftime(disconnect_time_str, sizeof(disconnect_time_str), "%H:%M:%S", tm_info);
+            } else {
+                int64_t uptime_sec = event->disconnect_time_ms / 1000;
+                int hours = uptime_sec / 3600;
+                int minutes = (uptime_sec % 3600) / 60;
+                int seconds = uptime_sec % 60;
+                snprintf(disconnect_time_str, sizeof(disconnect_time_str), "%02d:%02d:%02d", 
+                         hours, minutes, seconds);
+            }
             
             ESP_LOGI(TAG, "#%-4d %-20s %-15s %s", 
                      i + 1, disconnect_time_str, duration_str, event->disconnect_reason);
@@ -207,6 +346,7 @@ void monitor_report_statistics(void) {
 
 void monitor_reset_statistics(void) {
     memset(&mqtt_stats, 0, sizeof(mqtt_stats));
+    mqtt_stats.boot_time_ms = esp_timer_get_time() / 1000;
     ESP_LOGI(TAG, "统计数据已重置");
 }
 
@@ -218,7 +358,8 @@ void monitor_task(void *pvParameters) {
     // 初始化监控模块
     monitor_init();
     
-    // 等待首次连接
+    // 注意：时间同步在WiFi连接成功后由wifi.c触发
+    // 这里等待一段时间确保同步完成
     vTaskDelay(pdMS_TO_TICKS(5000));
     
     while (1) {

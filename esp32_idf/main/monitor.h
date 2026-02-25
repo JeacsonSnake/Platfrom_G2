@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <time.h>
+#include "esp_sntp.h"
 
 //////////////////////////////////////////////////////////////
 //////////////////// MQTT Connection Monitor /////////////////
@@ -13,6 +14,8 @@
 // 监控配置参数
 #define MONITOR_REPORT_INTERVAL_MS  (4 * 60 * 60 * 1000)  // 4小时报告间隔
 #define MONITOR_MAX_DISCONNECT_LOG  100                   // 最大记录断开事件数
+#define NTP_SERVER "pool.ntp.org"                          // NTP服务器地址
+#define TIME_SYNC_TIMEOUT_MS        30000                  // 时间同步超时时间（30秒）
 
 // 单次断开事件记录结构体
 typedef struct {
@@ -24,6 +27,12 @@ typedef struct {
 
 // MQTT连接统计数据结构体
 typedef struct {
+    // 时间同步相关
+    bool time_synced;               // 时间是否已同步
+    int64_t boot_time_ms;           // 开机时的系统时间（毫秒）
+    time_t boot_real_time;          // 开机时的实际时间（UTC时间戳）
+    int64_t time_sync_time_ms;      // 时间同步完成时的系统时间
+    
     // 连接统计
     int total_connections;          // 总连接次数
     int total_disconnects;          // 总断开次数
@@ -51,5 +60,12 @@ void monitor_record_connect(void);
 void monitor_record_disconnect(const char* reason);
 void monitor_report_statistics(void);
 void monitor_reset_statistics(void);
+
+// 时间同步相关函数
+void monitor_start_time_sync(void);
+bool monitor_wait_time_sync(int timeout_ms);
+bool monitor_is_time_synced(void);
+void monitor_get_current_time_str(char* buffer, size_t buffer_size);
+void monitor_get_elapsed_time_str(char* buffer, size_t buffer_size);
 
 #endif // MONITOR_H

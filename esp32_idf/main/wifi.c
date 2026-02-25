@@ -19,6 +19,10 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
         ESP_LOGI(TAG, "Got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         status_led_set_mode(LED_BLINK_SLOW);  // WiFi 已连接，等待 MQTT - 慢速闪烁
+        
+        // 启动NTP时间同步
+        monitor_start_time_sync();
+        
         xSemaphoreGive(sem);
     }
 }
