@@ -42,6 +42,8 @@ void app_main(void){
     xTaskCreate(mqtt_heartbeat_task, "MQTT_HB", 4096, NULL, 1, NULL);
     // 创建MQTT连接健康检查任务
     xTaskCreate(mqtt_health_check_task, "MQTT_CHK", 4096, NULL, 1, NULL);
+    // 创建MQTT错误统计报告任务
+    xTaskCreate(mqtt_error_report_task, "MQTT_ERR", 2048, NULL, 1, NULL);
     // 初始化PWM
     pwm_init();
     // 初始化PCNT

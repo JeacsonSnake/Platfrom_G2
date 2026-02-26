@@ -137,6 +137,8 @@ void mqtt_init();
 void mqtt_heartbeat_task(void *pvParameters);
 // MQTT Health Check Task 连接健康检查任务
 void mqtt_health_check_task(void *pvParameters);
+// MQTT Error Report Task 错误统计报告任务
+void mqtt_error_report_task(void *pvParameters);
 
 
 

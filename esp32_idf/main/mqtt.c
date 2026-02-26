@@ -1,5 +1,7 @@
 #include "main.h"
 #include "monitor.h"
+#include "errno.h"
+#include "lwip/sockets.h"
 
 static char* TAG = "ESP32S3_MQTT_EVENT";
 static bool connect_flag = false; // 定义一个连接上mqtt服务器的flag
@@ -8,6 +10,13 @@ static SemaphoreHandle_t connect_flag_mutex = NULL; // 互斥锁保护connect_fl
 static SemaphoreHandle_t subscribe_flag_mutex = NULL; // 互斥锁保护subscribe_flag
 static int reconnect_attempts = 0; // 当前会话重连尝试计数
 static int total_disconnect_count = 0; // 总断开次数计数器（累计所有会话）
+
+// 错误类型统计
+static int error_count_transport_timeout = 0;      // 传输层超时
+static int error_count_ping_timeout = 0;           // PING超时
+static int error_count_connection_reset = 0;       // 连接被重置
+static int error_count_write_timeout = 0;          // 写入超时
+static int error_count_connect_failed = 0;         // 连接失败
 
 // 安全地获取连接状态
 static bool get_connect_flag(void) {
@@ -54,6 +63,57 @@ static void set_subscribe_flag(bool flag) {
     subscribe_flag = flag;
     if (subscribe_flag_mutex != NULL) {
         xSemaphoreGive(subscribe_flag_mutex);
+    }
+}
+
+// 获取错误类型字符串并更新统计
+static const char* get_error_type_string(esp_mqtt_error_type_t error_type, int esp_tls_last_esp_err, 
+                                         int esp_tls_stack_err, int esp_tls_cert_verify_flags, 
+                                         int connect_return_code)
+{
+    switch (error_type) {
+        case MQTT_ERROR_TYPE_TCP_TRANSPORT:
+            error_count_transport_timeout++;
+            if (esp_tls_last_esp_err == ESP_ERR_MBEDTLS_SSL_SETUP_FAILED) {
+                return "TLS_SSL_SETUP_FAILED";
+            } else if (esp_tls_last_esp_err == ESP_ERR_MBEDTLS_SSL_HANDSHAKE_FAILED) {
+                return "TLS_HANDSHAKE_FAILED";
+            } else if (esp_tls_stack_err == MBEDTLS_ERR_SSL_TIMEOUT) {
+                return "TLS_TIMEOUT";
+            } else if (connect_return_code == ECONNREFUSED) {
+                return "TCP_CONNECTION_REFUSED";
+            } else if (connect_return_code == ETIMEDOUT || connect_return_code == EINPROGRESS) {
+                return "TCP_CONNECT_TIMEOUT";
+            } else if (connect_return_code == ECONNRESET) {
+                error_count_connection_reset++;
+                return "TCP_CONNECTION_RESET";
+            } else if (connect_return_code == ENETUNREACH) {
+                return "NETWORK_UNREACHABLE";
+            }
+            return "TCP_TRANSPORT_ERROR";
+            
+        case MQTT_ERROR_TYPE_CONNECTION_REFUSED:
+            switch (connect_return_code) {
+                case 0x01: return "CONN_REFUSE_PROTOCOL";
+                case 0x02: return "CONN_REFUSE_ID_REJECTED";
+                case 0x03: return "CONN_REFUSE_SERVER_UNAVAILABLE";
+                case 0x04: return "CONN_REFUSE_BAD_CREDENTIALS";
+                case 0x05: return "CONN_REFUSE_NOT_AUTHORIZED";
+                default: return "CONN_REFUSE_UNKNOWN";
+            }
+            
+        case MQTT_ERROR_TYPE_SUBSCRIBE_FAILED:
+            return "SUBSCRIBE_FAILED";
+            
+        case MQTT_ERROR_TYPE_PUBLISH_FAILED:
+            return "PUBLISH_FAILED";
+            
+        case MQTT_ERROR_TYPE_PING_TIMEOUT:
+            error_count_ping_timeout++;
+            return "PING_RESPONSE_TIMEOUT";
+            
+        default:
+            return "UNKNOWN_ERROR";
     }
 }
 
@@ -107,7 +167,7 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
             }
             break;
 
-        case MQTT_EVENT_DISCONNECTED:
+        case MQTT_EVENT_DISCONNECTED: {
             ESP_LOGI(TAG, "Disconnected from MQTT server.");
             set_connect_flag(false);
             set_subscribe_flag(false); // 重置订阅状态
@@ -115,9 +175,26 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
             total_disconnect_count++;
             ESP_LOGW(TAG, "MQTT断开次数: 当前会话=%d, 总计=%d", reconnect_attempts, total_disconnect_count);
             status_led_set_mode(LED_BLINK_SLOW);  // MQTT 断开，回到慢速闪烁
+            
+            // 获取详细错误信息
+            const char* error_reason = "No PING_RESP / Connection reset";
+            if (client_event->error_handle) {
+                esp_mqtt_error_type_t error_type = client_event->error_handle->error_type;
+                int esp_tls_last_esp_err = client_event->error_handle->esp_tls_last_esp_err;
+                int esp_tls_stack_err = client_event->error_handle->esp_tls_stack_err;
+                int connect_return_code = client_event->error_handle->connect_return_code;
+                
+                error_reason = get_error_type_string(error_type, esp_tls_last_esp_err, 
+                                                      esp_tls_stack_err, 0, connect_return_code);
+                ESP_LOGW(TAG, "断开原因: %s (type=%d, tls_err=%d, stack_err=%d, ret_code=%d)",
+                         error_reason, error_type, esp_tls_last_esp_err, 
+                         esp_tls_stack_err, connect_return_code);
+            }
+            
             // 记录断开事件
-            monitor_record_disconnect("No PING_RESP / Connection reset");
+            monitor_record_disconnect(error_reason);
             break;
+        }
 
         case MQTT_EVENT_DATA:
             {
@@ -130,7 +207,8 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
                 message_compare(data);
             }
             break;
-        case MQTT_EVENT_ERROR:
+            
+        case MQTT_EVENT_ERROR: {
             ESP_LOGE(TAG, "MQTT connection error");
             set_connect_flag(false);
             set_subscribe_flag(false); // 重置订阅状态
@@ -138,9 +216,26 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
             total_disconnect_count++;
             ESP_LOGW(TAG, "MQTT错误次数: 当前会话=%d, 总计=%d", reconnect_attempts, total_disconnect_count);
             status_led_set_mode(LED_BLINK_SLOW);  // MQTT 错误，回到慢速闪烁
+            
+            // 获取详细错误信息
+            const char* error_reason = "MQTT_EVENT_ERROR";
+            if (client_event->error_handle) {
+                esp_mqtt_error_type_t error_type = client_event->error_handle->error_type;
+                int esp_tls_last_esp_err = client_event->error_handle->esp_tls_last_esp_err;
+                int esp_tls_stack_err = client_event->error_handle->esp_tls_stack_err;
+                int connect_return_code = client_event->error_handle->connect_return_code;
+                
+                error_reason = get_error_type_string(error_type, esp_tls_last_esp_err, 
+                                                      esp_tls_stack_err, 0, connect_return_code);
+                ESP_LOGE(TAG, "错误详情: %s (type=%d, tls_err=%d, stack_err=%d, ret_code=%d)",
+                         error_reason, error_type, esp_tls_last_esp_err, 
+                         esp_tls_stack_err, connect_return_code);
+            }
+            
             // 记录断开事件
-            monitor_record_disconnect("MQTT_EVENT_ERROR");
+            monitor_record_disconnect(error_reason);
             break;
+        }
 
         default:
             break;
@@ -234,6 +329,27 @@ void mqtt_health_check_task(void *pvParameters)
     }
 }
 
+// 错误统计报告任务 - 定期输出错误统计
+void mqtt_error_report_task(void *pvParameters)
+{
+    vTaskDelay(pdMS_TO_TICKS(60000)); // 等待1分钟后开始报告
+    
+    while (1)
+    {
+        ESP_LOGI(TAG, "=================================================");
+        ESP_LOGI(TAG, "           MQTT错误类型统计报告");
+        ESP_LOGI(TAG, "=================================================");
+        ESP_LOGI(TAG, "传输层超时:        %d", error_count_transport_timeout);
+        ESP_LOGI(TAG, "PING响应超时:      %d", error_count_ping_timeout);
+        ESP_LOGI(TAG, "连接被重置:        %d", error_count_connection_reset);
+        ESP_LOGI(TAG, "写入超时:          %d", error_count_write_timeout);
+        ESP_LOGI(TAG, "连接失败:          %d", error_count_connect_failed);
+        ESP_LOGI(TAG, "=================================================");
+        
+        vTaskDelay(pdMS_TO_TICKS(300000)); // 每5分钟报告一次
+    }
+}
+
 // 初始化MQTT线程
 void mqtt_init()
 {
@@ -276,12 +392,12 @@ void mqtt_init()
             .disable_clean_session = true, // 启用清理会话，避免服务器残留状态导致问题
         },
         .network = {
-            .reconnect_timeout_ms = 3000,  // 重连间隔缩短为 3秒，更快恢复连接
-            .timeout_ms = 15000,           // 网络操作超时增加到 15秒，适应不稳定网络
+            .reconnect_timeout_ms = 5000,  // 恢复为 5秒重连间隔
+            .timeout_ms = 20000,           // 网络操作超时增加到 20秒，适应不稳定网络
         },
         .buffer = {
-            .size = 2048,                  // 增加发送缓冲区到2KB
-            .out_size = 2048,              // 增加接收缓冲区到2KB
+            .size = 4096,                  // 增加发送缓冲区到4KB
+            .out_size = 4096,              // 增加接收缓冲区到4KB
         },
         .task = {
             .priority = 5,                 // 提高MQTT内部任务优先级
