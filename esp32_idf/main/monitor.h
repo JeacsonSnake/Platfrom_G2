@@ -12,10 +12,12 @@
 //////////////////////////////////////////////////////////////
 
 // 监控配置参数
-#define MONITOR_REPORT_INTERVAL_MS  (4 * 60 * 60 * 1000)  // 4小时报告间隔
+#define MONITOR_REPORT_INTERVAL_MS  (0.25 * 60 * 60 * 1000)  // 15分钟报告间隔
 #define MONITOR_MAX_DISCONNECT_LOG  100                   // 最大记录断开事件数
-#define NTP_SERVER_PRIMARY   "cn.pool.ntp.org"             // 国内NTP服务器
-#define NTP_SERVER_BACKUP    "ntp.aliyun.com"              // 阿里云NTP服务器
+// 香港地区优化NTP服务器配置
+#define NTP_SERVER_PRIMARY   "hk.pool.ntp.org"             // 香港NTP服务器池（地理位置最近）
+#define NTP_SERVER_BACKUP    "asia.pool.ntp.org"           // 亚洲NTP服务器池
+#define NTP_SERVER_FALLBACK  "time.hko.hk"                 // 香港天文台时间服务器（备用）
 #define TIME_SYNC_TIMEOUT_MS        30000                  // 时间同步超时时间（30秒）
 #define TIME_SYNC_RETRY_MAX         3                      // 最大重试次数
 

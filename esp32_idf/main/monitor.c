@@ -87,14 +87,24 @@ static void sntp_sync_notification_cb(struct timeval *tv)
     // 使用互斥锁安全设置同步标志
     set_time_synced(true);
     
+    // 同步完成后，恢复正常的NTP轮询间隔（1小时）
+    esp_sntp_set_sync_interval(3600 * 1000);  // 正常轮询间隔：1小时
+    
     struct tm* tm_info = localtime(&now);
     char time_str[32];
     strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", tm_info);
     
+    // 计算运行时长
+    int64_t uptime_sec = current_time / 1000;
+    int run_hours = uptime_sec / 3600;
+    int run_minutes = (uptime_sec % 3600) / 60;
+    int run_seconds = uptime_sec % 60;
+    
     ESP_LOGI(TAG, "时间同步完成！");
-    ESP_LOGI(TAG, "当前实际时间: %s", time_str);
+    ESP_LOGI(TAG, "当前实际时间: %s [运行 %02d:%02d:%02d]", time_str, run_hours, run_minutes, run_seconds);
     ESP_LOGI(TAG, "开机时间戳: %lld ms", mqtt_stats.boot_time_ms);
     ESP_LOGI(TAG, "实际开机时间: %s", ctime(&mqtt_stats.boot_real_time));
+    ESP_LOGI(TAG, "NTP轮询间隔已恢复为1小时");
     ESP_LOGI(TAG, "==============================================");
 }
 
@@ -125,19 +135,23 @@ void monitor_start_time_sync(void)
     
     ESP_LOGI(TAG, "==============================================");
     ESP_LOGI(TAG, "正在启动 SNTP 时间同步...");
-    ESP_LOGI(TAG, "NTP服务器1: %s", NTP_SERVER_PRIMARY);
-    ESP_LOGI(TAG, "NTP服务器2: %s", NTP_SERVER_BACKUP);
+    ESP_LOGI(TAG, "NTP服务器1: %s (香港本地)", NTP_SERVER_PRIMARY);
+    ESP_LOGI(TAG, "NTP服务器2: %s (亚洲区域)", NTP_SERVER_BACKUP);
+    ESP_LOGI(TAG, "NTP服务器3: %s (香港天文台)", NTP_SERVER_FALLBACK);
     ESP_LOGI(TAG, "当前系统时间: %lld ms", mqtt_stats.boot_time_ms);
     
-    // 设置中国时区 (UTC+8)
-    setenv("TZ", "CST-8", 1);
+    // 设置香港时区 (UTC+8)
+    setenv("TZ", "HKT-8", 1);
     tzset();
-    ESP_LOGI(TAG, "时区设置: CST-8 (UTC+8)");
+    ESP_LOGI(TAG, "时区设置: HKT-8 (UTC+8, 香港标准时间)");
     
-    // 配置 SNTP
+    // 配置 SNTP - 优化参数以加快同步速度
     esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
     esp_sntp_setservername(0, NTP_SERVER_PRIMARY);
     esp_sntp_setservername(1, NTP_SERVER_BACKUP);
+    esp_sntp_setservername(2, NTP_SERVER_FALLBACK);
+    // 缩短轮询间隔，加快首次同步速度
+    esp_sntp_set_sync_interval(1000);  // 首次同步间隔1秒，快速获取时间
     esp_sntp_set_sync_mode(SNTP_SYNC_MODE_IMMED);
     esp_sntp_set_time_sync_notification_cb(sntp_sync_notification_cb);
     esp_sntp_init();
@@ -193,22 +207,35 @@ bool monitor_is_time_synced(void)
 //////////////////////////////////////////////////////////////
 
 // 获取带偏移的当前实际时间字符串（考虑开机时间）
+// 格式: 同步后 "2026-02-26 15:16:04 [运行 00:01:45]"
+//       未同步 "1970-01-01 00:00:45 [运行 00:01:45]"
 void monitor_get_current_time_str(char* buffer, size_t buffer_size)
 {
+    // 计算系统运行时间
+    int64_t uptime_ms = esp_timer_get_time() / 1000;
+    int64_t uptime_sec = uptime_ms / 1000;
+    int run_hours = uptime_sec / 3600;
+    int run_minutes = (uptime_sec % 3600) / 60;
+    int run_seconds = uptime_sec % 60;
+    
     // 使用 getter 函数安全获取同步状态
     if (get_time_synced()) {
-        // 使用实际时间
+        // 已同步：显示实际时间 + 运行时长
         time_t now = time(NULL);
         struct tm* tm_info = localtime(&now);
-        strftime(buffer, buffer_size, "%Y-%m-%d %H:%M:%S", tm_info);
+        char time_str[32];
+        strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", tm_info);
+        snprintf(buffer, buffer_size, "%s [运行 %02d:%02d:%02d]", 
+                 time_str, run_hours, run_minutes, run_seconds);
     } else {
-        // 未同步时使用系统运行时间
-        int64_t uptime_ms = esp_timer_get_time() / 1000;
-        int64_t uptime_sec = uptime_ms / 1000;
-        int hours = uptime_sec / 3600;
-        int minutes = (uptime_sec % 3600) / 60;
-        int seconds = uptime_sec % 60;
-        snprintf(buffer, buffer_size, "未同步 [运行 %02d:%02d:%02d]", hours, minutes, seconds);
+        // 未同步：显示1970年基准时间 + 运行时长
+        // 从开机时间戳计算系统时间（从1970-01-01开始）
+        time_t sys_time = uptime_sec;  // 系统从Unix纪元开始计数
+        struct tm* tm_info = localtime(&sys_time);
+        char time_str[32];
+        strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", tm_info);
+        snprintf(buffer, buffer_size, "%s [运行 %02d:%02d:%02d]", 
+                 time_str, run_hours, run_minutes, run_seconds);
     }
 }
 
@@ -405,21 +432,30 @@ void monitor_report_statistics(void) {
                 snprintf(duration_str, sizeof(duration_str), "未恢复");
             }
             
-            // 显示断开时间
-            char disconnect_time_str[32];
+            // 显示断开时间 - 使用统一格式
+            char disconnect_time_str[64];
+            // 计算运行时长（用于显示[运行 xx:xx:xx]）
+            int64_t event_uptime_sec = event->disconnect_time_ms / 1000;
+            int run_h = event_uptime_sec / 3600;
+            int run_m = (event_uptime_sec % 3600) / 60;
+            int run_s = event_uptime_sec % 60;
+            
             if (get_time_synced()) {
-                // 计算实际断开时间
-                time_t disconnect_real_time = mqtt_stats.boot_real_time + 
-                    (event->disconnect_time_ms / 1000);
+                // 已同步：显示实际时间 + 运行时长
+                time_t disconnect_real_time = mqtt_stats.boot_real_time + event_uptime_sec;
                 struct tm* tm_info = localtime(&disconnect_real_time);
-                strftime(disconnect_time_str, sizeof(disconnect_time_str), "%H:%M:%S", tm_info);
+                char time_str[32];
+                strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", tm_info);
+                snprintf(disconnect_time_str, sizeof(disconnect_time_str), "%s [运行 %02d:%02d:%02d]", 
+                         time_str, run_h, run_m, run_s);
             } else {
-                int64_t uptime_sec = event->disconnect_time_ms / 1000;
-                int hours = uptime_sec / 3600;
-                int minutes = (uptime_sec % 3600) / 60;
-                int seconds = uptime_sec % 60;
-                snprintf(disconnect_time_str, sizeof(disconnect_time_str), "%02d:%02d:%02d", 
-                         hours, minutes, seconds);
+                // 未同步：显示1970年基准时间 + 运行时长
+                time_t sys_time = event_uptime_sec;
+                struct tm* tm_info = localtime(&sys_time);
+                char time_str[32];
+                strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", tm_info);
+                snprintf(disconnect_time_str, sizeof(disconnect_time_str), "%s [运行 %02d:%02d:%02d]", 
+                         time_str, run_h, run_m, run_s);
             }
             
             ESP_LOGI(TAG, "#%-4d %-20s %-15s %s", 
