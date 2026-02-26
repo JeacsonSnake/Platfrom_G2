@@ -36,8 +36,12 @@ void app_main(void){
     vTaskDelay(5000 / portTICK_PERIOD_MS);
     // 创建MQTT连接监控任务（在WiFi连接后创建，确保NTP同步能正常进行）
     xTaskCreate(monitor_task, "MONITOR_TASK", 4096, NULL, 2, NULL);
-    // 创建mqtt线程
-    xTaskCreate(mqtt_init, "MQTT_TASK", 4096, NULL, 1, NULL);
+    // 创建MQTT初始化任务（初始化完成后会自删除）
+    xTaskCreate(mqtt_init, "MQTT_INIT", 8192, NULL, 2, NULL);
+    // 创建MQTT心跳发送任务
+    xTaskCreate(mqtt_heartbeat_task, "MQTT_HB", 4096, NULL, 1, NULL);
+    // 创建MQTT连接健康检查任务
+    xTaskCreate(mqtt_health_check_task, "MQTT_CHK", 4096, NULL, 1, NULL);
     // 初始化PWM
     pwm_init();
     // 初始化PCNT

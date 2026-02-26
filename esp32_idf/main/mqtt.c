@@ -3,6 +3,31 @@
 
 static char* TAG = "ESP32S3_MQTT_EVENT";
 static bool connect_flag = false; // 定义一个连接上mqtt服务器的flag
+static SemaphoreHandle_t connect_flag_mutex = NULL; // 互斥锁保护connect_flag
+
+// 安全地获取连接状态
+static bool get_connect_flag(void) {
+    bool flag = false;
+    if (connect_flag_mutex != NULL) {
+        xSemaphoreTake(connect_flag_mutex, portMAX_DELAY);
+    }
+    flag = connect_flag;
+    if (connect_flag_mutex != NULL) {
+        xSemaphoreGive(connect_flag_mutex);
+    }
+    return flag;
+}
+
+// 安全地设置连接状态
+static void set_connect_flag(bool flag) {
+    if (connect_flag_mutex != NULL) {
+        xSemaphoreTake(connect_flag_mutex, portMAX_DELAY);
+    }
+    connect_flag = flag;
+    if (connect_flag_mutex != NULL) {
+        xSemaphoreGive(connect_flag_mutex);
+    }
+}
 
 // MQTT信息处理
 void message_compare(char *msg)
@@ -35,7 +60,7 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
     {
         case MQTT_EVENT_CONNECTED:
             ESP_LOGI(TAG, "Connected to MQTT server.");
-            connect_flag = true;
+            set_connect_flag(true);
             status_led_set_mode(LED_ON);  // MQTT 连接成功 - LED 常亮
             // 记录连接事件
             monitor_record_connect();
@@ -45,7 +70,7 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
 
         case MQTT_EVENT_DISCONNECTED:
             ESP_LOGI(TAG, "Disconnected from MQTT server.");
-            connect_flag = false;
+            set_connect_flag(false);
             status_led_set_mode(LED_BLINK_SLOW);  // MQTT 断开，回到慢速闪烁
             // 记录断开事件
             monitor_record_disconnect("No PING_RESP / Connection reset");
@@ -64,7 +89,7 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
             break;
         case MQTT_EVENT_ERROR:
             ESP_LOGE(TAG, "MQTT connection error");
-            connect_flag = false;
+            set_connect_flag(false);
             status_led_set_mode(LED_BLINK_SLOW);  // MQTT 错误，回到慢速闪烁
             // 记录断开事件
             monitor_record_disconnect("MQTT_EVENT_ERROR");
@@ -75,10 +100,92 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
     }
 }
 
+// 心跳发送任务 - 独立于MQTT事件处理
+void mqtt_heartbeat_task(void *pvParameters)
+{
+    ESP_LOGI(TAG, "MQTT心跳任务已启动");
+    
+    // 等待初始连接建立
+    vTaskDelay(pdMS_TO_TICKS(5000));
+    
+    while (1)
+    {
+        // 使用安全的方式获取连接状态
+        if (get_connect_flag() == true)
+        {
+            char buff[64] = "ESP32_1 is online";
+            // 向mqtt服务器发布主题为heartbeat，payload为buff的数据
+            int msg_id = esp_mqtt_client_publish(mqtt_client, MQTT_HEARTBEAT_CHANNEL, buff, strlen(buff), 1, 0);
+            if (msg_id < 0) {
+                ESP_LOGW(TAG, "心跳发送失败，可能连接已断开");
+            } else {
+                ESP_LOGD(TAG, "心跳已发送 (msg_id=%d)", msg_id);
+            }
+        }
+        else
+        {
+            ESP_LOGD(TAG, "MQTT未连接，跳过本次心跳发送");
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(30000));  // 应用层心跳改为30秒，减轻网络负担
+    }
+}
+
+// 连接健康检查任务 - 监控连接状态并主动触发重连
+void mqtt_health_check_task(void *pvParameters)
+{
+    ESP_LOGI(TAG, "MQTT连接健康检查任务已启动");
+    
+    int disconnect_count = 0;
+    const int MAX_DISCONNECT_BEFORE_RECONNECT = 3; // 连续3次检查未连接则强制重连
+    
+    // 初始延迟，等待MQTT连接建立
+    vTaskDelay(pdMS_TO_TICKS(10000));
+    
+    while (1)
+    {
+        // 每10秒检查一次连接状态
+        vTaskDelay(pdMS_TO_TICKS(10000));
+        
+        if (!get_connect_flag()) {
+            disconnect_count++;
+            ESP_LOGW(TAG, "MQTT连接检查: 未连接 (计数=%d/%d)", disconnect_count, MAX_DISCONNECT_BEFORE_RECONNECT);
+            
+            if (disconnect_count >= MAX_DISCONNECT_BEFORE_RECONNECT) {
+                ESP_LOGW(TAG, "MQTT连接检查: 连续%d次未连接，尝试强制重连...", MAX_DISCONNECT_BEFORE_RECONNECT);
+                
+                // 尝试停止并重新启动MQTT客户端
+                esp_mqtt_client_stop(mqtt_client);
+                vTaskDelay(pdMS_TO_TICKS(1000));
+                esp_err_t err = esp_mqtt_client_start(mqtt_client);
+                
+                if (err == ESP_OK) {
+                    ESP_LOGI(TAG, "MQTT客户端已重新启动，等待连接...");
+                } else {
+                    ESP_LOGE(TAG, "MQTT客户端重启失败: %s", esp_err_to_name(err));
+                }
+                
+                disconnect_count = 0; // 重置计数器
+            }
+        } else {
+            if (disconnect_count > 0) {
+                ESP_LOGI(TAG, "MQTT连接检查: 连接已恢复");
+            }
+            disconnect_count = 0; // 连接正常，重置计数器
+        }
+    }
+}
 
 // 初始化MQTT线程
 void mqtt_init()
 {
+    // 初始化互斥锁
+    connect_flag_mutex = xSemaphoreCreateMutex();
+    if (connect_flag_mutex == NULL) {
+        ESP_LOGE(TAG, "创建connect_flag互斥锁失败");
+        return;
+    }
+    
     // mqtt服务器的配置信息
     esp_mqtt_client_config_t cfg = {
         .broker.address = {
@@ -106,30 +213,35 @@ void mqtt_init()
             .timeout_ms = 10000,           // 网络操作超时 10秒
         },
         .buffer = {
-            .size = 1024,                  // 增加发送缓冲区
-            .out_size = 1024,              // 增加接收缓冲区
+            .size = 2048,                  // 增加发送缓冲区到2KB
+            .out_size = 2048,              // 增加接收缓冲区到2KB
+        },
+        .task = {
+            .priority = 5,                 // 提高MQTT内部任务优先级
+            .stack_size = 8192,            // 增加MQTT内部任务栈大小到8KB
         }
     };
 
     // 定义MQTT客户端
     mqtt_client = esp_mqtt_client_init(&cfg);
+    if (mqtt_client == NULL) {
+        ESP_LOGE(TAG, "MQTT客户端初始化失败");
+        return;
+    }
 
     //注册MQTT状态机事件处理回调函数
     esp_mqtt_client_register_event(mqtt_client, MQTT_EVENT_ANY, mqtt_event_handler, NULL);
 
     // 开始MQTT客户端
-    esp_mqtt_client_start(mqtt_client);
-
-    // 客户端心跳
-    while (1)
-    {
-        if (connect_flag == true)
-        {
-            char buff[64] = "ESP32_1 is online";
-            // 向mqtt服务器发布主题为heartbeat，payload为buff的数据
-            esp_mqtt_client_publish(mqtt_client, MQTT_HEARTBEAT_CHANNEL, buff, strlen(buff), 2, 0); 
-        }
-
-        vTaskDelay(pdMS_TO_TICKS(30000));  // 应用层心跳改为30秒，减轻网络负担
+    esp_err_t err = esp_mqtt_client_start(mqtt_client);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "MQTT客户端启动失败: %s", esp_err_to_name(err));
+        return;
     }
+    
+    ESP_LOGI(TAG, "MQTT客户端已启动");
+    
+    // 此任务完成使命，删除自身
+    // 心跳和健康检查由单独的任务处理
+    vTaskDelete(NULL);
 }

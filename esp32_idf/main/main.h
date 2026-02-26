@@ -133,6 +133,10 @@ typedef struct
 
 // MQTT Connection Function 初始化方法
 void mqtt_init();
+// MQTT Heartbeat Task 心跳发送任务
+void mqtt_heartbeat_task(void *pvParameters);
+// MQTT Health Check Task 连接健康检查任务
+void mqtt_health_check_task(void *pvParameters);
 
 
 
