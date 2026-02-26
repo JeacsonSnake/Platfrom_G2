@@ -135,15 +135,15 @@ void monitor_start_time_sync(void)
     
     ESP_LOGI(TAG, "==============================================");
     ESP_LOGI(TAG, "正在启动 SNTP 时间同步...");
-    ESP_LOGI(TAG, "NTP服务器1: %s (香港本地)", NTP_SERVER_PRIMARY);
-    ESP_LOGI(TAG, "NTP服务器2: %s (亚洲区域)", NTP_SERVER_BACKUP);
-    ESP_LOGI(TAG, "NTP服务器3: %s (香港天文台)", NTP_SERVER_FALLBACK);
+    ESP_LOGI(TAG, "NTP服务器1: %s (国内)", NTP_SERVER_PRIMARY);
+    ESP_LOGI(TAG, "NTP服务器2: %s (阿里云)", NTP_SERVER_BACKUP);
+    ESP_LOGI(TAG, "NTP服务器3: %s (腾讯云)", NTP_SERVER_FALLBACK);
     ESP_LOGI(TAG, "当前系统时间: %lld ms", mqtt_stats.boot_time_ms);
     
-    // 设置香港时区 (UTC+8)
-    setenv("TZ", "HKT-8", 1);
+    // 设置中国时区 (UTC+8)
+    setenv("TZ", "CST-8", 1);
     tzset();
-    ESP_LOGI(TAG, "时区设置: HKT-8 (UTC+8, 香港标准时间)");
+    ESP_LOGI(TAG, "时区设置: CST-8 (UTC+8, 中国标准时间)");
     
     // 配置 SNTP - 优化参数以加快同步速度
     esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
