@@ -6,7 +6,8 @@ static bool connect_flag = false; // 定义一个连接上mqtt服务器的flag
 static bool subscribe_flag = false; // 定义一个已订阅频道的flag
 static SemaphoreHandle_t connect_flag_mutex = NULL; // 互斥锁保护connect_flag
 static SemaphoreHandle_t subscribe_flag_mutex = NULL; // 互斥锁保护subscribe_flag
-static int reconnect_attempts = 0; // 重连尝试计数
+static int reconnect_attempts = 0; // 当前会话重连尝试计数
+static int total_disconnect_count = 0; // 总断开次数计数器（累计所有会话）
 
 // 安全地获取连接状态
 static bool get_connect_flag(void) {
@@ -111,7 +112,8 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
             set_connect_flag(false);
             set_subscribe_flag(false); // 重置订阅状态
             reconnect_attempts++;
-            ESP_LOGW(TAG, "MQTT断开次数: %d", reconnect_attempts);
+            total_disconnect_count++;
+            ESP_LOGW(TAG, "MQTT断开次数: 当前会话=%d, 总计=%d", reconnect_attempts, total_disconnect_count);
             status_led_set_mode(LED_BLINK_SLOW);  // MQTT 断开，回到慢速闪烁
             // 记录断开事件
             monitor_record_disconnect("No PING_RESP / Connection reset");
@@ -131,6 +133,10 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
         case MQTT_EVENT_ERROR:
             ESP_LOGE(TAG, "MQTT connection error");
             set_connect_flag(false);
+            set_subscribe_flag(false); // 重置订阅状态
+            reconnect_attempts++;
+            total_disconnect_count++;
+            ESP_LOGW(TAG, "MQTT错误次数: 当前会话=%d, 总计=%d", reconnect_attempts, total_disconnect_count);
             status_led_set_mode(LED_BLINK_SLOW);  // MQTT 错误，回到慢速闪烁
             // 记录断开事件
             monitor_record_disconnect("MQTT_EVENT_ERROR");
@@ -190,8 +196,8 @@ void mqtt_health_check_task(void *pvParameters)
         
         if (!get_connect_flag()) {
             disconnect_count++;
-            ESP_LOGW(TAG, "MQTT连接检查: 未连接 (计数=%d/%d, 总重连=%d)", 
-                     disconnect_count, MAX_DISCONNECT_BEFORE_RECONNECT, reconnect_attempts);
+            ESP_LOGW(TAG, "MQTT连接检查: 未连接 (计数=%d/%d, 会话重连=%d, 总计=%d)", 
+                     disconnect_count, MAX_DISCONNECT_BEFORE_RECONNECT, reconnect_attempts, total_disconnect_count);
             
             if (disconnect_count >= MAX_DISCONNECT_BEFORE_RECONNECT) {
                 // 计算指数退避延迟（最多30秒）
@@ -265,13 +271,13 @@ void mqtt_init()
         },
         // 添加会话和网络配置以改善连接稳定性
         .session = {
-            .keepalive = 60,               // 60秒 KeepAlive 间隔（禁用WiFi省电后，可恢复正常值）
+            .keepalive = 120,              // 120秒 KeepAlive 间隔，减少频繁 PING 带来的网络负担
             .disable_keepalive = false,    // 启用 KeepAlive
-            .disable_clean_session = false, // 保留会话，断线重连后自动恢复订阅
+            .disable_clean_session = true, // 启用清理会话，避免服务器残留状态导致问题
         },
         .network = {
-            .reconnect_timeout_ms = 5000,  // 重连间隔 5秒
-            .timeout_ms = 10000,           // 网络操作超时 10秒
+            .reconnect_timeout_ms = 3000,  // 重连间隔缩短为 3秒，更快恢复连接
+            .timeout_ms = 15000,           // 网络操作超时增加到 15秒，适应不稳定网络
         },
         .buffer = {
             .size = 2048,                  // 增加发送缓冲区到2KB
