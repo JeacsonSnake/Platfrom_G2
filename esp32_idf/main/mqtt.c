@@ -74,25 +74,33 @@ static const char* get_error_type_string(esp_mqtt_error_type_t error_type, int e
     switch (error_type) {
         case MQTT_ERROR_TYPE_TCP_TRANSPORT:
             error_count_transport_timeout++;
-            if (esp_tls_last_esp_err == ESP_ERR_MBEDTLS_SSL_SETUP_FAILED) {
-                return "TLS_SSL_SETUP_FAILED";
-            } else if (esp_tls_last_esp_err == ESP_ERR_MBEDTLS_SSL_HANDSHAKE_FAILED) {
-                return "TLS_HANDSHAKE_FAILED";
-            } else if (esp_tls_stack_err == MBEDTLS_ERR_SSL_TIMEOUT) {
-                return "TLS_TIMEOUT";
-            } else if (connect_return_code == ECONNREFUSED) {
+            // 根据 connect_return_code (errno) 判断具体错误
+            if (connect_return_code == ECONNREFUSED) {
                 return "TCP_CONNECTION_REFUSED";
-            } else if (connect_return_code == ETIMEDOUT || connect_return_code == EINPROGRESS) {
+            } else if (connect_return_code == ETIMEDOUT) {
                 return "TCP_CONNECT_TIMEOUT";
+            } else if (connect_return_code == EINPROGRESS) {
+                return "TCP_CONNECT_IN_PROGRESS";  // 连接正在进行中（异步连接超时）
             } else if (connect_return_code == ECONNRESET) {
                 error_count_connection_reset++;
                 return "TCP_CONNECTION_RESET";
             } else if (connect_return_code == ENETUNREACH) {
                 return "NETWORK_UNREACHABLE";
+            } else if (connect_return_code == EHOSTUNREACH) {
+                return "HOST_UNREACHABLE";
+            } else if (connect_return_code == EADDRNOTAVAIL) {
+                return "ADDRESS_NOT_AVAILABLE";
+            }
+            // TLS相关错误判断（通过 stack_err 的大致范围）
+            if (esp_tls_stack_err != 0) {
+                if (esp_tls_stack_err < 0) {
+                    return "TLS_ERROR";  // 简化处理，不依赖具体宏
+                }
             }
             return "TCP_TRANSPORT_ERROR";
             
         case MQTT_ERROR_TYPE_CONNECTION_REFUSED:
+            // MQTT协议层面的连接拒绝（CONNACK返回码）
             switch (connect_return_code) {
                 case 0x01: return "CONN_REFUSE_PROTOCOL";
                 case 0x02: return "CONN_REFUSE_ID_REJECTED";
@@ -105,15 +113,10 @@ static const char* get_error_type_string(esp_mqtt_error_type_t error_type, int e
         case MQTT_ERROR_TYPE_SUBSCRIBE_FAILED:
             return "SUBSCRIBE_FAILED";
             
-        case MQTT_ERROR_TYPE_PUBLISH_FAILED:
-            return "PUBLISH_FAILED";
-            
-        case MQTT_ERROR_TYPE_PING_TIMEOUT:
-            error_count_ping_timeout++;
-            return "PING_RESPONSE_TIMEOUT";
-            
         default:
-            return "UNKNOWN_ERROR";
+            // 其他未分类错误，可能是PING超时等
+            error_count_ping_timeout++;
+            return "PING_OR_UNKNOWN_ERROR";
     }
 }
 
