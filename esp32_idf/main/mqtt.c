@@ -3,7 +3,11 @@
 
 static char* TAG = "ESP32S3_MQTT_EVENT";
 static bool connect_flag = false; // 定义一个连接上mqtt服务器的flag
+static bool subscribe_flag = false; // 定义一个已订阅频道的flag
 static SemaphoreHandle_t connect_flag_mutex = NULL; // 互斥锁保护connect_flag
+static SemaphoreHandle_t subscribe_flag_mutex = NULL; // 互斥锁保护subscribe_flag
+static int reconnect_attempts = 0; // 重连尝试计数
+static const int MAX_RECONNECT_ATTEMPTS = 10; // 最大重连尝试次数（指数退避用）
 
 // 安全地获取连接状态
 static bool get_connect_flag(void) {
@@ -26,6 +30,30 @@ static void set_connect_flag(bool flag) {
     connect_flag = flag;
     if (connect_flag_mutex != NULL) {
         xSemaphoreGive(connect_flag_mutex);
+    }
+}
+
+// 安全地获取订阅状态
+static bool get_subscribe_flag(void) {
+    bool flag = false;
+    if (subscribe_flag_mutex != NULL) {
+        xSemaphoreTake(subscribe_flag_mutex, portMAX_DELAY);
+    }
+    flag = subscribe_flag;
+    if (subscribe_flag_mutex != NULL) {
+        xSemaphoreGive(subscribe_flag_mutex);
+    }
+    return flag;
+}
+
+// 安全地设置订阅状态
+static void set_subscribe_flag(bool flag) {
+    if (subscribe_flag_mutex != NULL) {
+        xSemaphoreTake(subscribe_flag_mutex, portMAX_DELAY);
+    }
+    subscribe_flag = flag;
+    if (subscribe_flag_mutex != NULL) {
+        xSemaphoreGive(subscribe_flag_mutex);
     }
 }
 
@@ -61,16 +89,30 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
         case MQTT_EVENT_CONNECTED:
             ESP_LOGI(TAG, "Connected to MQTT server.");
             set_connect_flag(true);
+            reconnect_attempts = 0; // 重置重连计数器
             status_led_set_mode(LED_ON);  // MQTT 连接成功 - LED 常亮
             // 记录连接事件
             monitor_record_connect();
-            // 订阅MQTT 控制频道来接收指令
-            esp_mqtt_client_subscribe(mqtt_client, MQTT_CONTROL_CHANNEL, 2);
+            // 订阅MQTT 控制频道来接收指令（仅在未订阅时订阅）
+            if (!get_subscribe_flag()) {
+                int msg_id = esp_mqtt_client_subscribe(mqtt_client, MQTT_CONTROL_CHANNEL, 1);
+                if (msg_id >= 0) {
+                    ESP_LOGI(TAG, "已订阅控制频道 '%s' (msg_id=%d)", MQTT_CONTROL_CHANNEL, msg_id);
+                    set_subscribe_flag(true);
+                } else {
+                    ESP_LOGE(TAG, "订阅控制频道失败");
+                }
+            } else {
+                ESP_LOGI(TAG, "会话已恢复，跳过重复订阅");
+            }
             break;
 
         case MQTT_EVENT_DISCONNECTED:
             ESP_LOGI(TAG, "Disconnected from MQTT server.");
             set_connect_flag(false);
+            set_subscribe_flag(false); // 重置订阅状态
+            reconnect_attempts++;
+            ESP_LOGW(TAG, "MQTT断开次数: %d", reconnect_attempts);
             status_led_set_mode(LED_BLINK_SLOW);  // MQTT 断开，回到慢速闪烁
             // 记录断开事件
             monitor_record_disconnect("No PING_RESP / Connection reset");
@@ -149,20 +191,31 @@ void mqtt_health_check_task(void *pvParameters)
         
         if (!get_connect_flag()) {
             disconnect_count++;
-            ESP_LOGW(TAG, "MQTT连接检查: 未连接 (计数=%d/%d)", disconnect_count, MAX_DISCONNECT_BEFORE_RECONNECT);
+            ESP_LOGW(TAG, "MQTT连接检查: 未连接 (计数=%d/%d, 总重连=%d)", 
+                     disconnect_count, MAX_DISCONNECT_BEFORE_RECONNECT, reconnect_attempts);
             
             if (disconnect_count >= MAX_DISCONNECT_BEFORE_RECONNECT) {
-                ESP_LOGW(TAG, "MQTT连接检查: 连续%d次未连接，尝试强制重连...", MAX_DISCONNECT_BEFORE_RECONNECT);
+                // 计算指数退避延迟（最多30秒）
+                int backoff_delay = (reconnect_attempts < 6) ? (1 << reconnect_attempts) * 1000 : 30000;
+                if (backoff_delay > 30000) backoff_delay = 30000;
                 
-                // 尝试停止并重新启动MQTT客户端
-                esp_mqtt_client_stop(mqtt_client);
-                vTaskDelay(pdMS_TO_TICKS(1000));
-                esp_err_t err = esp_mqtt_client_start(mqtt_client);
+                ESP_LOGW(TAG, "MQTT连接检查: 连续%d次未连接，%dms后尝试强制重连...", 
+                         MAX_DISCONNECT_BEFORE_RECONNECT, backoff_delay);
                 
-                if (err == ESP_OK) {
-                    ESP_LOGI(TAG, "MQTT客户端已重新启动，等待连接...");
-                } else {
-                    ESP_LOGE(TAG, "MQTT客户端重启失败: %s", esp_err_to_name(err));
+                vTaskDelay(pdMS_TO_TICKS(backoff_delay));
+                
+                // 再次检查是否仍未连接
+                if (!get_connect_flag()) {
+                    // 尝试停止并重新启动MQTT客户端
+                    esp_mqtt_client_stop(mqtt_client);
+                    vTaskDelay(pdMS_TO_TICKS(1000));
+                    esp_err_t err = esp_mqtt_client_start(mqtt_client);
+                    
+                    if (err == ESP_OK) {
+                        ESP_LOGI(TAG, "MQTT客户端已重新启动，等待连接...");
+                    } else {
+                        ESP_LOGE(TAG, "MQTT客户端重启失败: %s", esp_err_to_name(err));
+                    }
                 }
                 
                 disconnect_count = 0; // 重置计数器
@@ -183,6 +236,15 @@ void mqtt_init()
     connect_flag_mutex = xSemaphoreCreateMutex();
     if (connect_flag_mutex == NULL) {
         ESP_LOGE(TAG, "创建connect_flag互斥锁失败");
+        return;
+    }
+    
+    subscribe_flag_mutex = xSemaphoreCreateMutex();
+    if (subscribe_flag_mutex == NULL) {
+        ESP_LOGE(TAG, "创建subscribe_flag互斥锁失败");
+        // 清理已创建的资源
+        vSemaphoreDelete(connect_flag_mutex);
+        connect_flag_mutex = NULL;
         return;
     }
     
