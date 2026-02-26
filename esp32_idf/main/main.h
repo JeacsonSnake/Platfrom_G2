@@ -58,6 +58,8 @@ void status_led_task(void *pvParameters);
 
 // WIFI Connection Function 初始化方法
 void wifi_init(void);
+// WiFi Connection Status 获取WiFi连接状态
+bool wifi_is_connected(void);
 
 // SNTP Time Sync Function 时间同步方法（由WiFi连接成功后调用）
 void monitor_start_time_sync(void);

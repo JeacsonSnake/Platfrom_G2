@@ -66,6 +66,13 @@ static void set_subscribe_flag(bool flag) {
     }
 }
 
+// ESP-TLS 错误码定义 (简化，避免依赖具体头文件)
+#define ESP_TLS_ERR_BASE 0x8000
+#define ESP_ERR_ESP_TLS_CANNOT_CONNECT (ESP_TLS_ERR_BASE + 0x04)  // 0x8004 = 32772
+
+// WiFi 连接状态检查（外部声明）
+extern bool wifi_is_connected(void);
+
 // 获取错误类型字符串并更新统计
 static const char* get_error_type_string(esp_mqtt_error_type_t error_type, int esp_tls_last_esp_err, 
                                          int esp_tls_stack_err, int esp_tls_cert_verify_flags, 
@@ -74,8 +81,19 @@ static const char* get_error_type_string(esp_mqtt_error_type_t error_type, int e
     switch (error_type) {
         case MQTT_ERROR_TYPE_TCP_TRANSPORT:
             error_count_transport_timeout++;
+            // 首先检查 ESP-TLS 层错误码
+            if (esp_tls_last_esp_err == ESP_ERR_ESP_TLS_CANNOT_CONNECT) {
+                error_count_connect_failed++;
+                // 进一步判断是 WiFi 问题还是服务器问题
+                if (!wifi_is_connected()) {
+                    return "WIFI_NOT_CONNECTED";
+                }
+                return "TLS_CANNOT_CONNECT";
+            }
+            
             // 根据 connect_return_code (errno) 判断具体错误
             if (connect_return_code == ECONNREFUSED) {
+                error_count_connect_failed++;
                 return "TCP_CONNECTION_REFUSED";
             } else if (connect_return_code == ETIMEDOUT) {
                 return "TCP_CONNECT_TIMEOUT";
@@ -292,6 +310,13 @@ void mqtt_health_check_task(void *pvParameters)
         // 每10秒检查一次连接状态
         vTaskDelay(pdMS_TO_TICKS(10000));
         
+        // 首先检查 WiFi 是否已连接
+        if (!wifi_is_connected()) {
+            ESP_LOGW(TAG, "MQTT连接检查: WiFi未连接，跳过MQTT重连检查");
+            disconnect_count = 0; // 重置计数器，避免累积
+            continue;
+        }
+        
         if (!get_connect_flag()) {
             disconnect_count++;
             ESP_LOGW(TAG, "MQTT连接检查: 未连接 (计数=%d/%d, 会话重连=%d, 总计=%d)", 
@@ -307,7 +332,13 @@ void mqtt_health_check_task(void *pvParameters)
                 
                 vTaskDelay(pdMS_TO_TICKS(backoff_delay));
                 
-                // 再次检查是否仍未连接
+                // 再次检查 WiFi 和 MQTT 状态
+                if (!wifi_is_connected()) {
+                    ESP_LOGW(TAG, "MQTT连接检查: WiFi仍未连接，跳过本次重连");
+                    disconnect_count = 0;
+                    continue;
+                }
+                
                 if (!get_connect_flag()) {
                     // 尝试停止并重新启动MQTT客户端
                     esp_mqtt_client_stop(mqtt_client);
