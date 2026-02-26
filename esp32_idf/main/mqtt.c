@@ -7,7 +7,6 @@ static bool subscribe_flag = false; // 定义一个已订阅频道的flag
 static SemaphoreHandle_t connect_flag_mutex = NULL; // 互斥锁保护connect_flag
 static SemaphoreHandle_t subscribe_flag_mutex = NULL; // 互斥锁保护subscribe_flag
 static int reconnect_attempts = 0; // 重连尝试计数
-static const int MAX_RECONNECT_ATTEMPTS = 10; // 最大重连尝试次数（指数退避用）
 
 // 安全地获取连接状态
 static bool get_connect_flag(void) {
