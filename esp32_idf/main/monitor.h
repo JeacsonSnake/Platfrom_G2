@@ -12,7 +12,7 @@
 //////////////////////////////////////////////////////////////
 
 // 监控配置参数
-#define MONITOR_REPORT_INTERVAL_MS  (( 60 / 12 ) * 60 * 60 * 1000)  // 5分钟报告间隔
+#define MONITOR_REPORT_INTERVAL_MS  (5 * 60 * 1000)  // 5分钟报告间隔（300000毫秒）
 #define MONITOR_MAX_DISCONNECT_LOG  100                   // 最大记录断开事件数
 // 国内NTP服务器配置（原配置，同步稳定性更好）
 #define NTP_SERVER_PRIMARY   "cn.pool.ntp.org"             // 国内NTP服务器池（主）

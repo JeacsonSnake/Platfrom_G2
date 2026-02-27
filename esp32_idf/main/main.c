@@ -27,23 +27,23 @@ bool pcnt_updated_list[4] = PCNT_UPDATE;
 
 // 主函数
 void app_main(void){
-    // 创建LED状态指示任务（优先级设为5，高于其他任务）
-    xTaskCreate(status_led_task, "LED_TASK", 4096, NULL, 5, NULL);
+    // 创建LED状态指示任务
+    xTaskCreate(status_led_task, "LED_TASK", 4096, NULL, 4, NULL);
     
     // 初始化WiFi，并等待WiFi连接
     // 注意：监控任务需要在WiFi连接后创建，确保NTP同步能正常进行
     wifi_init();
     vTaskDelay(5000 / portTICK_PERIOD_MS);
     // 创建MQTT连接监控任务（在WiFi连接后创建，确保NTP同步能正常进行）
-    xTaskCreate(monitor_task, "MONITOR_TASK", 4096, NULL, 2, NULL);
+    xTaskCreate(monitor_task, "MONITOR_TASK", 4096, NULL, 3, NULL);
     // 创建MQTT初始化任务（初始化完成后会自删除）
-    xTaskCreate(mqtt_init, "MQTT_INIT", 8192, NULL, 2, NULL);
+    xTaskCreate(mqtt_init, "MQTT_INIT", 4096, NULL, 2, NULL);
     // 创建MQTT心跳发送任务
     xTaskCreate(mqtt_heartbeat_task, "MQTT_HB", 4096, NULL, 1, NULL);
     // 创建MQTT连接健康检查任务
     xTaskCreate(mqtt_health_check_task, "MQTT_CHK", 4096, NULL, 1, NULL);
-    // 创建MQTT错误统计报告任务
-    xTaskCreate(mqtt_error_report_task, "MQTT_ERR", 2048, NULL, 1, NULL);
+    // 创建MQTT错误统计报告任务（栈大小4096防止栈溢出）
+    xTaskCreate(mqtt_error_report_task, "MQTT_ERR", 4096, NULL, 1, NULL);
     // 初始化PWM
     pwm_init();
     // 初始化PCNT

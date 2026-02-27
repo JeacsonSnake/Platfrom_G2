@@ -323,12 +323,21 @@ void mqtt_health_check_task(void *pvParameters)
                      disconnect_count, MAX_DISCONNECT_BEFORE_RECONNECT, reconnect_attempts, total_disconnect_count);
             
             if (disconnect_count >= MAX_DISCONNECT_BEFORE_RECONNECT) {
-                // 计算指数退避延迟（最多30秒）
-                int backoff_delay = (reconnect_attempts < 6) ? (1 << reconnect_attempts) * 1000 : 30000;
-                if (backoff_delay > 30000) backoff_delay = 30000;
+                // 计算指数退避延迟（针对弱信号优化：更激进的退避策略）
+                // 延迟序列：2s, 4s, 8s, 15s, 15s, 15s...（最多15秒，避免过长等待）
+                int backoff_delay;
+                if (reconnect_attempts < 2) {
+                    backoff_delay = 2000;  // 前2次：2秒
+                } else if (reconnect_attempts < 4) {
+                    backoff_delay = 4000;  // 第3-4次：4秒
+                } else if (reconnect_attempts < 6) {
+                    backoff_delay = 8000;  // 第5-6次：8秒
+                } else {
+                    backoff_delay = 15000; // 之后：15秒（避免过长等待）
+                }
                 
-                ESP_LOGW(TAG, "MQTT连接检查: 连续%d次未连接，%dms后尝试强制重连...", 
-                         MAX_DISCONNECT_BEFORE_RECONNECT, backoff_delay);
+                ESP_LOGW(TAG, "MQTT连接检查: 连续%d次未连接，%dms后尝试强制重连(退避级别=%d)...", 
+                         MAX_DISCONNECT_BEFORE_RECONNECT, backoff_delay, reconnect_attempts);
                 
                 vTaskDelay(pdMS_TO_TICKS(backoff_delay));
                 
@@ -419,15 +428,15 @@ void mqtt_init()
         .credentials.authentication = {
             .password = "123456",
         },
-        // 添加会话和网络配置以改善连接稳定性
+        // 添加会话和网络配置以改善连接稳定性（针对弱信号环境优化）
         .session = {
-            .keepalive = 120,              // 120秒 KeepAlive 间隔，减少频繁 PING 带来的网络负担
+            .keepalive = 60,               // 60秒 KeepAlive 间隔，更快检测连接问题
             .disable_keepalive = false,    // 启用 KeepAlive
-            .disable_clean_session = true, // 启用清理会话，避免服务器残留状态导致问题
+            .disable_clean_session = false, // 禁用清理会话，启用会话恢复减少重连开销
         },
         .network = {
-            .reconnect_timeout_ms = 5000,  // 恢复为 5秒重连间隔
-            .timeout_ms = 20000,           // 网络操作超时增加到 20秒，适应不稳定网络
+            .reconnect_timeout_ms = 3000,  // 3秒重连间隔，更快尝试恢复
+            .timeout_ms = 10000,           // 网络操作超时10秒，避免长时间阻塞
         },
         .buffer = {
             .size = 4096,                  // 增加发送缓冲区到4KB
