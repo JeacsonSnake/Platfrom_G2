@@ -27,8 +27,8 @@ bool pcnt_updated_list[4] = PCNT_UPDATE;
 
 // 主函数
 void app_main(void){
-    // 创建LED状态指示任务
-    xTaskCreate(status_led_task, "LED_TASK", 4096, NULL, 4, NULL);
+    // 创建LED状态指示任务（优先级2，低于WiFi初始化，避免影响WiFi连接）
+    xTaskCreate(status_led_task, "LED_TASK", 4096, NULL, 2, NULL);
     
     // 初始化WiFi，并等待WiFi连接
     // 注意：监控任务需要在WiFi连接后创建，确保NTP同步能正常进行
