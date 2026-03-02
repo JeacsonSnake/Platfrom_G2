@@ -376,11 +376,13 @@ void mqtt_health_check_task(void *pvParameters)
 void mqtt_error_report_task(void *pvParameters)
 {
     vTaskDelay(pdMS_TO_TICKS(60000)); // 等待1分钟后开始报告
-    
+    char time_str[64];
+    monitor_get_current_time_str(time_str, sizeof(time_str));
+
     while (1)
     {
         ESP_LOGI(TAG, "=================================================");
-        ESP_LOGI(TAG, "           MQTT错误类型统计报告");
+        ESP_LOGI(TAG, "           MQTT错误类型统计报告 [%s]", time_str);
         ESP_LOGI(TAG, "=================================================");
         ESP_LOGI(TAG, "传输层超时:        %d", error_count_transport_timeout);
         ESP_LOGI(TAG, "PING响应超时:      %d", error_count_ping_timeout);
