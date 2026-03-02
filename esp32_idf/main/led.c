@@ -21,7 +21,6 @@ static const led_color_t COLOR_OFF = {0, 0, 0};
 static const led_color_t COLOR_GREEN = {255, 0, 0};
 static const led_color_t COLOR_BLUE = {0, 0, 255};
 static const led_color_t COLOR_YELLOW = {255, 255, 0};
-static const led_color_t COLOR_WHITE = {255, 255, 255};
 
 static void set_led_color(const led_color_t *color)
 {
