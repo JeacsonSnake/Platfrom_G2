@@ -58,6 +58,8 @@ void status_led_task(void *pvParameters);
 
 // WIFI Connection Function 初始化方法
 void wifi_init(void);
+// WiFi Connection Status 获取WiFi连接状态
+bool wifi_is_connected(void);
 
 // SNTP Time Sync Function 时间同步方法（由WiFi连接成功后调用）
 void monitor_start_time_sync(void);
@@ -133,6 +135,12 @@ typedef struct
 
 // MQTT Connection Function 初始化方法
 void mqtt_init();
+// MQTT Heartbeat Task 心跳发送任务
+void mqtt_heartbeat_task(void *pvParameters);
+// MQTT Health Check Task 连接健康检查任务
+void mqtt_health_check_task(void *pvParameters);
+// MQTT Error Report Task 错误统计报告任务
+void mqtt_error_report_task(void *pvParameters);
 
 
 

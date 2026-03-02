@@ -6,17 +6,28 @@ static char *TAG = "ESP32S3_WIFI_EVENT";
 // 互斥信号量，作为保护，其实就是监测这个进程是否完成
 SemaphoreHandle_t sem;
 
+// WiFi 连接状态标志
+static bool wifi_connected = false;
+
+// 获取 WiFi 连接状态（供其他模块使用）
+bool wifi_is_connected(void)
+{
+    return wifi_connected;
+}
+
 static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
     if ((event_base == WIFI_EVENT) && (event_id == WIFI_EVENT_STA_START ||
                                        event_id == WIFI_EVENT_STA_DISCONNECTED))
     {
+        wifi_connected = false;
         ESP_LOGI(TAG, "Begin to connect the AP");
         status_led_set_mode(LED_BLINK_FAST);  // WiFi 连接中 - 快速闪烁
         esp_wifi_connect();
     }
     else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
     {
+        wifi_connected = true;
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
         ESP_LOGI(TAG, "Got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         status_led_set_mode(LED_BLINK_SLOW);  // WiFi 已连接，等待 MQTT - 慢速闪烁

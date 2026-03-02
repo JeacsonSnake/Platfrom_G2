@@ -21,7 +21,6 @@ static const led_color_t COLOR_OFF = {0, 0, 0};
 static const led_color_t COLOR_GREEN = {255, 0, 0};
 static const led_color_t COLOR_BLUE = {0, 0, 255};
 static const led_color_t COLOR_YELLOW = {255, 255, 0};
-static const led_color_t COLOR_WHITE = {255, 255, 255};
 
 static void set_led_color(const led_color_t *color)
 {
@@ -60,15 +59,7 @@ void status_led_init(void)
 
     ESP_LOGI(TAG, "WS2812 RGB LED initialized on GPIO %d", STATUS_LED_GPIO);
 
-    // 启动测试：LED 闪烁 3 次（白色）
-    ESP_LOGI(TAG, "LED startup test - blinking 3 times...");
-    for (int i = 0; i < 3; i++) {
-        set_led_color(&COLOR_WHITE);
-        vTaskDelay(pdMS_TO_TICKS(300));
-        set_led_color(&COLOR_OFF);
-        vTaskDelay(pdMS_TO_TICKS(300));
-    }
-    ESP_LOGI(TAG, "LED startup test complete");
+    // 注意：启动测试已移至 WiFi 连接成功后执行，避免阻塞 WiFi 事件处理
 }
 
 void status_led_set_mode(int mode)
