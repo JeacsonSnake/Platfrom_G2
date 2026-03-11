@@ -72,14 +72,15 @@ void monitor_start_time_sync(void);
 #define LEDC_TIMER      LEDC_TIMER_0
 #define LEDC_MODE       LEDC_LOW_SPEED_MODE
 #define LEDC_DUTY_RES   LEDC_TIMER_13_BIT
-#define LEDC_DUTY       (8192)
-#define LEDC_FREQ       (5000)
+#define LEDC_DUTY       (0)         // Initial duty: 0 = Full speed (inverted logic)
+#define LEDC_FREQ       (20000)     // 20KHz PWM frequency for CHB-BLDC2418 motor
 
 // PWM Parameters PWM控制器参数
-#define LEDC_GPIO_LIST  {5, 6, 7, 8, 9, 10}
-#define LEDC_CHANNEL_LIST {LEDC_CHANNEL_0, LEDC_CHANNEL_1, LEDC_CHANNEL_2, LEDC_CHANNEL_3, LEDC_CHANNEL_4, LEDC_CHANNEL_5}
-extern const int pwm_channels[6];
-extern const int pwm_gpios[6];
+// CHB-BLDC2418 Motor: IO1, IO4, IO6, IO8 (GPIO1, GPIO4, GPIO6, GPIO8)
+#define LEDC_GPIO_LIST  {1, 4, 6, 8}
+#define LEDC_CHANNEL_LIST {LEDC_CHANNEL_0, LEDC_CHANNEL_1, LEDC_CHANNEL_2, LEDC_CHANNEL_3}
+extern const int pwm_channels[4];
+extern const int pwm_gpios[4];
 
 
 // PWM Init Function 初始化方法
@@ -92,7 +93,8 @@ void pwm_set_duty(int data, int channel);
 //////////////////////// PCNT ////////////////////////////////
 //////////////////////////////////////////////////////////////
 // PCNT Parameters 参数数组
-#define PCNT_GPIO       {11, 12, 13, 14}
+// CHB-BLDC2418 Motor: IO2, IO5, IO7, IO9 (GPIO2, GPIO5, GPIO7, GPIO9)
+#define PCNT_GPIO       {2, 5, 7, 9}
 #define PCNT_UNIT       {NULL, NULL, NULL, NULL}
 #define PCNT_UPDATE     {false, false, false, false}
 #define PCNT_COUNT      {0, 0, 0, 0}

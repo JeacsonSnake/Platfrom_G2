@@ -51,7 +51,8 @@ void pcnt_monitor(void* params)
             char buff[64];
             sprintf(buff, "pcnt_count_%d_%d", index, pcnt_count_list[index]);
             esp_mqtt_client_publish(mqtt_client, MQTT_DATA_CHANNEL, buff, strlen(buff), 2, 0);
-            pwm_set_duty(8192, index);
+            // CHB-BLDC2418: Duty 8191 = Motor OFF (inverted logic)
+            pwm_set_duty(8191, index);
             pcnt_updated_list[index] = false;
             if(pcnt_count_list[index] == 0){
                 idle = true;

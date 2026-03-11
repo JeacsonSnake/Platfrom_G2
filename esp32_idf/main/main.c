@@ -9,11 +9,11 @@ esp_mqtt_client_handle_t mqtt_client = MQTT_CLIENT_INIT;
 // Motor 控制数组初始化
 double motor_speed_list[4] = MOTOR_SPEED;
 
-// PWM 参数组初始化
+// PWM 参数组初始化 (CHB-BLDC2418: IO1, IO4, IO6, IO8)
 // PWM GPIO 信道初始化
-const int pwm_gpios[6] = LEDC_GPIO_LIST;
+const int pwm_gpios[4] = LEDC_GPIO_LIST;
 // PWM 频道初始化
-const int pwm_channels[6] = LEDC_CHANNEL_LIST;
+const int pwm_channels[4] = LEDC_CHANNEL_LIST;
 
 // PCNT参数组初始化
 // PCNT GPIO 信道初始化

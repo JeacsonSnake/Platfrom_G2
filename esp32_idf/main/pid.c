@@ -68,14 +68,16 @@ void PID_init(void* params)
         .pre_input = 0
     };
 
+    // CHB-BLDC2418 PID Parameters
+    // Max PCNT = (4500 RPM / 60) * 6 pulses/rotation = 450 pulses/sec
     struct PID_params pid_params = {
         .Kp         = 8,
         .Ki         = 0.02,
         .Kd         = 0.01,
-        .max_pwm    = 8192,
+        .max_pwm    = 8191,     // 13-bit resolution max value
         .min_pwm    = 0,
-        .max_pcnt   = 435,
-        .min_pcnt   = -435
+        .max_pcnt   = 450,      // 4500 RPM * 6 / 60 = 450
+        .min_pcnt   = 0
     };
 
     while(1){
@@ -83,7 +85,9 @@ void PID_init(void* params)
         {
             double temp = motor_speed_list[index];
             double new_input = PID_Calculate(pid_params, &data, temp, pcnt_count_list[index]);
-            int new_input_int = 8192 - (int)new_input;
+            // CHB-BLDC2418: Inverted PWM logic - High=OFF, Low=ON
+            // Duty 8191 = Motor OFF, Duty 0 = Motor ON
+            int new_input_int = 8191 - (int)new_input;
             pwm_set_duty(new_input_int, index);
             pcnt_updated_list[index] = false;
         }
@@ -128,7 +132,8 @@ void control_cmd(void *params)
     motor_speed_list[local_index] = local_speed;
     vTaskDelay(local_duration * 1000 / portTICK_PERIOD_MS);
     motor_speed_list[local_index] = 0;
-    pwm_set_duty(8192, local_index);
+    // CHB-BLDC2418: Duty 8191 = Motor OFF (inverted logic)
+    pwm_set_duty(8191, local_index);
     sprintf(buff, "task_finished_%d_%d_%d",local_index, local_speed, local_duration);
     esp_mqtt_client_publish(mqtt_client, MQTT_CONTROL_CHANNEL, buff, strlen(buff), 2, 0);
     vTaskDelete(NULL);
