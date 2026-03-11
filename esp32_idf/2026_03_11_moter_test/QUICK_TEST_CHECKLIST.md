@@ -98,7 +98,23 @@ I (xxxx) MQTT_EVENT: MQTT Connected to mqtt://192.168.110.31:1883
 
 ## 第六步：电机运行测试 (5分钟)
 
-### 6.1 使用 Python 测试脚本
+### 方法 A: 使用 MQTTX (推荐新手)
+
+1. **打开 MQTTX** 并连接到 `192.168.110.31:1883`
+2. **订阅主题**: `esp32_1/data` (用于接收电机反馈)
+3. **发送测试命令**:
+   - 主题: `esp32_1/control`
+   - 消息: `cmd_0_225_5`
+   - QoS: `1`
+
+**预期结果**:
+- 电机0开始旋转
+- `esp32_1/data` 收到类似 `pcnt_count_0_228` 的消息
+- 5秒后电机自动停止
+
+详细 MQTTX 使用方法见: [MQTTX_TEST_GUIDE.md](MQTTX_TEST_GUIDE.md)
+
+### 方法 B: 使用 Python 测试脚本
 
 ```powershell
 cd 2026_03_11_moter_test
@@ -132,7 +148,7 @@ Waiting 7s for motor operation...
    ✅ PASSED (Error < 10%)
 ```
 
-### 6.2 手动 MQTT 测试
+### 方法 C: 使用 mosquitto (命令行)
 
 ```bash
 # 订阅数据主题
