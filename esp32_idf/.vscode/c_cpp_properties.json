@@ -10,7 +10,7 @@
         "UNICODE",
         "_UNICODE"
       ],
-      "compilerPath": "e:\\.espressif\\tools\\xtensa-esp-elf\\esp-14.2.0_20251107\\xtensa-esp-elf\\bin\\xtensa-esp32s2-elf-gcc.exe",
+      "compilerPath": "e:\\.espressif\\tools\\xtensa-esp-elf\\esp-14.2.0_20251107\\xtensa-esp-elf\\bin\\xtensa-esp32s3-elf-gcc.exe",
       "cStandard": "c11",
       "compileCommands": "${workspaceFolder}/build/compile_commands.json"
     }

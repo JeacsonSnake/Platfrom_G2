@@ -271,26 +271,64 @@ void mqtt_heartbeat_task(void *pvParameters)
     // 等待初始连接建立
     vTaskDelay(pdMS_TO_TICKS(5000));
     
+    TickType_t last_wake_time = xTaskGetTickCount();
+    const TickType_t interval = pdMS_TO_TICKS(30000);  // 30秒间隔
+    static int consecutive_failures = 0;  // 连续失败计数
+    
     while (1)
     {
+        // 使用绝对延迟，确保固定频率执行
+        vTaskDelayUntil(&last_wake_time, interval);
+        
         // 使用安全的方式获取连接状态
         if (get_connect_flag() == true)
         {
             char buff[64] = "ESP32_1 is online";
+            
+            // 记录发送前tick和系统信息，用于检测阻塞
+            TickType_t publish_start = xTaskGetTickCount();
+            uint32_t free_heap = esp_get_free_heap_size();
+            UBaseType_t uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
+            
             // 向mqtt服务器发布主题为heartbeat，payload为buff的数据
+            // 使用QoS=1确保心跳可靠传输，retain=0
             int msg_id = esp_mqtt_client_publish(mqtt_client, MQTT_HEARTBEAT_CHANNEL, buff, strlen(buff), 1, 0);
+            
+            TickType_t publish_elapsed = xTaskGetTickCount() - publish_start;
+            uint32_t elapsed_ms = publish_elapsed * portTICK_PERIOD_MS;
+            
             if (msg_id < 0) {
-                ESP_LOGW(TAG, "心跳发送失败，可能连接已断开");
+                consecutive_failures++;
+                ESP_LOGW(TAG, "心跳发送失败 #%d (msg_id=%d, elapsed=%ums, heap=%u, stack=%u)", 
+                         consecutive_failures, msg_id, elapsed_ms, free_heap, uxHighWaterMark);
+                
+                // 连续3次失败，提示可能的连接问题
+                if (consecutive_failures >= 3) {
+                    ESP_LOGW(TAG, "连续%d次心跳发送失败，连接质量可能下降", consecutive_failures);
+                }
             } else {
-                ESP_LOGD(TAG, "心跳已发送 (msg_id=%d)", msg_id);
+                // 发送成功，重置失败计数
+                if (consecutive_failures > 0) {
+                    ESP_LOGI(TAG, "心跳恢复发送 (msg_id=%d, 之前连续失败%d次)", msg_id, consecutive_failures);
+                    consecutive_failures = 0;
+                }
+                
+                // 检测publish耗时是否异常（可能表明TCP层阻塞）
+                if (elapsed_ms > 5000) {
+                    ESP_LOGW(TAG, "心跳发送耗时过长，可能存在TCP层阻塞 (msg_id=%d, elapsed=%ums, heap=%u)", 
+                             msg_id, elapsed_ms, free_heap);
+                } else if (elapsed_ms > 1000) {
+                    ESP_LOGW(TAG, "心跳已发送但耗时较长 (msg_id=%d, elapsed=%ums)", msg_id, elapsed_ms);
+                } else {
+                    ESP_LOGI(TAG, "心跳已发送 (msg_id=%d, elapsed=%ums)", msg_id, elapsed_ms);
+                }
             }
         }
         else
         {
-            ESP_LOGD(TAG, "MQTT未连接，跳过本次心跳发送");
+            ESP_LOGW(TAG, "MQTT未连接，跳过本次心跳发送");
+            consecutive_failures = 0;  // 未连接时不计入失败
         }
-
-        vTaskDelay(pdMS_TO_TICKS(30000));  // 应用层心跳改为30秒，减轻网络负担
     }
 }
 
