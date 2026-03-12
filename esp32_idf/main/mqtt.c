@@ -151,9 +151,21 @@ void message_compare(char *msg)
     {
         int index, speed, duration;
         sscanf(msg, "cmd_%d_%d_%d",  &index, &speed, &duration);
-        cmd_params params = {speed, duration, index};
-        xTaskCreate(control_cmd, "CMD_TASK", 4096, (void*)&params, 1, NULL);
-
+        
+        // Allocate params on heap to ensure lifetime across task creation
+        cmd_params *params = malloc(sizeof(cmd_params));
+        if (params != NULL) {
+            params->speed = speed;
+            params->duration = duration;
+            params->index = index;
+            
+            if (xTaskCreate(control_cmd, "CMD_TASK", 4096, (void*)params, 1, NULL) != pdPASS) {
+                ESP_LOGE(TAG, "Failed to create control task");
+                free(params);
+            }
+        } else {
+            ESP_LOGE(TAG, "Failed to allocate memory for cmd_params");
+        }
     }
 }
 

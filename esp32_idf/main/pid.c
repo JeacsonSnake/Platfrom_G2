@@ -122,19 +122,22 @@ void pid_process_init()
 void control_cmd(void *params)
 {
     cmd_params* local_params = (cmd_params*)params;
-    int local_speed = local_params -> speed;
-    int local_duration = local_params -> duration;
-    int local_index = local_params -> index;
+    int local_speed = local_params->speed;
+    int local_duration = local_params->duration;
+    int local_index = local_params->index;
+    
+    // Free the allocated memory after copying to local variables
+    free(local_params);
 
     char buff[64];
-    sprintf(buff, "task_create_%d_%d_%d",local_index, local_speed, local_duration);
+    sprintf(buff, "task_create_%d_%d_%d", local_index, local_speed, local_duration);
     esp_mqtt_client_publish(mqtt_client, MQTT_CONTROL_CHANNEL, buff, strlen(buff), 2, 0);
     motor_speed_list[local_index] = local_speed;
     vTaskDelay(local_duration * 1000 / portTICK_PERIOD_MS);
     motor_speed_list[local_index] = 0;
     // CHB-BLDC2418: Duty 8191 = Motor OFF (inverted logic)
     pwm_set_duty(8191, local_index);
-    sprintf(buff, "task_finished_%d_%d_%d",local_index, local_speed, local_duration);
+    sprintf(buff, "task_finished_%d_%d_%d", local_index, local_speed, local_duration);
     esp_mqtt_client_publish(mqtt_client, MQTT_CONTROL_CHANNEL, buff, strlen(buff), 2, 0);
     vTaskDelete(NULL);
 }
