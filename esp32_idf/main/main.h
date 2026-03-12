@@ -73,7 +73,9 @@ void monitor_start_time_sync(void);
 #define LEDC_MODE       LEDC_LOW_SPEED_MODE
 #define LEDC_DUTY_RES   LEDC_TIMER_13_BIT
 #define LEDC_DUTY       (0)         // Initial duty: 0 = Full speed (inverted logic)
-#define LEDC_FREQ       (20000)     // 20KHz PWM frequency for CHB-BLDC2418 motor
+#define LEDC_FREQ       (5000)      // 5KHz PWM frequency (20KHz requires 8-bit resolution, see Bug002)
+                                            // CHB-BLDC2418 spec: 15K~25KHz recommended for noise reduction
+                                            // But ESP32-S3 hardware cannot achieve 20KHz + 13-bit simultaneously
 
 // PWM Parameters PWM控制器参数
 // CHB-BLDC2418 Motor: IO1, IO4, IO6, IO8 (GPIO1, GPIO4, GPIO6, GPIO8)
