@@ -1,0 +1,57 @@
+============================================================
+ESP32-S3 串口日志记录
+开始时间: 2026-03-14 18:24:31
+串口: COM10, 波特率: 115200
+============================================================
+
+[2026-03-14 18:24:39.295] W (1579) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (1/6I (42799) PCNT_EVENT: Motor 2 running, PCNT=0 (target=255)
+[2026-03-14 18:24:39.299] I (42809) PWM_EVENT: PWM channel 2 duty set to 6144.
+[2026-03-14 18:24:40.291] I (43799) PCNT_EVENT: Motor 2 running, PCNT=105 (target=255)
+[2026-03-14 18:24:40.299] I (43809) PWM_EVENT: PWM channel 2 duty set to 4937.
+[2026-03-14 18:24:41.292] I (44799) PCNT_EVENT: Motor 2 running, PCNT=171 (target=255)
+[2026-03-14 18:24:41.298] I (44809) PWM_EVENT: PWM channel 2 duty set to 4256.
+[2026-03-14 18:24:42.292] I (45799) PCNT_EVENT: Motor 2 running, PCNT=215 (target=255)
+[2026-03-14 18:24:42.299] I (45809) PWM_EVENT: PWM channel 2 duty set to 3926.
+[2026-03-14 18:24:43.291] I (46799) PCNT_EVENT: Motor 2 running, PCNT=234 (target=255)
+[2026-03-14 18:24:43.299] I (46809) PWM_EVENT: PWM channel 2 duty set to 3747.
+[2026-03-14 18:24:44.290] I (47799) PCNT_EVENT: Motor 2 running, PCNT=247 (target=255)
+[2026-03-14 18:24:44.300] I (47809) PWM_EVENT: PWM channel 2 duty set to 3672.
+[2026-03-14 18:24:45.292] I (48799) PCNT_EVENT: Motor 2 running, PCNT=246 (target=255)
+[2026-03-14 18:24:45.300] I (48809) PWM_EVENT: PWM channel 2 duty set to 3588.
+[2026-03-14 18:24:46.111] I (49619) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=52726, elapsed=0ms)
+[2026-03-14 18:24:46.291] I (49799) PCNT_EVENT: Motor 2 running, PCNT=257 (target=255)
+[2026-03-14 18:24:46.299] I (49809) PWM_EVENT: PWM channel 2 duty set to 3593.
+[2026-03-14 18:24:47.291] I (50799) PCNT_EVENT: Motor 2 running, PCNT=254 (target=255)
+[2026-03-14 18:24:47.299] I (50809) PWM_EVENT: PWM channel 2 duty set to 3574.
+[2026-03-14 18:24:48.291] I (51799) PCNT_EVENT: Motor 2 running, PCNT=248 (target=255)
+[2026-03-14 18:24:48.299] I (51809) PWM_EVENT: PWM channel 2 duty set to 3506.
+[2026-03-14 18:24:49.189] I (52699) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-14 18:24:49.291] I (52799) PCNT_EVENT: Motor 2 idle, PCNT=242
+[2026-03-14 18:24:49.293] I (52799) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-14 18:24:50.292] I (53799) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-03-14 18:24:50.294] I (53799) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-14 18:25:11.109] I (74619) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-14 18:25:11.115] I (74619) ESP32S3_MQTT_EVENT:            MQTT错误类型统计报告 [2026-03-14 18:25:11 [运行 00:01:14]]
+[2026-03-14 18:25:11.122] I (74619) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-14 18:25:11.127] I (74629) ESP32S3_MQTT_EVENT: 传输层超时:        0
+[2026-03-14 18:25:11.132] I (74629) ESP32S3_MQTT_EVENT: PING响应超时:      0
+[2026-03-14 18:25:11.136] I (74639) ESP32S3_MQTT_EVENT: 连接被重置:        0
+[2026-03-14 18:25:11.141] I (74639) ESP32S3_MQTT_EVENT: 写入超时:          0
+[2026-03-14 18:25:11.147] I (74649) ESP32S3_MQTT_EVENT: 连接失败:          0
+[2026-03-14 18:25:11.154] I (74649) ESP32S3_MQTT_EVENT: =================================================
+
+
+============================================================
+日志记录结束
+结束时间: 2026-03-14 18:25:13
+总运行时间: 0.70 分钟
+总行数: 35
+============================================================
+连接统计:
+  - MQTT连接次数: 0
+  - MQTT断开次数: 0
+  - 连接保持率: 0.00%
+
+错误统计:
+  - 无错误记录
+============================================================
