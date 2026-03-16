@@ -82,11 +82,15 @@ void pcnt_monitor(void* params)
             abnormal_check_enabled = true;
             
             // 如果不空闲则开始测量
-            char buff[64];
-            sprintf(buff, "pcnt_count_%d_%d", index, pcnt_count_list[index]);
-            esp_mqtt_client_publish(mqtt_client, MQTT_DATA_CHANNEL, buff, strlen(buff), 2, 0);
+            // 将200ms原始值转换为每秒值，保持与旧版1秒采样相同的数值范围
             int actual_per_sec = pcnt_count_list[index] * 5;
             int target_per_sec = (int)motor_speed_list[index];
+            
+            char buff[64];
+            // MQTT发布每秒值（0-450范围），与1秒采样时格式一致
+            sprintf(buff, "pcnt_count_%d_%d", index, actual_per_sec);
+            esp_mqtt_client_publish(mqtt_client, MQTT_DATA_CHANNEL, buff, strlen(buff), 2, 0);
+            
             ESP_LOGI(TAG, "Motor %d running, PCNT=%d/s (raw=%d/200ms), target=%d/s", 
                      index, actual_per_sec, pcnt_count_list[index], target_per_sec);
             idle = false;
