@@ -105,6 +105,11 @@ void PID_init(void* params)
         .min_pcnt   = 0
     };
 
+    // Soft start variables
+    int startup_phase = 1;  // 1 = in startup, 0 = normal operation
+    int startup_counter = 0;
+    double max_pwm_during_startup = 3000;  // Limit initial PWM to prevent overshoot
+    
     while(1){
         if(pcnt_updated_list[index] == true)
         {
@@ -113,10 +118,24 @@ void PID_init(void* params)
             // pcnt_count_list is per 200ms, multiply by 5 to get per-second
             double actual_speed_per_sec = pcnt_count_list[index] * 5;
             double new_input = PID_Calculate(pid_params, &data, temp, actual_speed_per_sec);
+            
+            // Soft start: limit max output during first 10 samples (2 seconds)
+            if (startup_phase) {
+                startup_counter++;
+                if (startup_counter <= 10) {
+                    // Gradually increase max allowed output
+                    double progress = startup_counter / 10.0;
+                    double current_max = max_pwm_during_startup + (8191 - max_pwm_during_startup) * progress;
+                    if (new_input > current_max) {
+                        new_input = current_max;
+                    }
+                } else {
+                    startup_phase = 0;  // End startup phase
+                }
+            }
+            
             // CHB-BLDC2418: Inverted PWM logic - High=OFF, Low=ON
             // Duty 8191 = Motor OFF, Duty 0 = Motor ON
-            // PID output range: min_pwm(1500) to max_pwm(6000)
-            // Inverted range: 8191-6000=2191 to 8191-1500=6691
             int new_input_int = 8191 - (int)new_input;
             
             // Additional safety clamp for PWM output
@@ -125,9 +144,15 @@ void PID_init(void* params)
             
             pwm_set_duty(new_input_int, index);
             
-            ESP_LOGI(TAG, "Motor %d PID: target=%.0f/s, actual=%.0f/s (raw=%d/200ms), pid_out=%.0f, pwm_duty=%d",
-                     index, temp, actual_speed_per_sec, pcnt_count_list[index], new_input, new_input_int);
+            ESP_LOGI(TAG, "Motor %d PID: target=%.0f/s, actual=%.0f/s (raw=%d/200ms), pid_out=%.0f, pwm_duty=%d, startup=%d",
+                     index, temp, actual_speed_per_sec, pcnt_count_list[index], new_input, new_input_int, startup_counter);
             pcnt_updated_list[index] = false;
+            
+            // Reset startup phase when motor stops
+            if (temp == 0 && !startup_phase) {
+                startup_phase = 1;
+                startup_counter = 0;
+            }
         }
         else{
             vTaskDelay(10 / portTICK_PERIOD_MS);
