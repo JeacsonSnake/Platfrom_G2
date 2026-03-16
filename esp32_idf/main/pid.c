@@ -70,13 +70,14 @@ void PID_init(void* params)
 
     // CHB-BLDC2418 PID Parameters
     // Max PCNT = (4500 RPM / 60) * 6 pulses/rotation = 450 pulses/sec
+    // Tuned for 200ms sampling interval (5Hz)
     struct PID_params pid_params = {
-        .Kp         = 8,
-        .Ki         = 0.02,
-        .Kd         = 0.01,
+        .Kp         = 5,        // Reduced for smoother response
+        .Ki         = 0.005,    // Scaled down for faster sampling (0.02/4)
+        .Kd         = 0.03,     // Increased for better damping
         .max_pwm    = 8191,     // 13-bit resolution max value
         .min_pwm    = 0,
-        .max_pcnt   = 450,      // 4500 RPM * 6 / 60 = 450
+        .max_pcnt   = 90,       // 450 * 0.2s = 90 pulses per 200ms interval
         .min_pcnt   = 0
     };
 

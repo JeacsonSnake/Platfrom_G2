@@ -65,12 +65,12 @@ void pcnt_monitor(void* params)
             char buff[64];
             sprintf(buff, "pcnt_count_%d_%d", index, pcnt_count_list[index]);
             esp_mqtt_client_publish(mqtt_client, MQTT_DATA_CHANNEL, buff, strlen(buff), 2, 0);
-            ESP_LOGI(TAG, "Motor %d running, PCNT=%d (target=%d)", 
-                     index, pcnt_count_list[index], (int)motor_speed_list[index]);
+            ESP_LOGI(TAG, "Motor %d running, PCNT=%d/200ms (target=%d/200ms)", 
+                     index, pcnt_count_list[index], (int)(motor_speed_list[index] / 5));
             idle = false;
             pcnt_updated_list[index] = true;
         }
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelay(200 / portTICK_PERIOD_MS);
     }
 }
 
