@@ -38,6 +38,8 @@ void pcnt_monitor(void* params)
     
     // 空闲控制
     bool idle = false;
+    // 异常值检测标志：仅在电机启动后才启用（避免未通电时的噪声）
+    bool abnormal_check_enabled = false;
     // Max theoretical PCNT per 200ms: 450 pulses/sec * 0.2s = 90
     // Allow some margin: 150 per 200ms (750/s) is max reasonable
     const int MAX_REASONABLE_PCNT_PER_200MS = 150;
@@ -48,11 +50,13 @@ void pcnt_monitor(void* params)
         pcnt_unit_get_count(unit, &pcnt_count_list[index]);
         pcnt_unit_clear_count(unit);
         
-        // Filter abnormal values (noise or overflow)
-        if (pcnt_count_list[index] > MAX_REASONABLE_PCNT_PER_200MS || pcnt_count_list[index] < 0) {
-            ESP_LOGW(TAG, "Motor %d PCNT abnormal value detected: %d, resetting to 0", 
-                     index, pcnt_count_list[index]);
-            pcnt_count_list[index] = 0;
+        // 异常值检测：仅在电机运行后才启用（避免未通电时的噪声干扰）
+        if (abnormal_check_enabled) {
+            if (pcnt_count_list[index] > MAX_REASONABLE_PCNT_PER_200MS || pcnt_count_list[index] < 0) {
+                ESP_LOGW(TAG, "Motor %d PCNT abnormal value detected: %d, resetting to 0", 
+                         index, pcnt_count_list[index]);
+                pcnt_count_list[index] = 0;
+            }
         }
 
         // 判断是否有转动指令，是否空闲，空闲时不进行测量更新
@@ -69,9 +73,14 @@ void pcnt_monitor(void* params)
             if(pcnt_count_list[index] == 0){
                 idle = true;
             }
+            // 电机停止后，禁用异常值检测（下次启动前可能有噪声）
+            abnormal_check_enabled = false;
         }
         else if(motor_speed_list[index] != 0)
         {
+            // 电机启动后，启用异常值检测
+            abnormal_check_enabled = true;
+            
             // 如果不空闲则开始测量
             char buff[64];
             sprintf(buff, "pcnt_count_%d_%d", index, pcnt_count_list[index]);
