@@ -8,16 +8,6 @@ void pcnt_func_init()
 {
     for(int i = 0; i <4; i++)
     {
-        // Configure GPIO with pull-up to prevent floating input noise
-        gpio_config_t io_conf = {
-            .pin_bit_mask = (1ULL << pcnt_gpios[i]),
-            .mode = GPIO_MODE_INPUT,
-            .pull_up_en = GPIO_PULLUP_ENABLE,  // Enable internal pull-up
-            .pull_down_en = GPIO_PULLDOWN_DISABLE,
-            .intr_type = GPIO_INTR_DISABLE,
-        };
-        gpio_config(&io_conf);
-        
         pcnt_unit_config_t unit_config = {
             .high_limit = 10000,
             .low_limit = -10000,
@@ -30,12 +20,11 @@ void pcnt_func_init()
         };
         pcnt_channel_handle_t pcnt_chan_handle = NULL;
         pcnt_new_channel(pcnt_unit_list[i], &chan_config, &pcnt_chan_handle);
-        // Only count on rising edge (one pulse per rotation cycle)
-        pcnt_channel_set_edge_action(pcnt_chan_handle, PCNT_CHANNEL_EDGE_ACTION_INCREASE, PCNT_CHANNEL_EDGE_ACTION_HOLD);
+        pcnt_channel_set_edge_action(pcnt_chan_handle, PCNT_CHANNEL_EDGE_ACTION_INCREASE, PCNT_CHANNEL_LEVEL_ACTION_KEEP);
         pcnt_unit_enable(pcnt_unit_list[i]);
         pcnt_unit_clear_count(pcnt_unit_list[i]);
         pcnt_unit_start(pcnt_unit_list[i]);
-        ESP_LOGI(TAG, "PCNT channel %d has been initiated on pin %d with pull-up.", i, pcnt_gpios[i]);
+        ESP_LOGI(TAG, "PCNT channel %d has been initiated on pin %d.", i, pcnt_gpios[i]);
     }
 }
 
