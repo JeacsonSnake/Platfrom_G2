@@ -96,12 +96,12 @@ void PID_init(void* params)
     // Max PCNT = (4500 RPM / 60) * 6 pulses/rotation = 450 pulses/sec
     // Tuned for 200ms sampling interval (5Hz)
     struct PID_params pid_params = {
-        .Kp         = 5,        // Reduced for smoother response
-        .Ki         = 0.002,    // Further reduced to prevent integral windup
-        .Kd         = 0.05,     // Increased for better damping
-        .max_pwm    = 6000,     // Limit max output to prevent motor running at absolute max
-        .min_pwm    = 1500,     // Minimum PWM to ensure controllable speed range
-        .max_pcnt   = 90,       // 450 * 0.2s = 90 pulses per 200ms interval
+        .Kp         = 8,        // Proportional gain
+        .Ki         = 0.02,     // Integral gain (scaled for 5Hz)
+        .Kd         = 0.01,     // Derivative gain
+        .max_pwm    = 8191,     // 13-bit max (full range)
+        .min_pwm    = 0,        // Allow full stop
+        .max_pcnt   = 450,      // 450 pulses/sec max
         .min_pcnt   = 0
     };
 
@@ -109,7 +109,10 @@ void PID_init(void* params)
         if(pcnt_updated_list[index] == true)
         {
             double temp = motor_speed_list[index];
-            double new_input = PID_Calculate(pid_params, &data, temp, pcnt_count_list[index]);
+            // Convert 200ms PCNT count to per-second rate for PID comparison
+            // pcnt_count_list is per 200ms, multiply by 5 to get per-second
+            double actual_speed_per_sec = pcnt_count_list[index] * 5;
+            double new_input = PID_Calculate(pid_params, &data, temp, actual_speed_per_sec);
             // CHB-BLDC2418: Inverted PWM logic - High=OFF, Low=ON
             // Duty 8191 = Motor OFF, Duty 0 = Motor ON
             // PID output range: min_pwm(1500) to max_pwm(6000)
@@ -122,8 +125,8 @@ void PID_init(void* params)
             
             pwm_set_duty(new_input_int, index);
             
-            ESP_LOGI(TAG, "Motor %d PID: target=%.0f, actual=%d, pid_out=%.0f, pwm_duty=%d",
-                     index, temp, pcnt_count_list[index], new_input, new_input_int);
+            ESP_LOGI(TAG, "Motor %d PID: target=%.0f/s, actual=%.0f/s (raw=%d/200ms), pid_out=%.0f, pwm_duty=%d",
+                     index, temp, actual_speed_per_sec, pcnt_count_list[index], new_input, new_input_int);
             pcnt_updated_list[index] = false;
         }
         else{
