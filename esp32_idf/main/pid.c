@@ -58,14 +58,10 @@ double PID_Calculate(struct PID_params params, struct PID_data *data, double tar
 
     // 抗饱和处理：如果输出饱和且积分推动了饱和，则回滚积分
     if (is_saturated) {
-        // 检查积分是否推动了饱和
-        double P_D_out = Pout + Dout;
-        double output_without_I = data->pre_input + P_D_out;
-        
-        // 如果去掉积分后不会饱和，说明是积分导致的饱和
+        // 如果当前误差与饱和方向相同，说明积分推动了饱和
+        // 回滚积分累积以防止积分 windup
         if ((output_unlimited > params.max_pwm && error > 0) ||
             (output_unlimited < params.min_pwm && error < 0)) {
-            // 回滚积分累积
             data->integral = pre_integral;
         }
     }
