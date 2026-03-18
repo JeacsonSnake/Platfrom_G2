@@ -1,0 +1,178 @@
+============================================================
+ESP32-S3 串口日志记录
+开始时间: 2026-03-16 17:58:25
+串口: COM10, 波特率: 115200
+============================================================
+
+[2026-03-16 17:58:25.551] I (111) esp_image: segment 1: paddr=00032ee0 vaddr=3fc9be00 sizeW (14984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2995, resetting to 0
+[2026-03-16 17:58:25.750] W (15184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2986, resetting to 0
+[2026-03-16 17:58:25.950] W (15384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2992, resetting to 0
+[2026-03-16 17:58:26.149] W (15584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2991, resetting to 0
+[2026-03-16 17:58:26.350] W (15784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2999, resetting to 0
+[2026-03-16 17:58:26.549] W (15984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2997, resetting to 0
+[2026-03-16 17:58:26.750] W (16184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 3003, resetting to 0
+[2026-03-16 17:58:26.950] W (16384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2995, resetting to 0
+[2026-03-16 17:58:27.151] W (16584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2944, resetting to 0
+[2026-03-16 17:58:27.351] W (16784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2959, resetting to 0
+[2026-03-16 17:58:27.550] W (16984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2922, resetting to 0
+[2026-03-16 17:58:27.750] W (17184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2981, resetting to 0
+[2026-03-16 17:58:27.950] W (17384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2967, resetting to 0
+[2026-03-16 17:58:28.150] W (17584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2977, resetting to 0
+[2026-03-16 17:58:28.349] W (17784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2987, resetting to 0
+[2026-03-16 17:58:28.550] W (17984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2993, resetting to 0
+[2026-03-16 17:58:28.750] W (18184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2989, resetting to 0
+[2026-03-16 17:58:28.949] W (18384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2993, resetting to 0
+[2026-03-16 17:58:29.149] W (18584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2986, resetting to 0
+[2026-03-16 17:58:29.350] W (18784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2994, resetting to 0
+[2026-03-16 17:58:29.549] W (18984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 3003, resetting to 0
+[2026-03-16 17:58:29.751] W (19184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 3000, resetting to 0
+[2026-03-16 17:58:29.951] W (19384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2995, resetting to 0
+[2026-03-16 17:58:30.150] W (19584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 3000, resetting to 0
+[2026-03-16 17:58:30.349] W (19784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2993, resetting to 0
+[2026-03-16 17:58:30.550] W (19984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2930, resetting to 0
+[2026-03-16 17:58:30.749] W (20184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2914, resetting to 0
+[2026-03-16 17:58:30.950] W (20384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2968, resetting to 0
+[2026-03-16 17:58:31.149] W (20584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2973, resetting to 0
+[2026-03-16 17:58:31.351] W (20784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2961, resetting to 0
+[2026-03-16 17:58:31.550] W (20984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2971, resetting to 0
+[2026-03-16 17:58:31.749] W (21184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2989, resetting to 0
+[2026-03-16 17:58:31.950] W (21384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2989, resetting to 0
+[2026-03-16 17:58:32.150] W (21584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2982, resetting to 0
+[2026-03-16 17:58:32.350] W (21784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2988, resetting to 0
+[2026-03-16 17:58:32.550] W (21984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2990, resetting to 0
+[2026-03-16 17:58:32.749] W (22184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2999, resetting to 0
+[2026-03-16 17:58:32.950] W (22384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2993, resetting to 0
+[2026-03-16 17:58:33.150] W (22584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2996, resetting to 0
+[2026-03-16 17:58:33.350] W (22784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2997, resetting to 0
+[2026-03-16 17:58:33.550] W (22984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2996, resetting to 0
+[2026-03-16 17:58:33.750] W (23184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2929, resetting to 0
+[2026-03-16 17:58:33.949] W (23384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2894, resetting to 0
+[2026-03-16 17:58:34.149] W (23584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2952, resetting to 0
+[2026-03-16 17:58:34.350] W (23784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2973, resetting to 0
+[2026-03-16 17:58:34.551] W (23984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2936, resetting to 0
+[2026-03-16 17:58:34.751] W (24184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2982, resetting to 0
+[2026-03-16 17:58:34.950] W (24384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2977, resetting to 0
+[2026-03-16 17:58:35.150] W (24584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2985, resetting to 0
+[2026-03-16 17:58:35.350] W (24784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2980, resetting to 0
+[2026-03-16 17:58:35.550] W (24984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2986, resetting to 0
+[2026-03-16 17:58:35.750] W (25184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2989, resetting to 0
+[2026-03-16 17:58:35.950] W (25384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2988, resetting to 0
+[2026-03-16 17:58:36.150] W (25584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2994, resetting to 0
+[2026-03-16 17:58:36.350] W (25784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2993, resetting to 0
+[2026-03-16 17:58:36.550] W (25984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2998, resetting to 0
+[2026-03-16 17:58:36.751] W (26184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2980, resetting to 0
+[2026-03-16 17:58:36.950] W (26384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2917, resetting to 0
+[2026-03-16 17:58:37.150] W (26584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2910, resetting to 0
+[2026-03-16 17:58:37.349] W (26784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2969, resetting to 0
+[2026-03-16 17:58:37.550] W (26984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2946, resetting to 0
+[2026-03-16 17:58:37.750] W (27184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2930, resetting to 0
+[2026-03-16 17:58:37.950] W (27384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2938, resetting to 0
+[2026-03-16 17:58:38.150] W (27584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2989, resetting to 0
+[2026-03-16 17:58:38.350] W (27784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2970, resetting to 0
+[2026-03-16 17:58:38.550] W (27984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2993, resetting to 0
+[2026-03-16 17:58:38.749] W (28184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2979, resetting to 0
+[2026-03-16 17:58:38.950] W (28384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2994, resetting to 0
+[2026-03-16 17:58:39.149] W (28584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2981, resetting to 0
+[2026-03-16 17:58:39.350] W (28784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2988, resetting to 0
+[2026-03-16 17:58:39.550] W (28984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2996, resetting to 0
+[2026-03-16 17:58:39.750] W (29184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2978, resetting to 0
+[2026-03-16 17:58:39.950] W (29384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2903, resetting to 0
+[2026-03-16 17:58:40.149] W (29584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2874, resetting to 0
+[2026-03-16 17:58:40.350] W (29784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2938, resetting to 0
+[2026-03-16 17:58:40.551] W (29984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2934, resetting to 0
+[2026-03-16 17:58:40.750] W (30184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2921, resetting to 0
+[2026-03-16 17:58:40.949] W (30384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2960, resetting to 0
+[2026-03-16 17:58:41.150] W (30584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2983, resetting to 0
+[2026-03-16 17:58:41.350] W (30784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2971, resetting to 0
+[2026-03-16 17:58:41.550] W (30984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2982, resetting to 0
+[2026-03-16 17:58:41.751] W (31184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2992, resetting to 0
+[2026-03-16 17:58:41.950] W (31384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2994, resetting to 0
+[2026-03-16 17:58:42.150] W (31584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2980, resetting to 0
+[2026-03-16 17:58:42.350] W (31784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2996, resetting to 0
+[2026-03-16 17:58:42.551] W (31984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2998, resetting to 0
+[2026-03-16 17:58:42.750] W (32184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2994, resetting to 0
+[2026-03-16 17:58:42.950] W (32384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2852, resetting to 0
+[2026-03-16 17:58:43.151] W (32584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2884, resetting to 0
+[2026-03-16 17:58:43.350] W (32784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2964, resetting to 0
+[2026-03-16 17:58:43.550] W (32984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2859, resetting to 0
+[2026-03-16 17:58:43.750] W (33184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2933, resetting to 0
+[2026-03-16 17:58:43.951] W (33384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2970, resetting to 0
+[2026-03-16 17:58:44.151] W (33584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 3083, resetting to 0
+[2026-03-16 17:58:44.351] W (33784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2652, resetting to 0
+[2026-03-16 17:58:44.550] W (33984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 1988, resetting to 0
+[2026-03-16 17:58:44.750] W (34184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2330, resetting to 0
+[2026-03-16 17:58:44.950] W (34384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 1941, resetting to 0
+[2026-03-16 17:58:45.150] W (34584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2045, resetting to 0
+[2026-03-16 17:58:45.350] W (34784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 1662, resetting to 0
+[2026-03-16 17:58:45.551] W (34984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 1243, resetting to 0
+[2026-03-16 17:58:45.751] W (35184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 5726, resetting to 0
+[2026-03-16 17:58:45.950] W (35384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 1948, resetting to 0
+[2026-03-16 17:58:46.150] W (35584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2327, resetting to 0
+[2026-03-16 17:58:46.350] W (35784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 1284, resetting to 0
+[2026-03-16 17:58:46.549] W (35984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2700, resetting to 0
+[2026-03-16 17:58:46.750] W (36184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 7117, resetting to 0
+[2026-03-16 17:58:46.950] W (36384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 9741, resetting to 0
+[2026-03-16 17:58:47.151] W (36584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 1317, resetting to 0
+[2026-03-16 17:58:47.349] W (36784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 1508, resetting to 0
+[2026-03-16 17:58:47.552] W (36984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2115, resetting to 0
+[2026-03-16 17:58:47.750] W (37184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2137, resetting to 0
+[2026-03-16 17:58:47.950] W (37384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2594, resetting to 0
+[2026-03-16 17:58:48.151] W (37584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 8637, resetting to 0
+[2026-03-16 17:58:48.349] W (37784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2325, resetting to 0
+[2026-03-16 17:58:48.550] W (37984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2134, resetting to 0
+[2026-03-16 17:58:48.751] W (38184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 5691, resetting to 0
+[2026-03-16 17:58:48.950] W (38384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 3882, resetting to 0
+[2026-03-16 17:58:49.150] W (38584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 9069, resetting to 0
+[2026-03-16 17:58:49.350] W (38784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 1742, resetting to 0
+[2026-03-16 17:58:49.551] W (38984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 6308, resetting to 0
+[2026-03-16 17:58:49.750] W (39184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 1591, resetting to 0
+[2026-03-16 17:58:49.950] W (39384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 7797, resetting to 0
+[2026-03-16 17:58:50.149] W (39584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 6656, resetting to 0
+[2026-03-16 17:58:50.350] W (39784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 983, resetting to 0
+[2026-03-16 17:58:50.551] W (39984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 7098, resetting to 0
+[2026-03-16 17:58:50.750] W (40184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2293, resetting to 0
+[2026-03-16 17:58:50.950] W (40384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 552, resetting to 0
+[2026-03-16 17:58:51.150] W (40584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 7557, resetting to 0
+[2026-03-16 17:58:51.351] W (40784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 8218, resetting to 0
+[2026-03-16 17:58:51.550] W (40984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 4369, resetting to 0
+[2026-03-16 17:58:51.751] W (41184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 3160, resetting to 0
+[2026-03-16 17:58:51.950] W (41384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 3231, resetting to 0
+[2026-03-16 17:58:52.151] W (41584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 9277, resetting to 0
+[2026-03-16 17:58:52.350] W (41784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 3150, resetting to 0
+[2026-03-16 17:58:52.550] W (41984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2305, resetting to 0
+[2026-03-16 17:58:52.750] W (42184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2185, resetting to 0
+[2026-03-16 17:58:52.950] W (42384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2154, resetting to 0
+[2026-03-16 17:58:53.013] I (42444) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=60681, elapsed=0ms)
+[2026-03-16 17:58:53.150] W (42584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 1852, resetting to 0
+[2026-03-16 17:58:53.350] W (42784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2003, resetting to 0
+[2026-03-16 17:58:53.550] W (42984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2213, resetting to 0
+[2026-03-16 17:58:53.750] W (43184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 696, resetting to 0
+[2026-03-16 17:58:53.950] W (43384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 1232, resetting to 0
+[2026-03-16 17:58:54.150] W (43584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2327, resetting to 0
+[2026-03-16 17:58:54.351] W (43784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2836, resetting to 0
+[2026-03-16 17:58:54.550] W (43984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2884, resetting to 0
+[2026-03-16 17:58:54.751] W (44184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2886, resetting to 0
+[2026-03-16 17:58:54.951] W (44384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2947, resetting to 0
+[2026-03-16 17:58:55.150] W (44584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2969, resetting to 0
+[2026-03-16 17:58:55.351] W (44784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2954, resetting to 0
+[2026-03-16 17:58:55.550] W (44984) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2968, resetting to 0
+[2026-03-16 17:58:55.751] W (45184) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2977, resetting to 0
+[2026-03-16 17:58:55.950] W (45384) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2977, resetting to 0
+[2026-03-16 17:58:56.149] W (45584) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2935, resetting to 0
+[2026-03-16 17:58:56.350] W (45784) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 2870, resetting to 0
+
+
+============================================================
+日志记录结束
+结束时间: 2026-03-16 17:58:56
+总运行时间: 0.52 分钟
+总行数: 156
+============================================================
+连接统计:
+  - MQTT连接次数: 0
+  - MQTT断开次数: 0
+  - 连接保持率: 0.00%
+
+错误统计:
+  - 无错误记录
+============================================================
