@@ -144,14 +144,18 @@ void PID_init(void* params)
                      index, temp, actual_speed_per_sec, pcnt_count_list[index], new_input, new_input_int, startup_counter);
             pcnt_updated_list[index] = false;
             
-            // Reset startup phase when motor starts (transition from 0 to non-zero)
-            // Track previous target speed to detect startup transition
+            // Reset startup phase when motor starts after being stopped
+            // startup_counter > 10 means we've completed a previous soft-start cycle
             static double prev_target_speed[4] = {0, 0, 0, 0};
-            if (temp > 0 && prev_target_speed[index] == 0 && !startup_phase) {
-                startup_phase = 1;
-                startup_counter = 0;
-                ESP_LOGI(TAG, "Motor %d soft-start reset detected (target: %.0f -> %.0f)", 
-                         index, prev_target_speed[index], temp);
+            if (temp > 0 && prev_target_speed[index] == 0) {
+                // Motor is starting (prev was 0, now non-zero)
+                if (!startup_phase || startup_counter > 10) {
+                    // Either not in startup, or counter shows we've done a full cycle
+                    startup_phase = 1;
+                    startup_counter = 0;
+                    ESP_LOGI(TAG, "Motor %d soft-start reset (target: %.0f -> %.0f, phase=%d)", 
+                             index, prev_target_speed[index], temp, startup_phase);
+                }
             }
             prev_target_speed[index] = temp;
         }
