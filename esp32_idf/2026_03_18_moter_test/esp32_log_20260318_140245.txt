@@ -1,0 +1,627 @@
+============================================================
+ESP32-S3 串口日志记录
+开始时间: 2026-03-18 14:02:45
+串口: COM10, 波特率: 115200
+============================================================
+
+[2026-03-18 14:02:45.331] W (1581) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (1/60)
+[2026-03-18 14:02:45.619] I (1861) wifi:connected with WeShare-6148, aid = 8, channel 1, BW20, bssid = c4:70:ab:d9:a0:e2
+[2026-03-18 14:02:45.621] I (1861) wifi:security: WPA2-PSK, phy: bgn, rssi: -70
+[2026-03-18 14:02:45.624] I (1871) wifi:pm start, type: 0
+[2026-03-18 14:02:45.626] 
+[2026-03-18 14:02:45.632] I (1871) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us
+[2026-03-18 14:02:45.640] I (1881) wifi:set rx beacon pti, rx_bcn_pti: 0, bcn_timeout: 25000, mt_pti: 0, mt_time: 10000
+[2026-03-18 14:02:45.645] I (1881) wifi:AP's beacon interval = 102400 us, DTIM period = 1
+[2026-03-18 14:02:46.331] W (2581) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (2/60)
+[2026-03-18 14:02:47.141] I (3391) ESP32S3_WIFI_EVENT: Got ip:192.168.110.199
+[2026-03-18 14:02:47.143] I (3391) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:02:47.146] I (3391) MQTT_MONITOR: ==============================================
+[2026-03-18 14:02:47.150] I (3391) MQTT_MONITOR: 正在启动 SNTP 时间同步...
+[2026-03-18 14:02:47.162] I (3401) MQTT_MONITOR: NTP服务器1: cn.pool.ntp.org (国内)
+[2026-03-18 14:02:47.163] I (3401) MQTT_MONITOR: NTP服务器2: ntp.aliyun.com (阿里云)
+[2026-03-18 14:02:47.168] I (3411) MQTT_MONITOR: NTP服务器3: ntp.tencent.com (腾讯云)
+[2026-03-18 14:02:47.173] I (3411) MQTT_MONITOR: 当前系统时间: 3028 ms
+[2026-03-18 14:02:47.179] I (3421) MQTT_MONITOR: 时区设置: CST-8 (UTC+8, 中国标准时间)
+[2026-03-18 14:02:47.185] I (3421) MQTT_MONITOR: SNTP 初始化完成，等待时间同步...
+[2026-03-18 14:02:47.191] I (3431) MQTT_MONITOR: ==============================================
+[2026-03-18 14:02:47.199] I (3441) esp_netif_handlers: sta ip: 192.168.110.199, mask: 255.255.255.0, gw: 192.168.110.1
+[2026-03-18 14:02:47.202] I (3441) ESP32S3_WIFI_EVENT: Connected to ap!
+[2026-03-18 14:02:47.209] I (3451) ESP32S3_WIFI_EVENT: Waiting for NTP time sync...
+[2026-03-18 14:02:49.238] I (5481) MQTT_MONITOR: ==============================================
+[2026-03-18 14:02:49.240] I (5481) MQTT_MONITOR: NTP时间同步回调被触发！
+[2026-03-18 14:02:49.242] I (5481) MQTT_MONITOR: 已发送同步完成信号
+[2026-03-18 14:02:49.250] I (5481) MQTT_MONITOR: ==============================================
+[2026-03-18 14:02:49.254] I (5491) MQTT_MONITOR: 时间同步完成！
+[2026-03-18 14:02:49.260] I (5501) MQTT_MONITOR: 当前实际时间: 2026-03-18 14:02:49 [运行 00:00:05]
+[2026-03-18 14:02:49.264] I (5501) MQTT_MONITOR: 开机时间戳: 3028 ms
+[2026-03-18 14:02:49.270] I (5511) MQTT_MONITOR: 实际开机时间: Wed Mar 18 14:02:44 2026
+[2026-03-18 14:02:49.272] 
+[2026-03-18 14:02:49.275] I (5511) MQTT_MONITOR: NTP轮询间隔已恢复为1小时
+[2026-03-18 14:02:49.282] I (5521) MQTT_MONITOR: ==============================================
+[2026-03-18 14:02:49.286] I (5531) MQTT_MONITOR: 时间同步成功！
+[2026-03-18 14:02:49.291] I (5531) MQTT_MONITOR: 当前时间: 2026-03-18 14:02:49
+[2026-03-18 14:02:49.295] I (5541) MQTT_MONITOR: 开机时间戳: 3028 ms
+[2026-03-18 14:02:49.301] I (5541) MQTT_MONITOR: 实际开机时间: Wed Mar 18 14:02:44 2026
+[2026-03-18 14:02:49.303] 
+[2026-03-18 14:02:49.307] I (5551) MQTT_MONITOR: ==============================================
+[2026-03-18 14:02:49.314] I (5551) ESP32S3_WIFI_EVENT: NTP time sync completed successfully
+[2026-03-18 14:02:54.311] I (10561) MQTT_MONITOR: MQTT连接监控模块已初始化
+[2026-03-18 14:02:54.313] I (10561) MQTT_MONITOR: 统计报告间隔: 0 小时
+[2026-03-18 14:02:54.316] I (10561) MQTT_MONITOR: =================================================
+[2026-03-18 14:02:54.323] I (10561) MQTT_MONITOR:       MQTT连接监控统计系统已启动
+[2026-03-18 14:02:54.329] I (10571) MQTT_MONITOR: =================================================
+[2026-03-18 14:02:54.335] I (10571) MQTT_MONITOR: 提示: 时间将在WiFi连接后通过NTP同步
+[2026-03-18 14:02:54.340] I (10581) MQTT_MONITOR: 等待 SNTP 时间同步完成...
+[2026-03-18 14:02:54.347] I (10581) MQTT_MONITOR: 时间同步已完成，开始监控任务
+[2026-03-18 14:02:54.352] I (10601) ESP32S3_MQTT_EVENT: MQTT客户端已启动
+[2026-03-18 14:02:54.357] I (10601) ESP32S3_MQTT_EVENT: MQTT心跳任务已启动
+[2026-03-18 14:02:54.362] I (10601) ESP32S3_MQTT_EVENT: MQTT连接健康检查任务已启动
+[2026-03-18 14:02:54.368] I (10601) PWM_EVENT: PWM timer 0 initiated at clock speed 5000.
+[2026-03-18 14:02:54.377] I (10611) PWM_EVENT: PWM channel 0 initiated on GPIO1 with initial duty 0 (inverted logic).
+[2026-03-18 14:02:54.384] I (10621) PWM_EVENT: PWM channel 1 initiated on GPIO4 with initial duty 0 (inverted logic).
+[2026-03-18 14:02:54.393] I (10631) PWM_EVENT: PWM channel 2 initiated on GPIO6 with initial duty 0 (inverted logic).
+[2026-03-18 14:02:54.401] I (10641) PWM_EVENT: PWM channel 3 initiated on GPIO8 with initial duty 0 (inverted logic).
+[2026-03-18 14:02:54.405] I (10641) PCNT_EVENT: PCNT channel 0 has been initiated on pin 2.
+[2026-03-18 14:02:54.412] I (10651) PCNT_EVENT: PCNT channel 1 has been initiated on pin 5.
+[2026-03-18 14:02:54.418] I (10661) PCNT_EVENT: PCNT channel 2 has been initiated on pin 7.
+[2026-03-18 14:02:54.423] I (10661) PCNT_EVENT: PCNT channel 3 has been initiated on pin 9.
+[2026-03-18 14:02:54.427] I (10671) PID_EVENT: Index number is: 1
+[2026-03-18 14:02:54.428] 
+[2026-03-18 14:02:54.431] I (10671) PID_EVENT: Index number is: 0
+[2026-03-18 14:02:54.432] 
+[2026-03-18 14:02:54.434] I (10671) PID_EVENT: Index number is: 2
+[2026-03-18 14:02:54.435] 
+[2026-03-18 14:02:54.439] I (10671) PID_EVENT: Index number is: 3
+[2026-03-18 14:02:54.440] 
+[2026-03-18 14:02:55.585] I (11831) ESP32S3_MQTT_EVENT: Connected to MQTT server.
+[2026-03-18 14:02:55.587] I (11831) ESP32S3_STATUS_LED: LED mode changed to: 3
+[2026-03-18 14:02:55.591] I (11831) MQTT_MONITOR: [连接事件] #1 | 时间: 2026-03-18 14:02:55 [运行 00:00:11]
+[2026-03-18 14:02:55.600] I (11841) ESP32S3_MQTT_EVENT: 已订阅控制频道 'esp32_1/control' (msg_id=63586)
+[2026-03-18 14:02:55.603] I (11851) PCNT_EVENT: Motor 0 idle, PCNT=0
+[2026-03-18 14:02:55.607] I (11851) PWM_EVENT: PWM channel 0 duty set to 8191.
+[2026-03-18 14:02:55.612] I (11851) PCNT_EVENT: Motor 2 idle, PCNT=4
+[2026-03-18 14:02:55.615] I (11851) PCNT_EVENT: Motor 1 idle, PCNT=11
+[2026-03-18 14:02:55.619] I (11851) PCNT_EVENT: Motor 3 idle, PCNT=0
+[2026-03-18 14:02:55.624] I (11861) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 14:02:55.629] I (11861) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-18 14:02:55.633] I (11861) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-03-18 14:02:55.822] I (12071) PCNT_EVENT: Motor 2 idle, PCNT=521
+[2026-03-18 14:02:55.824] I (12071) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 14:02:55.825] I (12071) PCNT_EVENT: Motor 1 idle, PCNT=178
+[2026-03-18 14:02:55.829] I (12071) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-18 14:02:56.023] I (12271) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-03-18 14:02:56.025] I (12271) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 14:02:56.026] I (12271) PCNT_EVENT: Motor 1 idle, PCNT=1
+[2026-03-18 14:02:56.030] I (12271) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-18 14:02:56.222] I (12471) PCNT_EVENT: Motor 1 idle, PCNT=4
+[2026-03-18 14:02:56.224] I (12471) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-18 14:02:56.423] I (12671) PCNT_EVENT: Motor 1 idle, PCNT=0
+[2026-03-18 14:02:56.425] I (12671) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-18 14:03:29.354] I (45601) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=18167, elapsed=0ms)
+[2026-03-18 14:03:32.423] I (48671) PCNT_EVENT: Motor 2 running, PCNT=0/s (raw=0/200ms), target=50/s
+[2026-03-18 14:03:32.432] I (48681) PWM_EVENT: PWM channel 2 duty set to 7790.
+[2026-03-18 14:03:32.436] I (48681) PID_EVENT: Motor 2 PID: target=50/s, actual=0/s (raw=0/200ms), pid_out=402, pwm_duty=7790, startup=1
+[2026-03-18 14:03:32.625] I (48871) PCNT_EVENT: Motor 2 running, PCNT=10/s (raw=2/200ms), target=50/s
+[2026-03-18 14:03:32.632] I (48881) PWM_EVENT: PWM channel 2 duty set to 7468.
+[2026-03-18 14:03:32.637] I (48881) PID_EVENT: Motor 2 PID: target=50/s, actual=10/s (raw=2/200ms), pid_out=723, pwm_duty=7468, startup=2
+[2026-03-18 14:03:32.824] I (49071) PCNT_EVENT: Motor 2 running, PCNT=20/s (raw=4/200ms), target=50/s
+[2026-03-18 14:03:32.832] I (49081) PWM_EVENT: PWM channel 2 duty set to 7226.
+[2026-03-18 14:03:32.836] I (49081) PID_EVENT: Motor 2 PID: target=50/s, actual=20/s (raw=4/200ms), pid_out=966, pwm_duty=7226, startup=3
+[2026-03-18 14:03:33.024] I (49271) PCNT_EVENT: Motor 2 running, PCNT=40/s (raw=8/200ms), target=50/s
+[2026-03-18 14:03:33.033] I (49281) PWM_EVENT: PWM channel 2 duty set to 7144.
+[2026-03-18 14:03:33.037] I (49281) PID_EVENT: Motor 2 PID: target=50/s, actual=40/s (raw=8/200ms), pid_out=1048, pwm_duty=7144, startup=4
+[2026-03-18 14:03:33.224] I (49471) PCNT_EVENT: Motor 2 running, PCNT=45/s (raw=9/200ms), target=50/s
+[2026-03-18 14:03:33.232] I (49481) PWM_EVENT: PWM channel 2 duty set to 7101.
+[2026-03-18 14:03:33.235] I (49481) PID_EVENT: Motor 2 PID: target=50/s, actual=45/s (raw=9/200ms), pid_out=1091, pwm_duty=7101, startup=5
+[2026-03-18 14:03:33.424] I (49671) PCNT_EVENT: Motor 2 running, PCNT=45/s (raw=9/200ms), target=50/s
+[2026-03-18 14:03:33.432] I (49681) PWM_EVENT: PWM channel 2 duty set to 7058.
+[2026-03-18 14:03:33.437] I (49681) PID_EVENT: Motor 2 PID: target=50/s, actual=45/s (raw=9/200ms), pid_out=1133, pwm_duty=7058, startup=6
+[2026-03-18 14:03:33.623] I (49871) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:03:33.632] I (49881) PWM_EVENT: PWM channel 2 duty set to 7055.
+[2026-03-18 14:03:33.636] I (49881) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1136, pwm_duty=7055, startup=7
+[2026-03-18 14:03:33.823] I (50071) PCNT_EVENT: Motor 2 running, PCNT=55/s (raw=11/200ms), target=50/s
+[2026-03-18 14:03:33.833] I (50081) PWM_EVENT: PWM channel 2 duty set to 7093.
+[2026-03-18 14:03:33.836] I (50081) PID_EVENT: Motor 2 PID: target=50/s, actual=55/s (raw=11/200ms), pid_out=1099, pwm_duty=7093, startup=8
+[2026-03-18 14:03:34.024] I (50271) PCNT_EVENT: Motor 2 running, PCNT=45/s (raw=9/200ms), target=50/s
+[2026-03-18 14:03:34.032] I (50281) PWM_EVENT: PWM channel 2 duty set to 7050.
+[2026-03-18 14:03:34.035] I (50281) PID_EVENT: Motor 2 PID: target=50/s, actual=45/s (raw=9/200ms), pid_out=1142, pwm_duty=7050, startup=9
+[2026-03-18 14:03:34.223] I (50471) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:03:34.233] I (50481) PWM_EVENT: PWM channel 2 duty set to 7047.
+[2026-03-18 14:03:34.237] I (50481) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1144, pwm_duty=7047, startup=10
+[2026-03-18 14:03:34.423] I (50671) PCNT_EVENT: Motor 2 running, PCNT=60/s (raw=12/200ms), target=50/s
+[2026-03-18 14:03:34.433] I (50681) PWM_EVENT: PWM channel 2 duty set to 7125.
+[2026-03-18 14:03:34.436] I (50681) PID_EVENT: Motor 2 PID: target=50/s, actual=60/s (raw=12/200ms), pid_out=1067, pwm_duty=7125, startup=11
+[2026-03-18 14:03:34.623] I (50871) PCNT_EVENT: Motor 2 running, PCNT=45/s (raw=9/200ms), target=50/s
+[2026-03-18 14:03:34.632] I (50881) PWM_EVENT: PWM channel 2 duty set to 7082.
+[2026-03-18 14:03:34.636] I (50881) PID_EVENT: Motor 2 PID: target=50/s, actual=45/s (raw=9/200ms), pid_out=1110, pwm_duty=7082, startup=11
+[2026-03-18 14:03:34.825] I (51071) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:03:34.831] I (51081) PWM_EVENT: PWM channel 2 duty set to 7079.
+[2026-03-18 14:03:34.836] I (51081) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1112, pwm_duty=7079, startup=11
+[2026-03-18 14:03:35.023] I (51271) PCNT_EVENT: Motor 2 running, PCNT=60/s (raw=12/200ms), target=50/s
+[2026-03-18 14:03:35.033] I (51281) PWM_EVENT: PWM channel 2 duty set to 7157.
+[2026-03-18 14:03:35.036] I (51281) PID_EVENT: Motor 2 PID: target=50/s, actual=60/s (raw=12/200ms), pid_out=1035, pwm_duty=7157, startup=11
+[2026-03-18 14:03:35.224] I (51471) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:03:35.232] I (51481) PWM_EVENT: PWM channel 2 duty set to 7154.
+[2026-03-18 14:03:35.237] I (51481) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1037, pwm_duty=7154, startup=11
+[2026-03-18 14:03:35.423] I (51671) PCNT_EVENT: Motor 2 running, PCNT=45/s (raw=9/200ms), target=50/s
+[2026-03-18 14:03:35.432] I (51681) PWM_EVENT: PWM channel 2 duty set to 7111.
+[2026-03-18 14:03:35.437] I (51681) PID_EVENT: Motor 2 PID: target=50/s, actual=45/s (raw=9/200ms), pid_out=1080, pwm_duty=7111, startup=11
+[2026-03-18 14:03:42.323] I (58571) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 14:03:45.633] W (61881) transport_base: Poll timeout or error, errno=Success, fd=54, timeout_ms=10000
+[2026-03-18 14:03:45.636] E (61881) mqtt_client: Writing didn't complete in specified timeout: errno=0
+[2026-03-18 14:03:45.641] I (61881) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-18 14:03:45.649] W (61881) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=1, 总计=1
+[2026-03-18 14:03:45.652] I (61891) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:03:45.663] W (61901) ESP32S3_MQTT_EVENT: 断开原因: PING_OR_UNKNOWN_ERROR (type=0, tls_err=0, stack_err=0, ret_code=0)
+[2026-03-18 14:03:45.674] W (61911) MQTT_MONITOR: [断开事件] #1 | 时间: 2026-03-18 14:03:45 [运行 00:01:01] | 原因: PING_OR_UNKNOWN_ERROR
+[2026-03-18 14:03:45.680] I (61921) PCNT_EVENT: Motor 2 running, PCNT=45/s (raw=9/200ms), target=50/s
+[2026-03-18 14:03:45.684] I (61931) PWM_EVENT: PWM channel 2 duty set to 7470.
+[2026-03-18 14:03:45.695] I (61931) PID_EVENT: Motor 2 PID: target=0/s, actual=45/s (raw=9/200ms), pid_out=721, pwm_duty=7470, startup=11
+[2026-03-18 14:03:45.872] W (62121) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 341, resetting to 0
+[2026-03-18 14:03:45.874] I (62121) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-03-18 14:03:45.877] I (62121) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 14:03:54.353] I (70601) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-18 14:03:54.359] I (70601) ESP32S3_MQTT_EVENT:            MQTT错误类型统计报告 [2026-03-18 14:03:54 [运行 00:01:10]]
+[2026-03-18 14:03:54.367] I (70601) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-18 14:03:54.374] W (70611) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=1/3, 会话重连=1, 总计=1)
+[2026-03-18 14:03:54.379] I (70611) ESP32S3_MQTT_EVENT: 传输层超时:        0
+[2026-03-18 14:03:54.385] I (70621) ESP32S3_MQTT_EVENT: PING响应超时:      1
+[2026-03-18 14:03:54.389] I (70631) ESP32S3_MQTT_EVENT: 连接被重置:        0
+[2026-03-18 14:03:54.394] I (70631) ESP32S3_MQTT_EVENT: 写入超时:          0
+[2026-03-18 14:03:54.398] I (70641) ESP32S3_MQTT_EVENT: 连接失败:          0
+[2026-03-18 14:03:54.407] I (70641) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-18 14:03:59.353] W (75601) ESP32S3_MQTT_EVENT: MQTT未连接，跳过本次心跳发送
+[2026-03-18 14:04:03.104] E (79351) mqtt_client: esp_mqtt_connect: mqtt_message_receive() returned 0
+[2026-03-18 14:04:03.106] E (79351) mqtt_client: MQTT connect failed
+[2026-03-18 14:04:03.108] I (79351) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-18 14:04:03.114] W (79351) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=2, 总计=2
+[2026-03-18 14:04:03.119] I (79361) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:04:03.129] W (79361) ESP32S3_MQTT_EVENT: 断开原因: PING_OR_UNKNOWN_ERROR (type=0, tls_err=0, stack_err=0, ret_code=0)
+[2026-03-18 14:04:03.140] W (79371) MQTT_MONITOR: [断开事件] #2 | 时间: 2026-03-18 14:04:02 [运行 00:01:19] | 原因: PING_OR_UNKNOWN_ERROR
+[2026-03-18 14:04:04.373] W (80621) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=2/3, 会话重连=2, 总计=2)
+[2026-03-18 14:04:14.374] W (90621) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=3/3, 会话重连=2, 总计=2)
+[2026-03-18 14:04:14.381] W (90621) ESP32S3_MQTT_EVENT: MQTT连接检查: 连续3次未连接，4000ms后尝试强制重连(退避级别=2)...
+[2026-03-18 14:04:16.143] E (92391) esp-tls: [sock=54] select() timeout
+[2026-03-18 14:04:16.145] E (92391) transport_base: Failed to open a new connection: 32774
+[2026-03-18 14:04:16.147] E (92391) mqtt_client: Error transport connect
+[2026-03-18 14:04:16.150] E (92391) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-18 14:04:16.158] W (92391) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=3, 总计=3
+[2026-03-18 14:04:16.162] I (92401) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:04:16.172] E (92401) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 14:04:16.183] W (92411) MQTT_MONITOR: [断开事件] #3 | 时间: 2026-03-18 14:04:15 [运行 00:01:32] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:04:16.187] I (92421) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-18 14:04:16.194] W (92431) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=4, 总计=4
+[2026-03-18 14:04:16.199] I (92441) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:04:16.210] W (92441) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 14:04:16.219] W (92451) MQTT_MONITOR: [断开事件] #4 | 时间: 2026-03-18 14:04:15 [运行 00:01:32] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:04:20.217] I (96461) ESP32S3_MQTT_EVENT: MQTT客户端已重新启动，等待连接...
+[2026-03-18 14:04:21.722] I (97961) ESP32S3_MQTT_EVENT: Connected to MQTT server.
+[2026-03-18 14:04:21.724] I (97961) ESP32S3_STATUS_LED: LED mode changed to: 3
+[2026-03-18 14:04:21.729] I (97971) MQTT_MONITOR: [连接事件] #2 | 时间: 2026-03-18 14:04:21 [运行 00:01:37]
+[2026-03-18 14:04:21.736] I (97971) ESP32S3_MQTT_EVENT: 已订阅控制频道 'esp32_1/control' (msg_id=61489)
+[2026-03-18 14:04:29.357] I (105601) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=32235, elapsed=0ms)
+[2026-03-18 14:04:59.357] I (135601) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=5972, elapsed=0ms)
+[2026-03-18 14:05:18.276] I (154521) PCNT_EVENT: Motor 2 running, PCNT=0/s (raw=0/200ms), target=50/s
+[2026-03-18 14:05:18.285] I (154531) PWM_EVENT: PWM channel 2 duty set to 7067.
+[2026-03-18 14:05:18.288] I (154531) PID_EVENT: Motor 2 PID: target=50/s, actual=0/s (raw=0/200ms), pid_out=1125, pwm_duty=7067, startup=11
+[2026-03-18 14:05:18.294] I (154531) PID_EVENT: Motor 2 soft-start reset (target: 0 -> 50, phase=1)
+[2026-03-18 14:05:18.476] I (154721) PCNT_EVENT: Motor 2 running, PCNT=40/s (raw=8/200ms), target=50/s
+[2026-03-18 14:05:18.485] I (154731) PWM_EVENT: PWM channel 2 duty set to 6984.
+[2026-03-18 14:05:18.489] I (154731) PID_EVENT: Motor 2 PID: target=50/s, actual=40/s (raw=8/200ms), pid_out=1207, pwm_duty=6984, startup=1
+[2026-03-18 14:05:18.676] I (154921) PCNT_EVENT: Motor 2 running, PCNT=55/s (raw=11/200ms), target=50/s
+[2026-03-18 14:05:18.684] I (154931) PWM_EVENT: PWM channel 2 duty set to 7021.
+[2026-03-18 14:05:18.689] I (154931) PID_EVENT: Motor 2 PID: target=50/s, actual=55/s (raw=11/200ms), pid_out=1170, pwm_duty=7021, startup=2
+[2026-03-18 14:05:18.876] I (155121) PCNT_EVENT: Motor 2 running, PCNT=45/s (raw=9/200ms), target=50/s
+[2026-03-18 14:05:18.885] I (155131) PWM_EVENT: PWM channel 2 duty set to 6978.
+[2026-03-18 14:05:18.888] I (155131) PID_EVENT: Motor 2 PID: target=50/s, actual=45/s (raw=9/200ms), pid_out=1213, pwm_duty=6978, startup=3
+[2026-03-18 14:05:19.076] I (155321) PCNT_EVENT: Motor 2 running, PCNT=55/s (raw=11/200ms), target=50/s
+[2026-03-18 14:05:19.085] I (155331) PWM_EVENT: PWM channel 2 duty set to 7016.
+[2026-03-18 14:05:19.088] I (155331) PID_EVENT: Motor 2 PID: target=50/s, actual=55/s (raw=11/200ms), pid_out=1176, pwm_duty=7016, startup=4
+[2026-03-18 14:05:19.276] I (155521) PCNT_EVENT: Motor 2 running, PCNT=55/s (raw=11/200ms), target=50/s
+[2026-03-18 14:05:19.284] I (155531) PWM_EVENT: PWM channel 2 duty set to 7053.
+[2026-03-18 14:05:19.289] I (155531) PID_EVENT: Motor 2 PID: target=50/s, actual=55/s (raw=11/200ms), pid_out=1138, pwm_duty=7053, startup=5
+[2026-03-18 14:05:19.476] I (155721) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:05:19.484] I (155731) PWM_EVENT: PWM channel 2 duty set to 7050.
+[2026-03-18 14:05:19.488] I (155731) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1141, pwm_duty=7050, startup=6
+[2026-03-18 14:05:19.676] I (155921) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:05:19.684] I (155931) PWM_EVENT: PWM channel 2 duty set to 7048.
+[2026-03-18 14:05:19.688] I (155931) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1144, pwm_duty=7048, startup=7
+[2026-03-18 14:05:19.876] I (156121) PCNT_EVENT: Motor 2 running, PCNT=55/s (raw=11/200ms), target=50/s
+[2026-03-18 14:05:19.884] I (156131) PWM_EVENT: PWM channel 2 duty set to 7085.
+[2026-03-18 14:05:19.888] I (156131) PID_EVENT: Motor 2 PID: target=50/s, actual=55/s (raw=11/200ms), pid_out=1106, pwm_duty=7085, startup=8
+[2026-03-18 14:05:20.077] I (156321) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:05:20.085] I (156331) PWM_EVENT: PWM channel 2 duty set to 7082.
+[2026-03-18 14:05:20.088] I (156331) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1109, pwm_duty=7082, startup=9
+[2026-03-18 14:05:20.275] I (156521) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:05:20.285] I (156531) PWM_EVENT: PWM channel 2 duty set to 7080.
+[2026-03-18 14:05:20.288] I (156531) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1112, pwm_duty=7080, startup=10
+[2026-03-18 14:05:20.476] I (156721) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:05:20.484] I (156731) PWM_EVENT: PWM channel 2 duty set to 7077.
+[2026-03-18 14:05:20.489] I (156731) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1114, pwm_duty=7077, startup=11
+[2026-03-18 14:05:20.676] I (156921) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:05:20.684] I (156931) PWM_EVENT: PWM channel 2 duty set to 7075.
+[2026-03-18 14:05:20.690] I (156931) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1117, pwm_duty=7075, startup=11
+[2026-03-18 14:05:20.875] I (157121) PCNT_EVENT: Motor 2 running, PCNT=55/s (raw=11/200ms), target=50/s
+[2026-03-18 14:05:20.885] I (157131) PWM_EVENT: PWM channel 2 duty set to 7112.
+[2026-03-18 14:05:20.888] I (157131) PID_EVENT: Motor 2 PID: target=50/s, actual=55/s (raw=11/200ms), pid_out=1079, pwm_duty=7112, startup=11
+[2026-03-18 14:05:21.076] I (157321) PCNT_EVENT: Motor 2 running, PCNT=55/s (raw=11/200ms), target=50/s
+[2026-03-18 14:05:21.084] I (157331) PWM_EVENT: PWM channel 2 duty set to 7150.
+[2026-03-18 14:05:21.089] I (157331) PID_EVENT: Motor 2 PID: target=50/s, actual=55/s (raw=11/200ms), pid_out=1042, pwm_duty=7150, startup=11
+[2026-03-18 14:05:21.276] I (157521) PCNT_EVENT: Motor 2 running, PCNT=45/s (raw=9/200ms), target=50/s
+[2026-03-18 14:05:21.285] I (157531) PWM_EVENT: PWM channel 2 duty set to 7107.
+[2026-03-18 14:05:21.288] I (157531) PID_EVENT: Motor 2 PID: target=50/s, actual=45/s (raw=9/200ms), pid_out=1084, pwm_duty=7107, startup=11
+[2026-03-18 14:05:21.476] I (157721) PCNT_EVENT: Motor 2 running, PCNT=40/s (raw=8/200ms), target=50/s
+[2026-03-18 14:05:21.484] I (157731) PWM_EVENT: PWM channel 2 duty set to 7024.
+[2026-03-18 14:05:21.488] I (157731) PID_EVENT: Motor 2 PID: target=50/s, actual=40/s (raw=8/200ms), pid_out=1167, pwm_duty=7024, startup=11
+[2026-03-18 14:05:21.675] I (157921) PCNT_EVENT: Motor 2 running, PCNT=55/s (raw=11/200ms), target=50/s
+[2026-03-18 14:05:21.685] I (157931) PWM_EVENT: PWM channel 2 duty set to 7062.
+[2026-03-18 14:05:21.688] I (157931) PID_EVENT: Motor 2 PID: target=50/s, actual=55/s (raw=11/200ms), pid_out=1130, pwm_duty=7062, startup=11
+[2026-03-18 14:05:21.876] I (158121) PCNT_EVENT: Motor 2 running, PCNT=45/s (raw=9/200ms), target=50/s
+[2026-03-18 14:05:21.885] I (158131) PWM_EVENT: PWM channel 2 duty set to 7019.
+[2026-03-18 14:05:21.888] I (158131) PID_EVENT: Motor 2 PID: target=50/s, actual=45/s (raw=9/200ms), pid_out=1172, pwm_duty=7019, startup=11
+[2026-03-18 14:05:22.077] I (158321) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:05:22.085] I (158331) PWM_EVENT: PWM channel 2 duty set to 7016.
+[2026-03-18 14:05:22.088] I (158331) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1175, pwm_duty=7016, startup=11
+[2026-03-18 14:05:22.275] I (158521) PCNT_EVENT: Motor 2 running, PCNT=60/s (raw=12/200ms), target=50/s
+[2026-03-18 14:05:22.285] I (158531) PWM_EVENT: PWM channel 2 duty set to 7094.
+[2026-03-18 14:05:22.289] I (158531) PID_EVENT: Motor 2 PID: target=50/s, actual=60/s (raw=12/200ms), pid_out=1097, pwm_duty=7094, startup=11
+[2026-03-18 14:05:22.477] I (158721) PCNT_EVENT: Motor 2 running, PCNT=40/s (raw=8/200ms), target=50/s
+[2026-03-18 14:05:22.484] I (158731) PWM_EVENT: PWM channel 2 duty set to 7011.
+[2026-03-18 14:05:22.488] I (158731) PID_EVENT: Motor 2 PID: target=50/s, actual=40/s (raw=8/200ms), pid_out=1180, pwm_duty=7011, startup=11
+[2026-03-18 14:05:22.676] I (158921) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:05:22.684] I (158931) PWM_EVENT: PWM channel 2 duty set to 7009.
+[2026-03-18 14:05:22.689] I (158931) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1183, pwm_duty=7009, startup=11
+[2026-03-18 14:05:22.876] I (159121) PCNT_EVENT: Motor 2 running, PCNT=40/s (raw=8/200ms), target=50/s
+[2026-03-18 14:05:22.885] I (159131) PWM_EVENT: PWM channel 2 duty set to 6926.
+[2026-03-18 14:05:22.888] I (159131) PID_EVENT: Motor 2 PID: target=50/s, actual=40/s (raw=8/200ms), pid_out=1266, pwm_duty=6926, startup=11
+[2026-03-18 14:05:23.077] I (159321) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:05:23.085] I (159331) PWM_EVENT: PWM channel 2 duty set to 6923.
+[2026-03-18 14:05:23.089] I (159331) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1269, pwm_duty=6923, startup=11
+[2026-03-18 14:05:23.135] I (159381) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 14:05:23.275] I (159521) PCNT_EVENT: Motor 2 idle, PCNT=18
+[2026-03-18 14:05:23.276] I (159521) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 14:05:23.476] I (159721) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-03-18 14:05:23.478] I (159721) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 14:05:28.677] I (164921) PCNT_EVENT: Motor 2 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-18 14:05:28.685] I (164931) PWM_EVENT: PWM channel 2 duty set to 6318.
+[2026-03-18 14:05:28.688] I (164931) PID_EVENT: Motor 2 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=1874, pwm_duty=6318, startup=11
+[2026-03-18 14:05:28.876] I (165121) PCNT_EVENT: Motor 2 running, PCNT=85/s (raw=17/200ms), target=75/s
+[2026-03-18 14:05:28.885] I (165131) PWM_EVENT: PWM channel 2 duty set to 6394.
+[2026-03-18 14:05:28.888] I (165131) PID_EVENT: Motor 2 PID: target=75/s, actual=85/s (raw=17/200ms), pid_out=1797, pwm_duty=6394, startup=11
+[2026-03-18 14:05:29.077] I (165321) PCNT_EVENT: Motor 2 running, PCNT=90/s (raw=18/200ms), target=75/s
+[2026-03-18 14:05:29.084] I (165331) PWM_EVENT: PWM channel 2 duty set to 6510.
+[2026-03-18 14:05:29.089] I (165331) PID_EVENT: Motor 2 PID: target=75/s, actual=90/s (raw=18/200ms), pid_out=1681, pwm_duty=6510, startup=11
+[2026-03-18 14:05:29.277] I (165521) PCNT_EVENT: Motor 2 running, PCNT=90/s (raw=18/200ms), target=75/s
+[2026-03-18 14:05:29.285] I (165531) PWM_EVENT: PWM channel 2 duty set to 6627.
+[2026-03-18 14:05:29.288] I (165531) PID_EVENT: Motor 2 PID: target=75/s, actual=90/s (raw=18/200ms), pid_out=1565, pwm_duty=6627, startup=11
+[2026-03-18 14:05:29.356] I (165601) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=50248, elapsed=0ms)
+[2026-03-18 14:05:29.476] I (165721) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-18 14:05:29.484] I (165731) PWM_EVENT: PWM channel 2 duty set to 6623.
+[2026-03-18 14:05:29.489] I (165731) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1568, pwm_duty=6623, startup=11
+[2026-03-18 14:05:29.678] I (165921) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-18 14:05:29.684] I (165931) PWM_EVENT: PWM channel 2 duty set to 6579.
+[2026-03-18 14:05:29.689] I (165931) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1612, pwm_duty=6579, startup=11
+[2026-03-18 14:05:29.876] I (166121) PCNT_EVENT: Motor 2 running, PCNT=85/s (raw=17/200ms), target=75/s
+[2026-03-18 14:05:29.884] I (166131) PWM_EVENT: PWM channel 2 duty set to 6656.
+[2026-03-18 14:05:29.889] I (166131) PID_EVENT: Motor 2 PID: target=75/s, actual=85/s (raw=17/200ms), pid_out=1536, pwm_duty=6656, startup=11
+[2026-03-18 14:05:30.076] I (166321) PCNT_EVENT: Motor 2 running, PCNT=80/s (raw=16/200ms), target=75/s
+[2026-03-18 14:05:30.086] I (166331) PWM_EVENT: PWM channel 2 duty set to 6693.
+[2026-03-18 14:05:30.089] I (166331) PID_EVENT: Motor 2 PID: target=75/s, actual=80/s (raw=16/200ms), pid_out=1499, pwm_duty=6693, startup=11
+[2026-03-18 14:05:33.595] I (169841) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 14:05:40.285] W (176531) transport_base: Poll timeout or error, errno=Success, fd=54, timeout_ms=10000
+[2026-03-18 14:05:40.288] E (176531) mqtt_client: Writing didn't complete in specified timeout: errno=0
+[2026-03-18 14:05:40.294] I (176531) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-18 14:05:40.301] W (176531) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=1, 总计=5
+[2026-03-18 14:05:40.306] I (176541) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:05:40.315] W (176551) ESP32S3_MQTT_EVENT: 断开原因: PING_OR_UNKNOWN_ERROR (type=0, tls_err=0, stack_err=0, ret_code=0)
+[2026-03-18 14:05:40.326] W (176561) MQTT_MONITOR: [断开事件] #5 | 时间: 2026-03-18 14:05:40 [运行 00:02:56] | 原因: PING_OR_UNKNOWN_ERROR
+[2026-03-18 14:05:40.332] I (176571) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-18 14:05:40.337] I (176581) PWM_EVENT: PWM channel 2 duty set to 7251.
+[2026-03-18 14:05:40.348] I (176581) PID_EVENT: Motor 2 PID: target=0/s, actual=70/s (raw=14/200ms), pid_out=940, pwm_duty=7251, startup=11
+[2026-03-18 14:05:40.526] W (176771) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 243, resetting to 0
+[2026-03-18 14:05:40.528] I (176771) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-03-18 14:05:40.529] I (176771) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 14:05:50.215] W (186461) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=1/3, 会话重连=1, 总计=5)
+[2026-03-18 14:05:59.116] E (195361) mqtt_client: esp_mqtt_connect: mqtt_message_receive() returned 0
+[2026-03-18 14:05:59.118] E (195361) mqtt_client: MQTT connect failed
+[2026-03-18 14:05:59.121] I (195361) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-18 14:05:59.128] W (195361) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=2, 总计=6
+[2026-03-18 14:05:59.131] I (195371) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:05:59.143] W (195371) ESP32S3_MQTT_EVENT: 断开原因: PING_OR_UNKNOWN_ERROR (type=0, tls_err=0, stack_err=0, ret_code=0)
+[2026-03-18 14:05:59.153] W (195381) MQTT_MONITOR: [断开事件] #6 | 时间: 2026-03-18 14:05:58 [运行 00:03:15] | 原因: PING_OR_UNKNOWN_ERROR
+[2026-03-18 14:05:59.355] W (195601) ESP32S3_MQTT_EVENT: MQTT未连接，跳过本次心跳发送
+[2026-03-18 14:06:00.216] W (196461) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=2/3, 会话重连=2, 总计=6)
+[2026-03-18 14:06:05.167] I (201411) ESP32S3_MQTT_EVENT: Connected to MQTT server.
+[2026-03-18 14:06:05.169] I (201411) ESP32S3_STATUS_LED: LED mode changed to: 3
+[2026-03-18 14:06:05.173] I (201411) MQTT_MONITOR: [连接事件] #3 | 时间: 2026-03-18 14:06:04 [运行 00:03:21]
+[2026-03-18 14:06:05.182] I (201421) ESP32S3_MQTT_EVENT: 已订阅控制频道 'esp32_1/control' (msg_id=48088)
+[2026-03-18 14:06:10.216] I (206461) ESP32S3_MQTT_EVENT: MQTT连接检查: 连接已恢复
+[2026-03-18 14:06:29.358] I (225601) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=3051, elapsed=0ms)
+[2026-03-18 14:06:39.750] E (235991) mqtt_client: esp_mqtt_handle_transport_read_error: transport_read(): EOF
+[2026-03-18 14:06:39.754] E (235991) mqtt_client: esp_mqtt_handle_transport_read_error: transport_read() error: errno=128
+[2026-03-18 14:06:39.759] E (235991) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-18 14:06:39.765] W (236001) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=1, 总计=7
+[2026-03-18 14:06:39.770] I (236001) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:06:39.781] E (236011) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=32776, stack_err=0, ret_code=0)
+[2026-03-18 14:06:39.791] W (236021) MQTT_MONITOR: [断开事件] #7 | 时间: 2026-03-18 14:06:39 [运行 00:03:55] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:06:39.797] E (236031) mqtt_client: mqtt_process_receive: mqtt_message_receive() returned -2
+[2026-03-18 14:06:39.803] I (236041) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-18 14:06:39.810] W (236041) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=2, 总计=8
+[2026-03-18 14:06:39.814] I (236051) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:06:39.825] W (236051) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=32776, stack_err=0, ret_code=0)
+[2026-03-18 14:06:39.835] W (236061) MQTT_MONITOR: [断开事件] #8 | 时间: 2026-03-18 14:06:39 [运行 00:03:55] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:06:40.216] W (236461) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=1/3, 会话重连=2, 总计=8)
+[2026-03-18 14:06:50.217] W (246461) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=2/3, 会话重连=2, 总计=8)
+[2026-03-18 14:06:52.836] E (249081) esp-tls: [sock=54] select() timeout
+[2026-03-18 14:06:52.838] E (249081) transport_base: Failed to open a new connection: 32774
+[2026-03-18 14:06:52.839] E (249081) mqtt_client: Error transport connect
+[2026-03-18 14:06:52.845] E (249081) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-18 14:06:52.852] W (249081) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=3, 总计=9
+[2026-03-18 14:06:52.855] I (249091) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:06:52.867] E (249091) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 14:06:52.876] W (249111) MQTT_MONITOR: [断开事件] #9 | 时间: 2026-03-18 14:06:52 [运行 00:04:08] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:06:52.881] I (249121) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-18 14:06:52.889] W (249121) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=4, 总计=10
+[2026-03-18 14:06:52.894] I (249131) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:06:52.903] W (249131) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 14:06:52.914] W (249141) MQTT_MONITOR: [断开事件] #10 | 时间: 2026-03-18 14:06:52 [运行 00:04:08] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:06:59.357] W (255601) ESP32S3_MQTT_EVENT: MQTT未连接，跳过本次心跳发送
+[2026-03-18 14:07:00.218] W (256461) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=3/3, 会话重连=4, 总计=10)
+[2026-03-18 14:07:00.225] W (256461) ESP32S3_MQTT_EVENT: MQTT连接检查: 连续3次未连接，8000ms后尝试强制重连(退避级别=4)...
+[2026-03-18 14:07:05.916] E (262161) esp-tls: [sock=54] select() timeout
+[2026-03-18 14:07:05.918] E (262161) transport_base: Failed to open a new connection: 32774
+[2026-03-18 14:07:05.919] E (262161) mqtt_client: Error transport connect
+[2026-03-18 14:07:05.926] E (262161) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-18 14:07:05.931] W (262161) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=5, 总计=11
+[2026-03-18 14:07:05.936] I (262171) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:07:05.948] E (262171) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 14:07:05.957] W (262191) MQTT_MONITOR: [断开事件] #11 | 时间: 2026-03-18 14:07:05 [运行 00:04:21] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:07:05.962] I (262201) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-18 14:07:05.969] W (262201) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=6, 总计=12
+[2026-03-18 14:07:05.973] I (262211) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:07:05.984] W (262211) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 14:07:05.995] W (262221) MQTT_MONITOR: [断开事件] #12 | 时间: 2026-03-18 14:07:05 [运行 00:04:21] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:07:09.990] I (266231) ESP32S3_MQTT_EVENT: MQTT客户端已重新启动，等待连接...
+[2026-03-18 14:07:19.988] W (276231) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=1/3, 会话重连=6, 总计=12)
+[2026-03-18 14:07:19.997] E (276241) esp-tls: [sock=54] select() timeout
+[2026-03-18 14:07:19.999] E (276241) transport_base: Failed to open a new connection: 32774
+[2026-03-18 14:07:20.000] E (276241) mqtt_client: Error transport connect
+[2026-03-18 14:07:20.005] E (276241) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-18 14:07:20.012] W (276241) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=7, 总计=13
+[2026-03-18 14:07:20.017] I (276251) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:07:20.026] E (276251) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 14:07:20.038] W (276271) MQTT_MONITOR: [断开事件] #13 | 时间: 2026-03-18 14:07:19 [运行 00:04:35] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:07:20.043] I (276281) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-18 14:07:20.049] W (276281) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=8, 总计=14
+[2026-03-18 14:07:20.054] I (276291) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:07:20.064] W (276291) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 14:07:20.075] W (276301) MQTT_MONITOR: [断开事件] #14 | 时间: 2026-03-18 14:07:19 [运行 00:04:35] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:07:29.357] W (285601) ESP32S3_MQTT_EVENT: MQTT未连接，跳过本次心跳发送
+[2026-03-18 14:07:29.988] W (286231) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=2/3, 会话重连=8, 总计=14)
+[2026-03-18 14:07:33.078] E (289321) esp-tls: [sock=54] select() timeout
+[2026-03-18 14:07:33.080] E (289321) transport_base: Failed to open a new connection: 32774
+[2026-03-18 14:07:33.082] E (289321) mqtt_client: Error transport connect
+[2026-03-18 14:07:33.085] E (289321) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-18 14:07:33.093] W (289321) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=9, 总计=15
+[2026-03-18 14:07:33.097] I (289331) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:07:33.107] E (289331) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 14:07:33.118] W (289351) MQTT_MONITOR: [断开事件] #15 | 时间: 2026-03-18 14:07:32 [运行 00:04:48] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:07:33.123] I (289361) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-18 14:07:33.129] W (289361) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=10, 总计=16
+[2026-03-18 14:07:33.135] I (289371) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:07:33.144] W (289371) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 14:07:33.155] W (289381) MQTT_MONITOR: [断开事件] #16 | 时间: 2026-03-18 14:07:32 [运行 00:04:49] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:07:39.988] W (296231) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=3/3, 会话重连=10, 总计=16)
+[2026-03-18 14:07:39.996] W (296231) ESP32S3_MQTT_EVENT: MQTT连接检查: 连续3次未连接，15000ms后尝试强制重连(退避级别=10)...
+[2026-03-18 14:07:40.609] I (296851) ESP32S3_MQTT_EVENT: Connected to MQTT server.
+[2026-03-18 14:07:40.611] I (296851) ESP32S3_STATUS_LED: LED mode changed to: 3
+[2026-03-18 14:07:40.616] I (296851) MQTT_MONITOR: [连接事件] #4 | 时间: 2026-03-18 14:07:40 [运行 00:04:56]
+[2026-03-18 14:07:40.623] I (296861) ESP32S3_MQTT_EVENT: 已订阅控制频道 'esp32_1/control' (msg_id=2706)
+[2026-03-18 14:07:48.730] I (304971) PCNT_EVENT: Motor 2 running, PCNT=0/s (raw=0/200ms), target=50/s
+[2026-03-18 14:07:48.738] I (304981) PWM_EVENT: PWM channel 2 duty set to 6847.
+[2026-03-18 14:07:48.743] I (304981) PID_EVENT: Motor 2 PID: target=50/s, actual=0/s (raw=0/200ms), pid_out=1345, pwm_duty=6847, startup=11
+[2026-03-18 14:07:48.750] I (304981) PID_EVENT: Motor 2 soft-start reset (target: 0 -> 50, phase=1)
+[2026-03-18 14:07:48.929] I (305171) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:07:48.937] I (305181) PWM_EVENT: PWM channel 2 duty set to 6844.
+[2026-03-18 14:07:48.941] I (305181) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1347, pwm_duty=6844, startup=1
+[2026-03-18 14:07:49.130] I (305371) PCNT_EVENT: Motor 2 running, PCNT=55/s (raw=11/200ms), target=50/s
+[2026-03-18 14:07:49.137] I (305381) PWM_EVENT: PWM channel 2 duty set to 6882.
+[2026-03-18 14:07:49.142] I (305381) PID_EVENT: Motor 2 PID: target=50/s, actual=55/s (raw=11/200ms), pid_out=1310, pwm_duty=6882, startup=2
+[2026-03-18 14:07:49.329] I (305571) PCNT_EVENT: Motor 2 running, PCNT=60/s (raw=12/200ms), target=50/s
+[2026-03-18 14:07:49.338] I (305581) PWM_EVENT: PWM channel 2 duty set to 6959.
+[2026-03-18 14:07:49.341] I (305581) PID_EVENT: Motor 2 PID: target=50/s, actual=60/s (raw=12/200ms), pid_out=1233, pwm_duty=6959, startup=3
+[2026-03-18 14:07:49.530] I (305771) PCNT_EVENT: Motor 2 running, PCNT=65/s (raw=13/200ms), target=50/s
+[2026-03-18 14:07:49.538] I (305781) PWM_EVENT: PWM channel 2 duty set to 7077.
+[2026-03-18 14:07:49.541] I (305781) PID_EVENT: Motor 2 PID: target=50/s, actual=65/s (raw=13/200ms), pid_out=1115, pwm_duty=7077, startup=4
+[2026-03-18 14:07:49.729] I (305971) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:07:49.737] I (305981) PWM_EVENT: PWM channel 2 duty set to 7074.
+[2026-03-18 14:07:49.743] I (305981) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1117, pwm_duty=7074, startup=5
+[2026-03-18 14:07:49.929] I (306171) PCNT_EVENT: Motor 2 running, PCNT=35/s (raw=7/200ms), target=50/s
+[2026-03-18 14:07:49.938] I (306181) PWM_EVENT: PWM channel 2 duty set to 6951.
+[2026-03-18 14:07:49.942] I (306181) PID_EVENT: Motor 2 PID: target=50/s, actual=35/s (raw=7/200ms), pid_out=1240, pwm_duty=6951, startup=6
+[2026-03-18 14:07:50.130] I (306371) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:07:50.138] I (306381) PWM_EVENT: PWM channel 2 duty set to 6949.
+[2026-03-18 14:07:50.142] I (306381) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1243, pwm_duty=6949, startup=7
+[2026-03-18 14:07:50.329] I (306571) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:07:50.337] I (306581) PWM_EVENT: PWM channel 2 duty set to 6946.
+[2026-03-18 14:07:50.342] I (306581) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1246, pwm_duty=6946, startup=8
+[2026-03-18 14:07:50.529] I (306771) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:07:50.537] I (306781) PWM_EVENT: PWM channel 2 duty set to 6943.
+[2026-03-18 14:07:50.542] I (306781) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1248, pwm_duty=6943, startup=9
+[2026-03-18 14:07:50.729] I (306971) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:07:50.738] I (306981) PWM_EVENT: PWM channel 2 duty set to 6941.
+[2026-03-18 14:07:50.741] I (306981) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1251, pwm_duty=6941, startup=10
+[2026-03-18 14:07:50.929] I (307171) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:07:50.937] I (307181) PWM_EVENT: PWM channel 2 duty set to 6938.
+[2026-03-18 14:07:50.942] I (307181) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1254, pwm_duty=6938, startup=11
+[2026-03-18 14:07:51.130] I (307371) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:07:51.137] I (307381) PWM_EVENT: PWM channel 2 duty set to 6935.
+[2026-03-18 14:07:51.142] I (307381) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1256, pwm_duty=6935, startup=11
+[2026-03-18 14:07:51.330] I (307571) PCNT_EVENT: Motor 2 running, PCNT=55/s (raw=11/200ms), target=50/s
+[2026-03-18 14:07:51.338] I (307581) PWM_EVENT: PWM channel 2 duty set to 6973.
+[2026-03-18 14:07:51.341] I (307581) PID_EVENT: Motor 2 PID: target=50/s, actual=55/s (raw=11/200ms), pid_out=1219, pwm_duty=6973, startup=11
+[2026-03-18 14:07:51.530] I (307771) PCNT_EVENT: Motor 2 running, PCNT=55/s (raw=11/200ms), target=50/s
+[2026-03-18 14:07:51.538] I (307781) PWM_EVENT: PWM channel 2 duty set to 7010.
+[2026-03-18 14:07:51.541] I (307781) PID_EVENT: Motor 2 PID: target=50/s, actual=55/s (raw=11/200ms), pid_out=1181, pwm_duty=7010, startup=11
+[2026-03-18 14:07:51.729] I (307971) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:07:51.738] I (307981) PWM_EVENT: PWM channel 2 duty set to 7008.
+[2026-03-18 14:07:51.741] I (307981) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1184, pwm_duty=7008, startup=11
+[2026-03-18 14:07:51.930] I (308171) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:07:51.937] I (308181) PWM_EVENT: PWM channel 2 duty set to 7005.
+[2026-03-18 14:07:51.942] I (308181) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1186, pwm_duty=7005, startup=11
+[2026-03-18 14:07:52.130] I (308371) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:07:52.137] I (308381) PWM_EVENT: PWM channel 2 duty set to 7003.
+[2026-03-18 14:07:52.142] I (308381) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1189, pwm_duty=7003, startup=11
+[2026-03-18 14:07:52.330] I (308571) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:07:52.338] I (308581) PWM_EVENT: PWM channel 2 duty set to 7000.
+[2026-03-18 14:07:52.342] I (308581) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1191, pwm_duty=7000, startup=11
+[2026-03-18 14:07:52.529] I (308771) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:07:52.538] I (308781) PWM_EVENT: PWM channel 2 duty set to 6998.
+[2026-03-18 14:07:52.541] I (308781) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1194, pwm_duty=6998, startup=11
+[2026-03-18 14:07:52.729] I (308971) PCNT_EVENT: Motor 2 running, PCNT=60/s (raw=12/200ms), target=50/s
+[2026-03-18 14:07:52.738] I (308981) PWM_EVENT: PWM channel 2 duty set to 7075.
+[2026-03-18 14:07:52.742] I (308981) PID_EVENT: Motor 2 PID: target=50/s, actual=60/s (raw=12/200ms), pid_out=1116, pwm_duty=7075, startup=11
+[2026-03-18 14:07:52.930] I (309171) PCNT_EVENT: Motor 2 running, PCNT=45/s (raw=9/200ms), target=50/s
+[2026-03-18 14:07:52.938] I (309181) PWM_EVENT: PWM channel 2 duty set to 7033.
+[2026-03-18 14:07:52.942] I (309181) PID_EVENT: Motor 2 PID: target=50/s, actual=45/s (raw=9/200ms), pid_out=1159, pwm_duty=7033, startup=11
+[2026-03-18 14:07:53.129] I (309371) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:07:53.138] I (309381) PWM_EVENT: PWM channel 2 duty set to 7030.
+[2026-03-18 14:07:53.142] I (309381) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1161, pwm_duty=7030, startup=11
+[2026-03-18 14:07:53.329] I (309571) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=50/s
+[2026-03-18 14:07:53.338] I (309581) PWM_EVENT: PWM channel 2 duty set to 7028.
+[2026-03-18 14:07:53.343] I (309581) PID_EVENT: Motor 2 PID: target=50/s, actual=50/s (raw=10/200ms), pid_out=1163, pwm_duty=7028, startup=11
+[2026-03-18 14:07:53.529] I (309771) PCNT_EVENT: Motor 2 running, PCNT=45/s (raw=9/200ms), target=50/s
+[2026-03-18 14:07:53.537] I (309781) PWM_EVENT: PWM channel 2 duty set to 6986.
+[2026-03-18 14:07:53.541] I (309781) PID_EVENT: Motor 2 PID: target=50/s, actual=45/s (raw=9/200ms), pid_out=1206, pwm_duty=6986, startup=11
+[2026-03-18 14:07:53.638] I (309881) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 14:07:53.729] I (309971) PCNT_EVENT: Motor 2 idle, PCNT=19
+[2026-03-18 14:07:53.730] I (309971) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 14:07:53.930] I (310171) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-03-18 14:07:53.932] I (310171) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 14:07:59.359] I (315601) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=46508, elapsed=0ms)
+[2026-03-18 14:08:05.730] I (321971) PCNT_EVENT: Motor 2 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-18 14:08:05.738] I (321981) PWM_EVENT: PWM channel 2 duty set to 6381.
+[2026-03-18 14:08:05.742] I (321981) PID_EVENT: Motor 2 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=1811, pwm_duty=6381, startup=11
+[2026-03-18 14:08:05.930] I (322171) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-18 14:08:05.938] I (322181) PWM_EVENT: PWM channel 2 duty set to 6378.
+[2026-03-18 14:08:05.942] I (322181) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1814, pwm_duty=6378, startup=11
+[2026-03-18 14:08:06.129] I (322371) PCNT_EVENT: Motor 2 running, PCNT=90/s (raw=18/200ms), target=75/s
+[2026-03-18 14:08:06.139] I (322381) PWM_EVENT: PWM channel 2 duty set to 6494.
+[2026-03-18 14:08:06.142] I (322381) PID_EVENT: Motor 2 PID: target=75/s, actual=90/s (raw=18/200ms), pid_out=1697, pwm_duty=6494, startup=11
+[2026-03-18 14:08:06.329] I (322571) PCNT_EVENT: Motor 2 running, PCNT=80/s (raw=16/200ms), target=75/s
+[2026-03-18 14:08:06.339] I (322581) PWM_EVENT: PWM channel 2 duty set to 6530.
+[2026-03-18 14:08:06.342] I (322581) PID_EVENT: Motor 2 PID: target=75/s, actual=80/s (raw=16/200ms), pid_out=1661, pwm_duty=6530, startup=11
+[2026-03-18 14:08:06.530] I (322771) PCNT_EVENT: Motor 2 running, PCNT=85/s (raw=17/200ms), target=75/s
+[2026-03-18 14:08:06.538] I (322781) PWM_EVENT: PWM channel 2 duty set to 6607.
+[2026-03-18 14:08:06.543] I (322781) PID_EVENT: Motor 2 PID: target=75/s, actual=85/s (raw=17/200ms), pid_out=1585, pwm_duty=6607, startup=11
+[2026-03-18 14:08:10.579] I (326821) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 14:08:16.599] W (332841) transport_base: Poll timeout or error, errno=Connection already in progress, fd=54, timeout_ms=10000
+[2026-03-18 14:08:16.605] E (332841) mqtt_client: Writing didn't complete in specified timeout: errno=119
+[2026-03-18 14:08:16.608] E (332841) mqtt_client: Error to resend data
+[2026-03-18 14:08:16.614] I (332851) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-18 14:08:16.621] W (332851) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=1, 总计=17
+[2026-03-18 14:08:16.626] I (332861) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:08:16.635] W (332861) ESP32S3_MQTT_EVENT: 断开原因: PING_OR_UNKNOWN_ERROR (type=0, tls_err=0, stack_err=0, ret_code=0)
+[2026-03-18 14:08:16.647] W (332871) MQTT_MONITOR: [断开事件] #17 | 时间: 2026-03-18 14:08:16 [运行 00:05:32] | 原因: PING_OR_UNKNOWN_ERROR
+[2026-03-18 14:08:24.989] W (341231) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=1/3, 会话重连=1, 总计=17)
+[2026-03-18 14:08:26.650] W (342891) transport_base: Poll timeout or error, errno=Connection already in progress, fd=-1, timeout_ms=10000
+[2026-03-18 14:08:26.655] E (342891) mqtt_client: Writing didn't complete in specified timeout: errno=119
+[2026-03-18 14:08:26.658] E (342891) mqtt_client: Error sending ping
+[2026-03-18 14:08:26.663] E (342901) mqtt_client: Can't send ping, disconnected
+[2026-03-18 14:08:26.668] I (342901) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-18 14:08:26.676] W (342911) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=2, 总计=18
+[2026-03-18 14:08:26.679] I (342911) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:08:26.690] W (342921) ESP32S3_MQTT_EVENT: 断开原因: PING_OR_UNKNOWN_ERROR (type=0, tls_err=0, stack_err=0, ret_code=0)
+[2026-03-18 14:08:26.702] W (342931) MQTT_MONITOR: [断开事件] #18 | 时间: 2026-03-18 14:08:26 [运行 00:05:42] | 原因: PING_OR_UNKNOWN_ERROR
+[2026-03-18 14:08:26.708] I (342941) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-18 14:08:26.713] I (342951) PWM_EVENT: PWM channel 2 duty set to 7166.
+[2026-03-18 14:08:26.722] I (342951) PID_EVENT: Motor 2 PID: target=0/s, actual=70/s (raw=14/200ms), pid_out=1026, pwm_duty=7166, startup=11
+[2026-03-18 14:08:26.899] W (343141) PCNT_EVENT: Motor 2 PCNT abnormal value detected: 299, resetting to 0
+[2026-03-18 14:08:26.901] I (343141) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-03-18 14:08:26.904] I (343141) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 14:08:29.359] W (345601) ESP32S3_MQTT_EVENT: MQTT未连接，跳过本次心跳发送
+[2026-03-18 14:08:34.989] W (351231) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=2/3, 会话重连=2, 总计=18)
+[2026-03-18 14:08:39.709] E (355951) esp-tls: [sock=54] select() timeout
+[2026-03-18 14:08:39.711] E (355951) transport_base: Failed to open a new connection: 32774
+[2026-03-18 14:08:39.713] E (355951) mqtt_client: Error transport connect
+[2026-03-18 14:08:39.717] E (355951) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-18 14:08:39.724] W (355951) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=3, 总计=19
+[2026-03-18 14:08:39.729] I (355961) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:08:39.738] E (355961) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 14:08:39.750] W (355981) MQTT_MONITOR: [断开事件] #19 | 时间: 2026-03-18 14:08:39 [运行 00:05:55] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:08:39.755] I (355991) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-18 14:08:39.761] W (355991) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=4, 总计=20
+[2026-03-18 14:08:39.766] I (356001) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:08:39.775] W (356001) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 14:08:39.787] W (356011) MQTT_MONITOR: [断开事件] #20 | 时间: 2026-03-18 14:08:39 [运行 00:05:55] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:08:44.990] W (361231) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=3/3, 会话重连=4, 总计=20)
+[2026-03-18 14:08:44.998] W (361231) ESP32S3_MQTT_EVENT: MQTT连接检查: 连续3次未连接，8000ms后尝试强制重连(退避级别=4)...
+[2026-03-18 14:08:52.790] E (369031) esp-tls: [sock=54] select() timeout
+[2026-03-18 14:08:52.792] E (369031) transport_base: Failed to open a new connection: 32774
+[2026-03-18 14:08:52.794] E (369031) mqtt_client: Error transport connect
+[2026-03-18 14:08:52.797] E (369031) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-18 14:08:52.804] W (369031) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=5, 总计=21
+[2026-03-18 14:08:52.808] I (369041) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:08:52.819] E (369041) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 14:08:52.830] W (369061) MQTT_MONITOR: [断开事件] #21 | 时间: 2026-03-18 14:08:52 [运行 00:06:08] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:08:52.835] I (369071) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-18 14:08:52.842] W (369071) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=6, 总计=22
+[2026-03-18 14:08:52.846] I (369081) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:08:52.857] W (369081) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 14:08:52.867] W (369091) MQTT_MONITOR: [断开事件] #22 | 时间: 2026-03-18 14:08:52 [运行 00:06:08] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:08:54.410] I (370651) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-18 14:08:54.416] I (370651) ESP32S3_MQTT_EVENT:            MQTT错误类型统计报告 [2026-03-18 14:08:54 [运行 00:06:10]]
+[2026-03-18 14:08:54.422] I (370651) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-18 14:08:54.428] I (370661) ESP32S3_MQTT_EVENT: 传输层超时:        16
+[2026-03-18 14:08:54.433] I (370661) ESP32S3_MQTT_EVENT: PING响应超时:      6
+[2026-03-18 14:08:54.438] I (370671) ESP32S3_MQTT_EVENT: 连接被重置:        0
+[2026-03-18 14:08:54.443] I (370671) ESP32S3_MQTT_EVENT: 写入超时:          0
+[2026-03-18 14:08:54.448] I (370681) ESP32S3_MQTT_EVENT: 连接失败:          0
+[2026-03-18 14:08:54.456] I (370681) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-18 14:08:55.363] I (371601) ESP32S3_MQTT_EVENT: MQTT客户端已重新启动，等待连接...
+[2026-03-18 14:08:59.359] W (375601) ESP32S3_MQTT_EVENT: MQTT未连接，跳过本次心跳发送
+[2026-03-18 14:09:05.360] W (381601) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=1/3, 会话重连=6, 总计=22)
+[2026-03-18 14:09:05.369] E (381611) esp-tls: [sock=54] select() timeout
+[2026-03-18 14:09:05.371] E (381611) transport_base: Failed to open a new connection: 32774
+[2026-03-18 14:09:05.373] E (381611) mqtt_client: Error transport connect
+[2026-03-18 14:09:05.377] E (381611) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-18 14:09:05.383] W (381611) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=7, 总计=23
+[2026-03-18 14:09:05.388] I (381621) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:09:05.399] E (381621) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 14:09:05.409] W (381641) MQTT_MONITOR: [断开事件] #23 | 时间: 2026-03-18 14:09:05 [运行 00:06:21] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:09:05.415] I (381651) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-18 14:09:05.421] W (381651) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=8, 总计=24
+[2026-03-18 14:09:05.426] I (381661) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:09:05.437] W (381661) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 14:09:05.448] W (381671) MQTT_MONITOR: [断开事件] #24 | 时间: 2026-03-18 14:09:05 [运行 00:06:21] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:09:15.360] W (391601) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=2/3, 会话重连=8, 总计=24)
+[2026-03-18 14:09:18.450] E (394691) esp-tls: [sock=54] select() timeout
+[2026-03-18 14:09:18.452] E (394691) transport_base: Failed to open a new connection: 32774
+[2026-03-18 14:09:18.453] E (394691) mqtt_client: Error transport connect
+[2026-03-18 14:09:18.458] E (394691) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-18 14:09:18.464] W (394691) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=9, 总计=25
+[2026-03-18 14:09:18.469] I (394701) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:09:18.480] E (394701) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 14:09:18.490] W (394721) MQTT_MONITOR: [断开事件] #25 | 时间: 2026-03-18 14:09:18 [运行 00:06:34] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 14:09:18.495] I (394731) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-18 14:09:18.502] W (394731) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=10, 总计=26
+[2026-03-18 14:09:18.507] I (394741) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 14:09:18.517] W (394741) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 14:09:18.528] W (394751) MQTT_MONITOR: [断开事件] #26 | 时间: 2026-03-18 14:09:18 [运行 00:06:34] | 原因: TCP_TRANSPORT_ERROR
+
+
+============================================================
+日志记录结束
+结束时间: 2026-03-18 14:09:23
+总运行时间: 6.64 分钟
+总行数: 604
+============================================================
+连接统计:
+  - MQTT连接次数: 4
+  - MQTT断开次数: 26
+  - 连接保持率: 15.38%
+
+错误统计:
+  - TCP_TRANSPORT_ERROR: 40
+  - PING_OR_UNKNOWN_ERROR: 12
+============================================================
