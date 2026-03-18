@@ -25,7 +25,7 @@ void pwm_init()
             .timer_sel  = LEDC_TIMER,
             .intr_type  = LEDC_INTR_DISABLE,
             .gpio_num   = pwm_gpios[i],
-            .duty       = LEDC_DUTY,    // 初始占空比0 (全速，反相逻辑)
+            .duty       = LEDC_DUTY,    // 初始占空比8191 (停止，反相逻辑)
             .hpoint     = 0
         };
         ledc_channel_config(&ledc_channel);

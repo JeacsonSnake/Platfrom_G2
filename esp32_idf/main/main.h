@@ -72,7 +72,7 @@ void monitor_start_time_sync(void);
 #define LEDC_TIMER      LEDC_TIMER_0
 #define LEDC_MODE       LEDC_LOW_SPEED_MODE
 #define LEDC_DUTY_RES   LEDC_TIMER_13_BIT
-#define LEDC_DUTY       (0)         // Initial duty: 0 = Full speed (inverted logic)
+#define LEDC_DUTY       (8191)      // Initial duty: 8191 = Motor OFF (inverted logic: High=OFF, Low=ON)
 #define LEDC_FREQ       (5000)      // 5KHz PWM frequency (20KHz requires 8-bit resolution, see Bug002)
                                             // CHB-BLDC2418 spec: 15K~25KHz recommended for noise reduction
                                             // But ESP32-S3 hardware cannot achieve 20KHz + 13-bit simultaneously
