@@ -144,11 +144,16 @@ void PID_init(void* params)
                      index, temp, actual_speed_per_sec, pcnt_count_list[index], new_input, new_input_int, startup_counter);
             pcnt_updated_list[index] = false;
             
-            // Reset startup phase when motor stops
-            if (temp == 0 && !startup_phase) {
+            // Reset startup phase when motor starts (transition from 0 to non-zero)
+            // Track previous target speed to detect startup transition
+            static double prev_target_speed[4] = {0, 0, 0, 0};
+            if (temp > 0 && prev_target_speed[index] == 0 && !startup_phase) {
                 startup_phase = 1;
                 startup_counter = 0;
+                ESP_LOGI(TAG, "Motor %d soft-start reset detected (target: %.0f -> %.0f)", 
+                         index, prev_target_speed[index], temp);
             }
+            prev_target_speed[index] = temp;
         }
         else{
             vTaskDelay(10 / portTICK_PERIOD_MS);
