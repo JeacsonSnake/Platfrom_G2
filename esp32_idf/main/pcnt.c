@@ -154,9 +154,76 @@ void pcnt_monitor(void* params)
     }
 }
 
+// P9接口（Motor 3）专项诊断任务
+// 用于测试PH2.0-LI-5P_004接口的FG信号线（GPIO 9）是否正常
+void p9_interface_diagnostic_task(void* params)
+{
+    int index = 3; // Motor 3 / P9接口
+    ESP_LOGI(TAG, "========================================");
+    ESP_LOGI(TAG, "P9接口（Motor 3）专项诊断启动");
+    ESP_LOGI(TAG, "GPIO: PWM=GPIO%d, FG=GPIO%d", pwm_gpios[index], pcnt_gpios[index]);
+    ESP_LOGI(TAG, "物理接口: PH2.0-LI-5P_004");
+    ESP_LOGI(TAG, "========================================");
+    
+    // 配置GPIO 9为输入模式，用于直接读取电平
+    gpio_config_t io_conf = {
+        .pin_bit_mask = (1ULL << pcnt_gpios[index]),
+        .mode = GPIO_MODE_INPUT,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE,
+    };
+    gpio_config(&io_conf);
+    
+    // 检测GPIO 9电平变化
+    int level_change_count = 0;
+    int last_level = gpio_get_level(pcnt_gpios[index]);
+    int stable_count = 0;
+    
+    ESP_LOGI(TAG, "P9诊断: GPIO %d 初始电平=%d", pcnt_gpios[index], last_level);
+    
+    // 持续监测5秒
+    for (int i = 0; i < 50; i++) {
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+        int current_level = gpio_get_level(pcnt_gpios[index]);
+        
+        if (current_level != last_level) {
+            level_change_count++;
+            ESP_LOGI(TAG, "P9诊断: GPIO %d 电平变化 %d->%d (变化次数:%d)", 
+                     pcnt_gpios[index], last_level, current_level, level_change_count);
+            last_level = current_level;
+            stable_count = 0;
+        } else {
+            stable_count++;
+        }
+    }
+    
+    // 输出诊断结果
+    ESP_LOGI(TAG, "========================================");
+    ESP_LOGI(TAG, "P9接口诊断结果:");
+    ESP_LOGI(TAG, "  - GPIO %d 电平变化次数: %d", pcnt_gpios[index], level_change_count);
+    if (level_change_count == 0) {
+        ESP_LOGW(TAG, "  ⚠️ 警告: GPIO %d 无信号变化，可能原因:", pcnt_gpios[index]);
+        ESP_LOGW(TAG, "     1. P9接口未连接电机");
+        ESP_LOGW(TAG, "     2. FG信号线（IO9）断开或接触不良");
+        ESP_LOGW(TAG, "     3. 电机未上电（12V未接通）");
+        ESP_LOGW(TAG, "     4. 编码器硬件故障");
+    } else if (level_change_count < 10) {
+        ESP_LOGW(TAG, "  ⚠️ 信号较弱，可能接触不良");
+    } else {
+        ESP_LOGI(TAG, "  ✅ GPIO %d 信号正常", pcnt_gpios[index]);
+    }
+    ESP_LOGI(TAG, "========================================");
+    
+    vTaskDelete(NULL);
+}
+
 // PCNT 监测线程初始化
 void pcnt_monitor_init()
 {
+    // 创建P9接口专项诊断任务（仅运行一次，自动删除）
+    xTaskCreate(p9_interface_diagnostic_task, "P9_DIAG_TASK", 4096, NULL, 2, NULL);
+    
     // 初始化4个PCNT监测线程
     for(int i = 0; i < 4; i++)
     {
