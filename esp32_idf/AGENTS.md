@@ -227,11 +227,25 @@ python esp_analysis.py
 | RGB LED | 48 | WS2812 status LED |
 
 ### CHB-BLDC2418 Motor Driver Notes
+
+> **详细配置请参考**: [CHB-BLDC2418-Motor-Configuration.md](CHB-BLDC2418-Motor-Configuration.md) - 包含完整的电机规格、FG信号参数、PWM配置、GPIO引脚定义和PID参数。
+
 - **Inverted PWM logic**: High level = Motor OFF, Low level = Motor ON
 - **PWM Frequency**: 5KHz (compromise between noise and ESP32-S3 hardware limits)
 - **Recommended**: 15K~25KHz for noise reduction (but ESP32-S3 cannot achieve 20KHz + 13-bit simultaneously)
 - **Max PCNT**: 450 counts/sec at 4500 RPM (6 pulses per rotation)
 - **Soft-start**: Initial PWM limited to 3000 for 2 seconds to prevent overshoot
+
+#### Motor Specifications Summary
+
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| Model | CHB-BLDC2418 | 12V Permanent Magnet Brushless DC Motor |
+| Rated Speed | 4500 RPM | Maximum rated rotation speed |
+| Max Current | 0.16A | Per motor current consumption |
+| FG Signal | 6 pulses/rotation | Tachometer output (450 pulses/sec at max speed) |
+| PWM Logic | Inverted | Duty 8191=OFF (stop), 0=ON (full speed) |
+| PWM Frequency | 15K~25KHz | Recommended for noise reduction |
 
 ## Network Configuration
 
@@ -381,6 +395,10 @@ For production deployment, enable security features via `menuconfig` and use enc
 
 ## Reference Documentation
 
+### Project Documents
+- [CHB-BLDC2418-Motor-Configuration.md](CHB-BLDC2418-Motor-Configuration.md) - CHB-BLDC2418电机完整配置文档（规格参数、GPIO定义、PID设置）
+
+### External Documentation
 - [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/v5.5.2/esp32s3/index.html)
 - [ESP32-S3 Technical Reference Manual](https://www.espressif.com/sites/default/files/documentation/esp32-s3_technical_reference_manual_en.pdf)
 - [FreeRTOS Documentation](https://www.freertos.org/Documentation/RTOS_book.html)
