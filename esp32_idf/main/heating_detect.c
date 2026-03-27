@@ -418,18 +418,23 @@ static esp_err_t onewire_read_bit(uint8_t *bit)
 
 /**
  * @brief 写一个字节到1-Wire总线（LSB first）
+ * 
+ * 修复：添加位间延时，确保写操作稳定
  */
 static esp_err_t onewire_write_byte(uint8_t data)
 {
     for (int i = 0; i < 8; i++) {
         ESP_ERROR_CHECK(onewire_write_bit(data & 0x01));
         data >>= 1;
+        esp_rom_delay_us(2);  // 位间延时
     }
     return ESP_OK;
 }
 
 /**
  * @brief 从1-Wire总线读取一个字节（LSB first）
+ * 
+ * 修复：添加位间延时，确保读操作稳定
  */
 static esp_err_t onewire_read_byte(uint8_t *data)
 {
@@ -440,6 +445,7 @@ static esp_err_t onewire_read_byte(uint8_t *data)
         uint8_t bit = 0;
         ESP_ERROR_CHECK(onewire_read_bit(&bit));
         *data |= (bit << i);
+        esp_rom_delay_us(2);  // 位间延时
     }
     return ESP_OK;
 }
@@ -614,6 +620,8 @@ static esp_err_t max31850_start_conversion(const uint8_t *rom_id)
 
 /**
  * @brief 读取暂存器（9字节）
+ * 
+ * 修复：添加字节间延时，确保读取稳定
  */
 static esp_err_t max31850_read_scratchpad(const uint8_t *rom_id, uint8_t *scratchpad)
 {
@@ -622,8 +630,10 @@ static esp_err_t max31850_read_scratchpad(const uint8_t *rom_id, uint8_t *scratc
     ESP_ERROR_CHECK(onewire_match_rom(rom_id));
     onewire_write_byte(MAX31850_CMD_READ_SCRATCH);
     
+    // 关键修复：读取每个字节之间添加短暂延时
     for (int i = 0; i < MAX31850_SCRATCHPAD_LEN; i++) {
         onewire_read_byte(&scratchpad[i]);
+        esp_rom_delay_us(10);  // 字节间延时，确保总线稳定
     }
     
     return ESP_OK;
