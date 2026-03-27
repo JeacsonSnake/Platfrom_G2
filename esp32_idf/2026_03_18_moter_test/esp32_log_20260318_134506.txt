@@ -1,0 +1,454 @@
+============================================================
+ESP32-S3 串口日志记录
+开始时间: 2026-03-18 13:45:06
+串口: COM10, 波特率: 115200
+============================================================
+
+[2026-03-18 13:45:06.154] I (851) wifi:connected with WeShare-6148, aid = 8, channel 1, BW20, bssid = c4:70:ab:d9:a0:e2
+[2026-03-18 13:45:06.156] I (851) wifi:security: WPA2-PSK, phy: bgn, rssi: -69
+[2026-03-18 13:45:06.158] I (851) wifi:pm start, type: 0
+[2026-03-18 13:45:06.160] 
+[2026-03-18 13:45:06.166] I (851) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us
+[2026-03-18 13:45:06.174] I (861) wifi:set rx beacon pti, rx_bcn_pti: 0, bcn_timeout: 25000, mt_pti: 0, mt_time: 10000
+[2026-03-18 13:45:06.880] I (871) wifi:AP's beacon interval = 102400 us, DTIM period = 1
+[2026-03-18 13:45:06.882] W (1581) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (1/60)
+[2026-03-18 13:45:07.210] I (1911) ESP32S3_WIFI_EVENT: Got ip:192.168.110.199
+[2026-03-18 13:45:07.211] I (1911) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 13:45:07.215] I (1911) MQTT_MONITOR: ==============================================
+[2026-03-18 13:45:07.220] I (1911) MQTT_MONITOR: 正在启动 SNTP 时间同步...
+[2026-03-18 13:45:07.231] I (1911) MQTT_MONITOR: NTP服务器1: cn.pool.ntp.org (国内)
+[2026-03-18 13:45:07.233] I (1921) MQTT_MONITOR: NTP服务器2: ntp.aliyun.com (阿里云)
+[2026-03-18 13:45:07.236] I (1931) MQTT_MONITOR: NTP服务器3: ntp.tencent.com (腾讯云)
+[2026-03-18 13:45:07.242] I (1931) MQTT_MONITOR: 当前系统时间: 1548 ms
+[2026-03-18 13:45:07.248] I (1941) MQTT_MONITOR: 时区设置: CST-8 (UTC+8, 中国标准时间)
+[2026-03-18 13:45:07.254] I (1941) MQTT_MONITOR: SNTP 初始化完成，等待时间同步...
+[2026-03-18 13:45:07.259] I (1951) MQTT_MONITOR: ==============================================
+[2026-03-18 13:45:07.268] I (1961) esp_netif_handlers: sta ip: 192.168.110.199, mask: 255.255.255.0, gw: 192.168.110.1
+[2026-03-18 13:45:07.271] I (1961) ESP32S3_WIFI_EVENT: Connected to ap!
+[2026-03-18 13:45:07.276] I (1971) ESP32S3_WIFI_EVENT: Waiting for NTP time sync...
+[2026-03-18 13:45:09.833] I (4531) MQTT_MONITOR: ==============================================
+[2026-03-18 13:45:09.835] I (4531) MQTT_MONITOR: NTP时间同步回调被触发！
+[2026-03-18 13:45:09.837] I (4531) MQTT_MONITOR: 已发送同步完成信号
+[2026-03-18 13:45:09.844] I (4531) MQTT_MONITOR: ==============================================
+[2026-03-18 13:45:09.849] I (4531) MQTT_MONITOR: 时间同步完成！
+[2026-03-18 13:45:09.855] I (4541) MQTT_MONITOR: 当前实际时间: 2026-03-18 13:45:09 [运行 00:00:04]
+[2026-03-18 13:45:09.860] I (4551) MQTT_MONITOR: 开机时间戳: 1548 ms
+[2026-03-18 13:45:09.866] I (4561) MQTT_MONITOR: 实际开机时间: Wed Mar 18 13:45:05 2026
+[2026-03-18 13:45:09.868] 
+[2026-03-18 13:45:09.871] I (4561) MQTT_MONITOR: NTP轮询间隔已恢复为1小时
+[2026-03-18 13:45:09.878] I (4571) MQTT_MONITOR: ==============================================
+[2026-03-18 13:45:09.881] I (4571) MQTT_MONITOR: 时间同步成功！
+[2026-03-18 13:45:09.887] I (4581) MQTT_MONITOR: 当前时间: 2026-03-18 13:45:09
+[2026-03-18 13:45:09.890] I (4581) MQTT_MONITOR: 开机时间戳: 1548 ms
+[2026-03-18 13:45:09.896] I (4591) MQTT_MONITOR: 实际开机时间: Wed Mar 18 13:45:05 2026
+[2026-03-18 13:45:09.898] 
+[2026-03-18 13:45:09.903] I (4591) MQTT_MONITOR: ==============================================
+[2026-03-18 13:45:09.908] I (4601) ESP32S3_WIFI_EVENT: NTP time sync completed successfully
+[2026-03-18 13:45:14.900] I (9601) MQTT_MONITOR: MQTT连接监控模块已初始化
+[2026-03-18 13:45:14.902] I (9601) MQTT_MONITOR: 统计报告间隔: 0 小时
+[2026-03-18 13:45:14.905] I (9601) MQTT_MONITOR: =================================================
+[2026-03-18 13:45:14.912] I (9601) MQTT_MONITOR:       MQTT连接监控统计系统已启动
+[2026-03-18 13:45:14.918] I (9611) MQTT_MONITOR: =================================================
+[2026-03-18 13:45:14.924] I (9611) MQTT_MONITOR: 提示: 时间将在WiFi连接后通过NTP同步
+[2026-03-18 13:45:14.929] I (9621) MQTT_MONITOR: 等待 SNTP 时间同步完成...
+[2026-03-18 13:45:14.935] I (9621) MQTT_MONITOR: 时间同步已完成，开始监控任务
+[2026-03-18 13:45:14.940] I (9631) ESP32S3_MQTT_EVENT: MQTT客户端已启动
+[2026-03-18 13:45:14.944] I (9641) ESP32S3_MQTT_EVENT: MQTT心跳任务已启动
+[2026-03-18 13:45:14.950] I (9641) ESP32S3_MQTT_EVENT: MQTT连接健康检查任务已启动
+[2026-03-18 13:45:14.963] I (9641) PWM_EVENT: PWM timer 0 initiated at clock speed 5000.
+[2026-03-18 13:45:14.965] I (9651) PWM_EVENT: PWM channel 0 initiated on GPIO1 with initial duty 0 (inverted logic).
+[2026-03-18 13:45:14.971] I (9661) PWM_EVENT: PWM channel 1 initiated on GPIO4 with initial duty 0 (inverted logic).
+[2026-03-18 13:45:14.980] I (9671) PWM_EVENT: PWM channel 2 initiated on GPIO6 with initial duty 0 (inverted logic).
+[2026-03-18 13:45:14.988] I (9681) PWM_EVENT: PWM channel 3 initiated on GPIO8 with initial duty 0 (inverted logic).
+[2026-03-18 13:45:14.994] I (9681) PCNT_EVENT: PCNT channel 0 has been initiated on pin 2.
+[2026-03-18 13:45:14.998] I (9691) PCNT_EVENT: PCNT channel 1 has been initiated on pin 5.
+[2026-03-18 13:45:15.005] I (9691) PCNT_EVENT: PCNT channel 2 has been initiated on pin 7.
+[2026-03-18 13:45:15.011] I (9701) PCNT_EVENT: PCNT channel 3 has been initiated on pin 9.
+[2026-03-18 13:45:15.014] I (9711) PID_EVENT: Index number is: 0
+[2026-03-18 13:45:15.015] 
+[2026-03-18 13:45:15.017] I (9711) PID_EVENT: Index number is: 1
+[2026-03-18 13:45:15.018] 
+[2026-03-18 13:45:15.022] I (9711) PID_EVENT: Index number is: 2
+[2026-03-18 13:45:15.023] 
+[2026-03-18 13:45:15.025] I (9711) PID_EVENT: Index number is: 3
+[2026-03-18 13:45:15.026] 
+[2026-03-18 13:45:24.941] E (19641) esp-tls: [sock=54] select() timeout
+[2026-03-18 13:45:24.943] E (19641) transport_base: Failed to open a new connection: 32774
+[2026-03-18 13:45:24.945] E (19641) mqtt_client: Error transport connect
+[2026-03-18 13:45:24.948] E (19641) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-18 13:45:24.955] W (19641) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=1, 总计=1
+[2026-03-18 13:45:24.960] I (19651) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 13:45:24.969] E (19651) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 13:45:24.981] W (19661) MQTT_MONITOR: [断开事件] #1 | 时间: 2026-03-18 13:45:24 [运行 00:00:19] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 13:45:24.984] I (19671) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-18 13:45:24.991] W (19681) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=2, 总计=2
+[2026-03-18 13:45:24.996] I (19691) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 13:45:25.007] W (19691) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-18 13:45:25.016] W (19701) MQTT_MONITOR: [断开事件] #2 | 时间: 2026-03-18 13:45:24 [运行 00:00:19] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-18 13:45:25.019] I (19711) PCNT_EVENT: Motor 0 idle, PCNT=0
+[2026-03-18 13:45:25.024] I (19711) PCNT_EVENT: Motor 1 idle, PCNT=4
+[2026-03-18 13:45:25.027] I (19711) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-03-18 13:45:25.031] I (19711) PCNT_EVENT: Motor 3 idle, PCNT=0
+[2026-03-18 13:45:25.036] I (19721) PWM_EVENT: PWM channel 0 duty set to 8191.
+[2026-03-18 13:45:25.041] I (19721) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-18 13:45:25.046] I (19721) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 13:45:25.050] I (19731) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-03-18 13:45:25.240] I (19941) PCNT_EVENT: Motor 1 idle, PCNT=397
+[2026-03-18 13:45:25.241] I (19941) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-18 13:45:25.441] I (20141) PCNT_EVENT: Motor 1 idle, PCNT=0
+[2026-03-18 13:45:25.443] I (20141) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-18 13:45:34.081] I (28771) ESP32S3_MQTT_EVENT: Connected to MQTT server.
+[2026-03-18 13:45:34.082] I (28781) ESP32S3_STATUS_LED: LED mode changed to: 3
+[2026-03-18 13:45:34.087] I (28781) MQTT_MONITOR: [连接事件] #1 | 时间: 2026-03-18 13:45:33 [运行 00:00:28]
+[2026-03-18 13:45:34.094] I (28781) ESP32S3_MQTT_EVENT: 已订阅控制频道 'esp32_1/control' (msg_id=408)
+[2026-03-18 13:45:44.043] I (38741) PCNT_EVENT: Motor 2 running, PCNT=0/s (raw=0/200ms), target=255/s
+[2026-03-18 13:45:44.051] I (38751) PWM_EVENT: PWM channel 2 duty set to 6144.
+[2026-03-18 13:45:44.054] I (38751) PID_EVENT: Motor 2 PID: target=255/s, actual=0/s (raw=0/200ms), pid_out=2048, pwm_duty=6144, startup=1
+[2026-03-18 13:45:44.243] I (38941) PCNT_EVENT: Motor 2 running, PCNT=95/s (raw=19/200ms), target=255/s
+[2026-03-18 13:45:44.252] I (38951) PWM_EVENT: PWM channel 2 duty set to 4856.
+[2026-03-18 13:45:44.255] I (38951) PID_EVENT: Motor 2 PID: target=255/s, actual=95/s (raw=19/200ms), pid_out=3335, pwm_duty=4856, startup=2
+[2026-03-18 13:45:44.443] I (39141) PCNT_EVENT: Motor 2 running, PCNT=170/s (raw=34/200ms), target=255/s
+[2026-03-18 13:45:44.451] I (39151) PWM_EVENT: PWM channel 2 duty set to 4167.
+[2026-03-18 13:45:44.455] I (39151) PID_EVENT: Motor 2 PID: target=255/s, actual=170/s (raw=34/200ms), pid_out=4024, pwm_duty=4167, startup=3
+[2026-03-18 13:45:44.643] I (39341) PCNT_EVENT: Motor 2 running, PCNT=215/s (raw=43/200ms), target=255/s
+[2026-03-18 13:45:44.651] I (39351) PWM_EVENT: PWM channel 2 duty set to 3837.
+[2026-03-18 13:45:44.654] I (39351) PID_EVENT: Motor 2 PID: target=255/s, actual=215/s (raw=43/200ms), pid_out=4355, pwm_duty=3837, startup=4
+[2026-03-18 13:45:44.843] I (39541) PCNT_EVENT: Motor 2 running, PCNT=225/s (raw=45/200ms), target=255/s
+[2026-03-18 13:45:44.850] I (39551) PWM_EVENT: PWM channel 2 duty set to 3586.
+[2026-03-18 13:45:44.856] I (39551) PID_EVENT: Motor 2 PID: target=255/s, actual=225/s (raw=45/200ms), pid_out=4606, pwm_duty=3586, startup=5
+[2026-03-18 13:45:45.043] I (39741) PCNT_EVENT: Motor 2 running, PCNT=245/s (raw=49/200ms), target=255/s
+[2026-03-18 13:45:45.050] I (39751) PWM_EVENT: PWM channel 2 duty set to 3494.
+[2026-03-18 13:45:45.056] I (39751) PID_EVENT: Motor 2 PID: target=255/s, actual=245/s (raw=49/200ms), pid_out=4697, pwm_duty=3494, startup=6
+[2026-03-18 13:45:45.247] I (39941) PCNT_EVENT: Motor 2 running, PCNT=240/s (raw=48/200ms), target=255/s
+[2026-03-18 13:45:45.252] I (39951) PWM_EVENT: PWM channel 2 duty set to 3362.
+[2026-03-18 13:45:45.257] I (39951) PID_EVENT: Motor 2 PID: target=255/s, actual=240/s (raw=48/200ms), pid_out=4829, pwm_duty=3362, startup=7
+[2026-03-18 13:45:45.443] I (40141) PCNT_EVENT: Motor 2 running, PCNT=260/s (raw=52/200ms), target=255/s
+[2026-03-18 13:45:45.456] I (40151) PWM_EVENT: PWM channel 2 duty set to 3391.
+[2026-03-18 13:45:45.467] I (40161) PID_EVENT: Motor 2 PID: target=255/s, actual=260/s (raw=52/200ms), pid_out=4801, pwm_duty=3391, startup=8
+[2026-03-18 13:45:45.644] I (40341) PCNT_EVENT: Motor 2 running, PCNT=255/s (raw=51/200ms), target=255/s
+[2026-03-18 13:45:45.651] I (40351) PWM_EVENT: PWM channel 2 duty set to 3379.
+[2026-03-18 13:45:45.655] I (40351) PID_EVENT: Motor 2 PID: target=255/s, actual=255/s (raw=51/200ms), pid_out=4813, pwm_duty=3379, startup=9
+[2026-03-18 13:45:45.844] I (40541) PCNT_EVENT: Motor 2 running, PCNT=265/s (raw=53/200ms), target=255/s
+[2026-03-18 13:45:45.851] I (40551) PWM_EVENT: PWM channel 2 duty set to 3447.
+[2026-03-18 13:45:45.855] I (40551) PID_EVENT: Motor 2 PID: target=255/s, actual=265/s (raw=53/200ms), pid_out=4744, pwm_duty=3447, startup=10
+[2026-03-18 13:45:46.043] I (40741) PCNT_EVENT: Motor 2 running, PCNT=250/s (raw=50/200ms), target=255/s
+[2026-03-18 13:45:46.051] I (40751) PWM_EVENT: PWM channel 2 duty set to 3395.
+[2026-03-18 13:45:46.056] I (40751) PID_EVENT: Motor 2 PID: target=255/s, actual=250/s (raw=50/200ms), pid_out=4796, pwm_duty=3395, startup=11
+[2026-03-18 13:45:46.242] I (40941) PCNT_EVENT: Motor 2 running, PCNT=250/s (raw=50/200ms), target=255/s
+[2026-03-18 13:45:46.250] I (40951) PWM_EVENT: PWM channel 2 duty set to 3344.
+[2026-03-18 13:45:46.255] I (40951) PID_EVENT: Motor 2 PID: target=255/s, actual=250/s (raw=50/200ms), pid_out=4848, pwm_duty=3344, startup=11
+[2026-03-18 13:45:46.443] I (41141) PCNT_EVENT: Motor 2 running, PCNT=255/s (raw=51/200ms), target=255/s
+[2026-03-18 13:45:46.450] I (41151) PWM_EVENT: PWM channel 2 duty set to 3332.
+[2026-03-18 13:45:46.455] I (41151) PID_EVENT: Motor 2 PID: target=255/s, actual=255/s (raw=51/200ms), pid_out=4860, pwm_duty=3332, startup=11
+[2026-03-18 13:45:46.642] I (41341) PCNT_EVENT: Motor 2 running, PCNT=265/s (raw=53/200ms), target=255/s
+[2026-03-18 13:45:46.650] I (41351) PWM_EVENT: PWM channel 2 duty set to 3400.
+[2026-03-18 13:45:46.655] I (41351) PID_EVENT: Motor 2 PID: target=255/s, actual=265/s (raw=53/200ms), pid_out=4791, pwm_duty=3400, startup=11
+[2026-03-18 13:45:46.843] I (41541) PCNT_EVENT: Motor 2 running, PCNT=245/s (raw=49/200ms), target=255/s
+[2026-03-18 13:45:46.851] I (41551) PWM_EVENT: PWM channel 2 duty set to 3308.
+[2026-03-18 13:45:46.856] I (41551) PID_EVENT: Motor 2 PID: target=255/s, actual=245/s (raw=49/200ms), pid_out=4883, pwm_duty=3308, startup=11
+[2026-03-18 13:45:47.046] I (41741) PCNT_EVENT: Motor 2 running, PCNT=265/s (raw=53/200ms), target=255/s
+[2026-03-18 13:45:47.051] I (41751) PWM_EVENT: PWM channel 2 duty set to 3377.
+[2026-03-18 13:45:47.058] I (41751) PID_EVENT: Motor 2 PID: target=255/s, actual=265/s (raw=53/200ms), pid_out=4815, pwm_duty=3377, startup=11
+[2026-03-18 13:45:47.244] I (41941) PCNT_EVENT: Motor 2 running, PCNT=255/s (raw=51/200ms), target=255/s
+[2026-03-18 13:45:47.251] I (41951) PWM_EVENT: PWM channel 2 duty set to 3365.
+[2026-03-18 13:45:47.255] I (41951) PID_EVENT: Motor 2 PID: target=255/s, actual=255/s (raw=51/200ms), pid_out=4826, pwm_duty=3365, startup=11
+[2026-03-18 13:45:47.443] I (42141) PCNT_EVENT: Motor 2 running, PCNT=250/s (raw=50/200ms), target=255/s
+[2026-03-18 13:45:47.451] I (42151) PWM_EVENT: PWM channel 2 duty set to 3314.
+[2026-03-18 13:45:47.455] I (42151) PID_EVENT: Motor 2 PID: target=255/s, actual=250/s (raw=50/200ms), pid_out=4878, pwm_duty=3314, startup=11
+[2026-03-18 13:45:47.643] I (42341) PCNT_EVENT: Motor 2 running, PCNT=255/s (raw=51/200ms), target=255/s
+[2026-03-18 13:45:47.651] I (42351) PWM_EVENT: PWM channel 2 duty set to 3302.
+[2026-03-18 13:45:47.654] I (42351) PID_EVENT: Motor 2 PID: target=255/s, actual=255/s (raw=51/200ms), pid_out=4890, pwm_duty=3302, startup=11
+[2026-03-18 13:45:47.843] I (42541) PCNT_EVENT: Motor 2 running, PCNT=265/s (raw=53/200ms), target=255/s
+[2026-03-18 13:45:47.851] I (42551) PWM_EVENT: PWM channel 2 duty set to 3370.
+[2026-03-18 13:45:47.855] I (42551) PID_EVENT: Motor 2 PID: target=255/s, actual=265/s (raw=53/200ms), pid_out=4821, pwm_duty=3370, startup=11
+[2026-03-18 13:45:48.043] I (42741) PCNT_EVENT: Motor 2 running, PCNT=265/s (raw=53/200ms), target=255/s
+[2026-03-18 13:45:48.050] I (42751) PWM_EVENT: PWM channel 2 duty set to 3439.
+[2026-03-18 13:45:48.055] I (42751) PID_EVENT: Motor 2 PID: target=255/s, actual=265/s (raw=53/200ms), pid_out=4752, pwm_duty=3439, startup=11
+[2026-03-18 13:45:48.243] I (42941) PCNT_EVENT: Motor 2 running, PCNT=250/s (raw=50/200ms), target=255/s
+[2026-03-18 13:45:48.250] I (42951) PWM_EVENT: PWM channel 2 duty set to 3388.
+[2026-03-18 13:45:48.256] I (42951) PID_EVENT: Motor 2 PID: target=255/s, actual=250/s (raw=50/200ms), pid_out=4804, pwm_duty=3388, startup=11
+[2026-03-18 13:45:48.442] I (43141) PCNT_EVENT: Motor 2 running, PCNT=275/s (raw=55/200ms), target=255/s
+[2026-03-18 13:45:48.451] I (43151) PWM_EVENT: PWM channel 2 duty set to 3537.
+[2026-03-18 13:45:48.455] I (43151) PID_EVENT: Motor 2 PID: target=255/s, actual=275/s (raw=55/200ms), pid_out=4655, pwm_duty=3537, startup=11
+[2026-03-18 13:45:48.643] I (43341) PCNT_EVENT: Motor 2 running, PCNT=250/s (raw=50/200ms), target=255/s
+[2026-03-18 13:45:48.650] I (43351) PWM_EVENT: PWM channel 2 duty set to 3486.
+[2026-03-18 13:45:48.655] I (43351) PID_EVENT: Motor 2 PID: target=255/s, actual=250/s (raw=50/200ms), pid_out=4706, pwm_duty=3486, startup=11
+[2026-03-18 13:45:48.843] I (43541) PCNT_EVENT: Motor 2 running, PCNT=240/s (raw=48/200ms), target=255/s
+[2026-03-18 13:45:48.850] I (43551) PWM_EVENT: PWM channel 2 duty set to 3354.
+[2026-03-18 13:45:48.856] I (43551) PID_EVENT: Motor 2 PID: target=255/s, actual=240/s (raw=48/200ms), pid_out=4837, pwm_duty=3354, startup=11
+[2026-03-18 13:45:49.042] I (43741) PCNT_EVENT: Motor 2 running, PCNT=250/s (raw=50/200ms), target=255/s
+[2026-03-18 13:45:49.052] I (43751) PWM_EVENT: PWM channel 2 duty set to 3303.
+[2026-03-18 13:45:49.055] I (43751) PID_EVENT: Motor 2 PID: target=255/s, actual=250/s (raw=50/200ms), pid_out=4889, pwm_duty=3303, startup=11
+[2026-03-18 13:45:49.242] I (43941) PCNT_EVENT: Motor 2 running, PCNT=265/s (raw=53/200ms), target=255/s
+[2026-03-18 13:45:49.252] I (43951) PWM_EVENT: PWM channel 2 duty set to 3371.
+[2026-03-18 13:45:49.255] I (43951) PID_EVENT: Motor 2 PID: target=255/s, actual=265/s (raw=53/200ms), pid_out=4820, pwm_duty=3371, startup=11
+[2026-03-18 13:45:49.442] I (44141) PCNT_EVENT: Motor 2 running, PCNT=250/s (raw=50/200ms), target=255/s
+[2026-03-18 13:45:49.450] I (44151) PWM_EVENT: PWM channel 2 duty set to 3320.
+[2026-03-18 13:45:49.455] I (44151) PID_EVENT: Motor 2 PID: target=255/s, actual=250/s (raw=50/200ms), pid_out=4872, pwm_duty=3320, startup=11
+[2026-03-18 13:45:49.643] I (44341) PCNT_EVENT: Motor 2 running, PCNT=270/s (raw=54/200ms), target=255/s
+[2026-03-18 13:45:49.650] I (44351) PWM_EVENT: PWM channel 2 duty set to 3429.
+[2026-03-18 13:45:49.655] I (44351) PID_EVENT: Motor 2 PID: target=255/s, actual=270/s (raw=54/200ms), pid_out=4762, pwm_duty=3429, startup=11
+[2026-03-18 13:45:49.843] I (44541) PCNT_EVENT: Motor 2 running, PCNT=250/s (raw=50/200ms), target=255/s
+[2026-03-18 13:45:49.850] I (44551) PWM_EVENT: PWM channel 2 duty set to 3378.
+[2026-03-18 13:45:49.856] I (44551) PID_EVENT: Motor 2 PID: target=255/s, actual=250/s (raw=50/200ms), pid_out=4814, pwm_duty=3378, startup=11
+[2026-03-18 13:45:49.942] I (44641) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=282, elapsed=0ms)
+[2026-03-18 13:45:50.042] I (44741) PCNT_EVENT: Motor 2 running, PCNT=260/s (raw=52/200ms), target=255/s
+[2026-03-18 13:45:50.051] I (44751) PWM_EVENT: PWM channel 2 duty set to 3407.
+[2026-03-18 13:45:50.055] I (44751) PID_EVENT: Motor 2 PID: target=255/s, actual=260/s (raw=52/200ms), pid_out=4785, pwm_duty=3407, startup=11
+[2026-03-18 13:45:50.243] I (44941) PCNT_EVENT: Motor 2 running, PCNT=250/s (raw=50/200ms), target=255/s
+[2026-03-18 13:45:50.251] I (44951) PWM_EVENT: PWM channel 2 duty set to 3355.
+[2026-03-18 13:45:50.255] I (44951) PID_EVENT: Motor 2 PID: target=255/s, actual=250/s (raw=50/200ms), pid_out=4836, pwm_duty=3355, startup=11
+[2026-03-18 13:45:50.443] I (45141) PCNT_EVENT: Motor 2 running, PCNT=250/s (raw=50/200ms), target=255/s
+[2026-03-18 13:45:50.450] I (45151) PWM_EVENT: PWM channel 2 duty set to 3304.
+[2026-03-18 13:45:50.455] I (45151) PID_EVENT: Motor 2 PID: target=255/s, actual=250/s (raw=50/200ms), pid_out=4887, pwm_duty=3304, startup=11
+[2026-03-18 13:45:50.642] I (45341) PCNT_EVENT: Motor 2 running, PCNT=250/s (raw=50/200ms), target=255/s
+[2026-03-18 13:45:50.651] I (45351) PWM_EVENT: PWM channel 2 duty set to 3253.
+[2026-03-18 13:45:50.654] I (45351) PID_EVENT: Motor 2 PID: target=255/s, actual=250/s (raw=50/200ms), pid_out=4939, pwm_duty=3253, startup=11
+[2026-03-18 13:45:50.843] I (45541) PCNT_EVENT: Motor 2 running, PCNT=275/s (raw=55/200ms), target=255/s
+[2026-03-18 13:45:50.851] I (45551) PWM_EVENT: PWM channel 2 duty set to 3402.
+[2026-03-18 13:45:50.856] I (45551) PID_EVENT: Motor 2 PID: target=255/s, actual=275/s (raw=55/200ms), pid_out=4790, pwm_duty=3402, startup=11
+[2026-03-18 13:45:51.043] I (45741) PCNT_EVENT: Motor 2 running, PCNT=245/s (raw=49/200ms), target=255/s
+[2026-03-18 13:45:51.051] I (45751) PWM_EVENT: PWM channel 2 duty set to 3310.
+[2026-03-18 13:45:51.055] I (45751) PID_EVENT: Motor 2 PID: target=255/s, actual=245/s (raw=49/200ms), pid_out=4881, pwm_duty=3310, startup=11
+[2026-03-18 13:45:51.243] I (45941) PCNT_EVENT: Motor 2 running, PCNT=250/s (raw=50/200ms), target=255/s
+[2026-03-18 13:45:51.251] I (45951) PWM_EVENT: PWM channel 2 duty set to 3259.
+[2026-03-18 13:45:51.255] I (45951) PID_EVENT: Motor 2 PID: target=255/s, actual=250/s (raw=50/200ms), pid_out=4932, pwm_duty=3259, startup=11
+[2026-03-18 13:45:51.443] I (46141) PCNT_EVENT: Motor 2 running, PCNT=265/s (raw=53/200ms), target=255/s
+[2026-03-18 13:45:51.451] I (46151) PWM_EVENT: PWM channel 2 duty set to 3328.
+[2026-03-18 13:45:51.456] I (46151) PID_EVENT: Motor 2 PID: target=255/s, actual=265/s (raw=53/200ms), pid_out=4863, pwm_duty=3328, startup=11
+[2026-03-18 13:45:51.642] I (46341) PCNT_EVENT: Motor 2 running, PCNT=260/s (raw=52/200ms), target=255/s
+[2026-03-18 13:45:51.651] I (46351) PWM_EVENT: PWM channel 2 duty set to 3357.
+[2026-03-18 13:45:51.655] I (46351) PID_EVENT: Motor 2 PID: target=255/s, actual=260/s (raw=52/200ms), pid_out=4834, pwm_duty=3357, startup=11
+[2026-03-18 13:45:51.843] I (46541) PCNT_EVENT: Motor 2 running, PCNT=255/s (raw=51/200ms), target=255/s
+[2026-03-18 13:45:51.852] I (46551) PWM_EVENT: PWM channel 2 duty set to 3346.
+[2026-03-18 13:45:51.856] I (46551) PID_EVENT: Motor 2 PID: target=255/s, actual=255/s (raw=51/200ms), pid_out=4845, pwm_duty=3346, startup=11
+[2026-03-18 13:45:52.042] I (46741) PCNT_EVENT: Motor 2 running, PCNT=255/s (raw=51/200ms), target=255/s
+[2026-03-18 13:45:52.052] I (46751) PWM_EVENT: PWM channel 2 duty set to 3335.
+[2026-03-18 13:45:52.055] I (46751) PID_EVENT: Motor 2 PID: target=255/s, actual=255/s (raw=51/200ms), pid_out=4856, pwm_duty=3335, startup=11
+[2026-03-18 13:45:52.242] I (46941) PCNT_EVENT: Motor 2 running, PCNT=250/s (raw=50/200ms), target=255/s
+[2026-03-18 13:45:52.251] I (46951) PWM_EVENT: PWM channel 2 duty set to 3284.
+[2026-03-18 13:45:52.255] I (46951) PID_EVENT: Motor 2 PID: target=255/s, actual=250/s (raw=50/200ms), pid_out=4908, pwm_duty=3284, startup=11
+[2026-03-18 13:45:52.442] I (47141) PCNT_EVENT: Motor 2 running, PCNT=255/s (raw=51/200ms), target=255/s
+[2026-03-18 13:45:52.451] I (47151) PWM_EVENT: PWM channel 2 duty set to 3273.
+[2026-03-18 13:45:52.455] I (47151) PID_EVENT: Motor 2 PID: target=255/s, actual=255/s (raw=51/200ms), pid_out=4919, pwm_duty=3273, startup=11
+[2026-03-18 13:45:52.647] I (47341) PCNT_EVENT: Motor 2 running, PCNT=255/s (raw=51/200ms), target=255/s
+[2026-03-18 13:45:52.656] I (47351) PWM_EVENT: PWM channel 2 duty set to 3262.
+[2026-03-18 13:45:52.665] I (47361) PID_EVENT: Motor 2 PID: target=255/s, actual=255/s (raw=51/200ms), pid_out=4930, pwm_duty=3262, startup=11
+[2026-03-18 13:45:52.842] I (47541) PCNT_EVENT: Motor 2 running, PCNT=250/s (raw=50/200ms), target=255/s
+[2026-03-18 13:45:52.850] I (47551) PWM_EVENT: PWM channel 2 duty set to 3211.
+[2026-03-18 13:45:52.856] I (47551) PID_EVENT: Motor 2 PID: target=255/s, actual=250/s (raw=50/200ms), pid_out=4981, pwm_duty=3211, startup=11
+[2026-03-18 13:45:53.043] I (47741) PCNT_EVENT: Motor 2 running, PCNT=260/s (raw=52/200ms), target=255/s
+[2026-03-18 13:45:53.057] I (47751) PWM_EVENT: PWM channel 2 duty set to 3240.
+[2026-03-18 13:45:53.067] I (47761) PID_EVENT: Motor 2 PID: target=255/s, actual=260/s (raw=52/200ms), pid_out=4952, pwm_duty=3240, startup=11
+[2026-03-18 13:45:53.244] I (47941) PCNT_EVENT: Motor 2 running, PCNT=265/s (raw=53/200ms), target=255/s
+[2026-03-18 13:45:53.251] I (47951) PWM_EVENT: PWM channel 2 duty set to 3309.
+[2026-03-18 13:45:53.255] I (47951) PID_EVENT: Motor 2 PID: target=255/s, actual=265/s (raw=53/200ms), pid_out=4883, pwm_duty=3309, startup=11
+[2026-03-18 13:45:53.443] I (48141) PCNT_EVENT: Motor 2 running, PCNT=255/s (raw=51/200ms), target=255/s
+[2026-03-18 13:45:53.451] I (48151) PWM_EVENT: PWM channel 2 duty set to 3298.
+[2026-03-18 13:45:53.455] I (48151) PID_EVENT: Motor 2 PID: target=255/s, actual=255/s (raw=51/200ms), pid_out=4894, pwm_duty=3298, startup=11
+[2026-03-18 13:45:53.642] I (48341) PCNT_EVENT: Motor 2 running, PCNT=255/s (raw=51/200ms), target=255/s
+[2026-03-18 13:45:53.651] I (48351) PWM_EVENT: PWM channel 2 duty set to 3287.
+[2026-03-18 13:45:53.655] I (48351) PID_EVENT: Motor 2 PID: target=255/s, actual=255/s (raw=51/200ms), pid_out=4905, pwm_duty=3287, startup=11
+[2026-03-18 13:45:53.843] I (48541) PCNT_EVENT: Motor 2 running, PCNT=255/s (raw=51/200ms), target=255/s
+[2026-03-18 13:45:53.851] I (48551) PWM_EVENT: PWM channel 2 duty set to 3276.
+[2026-03-18 13:45:53.855] I (48551) PID_EVENT: Motor 2 PID: target=255/s, actual=255/s (raw=51/200ms), pid_out=4916, pwm_duty=3276, startup=11
+[2026-03-18 13:45:53.921] I (48621) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 13:45:54.043] I (48741) PCNT_EVENT: Motor 2 idle, PCNT=29
+[2026-03-18 13:45:54.044] I (48741) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 13:45:54.242] I (48941) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-03-18 13:45:54.243] I (48941) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 13:46:07.043] I (61741) PCNT_EVENT: Motor 2 running, PCNT=0/s (raw=0/200ms), target=420/s
+[2026-03-18 13:46:07.052] I (61751) PWM_EVENT: PWM channel 2 duty set to 0.
+[2026-03-18 13:46:07.055] I (61751) PID_EVENT: Motor 2 PID: target=420/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-18 13:46:07.244] I (61941) PCNT_EVENT: Motor 2 running, PCNT=385/s (raw=77/200ms), target=420/s
+[2026-03-18 13:46:07.251] I (61951) PWM_EVENT: PWM channel 2 duty set to 0.
+[2026-03-18 13:46:07.254] I (61951) PID_EVENT: Motor 2 PID: target=420/s, actual=385/s (raw=77/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-18 13:46:07.443] I (62141) PCNT_EVENT: Motor 2 running, PCNT=455/s (raw=91/200ms), target=420/s
+[2026-03-18 13:46:07.451] I (62151) PWM_EVENT: PWM channel 2 duty set to 271.
+[2026-03-18 13:46:07.456] I (62151) PID_EVENT: Motor 2 PID: target=420/s, actual=455/s (raw=91/200ms), pid_out=7920, pwm_duty=271, startup=11
+[2026-03-18 13:46:07.644] I (62341) PCNT_EVENT: Motor 2 running, PCNT=425/s (raw=85/200ms), target=420/s
+[2026-03-18 13:46:07.656] I (62351) PWM_EVENT: PWM channel 2 duty set to 301.
+[2026-03-18 13:46:07.661] I (62351) PID_EVENT: Motor 2 PID: target=420/s, actual=425/s (raw=85/200ms), pid_out=7891, pwm_duty=301, startup=11
+[2026-03-18 13:46:07.843] I (62541) PCNT_EVENT: Motor 2 running, PCNT=420/s (raw=84/200ms), target=420/s
+[2026-03-18 13:46:07.851] I (62551) PWM_EVENT: PWM channel 2 duty set to 290.
+[2026-03-18 13:46:07.855] I (62551) PID_EVENT: Motor 2 PID: target=420/s, actual=420/s (raw=84/200ms), pid_out=7901, pwm_duty=290, startup=11
+[2026-03-18 13:46:08.043] I (62741) PCNT_EVENT: Motor 2 running, PCNT=440/s (raw=88/200ms), target=420/s
+[2026-03-18 13:46:08.051] I (62751) PWM_EVENT: PWM channel 2 duty set to 441.
+[2026-03-18 13:46:08.055] I (62751) PID_EVENT: Motor 2 PID: target=420/s, actual=440/s (raw=88/200ms), pid_out=7751, pwm_duty=441, startup=11
+[2026-03-18 13:46:08.244] I (62941) PCNT_EVENT: Motor 2 running, PCNT=405/s (raw=81/200ms), target=420/s
+[2026-03-18 13:46:08.250] I (62951) PWM_EVENT: PWM channel 2 duty set to 311.
+[2026-03-18 13:46:08.255] I (62951) PID_EVENT: Motor 2 PID: target=420/s, actual=405/s (raw=81/200ms), pid_out=7881, pwm_duty=311, startup=11
+[2026-03-18 13:46:08.443] I (63141) PCNT_EVENT: Motor 2 running, PCNT=430/s (raw=86/200ms), target=420/s
+[2026-03-18 13:46:08.452] I (63151) PWM_EVENT: PWM channel 2 duty set to 381.
+[2026-03-18 13:46:08.456] I (63151) PID_EVENT: Motor 2 PID: target=420/s, actual=430/s (raw=86/200ms), pid_out=7810, pwm_duty=381, startup=11
+[2026-03-18 13:46:08.644] I (63341) PCNT_EVENT: Motor 2 running, PCNT=425/s (raw=85/200ms), target=420/s
+[2026-03-18 13:46:08.655] I (63351) PWM_EVENT: PWM channel 2 duty set to 411.
+[2026-03-18 13:46:08.659] I (63351) PID_EVENT: Motor 2 PID: target=420/s, actual=425/s (raw=85/200ms), pid_out=7780, pwm_duty=411, startup=11
+[2026-03-18 13:46:08.844] I (63541) PCNT_EVENT: Motor 2 running, PCNT=450/s (raw=90/200ms), target=420/s
+[2026-03-18 13:46:08.851] I (63551) PWM_EVENT: PWM channel 2 duty set to 642.
+[2026-03-18 13:46:08.857] I (63551) PID_EVENT: Motor 2 PID: target=420/s, actual=450/s (raw=90/200ms), pid_out=7549, pwm_duty=642, startup=11
+[2026-03-18 13:46:09.045] I (63741) PCNT_EVENT: Motor 2 running, PCNT=435/s (raw=87/200ms), target=420/s
+[2026-03-18 13:46:09.051] I (63751) PWM_EVENT: PWM channel 2 duty set to 753.
+[2026-03-18 13:46:09.056] I (63751) PID_EVENT: Motor 2 PID: target=420/s, actual=435/s (raw=87/200ms), pid_out=7438, pwm_duty=753, startup=11
+[2026-03-18 13:46:09.244] I (63941) PCNT_EVENT: Motor 2 running, PCNT=395/s (raw=79/200ms), target=420/s
+[2026-03-18 13:46:09.251] I (63951) PWM_EVENT: PWM channel 2 duty set to 544.
+[2026-03-18 13:46:09.256] I (63951) PID_EVENT: Motor 2 PID: target=420/s, actual=395/s (raw=79/200ms), pid_out=7648, pwm_duty=544, startup=11
+[2026-03-18 13:46:09.443] I (64141) PCNT_EVENT: Motor 2 running, PCNT=415/s (raw=83/200ms), target=420/s
+[2026-03-18 13:46:09.451] I (64151) PWM_EVENT: PWM channel 2 duty set to 495.
+[2026-03-18 13:46:09.456] I (64151) PID_EVENT: Motor 2 PID: target=420/s, actual=415/s (raw=83/200ms), pid_out=7697, pwm_duty=495, startup=11
+[2026-03-18 13:46:09.644] I (64341) PCNT_EVENT: Motor 2 running, PCNT=410/s (raw=82/200ms), target=420/s
+[2026-03-18 13:46:09.652] I (64351) PWM_EVENT: PWM channel 2 duty set to 405.
+[2026-03-18 13:46:09.656] I (64351) PID_EVENT: Motor 2 PID: target=420/s, actual=410/s (raw=82/200ms), pid_out=7787, pwm_duty=405, startup=11
+[2026-03-18 13:46:09.843] I (64541) PCNT_EVENT: Motor 2 running, PCNT=420/s (raw=84/200ms), target=420/s
+[2026-03-18 13:46:09.852] I (64551) PWM_EVENT: PWM channel 2 duty set to 395.
+[2026-03-18 13:46:09.855] I (64551) PID_EVENT: Motor 2 PID: target=420/s, actual=420/s (raw=84/200ms), pid_out=7796, pwm_duty=395, startup=11
+[2026-03-18 13:46:10.043] I (64741) PCNT_EVENT: Motor 2 running, PCNT=415/s (raw=83/200ms), target=420/s
+[2026-03-18 13:46:10.051] I (64751) PWM_EVENT: PWM channel 2 duty set to 346.
+[2026-03-18 13:46:10.056] I (64751) PID_EVENT: Motor 2 PID: target=420/s, actual=415/s (raw=83/200ms), pid_out=7846, pwm_duty=346, startup=11
+[2026-03-18 13:46:10.243] I (64941) PCNT_EVENT: Motor 2 running, PCNT=430/s (raw=86/200ms), target=420/s
+[2026-03-18 13:46:10.251] I (64951) PWM_EVENT: PWM channel 2 duty set to 416.
+[2026-03-18 13:46:10.256] I (64951) PID_EVENT: Motor 2 PID: target=420/s, actual=430/s (raw=86/200ms), pid_out=7775, pwm_duty=416, startup=11
+[2026-03-18 13:46:10.442] I (65141) PCNT_EVENT: Motor 2 running, PCNT=425/s (raw=85/200ms), target=420/s
+[2026-03-18 13:46:10.452] I (65151) PWM_EVENT: PWM channel 2 duty set to 447.
+[2026-03-18 13:46:10.456] I (65151) PID_EVENT: Motor 2 PID: target=420/s, actual=425/s (raw=85/200ms), pid_out=7745, pwm_duty=447, startup=11
+[2026-03-18 13:46:10.643] I (65341) PCNT_EVENT: Motor 2 running, PCNT=405/s (raw=81/200ms), target=420/s
+[2026-03-18 13:46:10.651] I (65351) PWM_EVENT: PWM channel 2 duty set to 317.
+[2026-03-18 13:46:10.656] I (65351) PID_EVENT: Motor 2 PID: target=420/s, actual=405/s (raw=81/200ms), pid_out=7874, pwm_duty=317, startup=11
+[2026-03-18 13:46:10.843] I (65541) PCNT_EVENT: Motor 2 running, PCNT=425/s (raw=85/200ms), target=420/s
+[2026-03-18 13:46:10.852] I (65551) PWM_EVENT: PWM channel 2 duty set to 348.
+[2026-03-18 13:46:10.855] I (65551) PID_EVENT: Motor 2 PID: target=420/s, actual=425/s (raw=85/200ms), pid_out=7844, pwm_duty=348, startup=11
+[2026-03-18 13:46:11.043] I (65741) PCNT_EVENT: Motor 2 running, PCNT=425/s (raw=85/200ms), target=420/s
+[2026-03-18 13:46:11.052] I (65751) PWM_EVENT: PWM channel 2 duty set to 378.
+[2026-03-18 13:46:11.055] I (65751) PID_EVENT: Motor 2 PID: target=420/s, actual=425/s (raw=85/200ms), pid_out=7813, pwm_duty=378, startup=11
+[2026-03-18 13:46:11.243] I (65941) PCNT_EVENT: Motor 2 running, PCNT=415/s (raw=83/200ms), target=420/s
+[2026-03-18 13:46:11.251] I (65951) PWM_EVENT: PWM channel 2 duty set to 328.
+[2026-03-18 13:46:11.256] I (65951) PID_EVENT: Motor 2 PID: target=420/s, actual=415/s (raw=83/200ms), pid_out=7863, pwm_duty=328, startup=11
+[2026-03-18 13:46:11.443] I (66141) PCNT_EVENT: Motor 2 running, PCNT=435/s (raw=87/200ms), target=420/s
+[2026-03-18 13:46:11.451] I (66151) PWM_EVENT: PWM channel 2 duty set to 439.
+[2026-03-18 13:46:11.455] I (66151) PID_EVENT: Motor 2 PID: target=420/s, actual=435/s (raw=87/200ms), pid_out=7752, pwm_duty=439, startup=11
+[2026-03-18 13:46:11.643] I (66341) PCNT_EVENT: Motor 2 running, PCNT=415/s (raw=83/200ms), target=420/s
+[2026-03-18 13:46:11.652] I (66351) PWM_EVENT: PWM channel 2 duty set to 390.
+[2026-03-18 13:46:11.655] I (66351) PID_EVENT: Motor 2 PID: target=420/s, actual=415/s (raw=83/200ms), pid_out=7802, pwm_duty=390, startup=11
+[2026-03-18 13:46:11.843] I (66541) PCNT_EVENT: Motor 2 running, PCNT=425/s (raw=85/200ms), target=420/s
+[2026-03-18 13:46:11.851] I (66551) PWM_EVENT: PWM channel 2 duty set to 421.
+[2026-03-18 13:46:11.856] I (66551) PID_EVENT: Motor 2 PID: target=420/s, actual=425/s (raw=85/200ms), pid_out=7771, pwm_duty=421, startup=11
+[2026-03-18 13:46:12.043] I (66741) PCNT_EVENT: Motor 2 running, PCNT=420/s (raw=84/200ms), target=420/s
+[2026-03-18 13:46:12.051] I (66751) PWM_EVENT: PWM channel 2 duty set to 411.
+[2026-03-18 13:46:12.055] I (66751) PID_EVENT: Motor 2 PID: target=420/s, actual=420/s (raw=84/200ms), pid_out=7780, pwm_duty=411, startup=11
+[2026-03-18 13:46:12.243] I (66941) PCNT_EVENT: Motor 2 running, PCNT=425/s (raw=85/200ms), target=420/s
+[2026-03-18 13:46:12.252] I (66951) PWM_EVENT: PWM channel 2 duty set to 442.
+[2026-03-18 13:46:12.256] I (66951) PID_EVENT: Motor 2 PID: target=420/s, actual=425/s (raw=85/200ms), pid_out=7749, pwm_duty=442, startup=11
+[2026-03-18 13:46:12.444] I (67141) PCNT_EVENT: Motor 2 running, PCNT=420/s (raw=84/200ms), target=420/s
+[2026-03-18 13:46:12.451] I (67151) PWM_EVENT: PWM channel 2 duty set to 433.
+[2026-03-18 13:46:12.455] I (67151) PID_EVENT: Motor 2 PID: target=420/s, actual=420/s (raw=84/200ms), pid_out=7759, pwm_duty=433, startup=11
+[2026-03-18 13:46:12.643] I (67341) PCNT_EVENT: Motor 2 running, PCNT=415/s (raw=83/200ms), target=420/s
+[2026-03-18 13:46:12.651] I (67351) PWM_EVENT: PWM channel 2 duty set to 383.
+[2026-03-18 13:46:12.656] I (67351) PID_EVENT: Motor 2 PID: target=420/s, actual=415/s (raw=83/200ms), pid_out=7808, pwm_duty=383, startup=11
+[2026-03-18 13:46:12.843] I (67541) PCNT_EVENT: Motor 2 running, PCNT=425/s (raw=85/200ms), target=420/s
+[2026-03-18 13:46:12.851] I (67551) PWM_EVENT: PWM channel 2 duty set to 414.
+[2026-03-18 13:46:12.855] I (67551) PID_EVENT: Motor 2 PID: target=420/s, actual=425/s (raw=85/200ms), pid_out=7777, pwm_duty=414, startup=11
+[2026-03-18 13:46:13.043] I (67741) PCNT_EVENT: Motor 2 running, PCNT=410/s (raw=82/200ms), target=420/s
+[2026-03-18 13:46:13.052] I (67751) PWM_EVENT: PWM channel 2 duty set to 325.
+[2026-03-18 13:46:13.055] I (67751) PID_EVENT: Motor 2 PID: target=420/s, actual=410/s (raw=82/200ms), pid_out=7867, pwm_duty=325, startup=11
+[2026-03-18 13:46:13.244] I (67941) PCNT_EVENT: Motor 2 running, PCNT=440/s (raw=88/200ms), target=420/s
+[2026-03-18 13:46:13.252] I (67951) PWM_EVENT: PWM channel 2 duty set to 476.
+[2026-03-18 13:46:13.255] I (67951) PID_EVENT: Motor 2 PID: target=420/s, actual=440/s (raw=88/200ms), pid_out=7715, pwm_duty=476, startup=11
+[2026-03-18 13:46:13.443] I (68141) PCNT_EVENT: Motor 2 running, PCNT=415/s (raw=83/200ms), target=420/s
+[2026-03-18 13:46:13.451] I (68151) PWM_EVENT: PWM channel 2 duty set to 427.
+[2026-03-18 13:46:13.456] I (68151) PID_EVENT: Motor 2 PID: target=420/s, actual=415/s (raw=83/200ms), pid_out=7765, pwm_duty=427, startup=11
+[2026-03-18 13:46:13.643] I (68341) PCNT_EVENT: Motor 2 running, PCNT=410/s (raw=82/200ms), target=420/s
+[2026-03-18 13:46:13.652] I (68351) PWM_EVENT: PWM channel 2 duty set to 337.
+[2026-03-18 13:46:13.655] I (68351) PID_EVENT: Motor 2 PID: target=420/s, actual=410/s (raw=82/200ms), pid_out=7854, pwm_duty=337, startup=11
+[2026-03-18 13:46:13.843] I (68541) PCNT_EVENT: Motor 2 running, PCNT=430/s (raw=86/200ms), target=420/s
+[2026-03-18 13:46:13.851] I (68551) PWM_EVENT: PWM channel 2 duty set to 408.
+[2026-03-18 13:46:13.856] I (68551) PID_EVENT: Motor 2 PID: target=420/s, actual=430/s (raw=86/200ms), pid_out=7783, pwm_duty=408, startup=11
+[2026-03-18 13:46:14.042] I (68741) PCNT_EVENT: Motor 2 running, PCNT=410/s (raw=82/200ms), target=420/s
+[2026-03-18 13:46:14.052] I (68751) PWM_EVENT: PWM channel 2 duty set to 319.
+[2026-03-18 13:46:14.055] I (68751) PID_EVENT: Motor 2 PID: target=420/s, actual=410/s (raw=82/200ms), pid_out=7873, pwm_duty=319, startup=11
+[2026-03-18 13:46:14.243] I (68941) PCNT_EVENT: Motor 2 running, PCNT=430/s (raw=86/200ms), target=420/s
+[2026-03-18 13:46:14.251] I (68951) PWM_EVENT: PWM channel 2 duty set to 390.
+[2026-03-18 13:46:14.256] I (68951) PID_EVENT: Motor 2 PID: target=420/s, actual=430/s (raw=86/200ms), pid_out=7801, pwm_duty=390, startup=11
+[2026-03-18 13:46:14.444] I (69141) PCNT_EVENT: Motor 2 running, PCNT=415/s (raw=83/200ms), target=420/s
+[2026-03-18 13:46:14.452] I (69151) PWM_EVENT: PWM channel 2 duty set to 341.
+[2026-03-18 13:46:14.455] I (69151) PID_EVENT: Motor 2 PID: target=420/s, actual=415/s (raw=83/200ms), pid_out=7851, pwm_duty=341, startup=11
+[2026-03-18 13:46:14.643] I (69341) PCNT_EVENT: Motor 2 running, PCNT=425/s (raw=85/200ms), target=420/s
+[2026-03-18 13:46:14.651] I (69351) PWM_EVENT: PWM channel 2 duty set to 372.
+[2026-03-18 13:46:14.656] I (69351) PID_EVENT: Motor 2 PID: target=420/s, actual=425/s (raw=85/200ms), pid_out=7820, pwm_duty=372, startup=11
+[2026-03-18 13:46:14.845] I (69541) PCNT_EVENT: Motor 2 running, PCNT=405/s (raw=81/200ms), target=420/s
+[2026-03-18 13:46:14.852] I (69551) PWM_EVENT: PWM channel 2 duty set to 242.
+[2026-03-18 13:46:14.855] I (69551) PID_EVENT: Motor 2 PID: target=420/s, actual=405/s (raw=81/200ms), pid_out=7949, pwm_duty=242, startup=11
+[2026-03-18 13:46:14.942] I (69641) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-18 13:46:14.949] I (69641) ESP32S3_MQTT_EVENT:            MQTT错误类型统计报告 [2026-03-18 13:46:14 [运行 00:01:09]]
+[2026-03-18 13:46:14.954] I (69641) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-18 13:46:14.959] I (69651) ESP32S3_MQTT_EVENT: 传输层超时:        2
+[2026-03-18 13:46:14.964] I (69651) ESP32S3_MQTT_EVENT: PING响应超时:      0
+[2026-03-18 13:46:14.970] I (69661) ESP32S3_MQTT_EVENT: 连接被重置:        0
+[2026-03-18 13:46:14.973] I (69661) ESP32S3_MQTT_EVENT: 写入超时:          0
+[2026-03-18 13:46:14.980] I (69671) ESP32S3_MQTT_EVENT: 连接失败:          0
+[2026-03-18 13:46:14.986] I (69671) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-18 13:46:15.043] I (69741) PCNT_EVENT: Motor 2 running, PCNT=430/s (raw=86/200ms), target=420/s
+[2026-03-18 13:46:15.051] I (69751) PWM_EVENT: PWM channel 2 duty set to 313.
+[2026-03-18 13:46:15.056] I (69751) PID_EVENT: Motor 2 PID: target=420/s, actual=430/s (raw=86/200ms), pid_out=7878, pwm_duty=313, startup=11
+[2026-03-18 13:46:15.243] I (69941) PCNT_EVENT: Motor 2 running, PCNT=425/s (raw=85/200ms), target=420/s
+[2026-03-18 13:46:15.251] I (69951) PWM_EVENT: PWM channel 2 duty set to 344.
+[2026-03-18 13:46:15.255] I (69951) PID_EVENT: Motor 2 PID: target=420/s, actual=425/s (raw=85/200ms), pid_out=7848, pwm_duty=344, startup=11
+[2026-03-18 13:46:15.443] I (70141) PCNT_EVENT: Motor 2 running, PCNT=420/s (raw=84/200ms), target=420/s
+[2026-03-18 13:46:15.452] I (70151) PWM_EVENT: PWM channel 2 duty set to 335.
+[2026-03-18 13:46:15.455] I (70151) PID_EVENT: Motor 2 PID: target=420/s, actual=420/s (raw=84/200ms), pid_out=7857, pwm_duty=335, startup=11
+[2026-03-18 13:46:15.643] I (70341) PCNT_EVENT: Motor 2 running, PCNT=425/s (raw=85/200ms), target=420/s
+[2026-03-18 13:46:15.651] I (70351) PWM_EVENT: PWM channel 2 duty set to 366.
+[2026-03-18 13:46:15.655] I (70351) PID_EVENT: Motor 2 PID: target=420/s, actual=425/s (raw=85/200ms), pid_out=7826, pwm_duty=366, startup=11
+[2026-03-18 13:46:15.844] I (70541) PCNT_EVENT: Motor 2 running, PCNT=410/s (raw=82/200ms), target=420/s
+[2026-03-18 13:46:15.852] I (70551) PWM_EVENT: PWM channel 2 duty set to 277.
+[2026-03-18 13:46:15.855] I (70551) PID_EVENT: Motor 2 PID: target=420/s, actual=410/s (raw=82/200ms), pid_out=7915, pwm_duty=277, startup=11
+[2026-03-18 13:46:16.043] I (70741) PCNT_EVENT: Motor 2 running, PCNT=425/s (raw=85/200ms), target=420/s
+[2026-03-18 13:46:16.051] I (70751) PWM_EVENT: PWM channel 2 duty set to 308.
+[2026-03-18 13:46:16.056] I (70751) PID_EVENT: Motor 2 PID: target=420/s, actual=425/s (raw=85/200ms), pid_out=7884, pwm_duty=308, startup=11
+[2026-03-18 13:46:16.243] I (70941) PCNT_EVENT: Motor 2 running, PCNT=450/s (raw=90/200ms), target=420/s
+[2026-03-18 13:46:16.251] I (70951) PWM_EVENT: PWM channel 2 duty set to 539.
+[2026-03-18 13:46:16.255] I (70951) PID_EVENT: Motor 2 PID: target=420/s, actual=450/s (raw=90/200ms), pid_out=7652, pwm_duty=539, startup=11
+[2026-03-18 13:46:16.443] I (71141) PCNT_EVENT: Motor 2 running, PCNT=415/s (raw=83/200ms), target=420/s
+[2026-03-18 13:46:16.451] I (71151) PWM_EVENT: PWM channel 2 duty set to 490.
+[2026-03-18 13:46:16.455] I (71151) PID_EVENT: Motor 2 PID: target=420/s, actual=415/s (raw=83/200ms), pid_out=7701, pwm_duty=490, startup=11
+[2026-03-18 13:46:16.643] I (71341) PCNT_EVENT: Motor 2 running, PCNT=415/s (raw=83/200ms), target=420/s
+[2026-03-18 13:46:16.652] I (71351) PWM_EVENT: PWM channel 2 duty set to 442.
+[2026-03-18 13:46:16.656] I (71351) PID_EVENT: Motor 2 PID: target=420/s, actual=415/s (raw=83/200ms), pid_out=7750, pwm_duty=442, startup=11
+[2026-03-18 13:46:16.843] I (71541) PCNT_EVENT: Motor 2 running, PCNT=405/s (raw=81/200ms), target=420/s
+[2026-03-18 13:46:16.852] I (71551) PWM_EVENT: PWM channel 2 duty set to 313.
+[2026-03-18 13:46:16.855] I (71551) PID_EVENT: Motor 2 PID: target=420/s, actual=405/s (raw=81/200ms), pid_out=7879, pwm_duty=313, startup=11
+[2026-03-18 13:46:16.931] I (71631) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 13:46:26.983] W (81681) transport_base: Poll timeout or error, errno=Connection already in progress, fd=54, timeout_ms=10000
+[2026-03-18 13:46:26.988] E (81681) mqtt_client: Writing didn't complete in specified timeout: errno=119
+[2026-03-18 13:46:26.991] E (81681) mqtt_client: Error to resend data
+[2026-03-18 13:46:26.996] I (81691) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-18 13:46:27.003] W (81691) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=1, 总计=3
+[2026-03-18 13:46:27.008] I (81701) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-18 13:46:27.017] W (81701) ESP32S3_MQTT_EVENT: 断开原因: PING_OR_UNKNOWN_ERROR (type=0, tls_err=0, stack_err=0, ret_code=0)
+[2026-03-18 13:46:27.029] W (81711) MQTT_MONITOR: [断开事件] #3 | 时间: 2026-03-18 13:46:26 [运行 00:01:21] | 原因: PING_OR_UNKNOWN_ERROR
+[2026-03-18 13:46:27.032] I (81721) PCNT_EVENT: Motor 2 idle, PCNT=49
+[2026-03-18 13:46:27.044] W (81721) ESP32S3_MQTT_EVENT: 心跳发送耗时过长，可能存在TCP层阻塞 (msg_id=51544, elapsed=7080ms, heap=174768)
+[2026-03-18 13:46:27.047] I (81731) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 13:46:27.242] I (81941) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-03-18 13:46:27.243] I (81941) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-18 13:46:32.908] I (87601) ESP32S3_MQTT_EVENT: Connected to MQTT server.
+[2026-03-18 13:46:32.910] I (87601) ESP32S3_STATUS_LED: LED mode changed to: 3
+[2026-03-18 13:46:32.915] I (87601) MQTT_MONITOR: [连接事件] #2 | 时间: 2026-03-18 13:46:32 [运行 00:01:27]
+[2026-03-18 13:46:32.922] I (87611) ESP32S3_MQTT_EVENT: 已订阅控制频道 'esp32_1/control' (msg_id=12342)
+[2026-03-18 13:46:49.944] I (104641) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=10476, elapsed=0ms)
+
+
+============================================================
+日志记录结束
+结束时间: 2026-03-18 13:47:07
+总运行时间: 2.02 分钟
+总行数: 431
+============================================================
+连接统计:
+  - MQTT连接次数: 2
+  - MQTT断开次数: 3
+  - 连接保持率: 66.67%
+
+错误统计:
+  - TCP_TRANSPORT_ERROR: 4
+  - PING_OR_UNKNOWN_ERROR: 2
+============================================================

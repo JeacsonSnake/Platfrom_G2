@@ -1,22 +1,40 @@
 #include "main.h"
+#include "monitor.h"
 
 static char *TAG = "ESP32S3_WIFI_EVENT";
 
 // 互斥信号量，作为保护，其实就是监测这个进程是否完成
 SemaphoreHandle_t sem;
 
+// WiFi 连接状态标志
+static bool wifi_connected = false;
+
+// 获取 WiFi 连接状态（供其他模块使用）
+bool wifi_is_connected(void)
+{
+    return wifi_connected;
+}
+
 static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
     if ((event_base == WIFI_EVENT) && (event_id == WIFI_EVENT_STA_START ||
                                        event_id == WIFI_EVENT_STA_DISCONNECTED))
     {
+        wifi_connected = false;
         ESP_LOGI(TAG, "Begin to connect the AP");
+        status_led_set_mode(LED_BLINK_FAST);  // WiFi 连接中 - 快速闪烁
         esp_wifi_connect();
     }
     else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
     {
+        wifi_connected = true;
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
         ESP_LOGI(TAG, "Got ip:" IPSTR, IP2STR(&event->ip_info.ip));
+        status_led_set_mode(LED_BLINK_SLOW);  // WiFi 已连接，等待 MQTT - 慢速闪烁
+        
+        // 启动NTP时间同步
+        monitor_start_time_sync();
+        
         xSemaphoreGive(sem);
     }
 }
@@ -56,14 +74,38 @@ void wifi_init(void)
 
     // 启动阶段
     ESP_ERROR_CHECK(esp_wifi_start());
+    
+    // 禁用 WiFi 省电模式，确保 MQTT 连接稳定
+    ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE));
 
-    // 等待阶段
-    while (1)
+    // 等待阶段（添加30秒超时机制）
+    int retry_count = 0;
+    const int MAX_RETRY = 60;  // 60秒超时（WiFi连接较慢，增加等待时间）
+    bool connected = false;
+    
+    while (retry_count < MAX_RETRY)
     {
-        if (xSemaphoreTake(sem, portMAX_DELAY) == pdPASS)
+        if (xSemaphoreTake(sem, pdMS_TO_TICKS(1000)) == pdPASS)
         {
             ESP_LOGI(TAG, "Connected to ap!");
+            connected = true;
             break;
+        }
+        retry_count++;
+        ESP_LOGW(TAG, "Waiting for WiFi connection... (%d/%d)", retry_count, MAX_RETRY);
+    }
+    
+    if (!connected) {
+        ESP_LOGE(TAG, "WiFi connection timeout! Check SSID and password.");
+        // 不阻塞程序，让后续模块有机会处理错误
+    } else {
+        // WiFi 连接成功后，等待 NTP 时间同步完成
+        ESP_LOGI(TAG, "Waiting for NTP time sync...");
+        bool time_synced = monitor_wait_time_sync(TIME_SYNC_TIMEOUT_MS);
+        if (time_synced) {
+            ESP_LOGI(TAG, "NTP time sync completed successfully");
+        } else {
+            ESP_LOGW(TAG, "NTP time sync timeout, continuing with system time");
         }
     }
 

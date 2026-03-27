@@ -15,20 +15,54 @@
 #include "esp_http_client.h"
 #include "esp_partition.h"
 #include "cJSON.h"
+#include "esp_timer.h"
 #include "driver/ledc.h"
 #include "driver/pulse_cnt.h"
+#include "driver/gpio.h"
+#include "driver/rmt_tx.h"
+#include "led_strip_encoder.h"
+#include "esp_sntp.h"
+#include "monitor.h"
 
+
+//////////////////////////////////////////////////////////////
+//////////////////////// STATUS LED //////////////////////////
+//////////////////////////////////////////////////////////////
+// Status LED GPIO (ESP32-S3-DevKitC-1 RGB LED @ GPIO48)
+#define STATUS_LED_GPIO         GPIO_NUM_48
+
+// WS2812 RGB LED 颜色模式
+// LED_OFF:      熄灭
+// LED_BLINK_FAST (黄色):   WiFi 连接中 (100ms)
+// LED_BLINK_SLOW (蓝色):   MQTT 连接中 (500ms)  
+// LED_ON (绿色):           全部连接成功
+
+// LED 状态模式
+#define LED_OFF         0   // 系统未启动
+#define LED_BLINK_FAST  1   // WiFi 连接中 (100ms)
+#define LED_BLINK_SLOW  2   // WiFi 已连接，MQTT 连接中 (500ms)
+#define LED_ON          3   // 全部连接成功
+
+// LED 状态初始化
+void status_led_init(void);
+void status_led_set_mode(int mode);
+void status_led_task(void *pvParameters);
 
 //////////////////////////////////////////////////////////////
 //////////////////////// WIFI ////////////////////////////////
 //////////////////////////////////////////////////////////////
 // WiFi SSID and Password
 // EMQX MQTT Server should be broadcasted within this network
-#define WIFI_SSID "去码头整点薯条"
-#define WIFI_PASS "Getfries0ndock"
+#define WIFI_SSID "WeShare-6148"
+#define WIFI_PASS "1234567890"
 
 // WIFI Connection Function 初始化方法
 void wifi_init(void);
+// WiFi Connection Status 获取WiFi连接状态
+bool wifi_is_connected(void);
+
+// SNTP Time Sync Function 时间同步方法（由WiFi连接成功后调用）
+void monitor_start_time_sync(void);
 
 
 //////////////////////////////////////////////////////////////
@@ -38,14 +72,17 @@ void wifi_init(void);
 #define LEDC_TIMER      LEDC_TIMER_0
 #define LEDC_MODE       LEDC_LOW_SPEED_MODE
 #define LEDC_DUTY_RES   LEDC_TIMER_13_BIT
-#define LEDC_DUTY       (8192)
-#define LEDC_FREQ       (5000)
+#define LEDC_DUTY       (8191)      // Initial duty: 8191 = Motor OFF (inverted logic: High=OFF, Low=ON)
+#define LEDC_FREQ       (5000)      // 5KHz PWM frequency (20KHz requires 8-bit resolution, see Bug002)
+                                            // CHB-BLDC2418 spec: 15K~25KHz recommended for noise reduction
+                                            // But ESP32-S3 hardware cannot achieve 20KHz + 13-bit simultaneously
 
 // PWM Parameters PWM控制器参数
-#define LEDC_GPIO_LIST  {5, 6, 7, 8, 9, 10}
-#define LEDC_CHANNEL_LIST {LEDC_CHANNEL_0, LEDC_CHANNEL_1, LEDC_CHANNEL_2, LEDC_CHANNEL_3, LEDC_CHANNEL_4, LEDC_CHANNEL_5}
-extern const int pwm_channels[6];
-extern const int pwm_gpios[6];
+// CHB-BLDC2418 Motor: IO1, IO4, IO6, IO8 (GPIO1, GPIO4, GPIO6, GPIO8)
+#define LEDC_GPIO_LIST  {1, 4, 6, 8}
+#define LEDC_CHANNEL_LIST {LEDC_CHANNEL_0, LEDC_CHANNEL_1, LEDC_CHANNEL_2, LEDC_CHANNEL_3}
+extern const int pwm_channels[4];
+extern const int pwm_gpios[4];
 
 
 // PWM Init Function 初始化方法
@@ -58,7 +95,8 @@ void pwm_set_duty(int data, int channel);
 //////////////////////// PCNT ////////////////////////////////
 //////////////////////////////////////////////////////////////
 // PCNT Parameters 参数数组
-#define PCNT_GPIO       {11, 12, 13, 14}
+// CHB-BLDC2418 Motor: IO2, IO5, IO7, IO9 (GPIO2, GPIO5, GPIO7, GPIO9)
+#define PCNT_GPIO       {2, 5, 7, 9}
 #define PCNT_UNIT       {NULL, NULL, NULL, NULL}
 #define PCNT_UPDATE     {false, false, false, false}
 #define PCNT_COUNT      {0, 0, 0, 0}
@@ -101,6 +139,12 @@ typedef struct
 
 // MQTT Connection Function 初始化方法
 void mqtt_init();
+// MQTT Heartbeat Task 心跳发送任务
+void mqtt_heartbeat_task(void *pvParameters);
+// MQTT Health Check Task 连接健康检查任务
+void mqtt_health_check_task(void *pvParameters);
+// MQTT Error Report Task 错误统计报告任务
+void mqtt_error_report_task(void *pvParameters);
 
 
 

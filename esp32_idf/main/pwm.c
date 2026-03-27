@@ -16,7 +16,7 @@ void pwm_init()
     ledc_timer_config(&ledc_timer);
     ESP_LOGI(TAG, "PWM timer %d initiated at clock speed %d.", LEDC_TIMER, LEDC_FREQ);
 
-    // 初始化PWM通道
+    // 初始化PWM通道 (CHB-BLDC2418: IO1, IO4, IO6, IO8)
     for(int i = 0; i < 4; i ++)
     {
         ledc_channel_config_t ledc_channel = {
@@ -25,11 +25,12 @@ void pwm_init()
             .timer_sel  = LEDC_TIMER,
             .intr_type  = LEDC_INTR_DISABLE,
             .gpio_num   = pwm_gpios[i],
-            .duty       = LEDC_DUTY,
+            .duty       = LEDC_DUTY,    // 初始占空比8191 (停止，反相逻辑)
             .hpoint     = 0
         };
         ledc_channel_config(&ledc_channel);
-        ESP_LOGI(TAG, "PWM channel %d initiated on port %d with max duty %d.", pwm_channels[i], pwm_gpios[i],LEDC_DUTY);
+        ESP_LOGI(TAG, "PWM channel %d initiated on GPIO%d with initial duty %d (inverted logic).", 
+                 pwm_channels[i], pwm_gpios[i], LEDC_DUTY);
     }
 }
 

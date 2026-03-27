@@ -1,5 +1,10 @@
 from rest_framework import status
+<<<<<<< HEAD
 from rest_framework.decorators import api_view
+=======
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+>>>>>>> s-codeRunTesting
 from rest_framework.response import Response
 
 from .models import Task, MotorControl, User, Motor, Spinning
@@ -180,10 +185,21 @@ def mqtt_msg(request):
 @api_view(['GET'])
 def device_list(request):
     # 限制只接受一页，并且每页上限50个设备
+<<<<<<< HEAD
     url = "http://localhost:18083/api/v5/clients?page=1&limit=50&node=emqx%40127.0.0.1"
     # EMQX 的密钥信息
     api_key = "14d39e44d739b1d9"
     secret_key = "DrXETy29CGKJnUHWMTQauKnOYzBN9A65z5Yw4FiUMpt9BC"
+=======
+    # url = "http://localhost:18083/api/v5/clients?page=1&limit=50&node=emqx%40127.0.0.1"
+    url = "http://192.168.233.100:18083/api/v5/clients?page=1&limit=50&node=emqx%40127.0.0.1"
+    # EMQX 的密钥信息
+    api_key = "d339f651ca2aafd5"
+    secret_key = "2wRmM5zNNMWhBmfUZuCmYLEMHa9AluBZnS9AKxesfVJUL"
+    
+    # api_key = "d339f651ca2aafd5"
+    # secret_key = "yqsTFKpr49BQcAHfZMzZFCunR1UnmmFw7EnXDS5DmsBF"
+>>>>>>> s-codeRunTesting
 
     # 使用Base64方式加密密钥对
     credentials = f"{api_key}:{secret_key}"

@@ -1,0 +1,219 @@
+============================================================
+ESP32-S3 串口日志记录
+开始时间: 2026-03-12 16:29:21
+串口: COM10, 波特率: 115200
+============================================================
+
+[2026-03-12 16:29:21.042] W (2582) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (2/60)
+[2026-03-12 16:29:22.041] W (3582) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (3/60)
+[2026-03-12 16:29:22.529] I (4062) ESP32S3_WIFI_EVENT: Begin to connect the AP
+[2026-03-12 16:29:22.531] I (4062) ESP32S3_STATUS_LED: LED mode changed to: 1
+[2026-03-12 16:29:22.586] I (4122) wifi:new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1, snd_ch_cfg:0x0
+[2026-03-12 16:29:22.588] I (4122) wifi:state: init -> auth (0xb0)
+[2026-03-12 16:29:23.042] W (4582) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (4/60)
+[2026-03-12 16:29:23.593] I (5132) wifi:state: auth -> init (0x200)
+[2026-03-12 16:29:23.604] I (5142) wifi:new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1, snd_ch_cfg:0x0
+[2026-03-12 16:29:23.606] I (5142) ESP32S3_WIFI_EVENT: Begin to connect the AP
+[2026-03-12 16:29:23.609] I (5142) ESP32S3_STATUS_LED: LED mode changed to: 1
+[2026-03-12 16:29:24.041] W (5582) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (5/60)
+[2026-03-12 16:29:25.041] W (6582) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (6/60)
+[2026-03-12 16:29:26.019] I (7552) ESP32S3_WIFI_EVENT: Begin to connect the AP
+[2026-03-12 16:29:26.021] I (7552) ESP32S3_STATUS_LED: LED mode changed to: 1
+[2026-03-12 16:29:26.042] W (7582) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (7/60)
+[2026-03-12 16:29:26.068] I (7602) wifi:new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1, snd_ch_cfg:0x0
+[2026-03-12 16:29:26.070] I (7602) wifi:state: init -> auth (0xb0)
+[2026-03-12 16:29:27.043] W (8582) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (8/60)
+[2026-03-12 16:29:27.072] I (8612) wifi:state: auth -> init (0x200)
+[2026-03-12 16:29:27.083] I (8622) wifi:new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1, snd_ch_cfg:0x0
+[2026-03-12 16:29:27.085] I (8622) ESP32S3_WIFI_EVENT: Begin to connect the AP
+[2026-03-12 16:29:27.089] I (8622) ESP32S3_STATUS_LED: LED mode changed to: 1
+[2026-03-12 16:29:28.042] W (9582) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (9/60)
+[2026-03-12 16:29:29.043] W (10582) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (10/60)
+[2026-03-12 16:29:29.500] I (11032) ESP32S3_WIFI_EVENT: Begin to connect the AP
+[2026-03-12 16:29:29.502] I (11032) ESP32S3_STATUS_LED: LED mode changed to: 1
+[2026-03-12 16:29:29.551] I (11082) wifi:new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1, snd_ch_cfg:0x0
+[2026-03-12 16:29:29.553] I (11082) wifi:state: init -> auth (0xb0)
+[2026-03-12 16:29:29.563] I (11102) wifi:state: auth -> assoc (0x0)
+[2026-03-12 16:29:29.657] I (11192) wifi:state: assoc -> run (0x10)
+[2026-03-12 16:29:30.042] W (11582) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (11/60)
+[2026-03-12 16:29:31.042] W (12582) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (12/60)
+[2026-03-12 16:29:32.043] W (13582) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (13/60)
+[2026-03-12 16:29:32.752] I (14282) wifi:state: run -> init (0xfc0)
+[2026-03-12 16:29:32.765] I (14302) wifi:new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1, snd_ch_cfg:0x0
+[2026-03-12 16:29:32.767] I (14302) ESP32S3_WIFI_EVENT: Begin to connect the AP
+[2026-03-12 16:29:32.770] I (14302) ESP32S3_STATUS_LED: LED mode changed to: 1
+[2026-03-12 16:29:33.043] W (14582) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (14/60)
+[2026-03-12 16:29:34.044] W (15582) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (15/60)
+[2026-03-12 16:29:35.044] W (16582) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (16/60)
+[2026-03-12 16:29:35.181] I (16712) ESP32S3_WIFI_EVENT: Begin to connect the AP
+[2026-03-12 16:29:35.184] I (16712) ESP32S3_STATUS_LED: LED mode changed to: 1
+[2026-03-12 16:29:35.190] I (16722) wifi:new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1, snd_ch_cfg:0x0
+[2026-03-12 16:29:35.192] I (16722) wifi:state: init -> auth (0xb0)
+[2026-03-12 16:29:35.197] I (16732) wifi:state: auth -> assoc (0x0)
+[2026-03-12 16:29:35.254] I (16792) wifi:state: assoc -> run (0x10)
+[2026-03-12 16:29:35.363] I (16892) wifi:connected with WeShare-6148, aid = 8, channel 1, BW20, bssid = c4:70:ab:d9:a0:e2
+[2026-03-12 16:29:35.364] I (16892) wifi:security: WPA2-PSK, phy: bgn, rssi: -71
+[2026-03-12 16:29:35.367] I (16902) wifi:pm start, type: 0
+[2026-03-12 16:29:35.368] 
+[2026-03-12 16:29:35.375] I (16902) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us
+[2026-03-12 16:29:35.384] I (16912) wifi:set rx beacon pti, rx_bcn_pti: 0, bcn_timeout: 25000, mt_pti: 0, mt_time: 10000
+[2026-03-12 16:29:35.390] I (16922) wifi:AP's beacon interval = 102400 us, DTIM period = 1
+[2026-03-12 16:29:36.044] W (17582) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (17/60)
+[2026-03-12 16:29:36.433] I (17972) ESP32S3_WIFI_EVENT: Got ip:192.168.110.199
+[2026-03-12 16:29:36.435] I (17972) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-12 16:29:36.438] I (17972) MQTT_MONITOR: ==============================================
+[2026-03-12 16:29:36.443] I (17972) MQTT_MONITOR: 正在启动 SNTP 时间同步...
+[2026-03-12 16:29:36.449] I (17982) MQTT_MONITOR: NTP服务器1: cn.pool.ntp.org (国内)
+[2026-03-12 16:29:36.456] I (17982) MQTT_MONITOR: NTP服务器2: ntp.aliyun.com (阿里云)
+[2026-03-12 16:29:36.461] I (17992) MQTT_MONITOR: NTP服务器3: ntp.tencent.com (腾讯云)
+[2026-03-12 16:29:36.465] I (17992) MQTT_MONITOR: 当前系统时间: 17608 ms
+[2026-03-12 16:29:36.472] I (18002) MQTT_MONITOR: 时区设置: CST-8 (UTC+8, 中国标准时间)
+[2026-03-12 16:29:36.479] I (18002) MQTT_MONITOR: SNTP 初始化完成，等待时间同步...
+[2026-03-12 16:29:36.484] I (18012) MQTT_MONITOR: ==============================================
+[2026-03-12 16:29:36.492] I (18022) esp_netif_handlers: sta ip: 192.168.110.199, mask: 255.255.255.0, gw: 192.168.110.1
+[2026-03-12 16:29:36.497] I (18022) ESP32S3_WIFI_EVENT: Connected to ap!
+[2026-03-12 16:29:36.502] I (18032) ESP32S3_WIFI_EVENT: Waiting for NTP time sync...
+[2026-03-12 16:29:37.315] I (18852) MQTT_MONITOR: ==============================================
+[2026-03-12 16:29:37.317] I (18852) MQTT_MONITOR: NTP时间同步回调被触发！
+[2026-03-12 16:29:37.320] I (18852) MQTT_MONITOR: 已发送同步完成信号
+[2026-03-12 16:29:37.326] I (18852) MQTT_MONITOR: ==============================================
+[2026-03-12 16:29:37.329] I (18852) MQTT_MONITOR: 时间同步完成！
+[2026-03-12 16:29:37.337] I (18862) MQTT_MONITOR: 当前实际时间: 2026-03-12 16:29:37 [运行 00:00:18]
+[2026-03-12 16:29:37.342] I (18872) MQTT_MONITOR: 开机时间戳: 17608 ms
+[2026-03-12 16:29:37.348] I (18872) MQTT_MONITOR: 实际开机时间: Thu Mar 12 16:29:19 2026
+[2026-03-12 16:29:37.349] 
+[2026-03-12 16:29:37.353] I (18882) MQTT_MONITOR: NTP轮询间隔已恢复为1小时
+[2026-03-12 16:29:37.360] I (18882) MQTT_MONITOR: ==============================================
+[2026-03-12 16:29:37.364] I (18892) MQTT_MONITOR: 时间同步成功！
+[2026-03-12 16:29:37.368] I (18902) MQTT_MONITOR: 当前时间: 2026-03-12 16:29:37
+[2026-03-12 16:29:37.373] I (18902) MQTT_MONITOR: 开机时间戳: 17608 ms
+[2026-03-12 16:29:37.380] I (18902) MQTT_MONITOR: 实际开机时间: Thu Mar 12 16:29:19 2026
+[2026-03-12 16:29:37.381] 
+[2026-03-12 16:29:37.385] I (18912) MQTT_MONITOR: ==============================================
+[2026-03-12 16:29:37.391] I (18922) ESP32S3_WIFI_EVENT: NTP time sync completed successfully
+[2026-03-12 16:29:42.384] I (23922) MQTT_MONITOR: MQTT连接监控模块已初始化
+[2026-03-12 16:29:42.386] I (23922) MQTT_MONITOR: 统计报告间隔: 0 小时
+[2026-03-12 16:29:42.391] I (23922) MQTT_MONITOR: =================================================
+[2026-03-12 16:29:42.396] I (23922) MQTT_MONITOR:       MQTT连接监控统计系统已启动
+[2026-03-12 16:29:42.402] I (23932) MQTT_MONITOR: =================================================
+[2026-03-12 16:29:42.410] I (23932) MQTT_MONITOR: 提示: 时间将在WiFi连接后通过NTP同步
+[2026-03-12 16:29:42.413] I (23942) MQTT_MONITOR: 等待 SNTP 时间同步完成...
+[2026-03-12 16:29:42.420] I (23942) MQTT_MONITOR: 时间同步已完成，开始监控任务
+[2026-03-12 16:29:42.425] I (23962) ESP32S3_MQTT_EVENT: MQTT客户端已启动
+[2026-03-12 16:29:42.430] I (23962) ESP32S3_MQTT_EVENT: MQTT心跳任务已启动
+[2026-03-12 16:29:42.436] I (23962) ESP32S3_MQTT_EVENT: MQTT连接健康检查任务已启动
+[2026-03-12 16:29:42.441] I (23962) PWM_EVENT: PWM timer 0 initiated at clock speed 5000.
+[2026-03-12 16:29:42.449] I (23972) PWM_EVENT: PWM channel 0 initiated on GPIO1 with initial duty 0 (inverted logic).
+[2026-03-12 16:29:42.457] I (23982) PWM_EVENT: PWM channel 1 initiated on GPIO4 with initial duty 0 (inverted logic).
+[2026-03-12 16:29:42.466] I (23992) PWM_EVENT: PWM channel 2 initiated on GPIO6 with initial duty 0 (inverted logic).
+[2026-03-12 16:29:42.470] I (24002) ESP32S3_MQTT_EVENT: Connected to MQTT server.
+[2026-03-12 16:29:42.475] I (24002) ESP32S3_STATUS_LED: LED mode changed to: 3
+[2026-03-12 16:29:42.483] I (24012) MQTT_MONITOR: [连接事件] #1 | 时间: 2026-03-12 16:29:42 [运行 00:00:23]
+[2026-03-12 16:29:42.491] I (24022) PWM_EVENT: PWM channel 3 initiated on GPIO8 with initial duty 0 (inverted logic).
+[2026-03-12 16:29:42.498] I (24022) ESP32S3_MQTT_EVENT: 已订阅控制频道 'esp32_1/control' (msg_id=14064)
+[2026-03-12 16:29:42.504] I (24032) PCNT_EVENT: PCNT channel 0 has been initiated on pin 2.
+[2026-03-12 16:29:42.510] I (24042) PCNT_EVENT: PCNT channel 1 has been initiated on pin 5.
+[2026-03-12 16:29:42.520] I (24042) PCNT_EVENT: PCNT channel 2 has been initiated on pin 7.
+[2026-03-12 16:29:42.522] I (24052) PCNT_EVENT: PCNT channel 3 has been initiated on pin 9.
+[2026-03-12 16:29:42.527] I (24062) PWM_EVENT: PWM channel 0 duty set to 8191.
+[2026-03-12 16:29:42.529] I (24062) PID_EVENT: Index number is: 0
+[2026-03-12 16:29:42.531] 
+[2026-03-12 16:29:42.534] I (24062) PID_EVENT: Index number is: 3
+[2026-03-12 16:29:42.535] 
+[2026-03-12 16:29:42.537] I (24062) PID_EVENT: Index number is: 1
+[2026-03-12 16:29:42.538] 
+[2026-03-12 16:29:42.540] I (24062) PID_EVENT: Index number is: 2
+[2026-03-12 16:29:42.542] 
+[2026-03-12 16:29:42.546] I (24062) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:29:42.550] I (24062) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-03-12 16:29:42.554] I (24062) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-12 16:30:17.431] I (58962) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=41919, elapsed=0ms)
+[2026-03-12 16:30:42.433] I (83962) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-12 16:30:42.439] I (83962) ESP32S3_MQTT_EVENT:            MQTT错误类型统计报告 [2026-03-12 16:30:42 [运行 00:01:23]]
+[2026-03-12 16:30:42.446] I (83962) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-12 16:30:42.451] I (83972) ESP32S3_MQTT_EVENT: 传输层超时:        0
+[2026-03-12 16:30:42.455] I (83972) ESP32S3_MQTT_EVENT: PING响应超时:      0
+[2026-03-12 16:30:42.460] I (83982) ESP32S3_MQTT_EVENT: 连接被重置:        0
+[2026-03-12 16:30:42.465] I (83982) ESP32S3_MQTT_EVENT: 写入超时:          0
+[2026-03-12 16:30:42.470] I (83992) ESP32S3_MQTT_EVENT: 连接失败:          0
+[2026-03-12 16:30:42.478] I (83992) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-12 16:30:47.436] I (88962) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=9819, elapsed=0ms)
+[2026-03-12 16:31:17.440] I (118962) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=3639, elapsed=0ms)
+[2026-03-12 16:31:30.571] I (132092) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:31.570] I (133092) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:32.570] I (134092) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:33.570] I (135092) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:34.570] I (136092) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:35.571] I (137092) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:36.570] I (138092) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:37.571] I (139092) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:38.570] I (140092) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:39.571] I (141092) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:39.690] I (141212) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:40.562] I (142082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:41.562] I (143082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:42.563] I (144082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:43.562] I (145082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:44.563] I (146082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:45.563] I (147082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:46.563] I (148082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:47.443] I (148962) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=3232, elapsed=0ms)
+[2026-03-12 16:31:47.564] I (149082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:48.563] I (150082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:49.564] I (151082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:50.563] I (152082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:51.563] I (153082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:52.563] I (154082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:53.563] I (155082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:54.564] I (156082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:55.564] I (157082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:56.565] I (158082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:57.564] I (159082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:58.564] I (160082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:31:59.564] I (161082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:32:00.565] I (162082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:32:01.565] I (163082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:32:02.565] I (164082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:32:03.565] I (165082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:32:04.566] I (166082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:32:05.566] I (167082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:32:06.566] I (168082) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:32:16.876] W (178392) transport_base: Poll timeout or error, errno=Connection already in progress, fd=54, timeout_ms=10000
+[2026-03-12 16:32:16.882] E (178392) mqtt_client: Writing didn't complete in specified timeout: errno=119
+[2026-03-12 16:32:16.885] E (178392) mqtt_client: Error to resend data
+[2026-03-12 16:32:16.890] I (178402) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-12 16:32:16.898] W (178402) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=1, 总计=1
+[2026-03-12 16:32:16.902] I (178412) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-12 16:32:16.912] W (178412) ESP32S3_MQTT_EVENT: 断开原因: PING_OR_UNKNOWN_ERROR (type=0, tls_err=0, stack_err=0, ret_code=0)
+[2026-03-12 16:32:16.923] W (178422) MQTT_MONITOR: [断开事件] #1 | 时间: 2026-03-12 16:32:17 [运行 00:02:58] | 原因: PING_OR_UNKNOWN_ERROR
+[2026-03-12 16:32:17.446] W (178962) ESP32S3_MQTT_EVENT: MQTT未连接，跳过本次心跳发送
+[2026-03-12 16:32:22.457] W (183972) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=1/3, 会话重连=1, 总计=1)
+[2026-03-12 16:32:26.928] W (188442) transport_base: Poll timeout or error, errno=Connection already in progress, fd=-1, timeout_ms=10000
+[2026-03-12 16:32:26.932] E (188442) mqtt_client: Writing didn't complete in specified timeout: errno=119
+[2026-03-12 16:32:26.937] E (188442) mqtt_client: Error sending ping
+[2026-03-12 16:32:26.942] E (188452) mqtt_client: Can't send ping, disconnected
+[2026-03-12 16:32:26.947] I (188452) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-12 16:32:26.954] W (188462) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=2, 总计=2
+[2026-03-12 16:32:26.957] I (188462) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-12 16:32:26.969] W (188472) ESP32S3_MQTT_EVENT: 断开原因: PING_OR_UNKNOWN_ERROR (type=0, tls_err=0, stack_err=0, ret_code=0)
+[2026-03-12 16:32:26.980] W (188482) MQTT_MONITOR: [断开事件] #2 | 时间: 2026-03-12 16:32:27 [运行 00:03:08] | 原因: PING_OR_UNKNOWN_ERROR
+[2026-03-12 16:32:26.984] I (188492) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:32:27.978] I (189492) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:32:28.978] I (190492) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-12 16:32:32.459] W (193972) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=2/3, 会话重连=2, 总计=2)
+
+
+============================================================
+日志记录结束
+结束时间: 2026-03-12 16:32:34
+总运行时间: 3.23 分钟
+总行数: 197
+============================================================
+连接统计:
+  - MQTT连接次数: 1
+  - MQTT断开次数: 2
+  - 连接保持率: 50.00%
+
+错误统计:
+  - PING_OR_UNKNOWN_ERROR: 4
+============================================================

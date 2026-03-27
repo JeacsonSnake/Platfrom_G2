@@ -20,7 +20,11 @@ const router = createRouter({
       component: HomeView,
     },
     {
+<<<<<<< HEAD
       path: '/test/',
+=======
+      path: '/test',
+>>>>>>> s-codeRunTesting
       name: 'test',
       component: TestView,
       meta: {
@@ -80,6 +84,7 @@ const router = createRouter({
   ]
 })
 
+<<<<<<< HEAD
 router.beforeEach((to, from, next) => {
   if(to.matched.some(record => record.meta.requireLogin) && !store.state.is_auth){
     next('/login')
@@ -88,5 +93,15 @@ router.beforeEach((to, from, next) => {
     next()
   }
 })
+=======
+// router.beforeEach((to, from, next) => {
+//   if(to.matched.some(record => record.meta.requireLogin) && !store.state.is_auth){
+//     next('/login')
+//   }
+//   else{
+//     next()
+//   }
+// })
+>>>>>>> s-codeRunTesting
 
 export default router

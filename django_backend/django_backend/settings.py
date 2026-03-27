@@ -143,9 +143,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # MQTT 相关设置
+<<<<<<< HEAD
 MQTT_SERVER = '192.168.31.18'
 MQTT_PORT = 1883
 MQTT_KEEPALIVE = 60
+=======
+# MQTT_SERVER = '192.168.31.18'
+MQTT_SERVER = '192.168.233.100'
+MQTT_PORT = 1883
+MQTT_KEEPALIVE = 60
+# MQTT 用户名&密码仅作节点识别，并非真实需要登陆
+>>>>>>> s-codeRunTesting
 MQTT_USER = 'Django'
 MQTT_PASSWORD = '123456'
 
@@ -154,4 +162,25 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
     }
+<<<<<<< HEAD
 }
+=======
+}
+
+# DRF 配置
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.openapi.AutoSchema',
+}
+
+# SWAGGER 相关设置
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,          # 关闭 Django 登录框
+    'JSON_EDITOR': True,
+    'SHOW_EXTENSIONS': True,
+    'SHOW_COMMON_EXTENSIONS': True,
+    # 允许自动扫描函数视图
+    'DEFAULT_AUTO_SCHEMA_CLASS': 'drf_yasg.inspectors.SwaggerAutoSchema',
+}
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+>>>>>>> s-codeRunTesting

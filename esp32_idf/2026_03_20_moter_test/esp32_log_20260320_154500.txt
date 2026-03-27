@@ -1,0 +1,1172 @@
+============================================================
+ESP32-S3 串口日志记录
+开始时间: 2026-03-20 15:45:00
+串口: COM10, 波特率: 115200
+============================================================
+
+[2026-03-20 15:45:03.035] I (111) esp_image: segment 1: paddr=00032f20 vaddr=3fc9be00 sizeI (5443) MQTT_MONITOR: ==============================================
+[2026-03-20 15:45:03.037] I (5443) MQTT_MONITOR: NTP时间同步回调被触发！
+[2026-03-20 15:45:03.038] I (5443) MQTT_MONITOR: 已发送同步完成信号
+[2026-03-20 15:45:03.045] I (5443) MQTT_MONITOR: ==============================================
+[2026-03-20 15:45:03.048] I (5443) MQTT_MONITOR: 时间同步完成！
+[2026-03-20 15:45:03.056] I (5453) MQTT_MONITOR: 当前实际时间: 2026-03-20 15:45:03 [运行 00:00:05]
+[2026-03-20 15:45:03.059] I (5463) MQTT_MONITOR: 开机时间戳: 1508 ms
+[2026-03-20 15:45:03.065] I (5463) MQTT_MONITOR: 实际开机时间: Fri Mar 20 15:44:58 2026
+[2026-03-20 15:45:03.067] 
+[2026-03-20 15:45:03.071] I (5473) MQTT_MONITOR: NTP轮询间隔已恢复为1小时
+[2026-03-20 15:45:03.077] I (5473) MQTT_MONITOR: ==============================================
+[2026-03-20 15:45:03.081] I (5483) MQTT_MONITOR: 时间同步成功！
+[2026-03-20 15:45:03.086] I (5483) MQTT_MONITOR: 当前时间: 2026-03-20 15:45:03
+[2026-03-20 15:45:03.091] I (5493) MQTT_MONITOR: 开机时间戳: 1508 ms
+[2026-03-20 15:45:03.097] I (5493) MQTT_MONITOR: 实际开机时间: Fri Mar 20 15:44:58 2026
+[2026-03-20 15:45:03.099] 
+[2026-03-20 15:45:03.103] I (5503) MQTT_MONITOR: ==============================================
+[2026-03-20 15:45:03.108] I (5513) ESP32S3_WIFI_EVENT: NTP time sync completed successfully
+[2026-03-20 15:45:08.103] I (10513) MQTT_MONITOR: MQTT连接监控模块已初始化
+[2026-03-20 15:45:08.105] I (10513) MQTT_MONITOR: 统计报告间隔: 0 小时
+[2026-03-20 15:45:08.107] I (10513) MQTT_MONITOR: =================================================
+[2026-03-20 15:45:08.114] I (10513) MQTT_MONITOR:       MQTT连接监控统计系统已启动
+[2026-03-20 15:45:08.121] I (10523) MQTT_MONITOR: =================================================
+[2026-03-20 15:45:08.127] I (10523) MQTT_MONITOR: 提示: 时间将在WiFi连接后通过NTP同步
+[2026-03-20 15:45:08.132] I (10533) MQTT_MONITOR: 等待 SNTP 时间同步完成...
+[2026-03-20 15:45:08.138] I (10533) MQTT_MONITOR: 时间同步已完成，开始监控任务
+[2026-03-20 15:45:08.143] I (10543) ESP32S3_MQTT_EVENT: MQTT客户端已启动
+[2026-03-20 15:45:08.148] I (10553) ESP32S3_MQTT_EVENT: MQTT心跳任务已启动
+[2026-03-20 15:45:08.153] I (10553) ESP32S3_MQTT_EVENT: MQTT连接健康检查任务已启动
+[2026-03-20 15:45:08.159] I (10553) PWM_EVENT: PWM timer 0 initiated at clock speed 5000.
+[2026-03-20 15:45:08.168] I (10563) PWM_EVENT: PWM channel 0 initiated on GPIO1 with initial duty 8191 (inverted logic).
+[2026-03-20 15:45:08.176] I (10573) PWM_EVENT: PWM channel 1 initiated on GPIO4 with initial duty 8191 (inverted logic).
+[2026-03-20 15:45:08.184] I (10583) PWM_EVENT: PWM channel 2 initiated on GPIO6 with initial duty 8191 (inverted logic).
+[2026-03-20 15:45:08.192] I (10593) PWM_EVENT: PWM channel 3 initiated on GPIO8 with initial duty 8191 (inverted logic).
+[2026-03-20 15:45:08.199] I (10603) PCNT_EVENT: PCNT channel 0 has been initiated on pin 2.
+[2026-03-20 15:45:08.204] I (10603) PCNT_EVENT: PCNT channel 1 has been initiated on pin 5.
+[2026-03-20 15:45:08.210] I (10613) PCNT_EVENT: PCNT channel 2 has been initiated on pin 7.
+[2026-03-20 15:45:08.216] I (10613) PCNT_EVENT: PCNT channel 3 has been initiated on pin 9.
+[2026-03-20 15:45:08.219] I (10623) PID_EVENT: Index number is: 0
+[2026-03-20 15:45:08.221] 
+[2026-03-20 15:45:08.223] I (10623) PID_EVENT: Index number is: 1
+[2026-03-20 15:45:08.224] 
+[2026-03-20 15:45:08.226] I (10623) PID_EVENT: Index number is: 2
+[2026-03-20 15:45:08.227] 
+[2026-03-20 15:45:08.231] I (10623) PID_EVENT: Index number is: 3
+[2026-03-20 15:45:08.232] 
+[2026-03-20 15:45:08.449] I (10853) ESP32S3_MQTT_EVENT: Connected to MQTT server.
+[2026-03-20 15:45:08.451] I (10853) ESP32S3_STATUS_LED: LED mode changed to: 3
+[2026-03-20 15:45:08.456] I (10853) MQTT_MONITOR: [连接事件] #1 | 时间: 2026-03-20 15:45:09 [运行 00:00:10]
+[2026-03-20 15:45:08.464] I (10863) ESP32S3_MQTT_EVENT: 已订阅控制频道 'esp32_1/control' (msg_id=50749)
+[2026-03-20 15:45:08.469] I (10873) PCNT_EVENT: Motor 0 idle, PCNT=0
+[2026-03-20 15:45:08.472] I (10873) PWM_EVENT: PWM channel 0 duty set to 8191.
+[2026-03-20 15:45:08.476] I (10883) PCNT_EVENT: Motor 1 idle, PCNT=266
+[2026-03-20 15:45:08.480] I (10883) PCNT_EVENT: Motor 2 idle, PCNT=168
+[2026-03-20 15:45:08.484] I (10883) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:08.488] I (10883) PCNT_EVENT: Motor 3 idle, PCNT=0
+[2026-03-20 15:45:08.494] I (10883) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:08.499] I (10893) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-03-20 15:45:08.685] I (11093) PCNT_EVENT: Motor 1 idle, PCNT=6570
+[2026-03-20 15:45:08.687] I (11093) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:08.695] I (11103) PCNT_EVENT: Motor 2 idle, PCNT=6647
+[2026-03-20 15:45:08.696] I (11103) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:08.886] I (11293) PCNT_EVENT: Motor 1 idle, PCNT=2886
+[2026-03-20 15:45:08.888] I (11293) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:08.897] I (11303) PCNT_EVENT: Motor 2 idle, PCNT=2843
+[2026-03-20 15:45:08.898] I (11303) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:09.085] I (11493) PCNT_EVENT: Motor 1 idle, PCNT=3063
+[2026-03-20 15:45:09.087] I (11493) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:09.093] I (11503) PCNT_EVENT: Motor 2 idle, PCNT=2815
+[2026-03-20 15:45:09.095] I (11503) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:09.285] I (11693) PCNT_EVENT: Motor 1 idle, PCNT=2928
+[2026-03-20 15:45:09.287] I (11693) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:09.294] I (11703) PCNT_EVENT: Motor 2 idle, PCNT=2800
+[2026-03-20 15:45:09.295] I (11703) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:09.485] I (11893) PCNT_EVENT: Motor 1 idle, PCNT=2879
+[2026-03-20 15:45:09.487] I (11893) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:09.493] I (11903) PCNT_EVENT: Motor 2 idle, PCNT=2851
+[2026-03-20 15:45:09.495] I (11903) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:09.686] I (12093) PCNT_EVENT: Motor 1 idle, PCNT=2809
+[2026-03-20 15:45:09.687] I (12093) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:09.697] I (12103) PCNT_EVENT: Motor 2 idle, PCNT=2786
+[2026-03-20 15:45:09.699] I (12103) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:09.886] I (12293) PCNT_EVENT: Motor 1 idle, PCNT=2943
+[2026-03-20 15:45:09.888] I (12293) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:09.897] I (12303) PCNT_EVENT: Motor 2 idle, PCNT=2872
+[2026-03-20 15:45:09.898] I (12303) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:10.085] I (12493) PCNT_EVENT: Motor 1 idle, PCNT=2896
+[2026-03-20 15:45:10.086] I (12493) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:10.094] I (12503) PCNT_EVENT: Motor 2 idle, PCNT=2851
+[2026-03-20 15:45:10.096] I (12503) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:10.285] I (12693) PCNT_EVENT: Motor 1 idle, PCNT=2920
+[2026-03-20 15:45:10.287] I (12693) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:10.295] I (12703) PCNT_EVENT: Motor 2 idle, PCNT=2910
+[2026-03-20 15:45:10.297] I (12703) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:10.485] I (12893) PCNT_EVENT: Motor 1 idle, PCNT=3058
+[2026-03-20 15:45:10.487] I (12893) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:10.495] I (12903) PCNT_EVENT: Motor 2 idle, PCNT=2853
+[2026-03-20 15:45:10.496] I (12903) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:10.684] I (13093) PCNT_EVENT: Motor 1 idle, PCNT=2948
+[2026-03-20 15:45:10.687] I (13093) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:10.693] I (13103) PCNT_EVENT: Motor 2 idle, PCNT=2737
+[2026-03-20 15:45:10.695] I (13103) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:10.884] I (13293) PCNT_EVENT: Motor 1 idle, PCNT=2820
+[2026-03-20 15:45:10.886] I (13293) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:10.894] I (13303) PCNT_EVENT: Motor 2 idle, PCNT=2825
+[2026-03-20 15:45:10.895] I (13303) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:11.085] I (13493) PCNT_EVENT: Motor 1 idle, PCNT=2943
+[2026-03-20 15:45:11.086] I (13493) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:11.097] I (13503) PCNT_EVENT: Motor 2 idle, PCNT=2856
+[2026-03-20 15:45:11.099] I (13503) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:11.284] I (13693) PCNT_EVENT: Motor 1 idle, PCNT=3027
+[2026-03-20 15:45:11.286] I (13693) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:11.295] I (13703) PCNT_EVENT: Motor 2 idle, PCNT=2874
+[2026-03-20 15:45:11.297] I (13703) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:11.484] I (13893) PCNT_EVENT: Motor 1 idle, PCNT=2817
+[2026-03-20 15:45:11.486] I (13893) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:11.503] I (13913) PCNT_EVENT: Motor 2 idle, PCNT=2982
+[2026-03-20 15:45:11.504] I (13913) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:11.686] I (14093) PCNT_EVENT: Motor 1 idle, PCNT=2901
+[2026-03-20 15:45:11.688] I (14093) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:11.705] I (14113) PCNT_EVENT: Motor 2 idle, PCNT=2891
+[2026-03-20 15:45:11.707] I (14113) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:11.886] I (14293) PCNT_EVENT: Motor 1 idle, PCNT=2880
+[2026-03-20 15:45:11.888] I (14293) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:11.903] I (14313) PCNT_EVENT: Motor 2 idle, PCNT=2886
+[2026-03-20 15:45:11.905] I (14313) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:12.085] I (14493) PCNT_EVENT: Motor 1 idle, PCNT=3133
+[2026-03-20 15:45:12.087] I (14493) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:12.107] I (14513) PCNT_EVENT: Motor 2 idle, PCNT=2959
+[2026-03-20 15:45:12.109] I (14513) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:12.286] I (14693) PCNT_EVENT: Motor 1 idle, PCNT=2884
+[2026-03-20 15:45:12.287] I (14693) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:12.304] I (14713) PCNT_EVENT: Motor 2 idle, PCNT=2950
+[2026-03-20 15:45:12.306] I (14713) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:12.483] I (14893) PCNT_EVENT: Motor 1 idle, PCNT=3002
+[2026-03-20 15:45:12.485] I (14893) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:12.504] I (14913) PCNT_EVENT: Motor 2 idle, PCNT=2940
+[2026-03-20 15:45:12.506] I (14913) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:12.685] I (15093) PCNT_EVENT: Motor 1 idle, PCNT=2933
+[2026-03-20 15:45:12.687] I (15093) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:12.704] I (15113) PCNT_EVENT: Motor 2 idle, PCNT=2953
+[2026-03-20 15:45:12.706] I (15113) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:12.886] I (15293) PCNT_EVENT: Motor 1 idle, PCNT=2706
+[2026-03-20 15:45:12.888] I (15293) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:12.904] I (15313) PCNT_EVENT: Motor 2 idle, PCNT=2799
+[2026-03-20 15:45:12.906] I (15313) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:13.086] I (15493) PCNT_EVENT: Motor 1 idle, PCNT=2661
+[2026-03-20 15:45:13.088] I (15493) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:13.105] I (15513) PCNT_EVENT: Motor 2 idle, PCNT=2829
+[2026-03-20 15:45:13.107] I (15513) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:13.285] I (15693) PCNT_EVENT: Motor 1 idle, PCNT=2526
+[2026-03-20 15:45:13.288] I (15693) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:13.306] I (15713) PCNT_EVENT: Motor 2 idle, PCNT=2702
+[2026-03-20 15:45:13.308] I (15713) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:13.485] I (15893) PCNT_EVENT: Motor 1 idle, PCNT=2657
+[2026-03-20 15:45:13.487] I (15893) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:13.504] I (15913) PCNT_EVENT: Motor 2 idle, PCNT=2748
+[2026-03-20 15:45:13.505] I (15913) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:13.685] I (16093) PCNT_EVENT: Motor 1 idle, PCNT=2715
+[2026-03-20 15:45:13.687] I (16093) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:13.704] I (16113) PCNT_EVENT: Motor 2 idle, PCNT=2787
+[2026-03-20 15:45:13.706] I (16113) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:13.896] I (16303) PCNT_EVENT: Motor 1 idle, PCNT=3021
+[2026-03-20 15:45:13.897] I (16303) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:13.905] I (16313) PCNT_EVENT: Motor 2 idle, PCNT=2794
+[2026-03-20 15:45:13.907] I (16313) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:14.094] I (16503) PCNT_EVENT: Motor 1 idle, PCNT=2847
+[2026-03-20 15:45:14.096] I (16503) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:14.106] I (16513) PCNT_EVENT: Motor 2 idle, PCNT=2777
+[2026-03-20 15:45:14.108] I (16513) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:14.294] I (16703) PCNT_EVENT: Motor 1 idle, PCNT=2897
+[2026-03-20 15:45:14.296] I (16703) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:14.304] I (16713) PCNT_EVENT: Motor 2 idle, PCNT=2777
+[2026-03-20 15:45:14.306] I (16713) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:14.495] I (16903) PCNT_EVENT: Motor 1 idle, PCNT=2724
+[2026-03-20 15:45:14.497] I (16903) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:14.504] I (16913) PCNT_EVENT: Motor 2 idle, PCNT=2775
+[2026-03-20 15:45:14.506] I (16913) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:14.695] I (17103) PCNT_EVENT: Motor 1 idle, PCNT=2828
+[2026-03-20 15:45:14.697] I (17103) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:14.703] I (17113) PCNT_EVENT: Motor 2 idle, PCNT=2786
+[2026-03-20 15:45:14.706] I (17113) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:14.896] I (17303) PCNT_EVENT: Motor 1 idle, PCNT=2975
+[2026-03-20 15:45:14.898] I (17303) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:14.905] I (17313) PCNT_EVENT: Motor 2 idle, PCNT=2791
+[2026-03-20 15:45:14.907] I (17313) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:15.095] I (17503) PCNT_EVENT: Motor 1 idle, PCNT=2864
+[2026-03-20 15:45:15.097] I (17503) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:15.103] I (17513) PCNT_EVENT: Motor 2 idle, PCNT=2754
+[2026-03-20 15:45:15.105] I (17513) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:15.297] I (17703) PCNT_EVENT: Motor 1 idle, PCNT=2832
+[2026-03-20 15:45:15.299] I (17703) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:15.305] I (17713) PCNT_EVENT: Motor 2 idle, PCNT=2784
+[2026-03-20 15:45:15.306] I (17713) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:15.496] I (17903) PCNT_EVENT: Motor 1 idle, PCNT=2808
+[2026-03-20 15:45:15.498] I (17903) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:15.504] I (17913) PCNT_EVENT: Motor 2 idle, PCNT=2768
+[2026-03-20 15:45:15.506] I (17913) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:15.695] I (18103) PCNT_EVENT: Motor 1 idle, PCNT=2928
+[2026-03-20 15:45:15.697] I (18103) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:15.709] I (18113) PCNT_EVENT: Motor 2 idle, PCNT=2846
+[2026-03-20 15:45:15.711] I (18113) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:15.895] I (18303) PCNT_EVENT: Motor 1 idle, PCNT=2893
+[2026-03-20 15:45:15.897] I (18303) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:15.914] I (18323) PCNT_EVENT: Motor 2 idle, PCNT=2947
+[2026-03-20 15:45:15.916] I (18323) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:16.095] I (18503) PCNT_EVENT: Motor 1 idle, PCNT=3101
+[2026-03-20 15:45:16.098] I (18503) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:16.113] I (18523) PCNT_EVENT: Motor 2 idle, PCNT=2844
+[2026-03-20 15:45:16.115] I (18523) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:16.295] I (18703) PCNT_EVENT: Motor 1 idle, PCNT=3133
+[2026-03-20 15:45:16.297] I (18703) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:16.317] I (18723) PCNT_EVENT: Motor 2 idle, PCNT=2892
+[2026-03-20 15:45:16.319] I (18723) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:16.495] I (18903) PCNT_EVENT: Motor 1 idle, PCNT=2983
+[2026-03-20 15:45:16.497] I (18903) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:16.517] I (18923) PCNT_EVENT: Motor 2 idle, PCNT=2844
+[2026-03-20 15:45:16.519] I (18923) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:16.695] I (19103) PCNT_EVENT: Motor 1 idle, PCNT=9301
+[2026-03-20 15:45:16.697] I (19103) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:16.715] I (19123) PCNT_EVENT: Motor 2 idle, PCNT=7378
+[2026-03-20 15:45:16.717] I (19123) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:16.897] I (19303) PCNT_EVENT: Motor 1 idle, PCNT=46
+[2026-03-20 15:45:16.899] I (19303) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:16.916] I (19323) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-03-20 15:45:16.918] I (19323) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:17.104] I (19513) PCNT_EVENT: Motor 1 idle, PCNT=27
+[2026-03-20 15:45:17.107] I (19513) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:17.305] I (19713) PCNT_EVENT: Motor 1 idle, PCNT=23
+[2026-03-20 15:45:17.307] I (19713) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:17.505] I (19913) PCNT_EVENT: Motor 1 idle, PCNT=23
+[2026-03-20 15:45:17.507] I (19913) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:17.705] I (20113) PCNT_EVENT: Motor 1 idle, PCNT=12
+[2026-03-20 15:45:17.707] I (20113) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:17.905] I (20313) PCNT_EVENT: Motor 1 idle, PCNT=15
+[2026-03-20 15:45:17.907] I (20313) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:18.106] I (20513) PCNT_EVENT: Motor 1 idle, PCNT=13
+[2026-03-20 15:45:18.107] I (20513) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:18.305] I (20713) PCNT_EVENT: Motor 1 idle, PCNT=24
+[2026-03-20 15:45:18.307] I (20713) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:18.505] I (20913) PCNT_EVENT: Motor 1 idle, PCNT=41
+[2026-03-20 15:45:18.506] I (20913) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:18.704] I (21113) PCNT_EVENT: Motor 1 idle, PCNT=46
+[2026-03-20 15:45:18.706] I (21113) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:18.905] I (21313) PCNT_EVENT: Motor 1 idle, PCNT=13
+[2026-03-20 15:45:18.907] I (21313) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:19.105] I (21513) PCNT_EVENT: Motor 1 idle, PCNT=18
+[2026-03-20 15:45:19.107] I (21513) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:19.306] I (21713) PCNT_EVENT: Motor 1 idle, PCNT=28
+[2026-03-20 15:45:19.308] I (21713) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:19.505] I (21913) PCNT_EVENT: Motor 1 idle, PCNT=35
+[2026-03-20 15:45:19.506] I (21913) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:19.705] I (22113) PCNT_EVENT: Motor 1 idle, PCNT=36
+[2026-03-20 15:45:19.707] I (22113) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:19.905] I (22313) PCNT_EVENT: Motor 1 idle, PCNT=59
+[2026-03-20 15:45:19.907] I (22313) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:20.105] I (22513) PCNT_EVENT: Motor 1 idle, PCNT=37
+[2026-03-20 15:45:20.107] I (22513) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:20.304] I (22713) PCNT_EVENT: Motor 1 idle, PCNT=27
+[2026-03-20 15:45:20.306] I (22713) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:20.505] I (22913) PCNT_EVENT: Motor 1 idle, PCNT=29
+[2026-03-20 15:45:20.507] I (22913) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:20.705] I (23113) PCNT_EVENT: Motor 1 idle, PCNT=32
+[2026-03-20 15:45:20.707] I (23113) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:20.904] I (23313) PCNT_EVENT: Motor 1 idle, PCNT=29
+[2026-03-20 15:45:20.907] I (23313) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:21.105] I (23513) PCNT_EVENT: Motor 1 idle, PCNT=50
+[2026-03-20 15:45:21.107] I (23513) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:21.305] I (23713) PCNT_EVENT: Motor 1 idle, PCNT=20
+[2026-03-20 15:45:21.307] I (23713) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:21.505] I (23913) PCNT_EVENT: Motor 1 idle, PCNT=41
+[2026-03-20 15:45:21.507] I (23913) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:21.705] I (24113) PCNT_EVENT: Motor 1 idle, PCNT=53
+[2026-03-20 15:45:21.708] I (24113) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:21.905] I (24313) PCNT_EVENT: Motor 1 idle, PCNT=47
+[2026-03-20 15:45:21.907] I (24313) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:22.105] I (24513) PCNT_EVENT: Motor 1 idle, PCNT=25
+[2026-03-20 15:45:22.107] I (24513) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:22.305] I (24713) PCNT_EVENT: Motor 1 idle, PCNT=26
+[2026-03-20 15:45:22.307] I (24713) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:22.505] I (24913) PCNT_EVENT: Motor 1 idle, PCNT=11
+[2026-03-20 15:45:22.507] I (24913) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:22.705] I (25113) PCNT_EVENT: Motor 1 idle, PCNT=15
+[2026-03-20 15:45:22.707] I (25113) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:22.905] I (25313) PCNT_EVENT: Motor 1 idle, PCNT=22
+[2026-03-20 15:45:22.907] I (25313) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:23.105] I (25513) PCNT_EVENT: Motor 1 idle, PCNT=35
+[2026-03-20 15:45:23.107] I (25513) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:23.305] I (25713) PCNT_EVENT: Motor 1 idle, PCNT=55
+[2026-03-20 15:45:23.307] I (25713) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:23.507] I (25913) PCNT_EVENT: Motor 1 idle, PCNT=34
+[2026-03-20 15:45:23.509] I (25913) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:23.706] I (26113) PCNT_EVENT: Motor 1 idle, PCNT=25
+[2026-03-20 15:45:23.708] I (26113) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:23.905] I (26313) PCNT_EVENT: Motor 1 idle, PCNT=32
+[2026-03-20 15:45:23.907] I (26313) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:24.105] I (26513) PCNT_EVENT: Motor 1 idle, PCNT=16
+[2026-03-20 15:45:24.107] I (26513) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:24.305] I (26713) PCNT_EVENT: Motor 1 idle, PCNT=26
+[2026-03-20 15:45:24.307] I (26713) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:24.506] I (26913) PCNT_EVENT: Motor 1 idle, PCNT=48
+[2026-03-20 15:45:24.507] I (26913) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:24.705] I (27113) PCNT_EVENT: Motor 1 idle, PCNT=28
+[2026-03-20 15:45:24.707] I (27113) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:24.905] I (27313) PCNT_EVENT: Motor 1 idle, PCNT=27
+[2026-03-20 15:45:24.907] I (27313) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:25.105] I (27513) PCNT_EVENT: Motor 1 idle, PCNT=23
+[2026-03-20 15:45:25.107] I (27513) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:25.305] I (27713) PCNT_EVENT: Motor 1 idle, PCNT=28
+[2026-03-20 15:45:25.306] I (27713) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:25.505] I (27913) PCNT_EVENT: Motor 1 idle, PCNT=68
+[2026-03-20 15:45:25.507] I (27913) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:25.705] I (28113) PCNT_EVENT: Motor 1 idle, PCNT=87
+[2026-03-20 15:45:25.706] I (28113) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:25.906] I (28313) PCNT_EVENT: Motor 1 idle, PCNT=118
+[2026-03-20 15:45:25.908] I (28313) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:26.105] I (28513) PCNT_EVENT: Motor 1 running, PCNT=260/s (raw=52/200ms), target=75/s
+[2026-03-20 15:45:26.113] I (28523) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:26.127] I (28533) PID_EVENT: Motor 1 PID: target=75/s, actual=260/s (raw=52/200ms), pid_out=0, pwm_duty=8191, startup=1
+[2026-03-20 15:45:26.305] I (28713) PCNT_EVENT: Motor 1 running, PCNT=120/s (raw=24/200ms), target=75/s
+[2026-03-20 15:45:26.313] I (28723) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:26.317] I (28723) PID_EVENT: Motor 1 PID: target=75/s, actual=120/s (raw=24/200ms), pid_out=0, pwm_duty=8191, startup=2
+[2026-03-20 15:45:26.505] I (28913) PCNT_EVENT: Motor 1 running, PCNT=210/s (raw=42/200ms), target=75/s
+[2026-03-20 15:45:26.513] I (28923) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:26.518] I (28923) PID_EVENT: Motor 1 PID: target=75/s, actual=210/s (raw=42/200ms), pid_out=0, pwm_duty=8191, startup=3
+[2026-03-20 15:45:26.706] I (29113) PCNT_EVENT: Motor 1 running, PCNT=120/s (raw=24/200ms), target=75/s
+[2026-03-20 15:45:26.717] I (29123) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:26.719] I (29123) PID_EVENT: Motor 1 PID: target=75/s, actual=120/s (raw=24/200ms), pid_out=0, pwm_duty=8191, startup=4
+[2026-03-20 15:45:26.905] I (29313) PCNT_EVENT: Motor 1 running, PCNT=120/s (raw=24/200ms), target=75/s
+[2026-03-20 15:45:26.913] I (29323) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:26.922] I (29323) PID_EVENT: Motor 1 PID: target=75/s, actual=120/s (raw=24/200ms), pid_out=0, pwm_duty=8191, startup=5
+[2026-03-20 15:45:27.106] I (29513) PCNT_EVENT: Motor 1 running, PCNT=55/s (raw=11/200ms), target=75/s
+[2026-03-20 15:45:27.112] I (29523) PWM_EVENT: PWM channel 1 duty set to 8030.
+[2026-03-20 15:45:27.119] I (29523) PID_EVENT: Motor 1 PID: target=75/s, actual=55/s (raw=11/200ms), pid_out=161, pwm_duty=8030, startup=6
+[2026-03-20 15:45:27.306] I (29713) PCNT_EVENT: Motor 1 running, PCNT=5/s (raw=1/200ms), target=75/s
+[2026-03-20 15:45:27.316] I (29723) PWM_EVENT: PWM channel 1 duty set to 7468.
+[2026-03-20 15:45:27.320] I (29723) PID_EVENT: Motor 1 PID: target=75/s, actual=5/s (raw=1/200ms), pid_out=723, pwm_duty=7468, startup=7
+[2026-03-20 15:45:27.506] I (29913) PCNT_EVENT: Motor 1 running, PCNT=30/s (raw=6/200ms), target=75/s
+[2026-03-20 15:45:27.513] I (29923) PWM_EVENT: PWM channel 1 duty set to 7106.
+[2026-03-20 15:45:27.518] I (29923) PID_EVENT: Motor 1 PID: target=75/s, actual=30/s (raw=6/200ms), pid_out=1086, pwm_duty=7106, startup=8
+[2026-03-20 15:45:27.705] I (30113) PCNT_EVENT: Motor 1 running, PCNT=95/s (raw=19/200ms), target=75/s
+[2026-03-20 15:45:27.715] I (30123) PWM_EVENT: PWM channel 1 duty set to 7264.
+[2026-03-20 15:45:27.719] I (30123) PID_EVENT: Motor 1 PID: target=75/s, actual=95/s (raw=19/200ms), pid_out=927, pwm_duty=7264, startup=9
+[2026-03-20 15:45:27.905] I (30313) PCNT_EVENT: Motor 1 running, PCNT=90/s (raw=18/200ms), target=75/s
+[2026-03-20 15:45:27.913] I (30323) PWM_EVENT: PWM channel 1 duty set to 7382.
+[2026-03-20 15:45:27.919] I (30323) PID_EVENT: Motor 1 PID: target=75/s, actual=90/s (raw=18/200ms), pid_out=809, pwm_duty=7382, startup=10
+[2026-03-20 15:45:28.106] I (30513) PCNT_EVENT: Motor 1 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:45:28.114] I (30523) PWM_EVENT: PWM channel 1 duty set to 7300.
+[2026-03-20 15:45:28.121] I (30523) PID_EVENT: Motor 1 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=892, pwm_duty=7300, startup=11
+[2026-03-20 15:45:28.305] I (30713) PCNT_EVENT: Motor 1 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:45:28.314] I (30723) PWM_EVENT: PWM channel 1 duty set to 7257.
+[2026-03-20 15:45:28.318] I (30723) PID_EVENT: Motor 1 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=934, pwm_duty=7257, startup=11
+[2026-03-20 15:45:28.506] I (30913) PCNT_EVENT: Motor 1 running, PCNT=135/s (raw=27/200ms), target=75/s
+[2026-03-20 15:45:28.516] I (30923) PWM_EVENT: PWM channel 1 duty set to 7737.
+[2026-03-20 15:45:28.520] I (30923) PID_EVENT: Motor 1 PID: target=75/s, actual=135/s (raw=27/200ms), pid_out=455, pwm_duty=7737, startup=11
+[2026-03-20 15:45:28.706] I (31113) PCNT_EVENT: Motor 1 running, PCNT=60/s (raw=12/200ms), target=75/s
+[2026-03-20 15:45:28.713] I (31123) PWM_EVENT: PWM channel 1 duty set to 7615.
+[2026-03-20 15:45:28.718] I (31123) PID_EVENT: Motor 1 PID: target=75/s, actual=60/s (raw=12/200ms), pid_out=577, pwm_duty=7615, startup=11
+[2026-03-20 15:45:28.905] I (31313) PCNT_EVENT: Motor 1 running, PCNT=95/s (raw=19/200ms), target=75/s
+[2026-03-20 15:45:28.913] I (31323) PWM_EVENT: PWM channel 1 duty set to 7774.
+[2026-03-20 15:45:28.921] I (31323) PID_EVENT: Motor 1 PID: target=75/s, actual=95/s (raw=19/200ms), pid_out=417, pwm_duty=7774, startup=11
+[2026-03-20 15:45:29.105] I (31513) PCNT_EVENT: Motor 1 running, PCNT=25/s (raw=5/200ms), target=75/s
+[2026-03-20 15:45:29.116] I (31523) PWM_EVENT: PWM channel 1 duty set to 7371.
+[2026-03-20 15:45:29.122] I (31523) PID_EVENT: Motor 1 PID: target=75/s, actual=25/s (raw=5/200ms), pid_out=820, pwm_duty=7371, startup=11
+[2026-03-20 15:45:29.305] I (31713) PCNT_EVENT: Motor 1 running, PCNT=95/s (raw=19/200ms), target=75/s
+[2026-03-20 15:45:29.317] I (31723) PWM_EVENT: PWM channel 1 duty set to 7530.
+[2026-03-20 15:45:29.321] I (31723) PID_EVENT: Motor 1 PID: target=75/s, actual=95/s (raw=19/200ms), pid_out=661, pwm_duty=7530, startup=11
+[2026-03-20 15:45:29.505] I (31913) PCNT_EVENT: Motor 1 running, PCNT=55/s (raw=11/200ms), target=75/s
+[2026-03-20 15:45:29.516] I (31923) PWM_EVENT: PWM channel 1 duty set to 7368.
+[2026-03-20 15:45:29.519] I (31923) PID_EVENT: Motor 1 PID: target=75/s, actual=55/s (raw=11/200ms), pid_out=823, pwm_duty=7368, startup=11
+[2026-03-20 15:45:29.705] I (32113) PCNT_EVENT: Motor 1 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:45:29.717] I (32123) PWM_EVENT: PWM channel 1 duty set to 7286.
+[2026-03-20 15:45:29.720] I (32123) PID_EVENT: Motor 1 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=906, pwm_duty=7286, startup=11
+[2026-03-20 15:45:29.905] I (32313) PCNT_EVENT: Motor 1 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:45:29.918] I (32323) PWM_EVENT: PWM channel 1 duty set to 7204.
+[2026-03-20 15:45:29.921] I (32323) PID_EVENT: Motor 1 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=988, pwm_duty=7204, startup=11
+[2026-03-20 15:45:30.105] I (32513) PCNT_EVENT: Motor 1 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:45:30.116] I (32523) PWM_EVENT: PWM channel 1 duty set to 7201.
+[2026-03-20 15:45:30.119] I (32523) PID_EVENT: Motor 1 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=990, pwm_duty=7201, startup=11
+[2026-03-20 15:45:30.306] I (32713) PCNT_EVENT: Motor 1 running, PCNT=85/s (raw=17/200ms), target=75/s
+[2026-03-20 15:45:30.316] I (32723) PWM_EVENT: PWM channel 1 duty set to 7279.
+[2026-03-20 15:45:30.321] I (32723) PID_EVENT: Motor 1 PID: target=75/s, actual=85/s (raw=17/200ms), pid_out=912, pwm_duty=7279, startup=11
+[2026-03-20 15:45:30.505] I (32913) PCNT_EVENT: Motor 1 running, PCNT=50/s (raw=10/200ms), target=75/s
+[2026-03-20 15:45:30.517] I (32923) PWM_EVENT: PWM channel 1 duty set to 7076.
+[2026-03-20 15:45:30.521] I (32923) PID_EVENT: Motor 1 PID: target=75/s, actual=50/s (raw=10/200ms), pid_out=1115, pwm_duty=7076, startup=11
+[2026-03-20 15:45:30.706] I (33113) PCNT_EVENT: Motor 1 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:45:30.715] I (33123) PWM_EVENT: PWM channel 1 duty set to 7074.
+[2026-03-20 15:45:30.721] I (33123) PID_EVENT: Motor 1 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1118, pwm_duty=7074, startup=11
+[2026-03-20 15:45:30.906] I (33313) PCNT_EVENT: Motor 1 running, PCNT=80/s (raw=16/200ms), target=75/s
+[2026-03-20 15:45:30.913] I (33323) PWM_EVENT: PWM channel 1 duty set to 7111.
+[2026-03-20 15:45:30.920] I (33323) PID_EVENT: Motor 1 PID: target=75/s, actual=80/s (raw=16/200ms), pid_out=1080, pwm_duty=7111, startup=11
+[2026-03-20 15:45:31.106] I (33513) PCNT_EVENT: Motor 1 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:45:31.116] I (33523) PWM_EVENT: PWM channel 1 duty set to 7028.
+[2026-03-20 15:45:31.119] I (33523) PID_EVENT: Motor 1 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=1163, pwm_duty=7028, startup=11
+[2026-03-20 15:45:31.306] I (33713) PCNT_EVENT: Motor 1 running, PCNT=60/s (raw=12/200ms), target=75/s
+[2026-03-20 15:45:31.313] I (33723) PWM_EVENT: PWM channel 1 duty set to 6905.
+[2026-03-20 15:45:31.318] I (33723) PID_EVENT: Motor 1 PID: target=75/s, actual=60/s (raw=12/200ms), pid_out=1286, pwm_duty=6905, startup=11
+[2026-03-20 15:45:31.506] I (33913) PCNT_EVENT: Motor 1 running, PCNT=85/s (raw=17/200ms), target=75/s
+[2026-03-20 15:45:31.513] I (33923) PWM_EVENT: PWM channel 1 duty set to 6982.
+[2026-03-20 15:45:31.517] I (33923) PID_EVENT: Motor 1 PID: target=75/s, actual=85/s (raw=17/200ms), pid_out=1209, pwm_duty=6982, startup=11
+[2026-03-20 15:45:31.705] I (34113) PCNT_EVENT: Motor 1 running, PCNT=55/s (raw=11/200ms), target=75/s
+[2026-03-20 15:45:31.714] I (34123) PWM_EVENT: PWM channel 1 duty set to 6819.
+[2026-03-20 15:45:31.719] I (34123) PID_EVENT: Motor 1 PID: target=75/s, actual=55/s (raw=11/200ms), pid_out=1373, pwm_duty=6819, startup=11
+[2026-03-20 15:45:31.906] I (34313) PCNT_EVENT: Motor 1 running, PCNT=95/s (raw=19/200ms), target=75/s
+[2026-03-20 15:45:31.916] I (34323) PWM_EVENT: PWM channel 1 duty set to 6976.
+[2026-03-20 15:45:31.920] I (34323) PID_EVENT: Motor 1 PID: target=75/s, actual=95/s (raw=19/200ms), pid_out=1215, pwm_duty=6976, startup=11
+[2026-03-20 15:45:32.106] I (34513) PCNT_EVENT: Motor 1 running, PCNT=110/s (raw=22/200ms), target=75/s
+[2026-03-20 15:45:32.118] I (34523) PWM_EVENT: PWM channel 1 duty set to 7254.
+[2026-03-20 15:45:32.122] I (34523) PID_EVENT: Motor 1 PID: target=75/s, actual=110/s (raw=22/200ms), pid_out=937, pwm_duty=7254, startup=11
+[2026-03-20 15:45:32.306] I (34713) PCNT_EVENT: Motor 1 running, PCNT=120/s (raw=24/200ms), target=75/s
+[2026-03-20 15:45:32.317] I (34723) PWM_EVENT: PWM channel 1 duty set to 7613.
+[2026-03-20 15:45:32.322] I (34723) PID_EVENT: Motor 1 PID: target=75/s, actual=120/s (raw=24/200ms), pid_out=578, pwm_duty=7613, startup=11
+[2026-03-20 15:45:32.506] I (34913) PCNT_EVENT: Motor 1 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:45:32.516] I (34923) PWM_EVENT: PWM channel 1 duty set to 7571.
+[2026-03-20 15:45:32.520] I (34923) PID_EVENT: Motor 1 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=620, pwm_duty=7571, startup=11
+[2026-03-20 15:45:32.705] I (35113) PCNT_EVENT: Motor 1 running, PCNT=25/s (raw=5/200ms), target=75/s
+[2026-03-20 15:45:32.713] I (35123) PWM_EVENT: PWM channel 1 duty set to 7168.
+[2026-03-20 15:45:32.720] I (35123) PID_EVENT: Motor 1 PID: target=75/s, actual=25/s (raw=5/200ms), pid_out=1023, pwm_duty=7168, startup=11
+[2026-03-20 15:45:32.906] I (35313) PCNT_EVENT: Motor 1 running, PCNT=60/s (raw=12/200ms), target=75/s
+[2026-03-20 15:45:32.916] I (35323) PWM_EVENT: PWM channel 1 duty set to 7046.
+[2026-03-20 15:45:32.921] I (35323) PID_EVENT: Motor 1 PID: target=75/s, actual=60/s (raw=12/200ms), pid_out=1146, pwm_duty=7046, startup=11
+[2026-03-20 15:45:33.033] I (35443) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:33.108] I (35513) PCNT_EVENT: Motor 1 idle, PCNT=25
+[2026-03-20 15:45:33.109] I (35513) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:33.305] I (35713) PCNT_EVENT: Motor 1 idle, PCNT=39
+[2026-03-20 15:45:33.306] I (35713) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:33.504] I (35913) PCNT_EVENT: Motor 1 idle, PCNT=16
+[2026-03-20 15:45:33.505] I (35913) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:33.705] I (36113) PCNT_EVENT: Motor 1 idle, PCNT=47
+[2026-03-20 15:45:33.707] I (36113) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:33.904] I (36313) PCNT_EVENT: Motor 1 idle, PCNT=47
+[2026-03-20 15:45:33.906] I (36313) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:34.104] I (36513) PCNT_EVENT: Motor 1 idle, PCNT=19
+[2026-03-20 15:45:34.106] I (36513) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:34.305] I (36713) PCNT_EVENT: Motor 1 idle, PCNT=63
+[2026-03-20 15:45:34.307] I (36713) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:34.504] I (36913) PCNT_EVENT: Motor 1 idle, PCNT=33
+[2026-03-20 15:45:34.506] I (36913) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:34.705] I (37113) PCNT_EVENT: Motor 1 idle, PCNT=37
+[2026-03-20 15:45:34.706] I (37113) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:34.908] I (37313) PCNT_EVENT: Motor 1 idle, PCNT=15
+[2026-03-20 15:45:34.909] I (37313) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:35.105] I (37513) PCNT_EVENT: Motor 1 idle, PCNT=19
+[2026-03-20 15:45:35.107] I (37513) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:35.306] I (37713) PCNT_EVENT: Motor 1 idle, PCNT=6
+[2026-03-20 15:45:35.307] I (37713) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:35.505] I (37913) PCNT_EVENT: Motor 1 idle, PCNT=14
+[2026-03-20 15:45:35.506] I (37913) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:35.705] I (38113) PCNT_EVENT: Motor 1 idle, PCNT=17
+[2026-03-20 15:45:35.707] I (38113) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:35.906] I (38313) PCNT_EVENT: Motor 1 idle, PCNT=23
+[2026-03-20 15:45:35.908] I (38313) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:36.105] I (38513) PCNT_EVENT: Motor 1 idle, PCNT=25
+[2026-03-20 15:45:36.107] I (38513) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:36.305] I (38713) PCNT_EVENT: Motor 1 idle, PCNT=25
+[2026-03-20 15:45:36.307] I (38713) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:36.505] I (38913) PCNT_EVENT: Motor 1 idle, PCNT=23
+[2026-03-20 15:45:36.507] I (38913) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:36.705] I (39113) PCNT_EVENT: Motor 1 idle, PCNT=29
+[2026-03-20 15:45:36.707] I (39113) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:36.905] I (39313) PCNT_EVENT: Motor 1 idle, PCNT=31
+[2026-03-20 15:45:36.907] I (39313) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:37.106] I (39513) PCNT_EVENT: Motor 1 idle, PCNT=25
+[2026-03-20 15:45:37.108] I (39513) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:37.306] I (39713) PCNT_EVENT: Motor 1 idle, PCNT=21
+[2026-03-20 15:45:37.307] I (39713) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:37.505] I (39913) PCNT_EVENT: Motor 1 idle, PCNT=22
+[2026-03-20 15:45:37.507] I (39913) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:37.705] I (40113) PCNT_EVENT: Motor 1 idle, PCNT=39
+[2026-03-20 15:45:37.707] I (40113) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:37.904] I (40313) PCNT_EVENT: Motor 1 idle, PCNT=60
+[2026-03-20 15:45:37.906] I (40313) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:38.104] I (40513) PCNT_EVENT: Motor 1 idle, PCNT=31
+[2026-03-20 15:45:38.106] I (40513) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:38.305] I (40713) PCNT_EVENT: Motor 1 idle, PCNT=41
+[2026-03-20 15:45:38.306] I (40713) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:38.505] I (40913) PCNT_EVENT: Motor 1 idle, PCNT=17
+[2026-03-20 15:45:38.507] I (40913) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:38.705] I (41113) PCNT_EVENT: Motor 1 idle, PCNT=9
+[2026-03-20 15:45:38.707] I (41113) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:38.904] I (41313) PCNT_EVENT: Motor 1 idle, PCNT=18
+[2026-03-20 15:45:38.908] I (41313) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:38.915] I (41323) PCNT_EVENT: Motor 2 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:38.923] I (41333) PWM_EVENT: PWM channel 2 duty set to 7589.
+[2026-03-20 15:45:38.931] I (41333) PID_EVENT: Motor 2 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=602, pwm_duty=7589, startup=1
+[2026-03-20 15:45:39.105] I (41513) PCNT_EVENT: Motor 1 idle, PCNT=0
+[2026-03-20 15:45:39.106] I (41513) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-20 15:45:39.116] I (41523) PCNT_EVENT: Motor 2 running, PCNT=15/s (raw=3/200ms), target=75/s
+[2026-03-20 15:45:39.123] I (41533) PWM_EVENT: PWM channel 2 duty set to 7107.
+[2026-03-20 15:45:39.127] I (41533) PID_EVENT: Motor 2 PID: target=75/s, actual=15/s (raw=3/200ms), pid_out=1085, pwm_duty=7107, startup=2
+[2026-03-20 15:45:39.316] I (41723) PCNT_EVENT: Motor 2 running, PCNT=50/s (raw=10/200ms), target=75/s
+[2026-03-20 15:45:39.324] I (41733) PWM_EVENT: PWM channel 2 duty set to 6904.
+[2026-03-20 15:45:39.328] I (41733) PID_EVENT: Motor 2 PID: target=75/s, actual=50/s (raw=10/200ms), pid_out=1288, pwm_duty=6904, startup=3
+[2026-03-20 15:45:39.516] I (41923) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:45:39.526] I (41933) PWM_EVENT: PWM channel 2 duty set to 6861.
+[2026-03-20 15:45:39.530] I (41933) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1331, pwm_duty=6861, startup=4
+[2026-03-20 15:45:39.716] I (42123) PCNT_EVENT: Motor 2 running, PCNT=60/s (raw=12/200ms), target=75/s
+[2026-03-20 15:45:39.726] I (42133) PWM_EVENT: PWM channel 2 duty set to 6737.
+[2026-03-20 15:45:39.730] I (42133) PID_EVENT: Motor 2 PID: target=75/s, actual=60/s (raw=12/200ms), pid_out=1454, pwm_duty=6737, startup=5
+[2026-03-20 15:45:39.915] I (42323) PCNT_EVENT: Motor 2 running, PCNT=80/s (raw=16/200ms), target=75/s
+[2026-03-20 15:45:39.923] I (42333) PWM_EVENT: PWM channel 2 duty set to 6774.
+[2026-03-20 15:45:39.927] I (42333) PID_EVENT: Motor 2 PID: target=75/s, actual=80/s (raw=16/200ms), pid_out=1418, pwm_duty=6774, startup=6
+[2026-03-20 15:45:40.116] I (42523) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:45:40.127] I (42533) PWM_EVENT: PWM channel 2 duty set to 6770.
+[2026-03-20 15:45:40.131] I (42533) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1421, pwm_duty=6770, startup=7
+[2026-03-20 15:45:40.316] I (42723) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:45:40.323] I (42733) PWM_EVENT: PWM channel 2 duty set to 6767.
+[2026-03-20 15:45:40.328] I (42733) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1425, pwm_duty=6767, startup=8
+[2026-03-20 15:45:40.516] I (42923) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:45:40.526] I (42933) PWM_EVENT: PWM channel 2 duty set to 6723.
+[2026-03-20 15:45:40.531] I (42933) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1468, pwm_duty=6723, startup=9
+[2026-03-20 15:45:40.716] I (43123) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:45:40.723] I (43133) PWM_EVENT: PWM channel 2 duty set to 6720.
+[2026-03-20 15:45:40.728] I (43133) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1472, pwm_duty=6720, startup=10
+[2026-03-20 15:45:40.916] I (43323) PCNT_EVENT: Motor 2 running, PCNT=85/s (raw=17/200ms), target=75/s
+[2026-03-20 15:45:40.927] I (43333) PWM_EVENT: PWM channel 2 duty set to 6796.
+[2026-03-20 15:45:40.932] I (43333) PID_EVENT: Motor 2 PID: target=75/s, actual=85/s (raw=17/200ms), pid_out=1395, pwm_duty=6796, startup=11
+[2026-03-20 15:45:41.116] I (43523) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:45:41.128] I (43533) PWM_EVENT: PWM channel 2 duty set to 6793.
+[2026-03-20 15:45:41.131] I (43533) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1399, pwm_duty=6793, startup=11
+[2026-03-20 15:45:41.316] I (43723) PCNT_EVENT: Motor 2 running, PCNT=80/s (raw=16/200ms), target=75/s
+[2026-03-20 15:45:41.324] I (43733) PWM_EVENT: PWM channel 2 duty set to 6829.
+[2026-03-20 15:45:41.331] I (43733) PID_EVENT: Motor 2 PID: target=75/s, actual=80/s (raw=16/200ms), pid_out=1362, pwm_duty=6829, startup=11
+[2026-03-20 15:45:41.516] I (43923) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:45:41.526] I (43933) PWM_EVENT: PWM channel 2 duty set to 6786.
+[2026-03-20 15:45:41.530] I (43933) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1406, pwm_duty=6786, startup=11
+[2026-03-20 15:45:41.716] I (44123) PCNT_EVENT: Motor 2 running, PCNT=95/s (raw=19/200ms), target=75/s
+[2026-03-20 15:45:41.724] I (44133) PWM_EVENT: PWM channel 2 duty set to 6943.
+[2026-03-20 15:45:41.731] I (44133) PID_EVENT: Motor 2 PID: target=75/s, actual=95/s (raw=19/200ms), pid_out=1248, pwm_duty=6943, startup=11
+[2026-03-20 15:45:41.916] I (44323) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:45:41.927] I (44333) PWM_EVENT: PWM channel 2 duty set to 6900.
+[2026-03-20 15:45:41.930] I (44333) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1292, pwm_duty=6900, startup=11
+[2026-03-20 15:45:42.116] I (44523) PCNT_EVENT: Motor 2 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:45:42.127] I (44533) PWM_EVENT: PWM channel 2 duty set to 6817.
+[2026-03-20 15:45:42.132] I (44533) PID_EVENT: Motor 2 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=1375, pwm_duty=6817, startup=11
+[2026-03-20 15:45:42.316] I (44723) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:45:42.326] I (44733) PWM_EVENT: PWM channel 2 duty set to 6773.
+[2026-03-20 15:45:42.329] I (44733) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1418, pwm_duty=6773, startup=11
+[2026-03-20 15:45:42.515] I (44923) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:45:42.527] I (44933) PWM_EVENT: PWM channel 2 duty set to 6730.
+[2026-03-20 15:45:42.531] I (44933) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1462, pwm_duty=6730, startup=11
+[2026-03-20 15:45:42.715] I (45123) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:45:42.727] I (45133) PWM_EVENT: PWM channel 2 duty set to 6726.
+[2026-03-20 15:45:42.731] I (45133) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1465, pwm_duty=6726, startup=11
+[2026-03-20 15:45:42.916] I (45323) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:45:42.924] I (45333) PWM_EVENT: PWM channel 2 duty set to 6683.
+[2026-03-20 15:45:42.926] I (45333) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1509, pwm_duty=6683, startup=11
+[2026-03-20 15:45:43.116] I (45523) PCNT_EVENT: Motor 2 running, PCNT=95/s (raw=19/200ms), target=75/s
+[2026-03-20 15:45:43.125] I (45533) PWM_EVENT: PWM channel 2 duty set to 6840.
+[2026-03-20 15:45:43.130] I (45533) PID_EVENT: Motor 2 PID: target=75/s, actual=95/s (raw=19/200ms), pid_out=1352, pwm_duty=6840, startup=11
+[2026-03-20 15:45:43.147] I (45553) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=12645, elapsed=0ms)
+[2026-03-20 15:45:43.316] I (45723) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:45:43.326] I (45733) PWM_EVENT: PWM channel 2 duty set to 6836.
+[2026-03-20 15:45:43.330] I (45733) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1355, pwm_duty=6836, startup=11
+[2026-03-20 15:45:43.515] I (45923) PCNT_EVENT: Motor 2 running, PCNT=85/s (raw=17/200ms), target=75/s
+[2026-03-20 15:45:43.528] I (45933) PWM_EVENT: PWM channel 2 duty set to 6913.
+[2026-03-20 15:45:43.532] I (45933) PID_EVENT: Motor 2 PID: target=75/s, actual=85/s (raw=17/200ms), pid_out=1278, pwm_duty=6913, startup=11
+[2026-03-20 15:45:43.715] I (46123) PCNT_EVENT: Motor 2 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:45:43.723] I (46133) PWM_EVENT: PWM channel 2 duty set to 6830.
+[2026-03-20 15:45:43.731] I (46133) PID_EVENT: Motor 2 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=1362, pwm_duty=6830, startup=11
+[2026-03-20 15:45:43.916] I (46323) PCNT_EVENT: Motor 2 running, PCNT=85/s (raw=17/200ms), target=75/s
+[2026-03-20 15:45:43.923] I (46333) PWM_EVENT: PWM channel 2 duty set to 6907.
+[2026-03-20 15:45:43.926] I (46333) PID_EVENT: Motor 2 PID: target=75/s, actual=85/s (raw=17/200ms), pid_out=1284, pwm_duty=6907, startup=11
+[2026-03-20 15:45:44.115] I (46523) PCNT_EVENT: Motor 2 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:45:44.123] I (46533) PWM_EVENT: PWM channel 2 duty set to 6824.
+[2026-03-20 15:45:44.126] I (46533) PID_EVENT: Motor 2 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=1368, pwm_duty=6824, startup=11
+[2026-03-20 15:45:44.316] I (46723) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:45:44.323] I (46733) PWM_EVENT: PWM channel 2 duty set to 6821.
+[2026-03-20 15:45:44.327] I (46733) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1371, pwm_duty=6821, startup=11
+[2026-03-20 15:45:44.515] I (46923) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:45:44.524] I (46933) PWM_EVENT: PWM channel 2 duty set to 6777.
+[2026-03-20 15:45:44.528] I (46933) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1414, pwm_duty=6777, startup=11
+[2026-03-20 15:45:44.715] I (47123) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:45:44.723] I (47133) PWM_EVENT: PWM channel 2 duty set to 6774.
+[2026-03-20 15:45:44.726] I (47133) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1417, pwm_duty=6774, startup=11
+[2026-03-20 15:45:44.914] I (47323) PCNT_EVENT: Motor 2 running, PCNT=85/s (raw=17/200ms), target=75/s
+[2026-03-20 15:45:44.924] I (47333) PWM_EVENT: PWM channel 2 duty set to 6851.
+[2026-03-20 15:45:44.928] I (47333) PID_EVENT: Motor 2 PID: target=75/s, actual=85/s (raw=17/200ms), pid_out=1340, pwm_duty=6851, startup=11
+[2026-03-20 15:45:45.116] I (47523) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:45:45.123] I (47533) PWM_EVENT: PWM channel 2 duty set to 6808.
+[2026-03-20 15:45:45.127] I (47533) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1384, pwm_duty=6808, startup=11
+[2026-03-20 15:45:45.315] I (47723) PCNT_EVENT: Motor 2 running, PCNT=85/s (raw=17/200ms), target=75/s
+[2026-03-20 15:45:45.323] I (47733) PWM_EVENT: PWM channel 2 duty set to 6885.
+[2026-03-20 15:45:45.328] I (47733) PID_EVENT: Motor 2 PID: target=75/s, actual=85/s (raw=17/200ms), pid_out=1307, pwm_duty=6885, startup=11
+[2026-03-20 15:45:45.515] I (47923) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:45:45.523] I (47933) PWM_EVENT: PWM channel 2 duty set to 6842.
+[2026-03-20 15:45:45.528] I (47933) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1350, pwm_duty=6842, startup=11
+[2026-03-20 15:45:45.714] I (48123) PCNT_EVENT: Motor 2 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:45:45.723] I (48133) PWM_EVENT: PWM channel 2 duty set to 6758.
+[2026-03-20 15:45:45.728] I (48133) PID_EVENT: Motor 2 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=1433, pwm_duty=6758, startup=11
+[2026-03-20 15:45:45.844] I (48253) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:45.914] I (48323) PCNT_EVENT: Motor 2 idle, PCNT=26
+[2026-03-20 15:45:45.916] I (48323) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:46.115] I (48523) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-03-20 15:45:46.117] I (48523) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:45:52.895] I (55303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:52.904] I (55313) PWM_EVENT: PWM channel 3 duty set to 7589.
+[2026-03-20 15:45:52.906] I (55313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=602, pwm_duty=7589, startup=1
+[2026-03-20 15:45:53.096] I (55503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:53.104] I (55513) PWM_EVENT: PWM channel 3 duty set to 6986.
+[2026-03-20 15:45:53.108] I (55513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=1205, pwm_duty=6986, startup=2
+[2026-03-20 15:45:53.296] I (55703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:53.304] I (55713) PWM_EVENT: PWM channel 3 duty set to 6382.
+[2026-03-20 15:45:53.312] I (55713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=1810, pwm_duty=6382, startup=3
+[2026-03-20 15:45:53.497] I (55903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:53.508] I (55913) PWM_EVENT: PWM channel 3 duty set to 5776.
+[2026-03-20 15:45:53.512] I (55913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=2416, pwm_duty=5776, startup=4
+[2026-03-20 15:45:53.697] I (56103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:53.706] I (56113) PWM_EVENT: PWM channel 3 duty set to 5168.
+[2026-03-20 15:45:53.711] I (56113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=3023, pwm_duty=5168, startup=5
+[2026-03-20 15:45:53.896] I (56303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:53.904] I (56313) PWM_EVENT: PWM channel 3 duty set to 4559.
+[2026-03-20 15:45:53.909] I (56313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=3632, pwm_duty=4559, startup=6
+[2026-03-20 15:45:54.097] I (56503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:54.106] I (56513) PWM_EVENT: PWM channel 3 duty set to 3949.
+[2026-03-20 15:45:54.110] I (56513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=4243, pwm_duty=3949, startup=7
+[2026-03-20 15:45:54.297] I (56703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:54.304] I (56713) PWM_EVENT: PWM channel 3 duty set to 3337.
+[2026-03-20 15:45:54.308] I (56713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=4855, pwm_duty=3337, startup=8
+[2026-03-20 15:45:54.496] I (56903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:54.503] I (56913) PWM_EVENT: PWM channel 3 duty set to 2723.
+[2026-03-20 15:45:54.507] I (56913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=5468, pwm_duty=2723, startup=9
+[2026-03-20 15:45:54.695] I (57103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:54.704] I (57113) PWM_EVENT: PWM channel 3 duty set to 2108.
+[2026-03-20 15:45:54.707] I (57113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=6083, pwm_duty=2108, startup=10
+[2026-03-20 15:45:54.897] I (57303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:54.904] I (57313) PWM_EVENT: PWM channel 3 duty set to 1492.
+[2026-03-20 15:45:54.907] I (57313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=6700, pwm_duty=1492, startup=11
+[2026-03-20 15:45:55.097] I (57503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:55.107] I (57513) PWM_EVENT: PWM channel 3 duty set to 874.
+[2026-03-20 15:45:55.111] I (57513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=7318, pwm_duty=874, startup=11
+[2026-03-20 15:45:55.296] I (57703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:55.307] I (57713) PWM_EVENT: PWM channel 3 duty set to 254.
+[2026-03-20 15:45:55.310] I (57713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=7937, pwm_duty=254, startup=11
+[2026-03-20 15:45:55.496] I (57903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:55.504] I (57913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:55.509] I (57913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:55.696] I (58103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:55.703] I (58113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:55.707] I (58113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:55.898] I (58303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:55.904] I (58313) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:55.909] I (58313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:56.095] I (58503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:56.103] I (58513) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:56.106] I (58513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:56.295] I (58703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:56.303] I (58713) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:56.307] I (58713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:56.496] I (58903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:56.504] I (58913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:56.507] I (58913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:56.695] I (59103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:56.703] I (59113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:56.708] I (59113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:56.895] I (59303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:56.903] I (59313) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:56.906] I (59313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:57.095] I (59503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:57.104] I (59513) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:57.107] I (59513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:57.295] I (59703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:57.304] I (59713) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:57.307] I (59713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:57.496] I (59903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:57.504] I (59913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:57.507] I (59913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:57.696] I (60103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:57.709] I (60113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:57.713] I (60113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:57.896] I (60303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:57.903] I (60313) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:57.906] I (60313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:58.097] I (60503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:58.104] I (60513) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:58.108] I (60513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:58.296] I (60703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:58.304] I (60713) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:58.307] I (60713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:58.497] I (60903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:58.507] I (60913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:58.511] I (60913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:58.697] I (61103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:58.703] I (61113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:58.706] I (61113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:58.895] I (61303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:58.904] I (61313) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:58.907] I (61313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:59.096] I (61503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:59.103] I (61513) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:59.108] I (61513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:59.297] I (61703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:59.304] I (61713) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:59.307] I (61713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:59.496] I (61903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:59.505] I (61913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:59.508] I (61913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:59.696] I (62103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:45:59.708] I (62113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:45:59.711] I (62113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:45:59.814] I (62223) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-03-20 15:45:59.895] I (62303) PCNT_EVENT: Motor 3 idle, PCNT=0
+[2026-03-20 15:45:59.897] I (62303) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-03-20 15:46:03.496] I (65903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:03.504] I (65913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:03.507] I (65913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:03.697] I (66103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:03.708] I (66113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:03.711] I (66113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:03.897] I (66303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:03.907] I (66313) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:03.910] I (66313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:04.096] I (66503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:04.106] I (66513) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:04.110] I (66513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:04.296] I (66703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:04.307] I (66713) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:04.311] I (66713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:04.497] I (66903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:04.507] I (66913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:04.511] I (66913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:04.696] I (67103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:04.703] I (67113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:04.707] I (67113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:04.896] I (67303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:04.903] I (67313) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:04.907] I (67313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:05.096] I (67503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:05.104] I (67513) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:05.107] I (67513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:05.296] I (67703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:05.303] I (67713) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:05.307] I (67713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:05.496] I (67903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:05.503] I (67913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:05.507] I (67913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:05.700] I (68103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:05.704] I (68113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:05.709] I (68113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:05.897] I (68303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:05.904] I (68313) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:05.907] I (68313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:06.095] I (68503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:06.104] I (68513) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:06.108] I (68513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:06.297] I (68703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:06.305] I (68713) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:06.310] I (68713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:06.497] I (68903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:06.504] I (68913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:06.508] I (68913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:06.697] I (69103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:06.703] I (69113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:06.707] I (69113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:06.897] I (69303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:06.905] I (69313) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:06.912] I (69313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:07.097] I (69503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:07.107] I (69513) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:07.110] I (69513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:07.296] I (69703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:07.307] I (69713) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:07.312] I (69713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:07.497] I (69903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:07.504] I (69913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:07.507] I (69913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:07.698] I (70103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:07.706] I (70113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:07.712] I (70113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:07.896] I (70303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:07.906] I (70313) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:07.909] I (70313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:08.097] I (70503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:08.108] I (70513) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:08.111] I (70513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:08.145] I (70553) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-20 15:46:08.151] I (70553) ESP32S3_MQTT_EVENT:            MQTT错误类型统计报告 [2026-03-20 15:46:08 [运行 00:01:10]]
+[2026-03-20 15:46:08.157] I (70553) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-20 15:46:08.162] I (70563) ESP32S3_MQTT_EVENT: 传输层超时:        0
+[2026-03-20 15:46:08.167] I (70563) ESP32S3_MQTT_EVENT: PING响应超时:      0
+[2026-03-20 15:46:08.172] I (70573) ESP32S3_MQTT_EVENT: 连接被重置:        0
+[2026-03-20 15:46:08.176] I (70573) ESP32S3_MQTT_EVENT: 写入超时:          0
+[2026-03-20 15:46:08.181] I (70583) ESP32S3_MQTT_EVENT: 连接失败:          0
+[2026-03-20 15:46:08.189] I (70583) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-20 15:46:08.296] I (70703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:08.306] I (70713) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:08.310] I (70713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:08.497] I (70903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:08.503] I (70913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:08.508] I (70913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:08.697] I (71103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:08.707] I (71113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:08.710] I (71113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:08.896] I (71303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:08.907] I (71313) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:08.911] I (71313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:09.097] I (71503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:09.109] I (71513) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:09.113] I (71513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:09.296] I (71703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:09.303] I (71713) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:09.309] I (71713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:09.497] I (71903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:09.506] I (71913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:09.512] I (71913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:09.696] I (72103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:09.704] I (72113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:09.707] I (72113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:09.896] I (72303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:09.908] I (72313) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:09.912] I (72313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:10.096] I (72503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:10.108] I (72513) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:10.113] I (72513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:10.297] I (72703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:10.307] I (72713) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:10.311] I (72713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:10.444] I (72853) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-03-20 15:46:10.495] I (72903) PCNT_EVENT: Motor 3 idle, PCNT=0
+[2026-03-20 15:46:10.497] I (72903) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-03-20 15:46:13.146] I (75553) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=38206, elapsed=0ms)
+[2026-03-20 15:46:14.316] I (76723) PCNT_EVENT: Motor 2 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:14.324] I (76733) PWM_EVENT: PWM channel 2 duty set to 6153.
+[2026-03-20 15:46:14.328] I (76733) PID_EVENT: Motor 2 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=2039, pwm_duty=6153, startup=11
+[2026-03-20 15:46:14.518] I (76923) PCNT_EVENT: Motor 2 running, PCNT=110/s (raw=22/200ms), target=75/s
+[2026-03-20 15:46:14.527] I (76933) PWM_EVENT: PWM channel 2 duty set to 6430.
+[2026-03-20 15:46:14.532] I (76933) PID_EVENT: Motor 2 PID: target=75/s, actual=110/s (raw=22/200ms), pid_out=1762, pwm_duty=6430, startup=11
+[2026-03-20 15:46:14.717] I (77123) PCNT_EVENT: Motor 2 running, PCNT=90/s (raw=18/200ms), target=75/s
+[2026-03-20 15:46:14.725] I (77133) PWM_EVENT: PWM channel 2 duty set to 6546.
+[2026-03-20 15:46:14.728] I (77133) PID_EVENT: Motor 2 PID: target=75/s, actual=90/s (raw=18/200ms), pid_out=1646, pwm_duty=6546, startup=11
+[2026-03-20 15:46:14.916] I (77323) PCNT_EVENT: Motor 2 running, PCNT=90/s (raw=18/200ms), target=75/s
+[2026-03-20 15:46:14.927] I (77333) PWM_EVENT: PWM channel 2 duty set to 6662.
+[2026-03-20 15:46:14.932] I (77333) PID_EVENT: Motor 2 PID: target=75/s, actual=90/s (raw=18/200ms), pid_out=1529, pwm_duty=6662, startup=11
+[2026-03-20 15:46:15.116] I (77523) PCNT_EVENT: Motor 2 running, PCNT=80/s (raw=16/200ms), target=75/s
+[2026-03-20 15:46:15.124] I (77533) PWM_EVENT: PWM channel 2 duty set to 6699.
+[2026-03-20 15:46:15.129] I (77533) PID_EVENT: Motor 2 PID: target=75/s, actual=80/s (raw=16/200ms), pid_out=1493, pwm_duty=6699, startup=11
+[2026-03-20 15:46:15.316] I (77723) PCNT_EVENT: Motor 2 running, PCNT=80/s (raw=16/200ms), target=75/s
+[2026-03-20 15:46:15.324] I (77733) PWM_EVENT: PWM channel 2 duty set to 6735.
+[2026-03-20 15:46:15.329] I (77733) PID_EVENT: Motor 2 PID: target=75/s, actual=80/s (raw=16/200ms), pid_out=1456, pwm_duty=6735, startup=11
+[2026-03-20 15:46:15.517] I (77923) PCNT_EVENT: Motor 2 running, PCNT=85/s (raw=17/200ms), target=75/s
+[2026-03-20 15:46:15.524] I (77933) PWM_EVENT: PWM channel 2 duty set to 6812.
+[2026-03-20 15:46:15.528] I (77933) PID_EVENT: Motor 2 PID: target=75/s, actual=85/s (raw=17/200ms), pid_out=1379, pwm_duty=6812, startup=11
+[2026-03-20 15:46:15.716] I (78123) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:46:15.728] I (78133) PWM_EVENT: PWM channel 2 duty set to 6809.
+[2026-03-20 15:46:15.731] I (78133) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1382, pwm_duty=6809, startup=11
+[2026-03-20 15:46:15.916] I (78323) PCNT_EVENT: Motor 2 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:46:15.924] I (78333) PWM_EVENT: PWM channel 2 duty set to 6726.
+[2026-03-20 15:46:15.928] I (78333) PID_EVENT: Motor 2 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=1466, pwm_duty=6726, startup=11
+[2026-03-20 15:46:16.116] I (78523) PCNT_EVENT: Motor 2 running, PCNT=90/s (raw=18/200ms), target=75/s
+[2026-03-20 15:46:16.123] I (78533) PWM_EVENT: PWM channel 2 duty set to 6843.
+[2026-03-20 15:46:16.129] I (78533) PID_EVENT: Motor 2 PID: target=75/s, actual=90/s (raw=18/200ms), pid_out=1348, pwm_duty=6843, startup=11
+[2026-03-20 15:46:16.316] I (78723) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:46:16.323] I (78733) PWM_EVENT: PWM channel 2 duty set to 6840.
+[2026-03-20 15:46:16.328] I (78733) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1352, pwm_duty=6840, startup=11
+[2026-03-20 15:46:16.515] I (78923) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:46:16.524] I (78933) PWM_EVENT: PWM channel 2 duty set to 6797.
+[2026-03-20 15:46:16.529] I (78933) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1395, pwm_duty=6797, startup=11
+[2026-03-20 15:46:16.716] I (79123) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:46:16.724] I (79133) PWM_EVENT: PWM channel 2 duty set to 6794.
+[2026-03-20 15:46:16.728] I (79133) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1398, pwm_duty=6794, startup=11
+[2026-03-20 15:46:16.916] I (79323) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:46:16.924] I (79333) PWM_EVENT: PWM channel 2 duty set to 6750.
+[2026-03-20 15:46:16.928] I (79333) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1441, pwm_duty=6750, startup=11
+[2026-03-20 15:46:17.118] I (79523) PCNT_EVENT: Motor 2 running, PCNT=90/s (raw=18/200ms), target=75/s
+[2026-03-20 15:46:17.124] I (79533) PWM_EVENT: PWM channel 2 duty set to 6868.
+[2026-03-20 15:46:17.129] I (79533) PID_EVENT: Motor 2 PID: target=75/s, actual=90/s (raw=18/200ms), pid_out=1324, pwm_duty=6868, startup=11
+[2026-03-20 15:46:17.317] I (79723) PCNT_EVENT: Motor 2 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:46:17.323] I (79733) PWM_EVENT: PWM channel 2 duty set to 6784.
+[2026-03-20 15:46:17.328] I (79733) PID_EVENT: Motor 2 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=1407, pwm_duty=6784, startup=11
+[2026-03-20 15:46:17.517] I (79923) PCNT_EVENT: Motor 2 running, PCNT=85/s (raw=17/200ms), target=75/s
+[2026-03-20 15:46:17.525] I (79933) PWM_EVENT: PWM channel 2 duty set to 6862.
+[2026-03-20 15:46:17.528] I (79933) PID_EVENT: Motor 2 PID: target=75/s, actual=85/s (raw=17/200ms), pid_out=1330, pwm_duty=6862, startup=11
+[2026-03-20 15:46:17.718] I (80123) PCNT_EVENT: Motor 2 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:46:17.729] I (80133) PWM_EVENT: PWM channel 2 duty set to 6778.
+[2026-03-20 15:46:17.733] I (80133) PID_EVENT: Motor 2 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=1413, pwm_duty=6778, startup=11
+[2026-03-20 15:46:17.917] I (80323) PCNT_EVENT: Motor 2 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:46:17.925] I (80333) PWM_EVENT: PWM channel 2 duty set to 6695.
+[2026-03-20 15:46:17.930] I (80333) PID_EVENT: Motor 2 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=1496, pwm_duty=6695, startup=11
+[2026-03-20 15:46:18.117] I (80523) PCNT_EVENT: Motor 2 running, PCNT=80/s (raw=16/200ms), target=75/s
+[2026-03-20 15:46:18.128] I (80533) PWM_EVENT: PWM channel 2 duty set to 6732.
+[2026-03-20 15:46:18.133] I (80533) PID_EVENT: Motor 2 PID: target=75/s, actual=80/s (raw=16/200ms), pid_out=1459, pwm_duty=6732, startup=11
+[2026-03-20 15:46:18.317] I (80723) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:46:18.327] I (80733) PWM_EVENT: PWM channel 2 duty set to 6729.
+[2026-03-20 15:46:18.332] I (80733) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1463, pwm_duty=6729, startup=11
+[2026-03-20 15:46:18.517] I (80923) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:46:18.524] I (80933) PWM_EVENT: PWM channel 2 duty set to 6726.
+[2026-03-20 15:46:18.528] I (80933) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1466, pwm_duty=6726, startup=11
+[2026-03-20 15:46:18.717] I (81123) PCNT_EVENT: Motor 2 running, PCNT=85/s (raw=17/200ms), target=75/s
+[2026-03-20 15:46:18.723] I (81133) PWM_EVENT: PWM channel 2 duty set to 6803.
+[2026-03-20 15:46:18.730] I (81133) PID_EVENT: Motor 2 PID: target=75/s, actual=85/s (raw=17/200ms), pid_out=1389, pwm_duty=6803, startup=11
+[2026-03-20 15:46:18.917] I (81323) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:46:18.924] I (81333) PWM_EVENT: PWM channel 2 duty set to 6800.
+[2026-03-20 15:46:18.930] I (81333) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1392, pwm_duty=6800, startup=11
+[2026-03-20 15:46:19.116] I (81523) PCNT_EVENT: Motor 2 running, PCNT=80/s (raw=16/200ms), target=75/s
+[2026-03-20 15:46:19.128] I (81533) PWM_EVENT: PWM channel 2 duty set to 6837.
+[2026-03-20 15:46:19.131] I (81533) PID_EVENT: Motor 2 PID: target=75/s, actual=80/s (raw=16/200ms), pid_out=1355, pwm_duty=6837, startup=11
+[2026-03-20 15:46:19.316] I (81723) PCNT_EVENT: Motor 2 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:46:19.325] I (81733) PWM_EVENT: PWM channel 2 duty set to 6754.
+[2026-03-20 15:46:19.331] I (81733) PID_EVENT: Motor 2 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=1438, pwm_duty=6754, startup=11
+[2026-03-20 15:46:19.516] I (81923) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:46:19.524] I (81933) PWM_EVENT: PWM channel 2 duty set to 6710.
+[2026-03-20 15:46:19.529] I (81933) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1481, pwm_duty=6710, startup=11
+[2026-03-20 15:46:19.716] I (82123) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:46:19.724] I (82133) PWM_EVENT: PWM channel 2 duty set to 6667.
+[2026-03-20 15:46:19.728] I (82133) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1524, pwm_duty=6667, startup=11
+[2026-03-20 15:46:19.918] I (82323) PCNT_EVENT: Motor 2 running, PCNT=80/s (raw=16/200ms), target=75/s
+[2026-03-20 15:46:19.924] I (82333) PWM_EVENT: PWM channel 2 duty set to 6704.
+[2026-03-20 15:46:19.930] I (82333) PID_EVENT: Motor 2 PID: target=75/s, actual=80/s (raw=16/200ms), pid_out=1488, pwm_duty=6704, startup=11
+[2026-03-20 15:46:20.117] I (82523) PCNT_EVENT: Motor 2 running, PCNT=95/s (raw=19/200ms), target=75/s
+[2026-03-20 15:46:20.123] I (82533) PWM_EVENT: PWM channel 2 duty set to 6861.
+[2026-03-20 15:46:20.128] I (82533) PID_EVENT: Motor 2 PID: target=75/s, actual=95/s (raw=19/200ms), pid_out=1330, pwm_duty=6861, startup=11
+[2026-03-20 15:46:20.316] I (82723) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:46:20.324] I (82733) PWM_EVENT: PWM channel 2 duty set to 6858.
+[2026-03-20 15:46:20.328] I (82733) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1333, pwm_duty=6858, startup=11
+[2026-03-20 15:46:20.517] I (82923) PCNT_EVENT: Motor 2 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:46:20.530] I (82933) PWM_EVENT: PWM channel 2 duty set to 6775.
+[2026-03-20 15:46:20.538] I (82943) PID_EVENT: Motor 2 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=1416, pwm_duty=6775, startup=11
+[2026-03-20 15:46:20.717] I (83123) PCNT_EVENT: Motor 2 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:46:20.727] I (83133) PWM_EVENT: PWM channel 2 duty set to 6692.
+[2026-03-20 15:46:20.732] I (83133) PID_EVENT: Motor 2 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=1499, pwm_duty=6692, startup=11
+[2026-03-20 15:46:20.917] I (83323) PCNT_EVENT: Motor 2 running, PCNT=80/s (raw=16/200ms), target=75/s
+[2026-03-20 15:46:20.927] I (83333) PWM_EVENT: PWM channel 2 duty set to 6729.
+[2026-03-20 15:46:20.931] I (83333) PID_EVENT: Motor 2 PID: target=75/s, actual=80/s (raw=16/200ms), pid_out=1462, pwm_duty=6729, startup=11
+[2026-03-20 15:46:21.117] I (83523) PCNT_EVENT: Motor 2 running, PCNT=80/s (raw=16/200ms), target=75/s
+[2026-03-20 15:46:21.127] I (83533) PWM_EVENT: PWM channel 2 duty set to 6766.
+[2026-03-20 15:46:21.130] I (83533) PID_EVENT: Motor 2 PID: target=75/s, actual=80/s (raw=16/200ms), pid_out=1425, pwm_duty=6766, startup=11
+[2026-03-20 15:46:21.284] I (83693) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:46:21.319] I (83723) PCNT_EVENT: Motor 2 idle, PCNT=31
+[2026-03-20 15:46:21.321] I (83723) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:46:21.527] I (83933) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-03-20 15:46:21.529] I (83933) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:46:23.126] I (85533) PCNT_EVENT: Motor 2 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:23.134] I (85543) PWM_EVENT: PWM channel 2 duty set to 6161.
+[2026-03-20 15:46:23.138] I (85543) PID_EVENT: Motor 2 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=2031, pwm_duty=6161, startup=11
+[2026-03-20 15:46:23.327] I (85733) PCNT_EVENT: Motor 2 running, PCNT=105/s (raw=21/200ms), target=75/s
+[2026-03-20 15:46:23.339] I (85743) PWM_EVENT: PWM channel 2 duty set to 6398.
+[2026-03-20 15:46:23.343] I (85743) PID_EVENT: Motor 2 PID: target=75/s, actual=105/s (raw=21/200ms), pid_out=1794, pwm_duty=6398, startup=11
+[2026-03-20 15:46:23.527] I (85933) PCNT_EVENT: Motor 2 running, PCNT=110/s (raw=22/200ms), target=75/s
+[2026-03-20 15:46:23.535] I (85943) PWM_EVENT: PWM channel 2 duty set to 6675.
+[2026-03-20 15:46:23.539] I (85943) PID_EVENT: Motor 2 PID: target=75/s, actual=110/s (raw=22/200ms), pid_out=1517, pwm_duty=6675, startup=11
+[2026-03-20 15:46:23.726] I (86133) PCNT_EVENT: Motor 2 running, PCNT=95/s (raw=19/200ms), target=75/s
+[2026-03-20 15:46:23.735] I (86143) PWM_EVENT: PWM channel 2 duty set to 6832.
+[2026-03-20 15:46:23.738] I (86143) PID_EVENT: Motor 2 PID: target=75/s, actual=95/s (raw=19/200ms), pid_out=1360, pwm_duty=6832, startup=11
+[2026-03-20 15:46:23.928] I (86333) PCNT_EVENT: Motor 2 running, PCNT=60/s (raw=12/200ms), target=75/s
+[2026-03-20 15:46:23.935] I (86343) PWM_EVENT: PWM channel 2 duty set to 6708.
+[2026-03-20 15:46:23.939] I (86343) PID_EVENT: Motor 2 PID: target=75/s, actual=60/s (raw=12/200ms), pid_out=1483, pwm_duty=6708, startup=11
+[2026-03-20 15:46:24.128] I (86533) PCNT_EVENT: Motor 2 running, PCNT=80/s (raw=16/200ms), target=75/s
+[2026-03-20 15:46:24.137] I (86543) PWM_EVENT: PWM channel 2 duty set to 6746.
+[2026-03-20 15:46:24.141] I (86543) PID_EVENT: Motor 2 PID: target=75/s, actual=80/s (raw=16/200ms), pid_out=1446, pwm_duty=6746, startup=11
+[2026-03-20 15:46:24.327] I (86733) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:46:24.334] I (86743) PWM_EVENT: PWM channel 2 duty set to 6702.
+[2026-03-20 15:46:24.339] I (86743) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1489, pwm_duty=6702, startup=11
+[2026-03-20 15:46:24.526] I (86933) PCNT_EVENT: Motor 2 running, PCNT=80/s (raw=16/200ms), target=75/s
+[2026-03-20 15:46:24.534] I (86943) PWM_EVENT: PWM channel 2 duty set to 6739.
+[2026-03-20 15:46:24.538] I (86943) PID_EVENT: Motor 2 PID: target=75/s, actual=80/s (raw=16/200ms), pid_out=1452, pwm_duty=6739, startup=11
+[2026-03-20 15:46:24.727] I (87133) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:46:24.735] I (87143) PWM_EVENT: PWM channel 2 duty set to 6696.
+[2026-03-20 15:46:24.738] I (87143) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1495, pwm_duty=6696, startup=11
+[2026-03-20 15:46:24.928] I (87333) PCNT_EVENT: Motor 2 running, PCNT=85/s (raw=17/200ms), target=75/s
+[2026-03-20 15:46:24.939] I (87343) PWM_EVENT: PWM channel 2 duty set to 6774.
+[2026-03-20 15:46:24.942] I (87343) PID_EVENT: Motor 2 PID: target=75/s, actual=85/s (raw=17/200ms), pid_out=1418, pwm_duty=6774, startup=11
+[2026-03-20 15:46:25.127] I (87533) PCNT_EVENT: Motor 2 running, PCNT=85/s (raw=17/200ms), target=75/s
+[2026-03-20 15:46:25.134] I (87543) PWM_EVENT: PWM channel 2 duty set to 6851.
+[2026-03-20 15:46:25.139] I (87543) PID_EVENT: Motor 2 PID: target=75/s, actual=85/s (raw=17/200ms), pid_out=1341, pwm_duty=6851, startup=11
+[2026-03-20 15:46:25.327] I (87733) PCNT_EVENT: Motor 2 running, PCNT=60/s (raw=12/200ms), target=75/s
+[2026-03-20 15:46:25.335] I (87743) PWM_EVENT: PWM channel 2 duty set to 6728.
+[2026-03-20 15:46:25.338] I (87743) PID_EVENT: Motor 2 PID: target=75/s, actual=60/s (raw=12/200ms), pid_out=1464, pwm_duty=6728, startup=11
+[2026-03-20 15:46:25.527] I (87933) PCNT_EVENT: Motor 2 running, PCNT=85/s (raw=17/200ms), target=75/s
+[2026-03-20 15:46:25.539] I (87943) PWM_EVENT: PWM channel 2 duty set to 6805.
+[2026-03-20 15:46:25.543] I (87943) PID_EVENT: Motor 2 PID: target=75/s, actual=85/s (raw=17/200ms), pid_out=1386, pwm_duty=6805, startup=11
+[2026-03-20 15:46:25.728] I (88133) PCNT_EVENT: Motor 2 running, PCNT=80/s (raw=16/200ms), target=75/s
+[2026-03-20 15:46:25.735] I (88143) PWM_EVENT: PWM channel 2 duty set to 6842.
+[2026-03-20 15:46:25.739] I (88143) PID_EVENT: Motor 2 PID: target=75/s, actual=80/s (raw=16/200ms), pid_out=1349, pwm_duty=6842, startup=11
+[2026-03-20 15:46:25.927] I (88333) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:46:25.935] I (88343) PWM_EVENT: PWM channel 2 duty set to 6799.
+[2026-03-20 15:46:25.940] I (88343) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1392, pwm_duty=6799, startup=11
+[2026-03-20 15:46:26.127] I (88533) PCNT_EVENT: Motor 2 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:46:26.135] I (88543) PWM_EVENT: PWM channel 2 duty set to 6716.
+[2026-03-20 15:46:26.138] I (88543) PID_EVENT: Motor 2 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=1475, pwm_duty=6716, startup=11
+[2026-03-20 15:46:26.326] I (88733) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:46:26.333] I (88743) PWM_EVENT: PWM channel 2 duty set to 6673.
+[2026-03-20 15:46:26.338] I (88743) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1518, pwm_duty=6673, startup=11
+[2026-03-20 15:46:26.526] I (88933) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:46:26.534] I (88943) PWM_EVENT: PWM channel 2 duty set to 6630.
+[2026-03-20 15:46:26.538] I (88943) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1561, pwm_duty=6630, startup=11
+[2026-03-20 15:46:26.726] I (89133) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:46:26.733] I (89143) PWM_EVENT: PWM channel 2 duty set to 6627.
+[2026-03-20 15:46:26.739] I (89143) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1565, pwm_duty=6627, startup=11
+[2026-03-20 15:46:26.926] I (89333) PCNT_EVENT: Motor 2 running, PCNT=95/s (raw=19/200ms), target=75/s
+[2026-03-20 15:46:26.934] I (89343) PWM_EVENT: PWM channel 2 duty set to 6784.
+[2026-03-20 15:46:26.939] I (89343) PID_EVENT: Motor 2 PID: target=75/s, actual=95/s (raw=19/200ms), pid_out=1407, pwm_duty=6784, startup=11
+[2026-03-20 15:46:27.126] I (89533) PCNT_EVENT: Motor 2 running, PCNT=75/s (raw=15/200ms), target=75/s
+[2026-03-20 15:46:27.134] I (89543) PWM_EVENT: PWM channel 2 duty set to 6781.
+[2026-03-20 15:46:27.139] I (89543) PID_EVENT: Motor 2 PID: target=75/s, actual=75/s (raw=15/200ms), pid_out=1410, pwm_duty=6781, startup=11
+[2026-03-20 15:46:27.326] I (89733) PCNT_EVENT: Motor 2 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:46:27.334] I (89743) PWM_EVENT: PWM channel 2 duty set to 6698.
+[2026-03-20 15:46:27.339] I (89743) PID_EVENT: Motor 2 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=1493, pwm_duty=6698, startup=11
+[2026-03-20 15:46:27.526] I (89933) PCNT_EVENT: Motor 2 running, PCNT=80/s (raw=16/200ms), target=75/s
+[2026-03-20 15:46:27.533] I (89943) PWM_EVENT: PWM channel 2 duty set to 6735.
+[2026-03-20 15:46:27.538] I (89943) PID_EVENT: Motor 2 PID: target=75/s, actual=80/s (raw=16/200ms), pid_out=1456, pwm_duty=6735, startup=11
+[2026-03-20 15:46:27.727] I (90133) PCNT_EVENT: Motor 2 running, PCNT=85/s (raw=17/200ms), target=75/s
+[2026-03-20 15:46:27.739] I (90143) PWM_EVENT: PWM channel 2 duty set to 6813.
+[2026-03-20 15:46:27.748] I (90153) PID_EVENT: Motor 2 PID: target=75/s, actual=85/s (raw=17/200ms), pid_out=1379, pwm_duty=6813, startup=11
+[2026-03-20 15:46:27.927] I (90333) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:46:27.937] I (90343) PWM_EVENT: PWM channel 2 duty set to 6770.
+[2026-03-20 15:46:27.942] I (90343) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1422, pwm_duty=6770, startup=11
+[2026-03-20 15:46:28.127] I (90533) PCNT_EVENT: Motor 2 running, PCNT=80/s (raw=16/200ms), target=75/s
+[2026-03-20 15:46:28.140] I (90543) PWM_EVENT: PWM channel 2 duty set to 6807.
+[2026-03-20 15:46:28.143] I (90543) PID_EVENT: Motor 2 PID: target=75/s, actual=80/s (raw=16/200ms), pid_out=1384, pwm_duty=6807, startup=11
+[2026-03-20 15:46:28.327] I (90733) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:46:28.336] I (90743) PWM_EVENT: PWM channel 2 duty set to 6764.
+[2026-03-20 15:46:28.341] I (90743) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1427, pwm_duty=6764, startup=11
+[2026-03-20 15:46:28.526] I (90933) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:46:28.534] I (90943) PWM_EVENT: PWM channel 2 duty set to 6721.
+[2026-03-20 15:46:28.540] I (90943) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1470, pwm_duty=6721, startup=11
+[2026-03-20 15:46:28.726] I (91133) PCNT_EVENT: Motor 2 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:46:28.735] I (91143) PWM_EVENT: PWM channel 2 duty set to 6638.
+[2026-03-20 15:46:28.739] I (91143) PID_EVENT: Motor 2 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=1553, pwm_duty=6638, startup=11
+[2026-03-20 15:46:28.927] I (91333) PCNT_EVENT: Motor 2 running, PCNT=85/s (raw=17/200ms), target=75/s
+[2026-03-20 15:46:28.937] I (91343) PWM_EVENT: PWM channel 2 duty set to 6716.
+[2026-03-20 15:46:28.942] I (91343) PID_EVENT: Motor 2 PID: target=75/s, actual=85/s (raw=17/200ms), pid_out=1476, pwm_duty=6716, startup=11
+[2026-03-20 15:46:29.128] I (91533) PCNT_EVENT: Motor 2 running, PCNT=65/s (raw=13/200ms), target=75/s
+[2026-03-20 15:46:29.139] I (91543) PWM_EVENT: PWM channel 2 duty set to 6632.
+[2026-03-20 15:46:29.144] I (91543) PID_EVENT: Motor 2 PID: target=75/s, actual=65/s (raw=13/200ms), pid_out=1559, pwm_duty=6632, startup=11
+[2026-03-20 15:46:29.327] I (91733) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:46:29.338] I (91743) PWM_EVENT: PWM channel 2 duty set to 6589.
+[2026-03-20 15:46:29.341] I (91743) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1602, pwm_duty=6589, startup=11
+[2026-03-20 15:46:29.528] I (91933) PCNT_EVENT: Motor 2 running, PCNT=100/s (raw=20/200ms), target=75/s
+[2026-03-20 15:46:29.538] I (91943) PWM_EVENT: PWM channel 2 duty set to 6787.
+[2026-03-20 15:46:29.542] I (91943) PID_EVENT: Motor 2 PID: target=75/s, actual=100/s (raw=20/200ms), pid_out=1405, pwm_duty=6787, startup=11
+[2026-03-20 15:46:29.728] I (92133) PCNT_EVENT: Motor 2 running, PCNT=70/s (raw=14/200ms), target=75/s
+[2026-03-20 15:46:29.734] I (92143) PWM_EVENT: PWM channel 2 duty set to 6744.
+[2026-03-20 15:46:29.738] I (92143) PID_EVENT: Motor 2 PID: target=75/s, actual=70/s (raw=14/200ms), pid_out=1448, pwm_duty=6744, startup=11
+[2026-03-20 15:46:29.927] I (92333) PCNT_EVENT: Motor 2 running, PCNT=80/s (raw=16/200ms), target=75/s
+[2026-03-20 15:46:29.939] I (92343) PWM_EVENT: PWM channel 2 duty set to 6781.
+[2026-03-20 15:46:29.942] I (92343) PID_EVENT: Motor 2 PID: target=75/s, actual=80/s (raw=16/200ms), pid_out=1410, pwm_duty=6781, startup=11
+[2026-03-20 15:46:30.045] I (92453) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:46:30.126] I (92533) PCNT_EVENT: Motor 2 idle, PCNT=8
+[2026-03-20 15:46:30.127] I (92533) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:46:30.328] I (92733) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-03-20 15:46:30.330] I (92733) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-20 15:46:37.497] I (99903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:37.504] I (99913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:37.508] I (99913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:37.696] I (100103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:37.705] I (100113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:37.713] I (100113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:37.897] I (100303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:37.904] I (100313) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:37.908] I (100313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:38.098] I (100503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:38.104] I (100513) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:38.108] I (100513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:38.297] I (100703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:38.308] I (100713) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:38.312] I (100713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:38.496] I (100903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:38.504] I (100913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:38.507] I (100913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:38.696] I (101103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:38.706] I (101113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:38.708] I (101113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:38.896] I (101303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:38.905] I (101313) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:38.908] I (101313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:39.097] I (101503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:39.105] I (101513) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:39.108] I (101513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:39.297] I (101703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:39.305] I (101713) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:39.309] I (101713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:39.497] I (101903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:39.506] I (101913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:39.508] I (101913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:39.697] I (102103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:39.705] I (102113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:39.709] I (102113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:39.899] I (102303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:39.904] I (102313) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:39.908] I (102313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:40.098] I (102503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:40.105] I (102513) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:40.108] I (102513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:40.298] I (102703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:40.304] I (102713) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:40.311] I (102713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:40.498] I (102903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:40.506] I (102913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:40.513] I (102913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:40.698] I (103103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:40.704] I (103113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:40.708] I (103113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:40.897] I (103303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:40.905] I (103313) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:40.908] I (103313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:41.098] I (103503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:41.104] I (103513) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:41.108] I (103513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:41.297] I (103703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:41.305] I (103713) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:41.309] I (103713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:41.497] I (103903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:41.508] I (103913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:41.512] I (103913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:41.698] I (104103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:41.708] I (104113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:41.712] I (104113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:41.897] I (104303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:41.908] I (104313) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:41.912] I (104313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:42.097] I (104503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:42.106] I (104513) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:42.113] I (104513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:42.298] I (104703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:42.307] I (104713) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:42.311] I (104713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:42.497] I (104903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:42.508] I (104913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:42.511] I (104913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:42.697] I (105103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:42.704] I (105113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:42.708] I (105113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:42.897] I (105303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:42.905] I (105313) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:42.908] I (105313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:43.097] I (105503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:43.105] I (105513) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:43.109] I (105513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:43.146] I (105553) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=40607, elapsed=0ms)
+[2026-03-20 15:46:43.297] I (105703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:43.304] I (105713) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:43.308] I (105713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:43.497] I (105903) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:43.505] I (105913) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:43.509] I (105913) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:43.697] I (106103) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:43.705] I (106113) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:43.709] I (106113) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:43.896] I (106303) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:43.905] I (106313) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:43.908] I (106313) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:44.096] I (106503) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:44.105] I (106513) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:44.109] I (106513) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:44.297] I (106703) PCNT_EVENT: Motor 3 running, PCNT=0/s (raw=0/200ms), target=75/s
+[2026-03-20 15:46:44.304] I (106713) PWM_EVENT: PWM channel 3 duty set to 0.
+[2026-03-20 15:46:44.308] I (106713) PID_EVENT: Motor 3 PID: target=75/s, actual=0/s (raw=0/200ms), pid_out=8191, pwm_duty=0, startup=11
+[2026-03-20 15:46:44.485] I (106893) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-03-20 15:46:44.496] I (106903) PCNT_EVENT: Motor 3 idle, PCNT=0
+[2026-03-20 15:46:44.498] I (106903) PWM_EVENT: PWM channel 3 duty set to 8191.
+
+
+============================================================
+日志记录结束
+结束时间: 2026-03-20 15:46:58
+总运行时间: 1.97 分钟
+总行数: 1150
+============================================================
+连接统计:
+  - MQTT连接次数: 1
+  - MQTT断开次数: 0
+  - 连接保持率: 100.00%
+
+错误统计:
+  - 无错误记录
+============================================================
