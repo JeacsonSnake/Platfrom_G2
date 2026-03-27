@@ -2,6 +2,17 @@
 
 static const char* TAG = "PID_EVENT";
 
+// 微分滤波系数（降低高频噪声影响）
+#define D_FILTER_ALPHA 0.8
+// 死区阈值（避免低速抖动）
+#define SPEED_DEAD_ZONE 5.0
+// PID采样周期（与PCNT采样周期保持一致）
+#define PID_SAMPLE_TIME_SEC 1.0
+// 输出变化率限制（减少突变）
+#define PWM_MAX_STEP 600.0
+// 积分项限制（防止积分饱和）
+#define INTEGRAL_LIMIT 5000.0
+
 // 这里的PID控制针对于以下过程
 // -- 转速 --> PID 控制器 --> PWM 控制输入 --> PCNT 转速测量 -->
 //          ^                                     |
@@ -9,34 +20,48 @@ static const char* TAG = "PID_EVENT";
 //          ---------------------------------------
 double PID_Calculate(struct PID_params params, struct PID_data *data, double target_speed, double current_speed)
 {
+    // 目标速度限制到可测量范围内
+    if (target_speed > params.max_pcnt) {
+        target_speed = params.max_pcnt;
+    } else if (target_speed < params.min_pcnt) {
+        target_speed = params.min_pcnt;
+    }
+
+    // 低速死区：认为目标为停止，清空积分避免抖动
+    if (target_speed > -SPEED_DEAD_ZONE && target_speed < SPEED_DEAD_ZONE) {
+        data->integral = 0;
+        data->pre_error = 0;
+        data->pre_measurement = current_speed;
+        data->d_filtered = 0;
+        data->pre_input = params.min_pwm;
+        return params.min_pwm;
+    }
+
     // 计算Error
     double error = target_speed - current_speed;
+    double dt = PID_SAMPLE_TIME_SEC;
 
     // 比例项
     double Pout = params.Kp * error;
-    
-    // 积分项
-    data -> integral += error;
-    // 限制积分项，防止积分饱和
-    if(data -> integral > params.max_pwm)
-    {
-        data -> integral = params.max_pwm;
+
+    // 微分项：对测量值做微分并进行低通滤波，避免设定值突变引发D项冲击
+    double raw_derivative = -(current_speed - data->pre_measurement) / dt;
+    data->d_filtered = D_FILTER_ALPHA * data->d_filtered + (1.0 - D_FILTER_ALPHA) * raw_derivative;
+    double Dout = params.Kd * data->d_filtered;
+
+    // 候选积分项（带dt）
+    double integral_candidate = data->integral + error * dt;
+    if (integral_candidate > INTEGRAL_LIMIT) {
+        integral_candidate = INTEGRAL_LIMIT;
+    } else if (integral_candidate < -INTEGRAL_LIMIT) {
+        integral_candidate = -INTEGRAL_LIMIT;
     }
-    if(data -> integral < params.min_pwm)
-    {
-        data -> integral = params.min_pwm;
-    }
-    double Iout = params.Ki * data -> integral;
 
-    // 微分项
-    double derivative = (error - data -> pre_error);
-    double Dout = params.Kd * derivative;
+    double Iout_candidate = params.Ki * integral_candidate;
+    double unsat_output = Pout + Iout_candidate + Dout;
 
-    // 计算整体输出
-    double output = Pout + Iout + Dout;
-    output = data -> pre_input + output;
-
-    // 限制条件
+    // 限制输出
+    double output = unsat_output;
     if(output > params.max_pwm)
     {
         output = params.max_pwm;
@@ -46,9 +71,35 @@ double PID_Calculate(struct PID_params params, struct PID_data *data, double tar
         output = params.min_pwm;
     }
 
+    // 反积分饱和：仅在输出未饱和，或误差有助于脱离饱和时更新积分
+    bool saturated_high = (unsat_output > params.max_pwm);
+    bool saturated_low = (unsat_output < params.min_pwm);
+    bool allow_integral_update = (!saturated_high && !saturated_low) ||
+                                 (saturated_high && error < 0) ||
+                                 (saturated_low && error > 0);
+    if (allow_integral_update) {
+        data->integral = integral_candidate;
+    }
+
+    // 输出变化率限制，减少突变和机械冲击
+    double delta = output - data->pre_input;
+    if (delta > PWM_MAX_STEP) {
+        output = data->pre_input + PWM_MAX_STEP;
+    } else if (delta < -PWM_MAX_STEP) {
+        output = data->pre_input - PWM_MAX_STEP;
+    }
+
+    // 再次限制条件
+    if (output > params.max_pwm) {
+        output = params.max_pwm;
+    } else if (output < params.min_pwm) {
+        output = params.min_pwm;
+    }
+
     // 保存本次误差到上次
-    data -> pre_error = error;
-    data -> pre_input = output;
+    data->pre_error = error;
+    data->pre_measurement = current_speed;
+    data->pre_input = output;
 
     return output;
 }
@@ -65,13 +116,15 @@ void PID_init(void* params)
     struct PID_data data = {
         .integral   = 0,
         .pre_error  = 0,
-        .pre_input = 0
+        .pre_input  = 0,
+        .pre_measurement = 0,
+        .d_filtered = 0
     };
 
     struct PID_params pid_params = {
         .Kp         = 8,
         .Ki         = 0.02,
-        .Kd         = 0.01,
+        .Kd         = 0.06,
         .max_pwm    = 8192,
         .min_pwm    = 0,
         .max_pcnt   = 435,

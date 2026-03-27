@@ -9,6 +9,8 @@
 import paho.mqtt.client as mqtt
 from django.conf import settings
 import os
+import socket
+import json
 
 from django.apps import apps
 
@@ -18,6 +20,7 @@ from channels.layers import get_channel_layer
 from .models import MotorEvent, MotorData
 
 ongoing_events = []
+client = None
 
 
 def on_connect(mqtt_client, userdata, flags, rc):
@@ -172,13 +175,34 @@ def on_message(mqtt_client, userdata, msg):
                 async_to_sync(channel_layer.group_send)('mqtt_group', package)
 
 
+def publish_device_command(topic, payload):
+    if client is None:
+        raise RuntimeError('MQTT client is unavailable.')
+
+    if isinstance(payload, (dict, list)):
+        payload = json.dumps(payload)
+    else:
+        payload = str(payload)
+
+    message_info = client.publish(topic, payload)
+    return message_info
+
+
+def mqtt_client_available():
+    return client is not None
+
+
 if os.environ.get('RUN_MAIN'):
-    client = mqtt.Client()
-    client.on_connect = on_connect
-    client.on_message = on_message
-    client.username_pw_set(settings.MQTT_USER, settings.MQTT_PASSWORD)
-    client.connect(
-        host=settings.MQTT_SERVER,
-        port=settings.MQTT_PORT,
-        keepalive=settings.MQTT_KEEPALIVE
-    )
+    try:
+        client = mqtt.Client()
+        client.on_connect = on_connect
+        client.on_message = on_message
+        client.username_pw_set(settings.MQTT_USER, settings.MQTT_PASSWORD)
+        client.connect(
+            host=settings.MQTT_SERVER,
+            port=settings.MQTT_PORT,
+            keepalive=settings.MQTT_KEEPALIVE
+        )
+    except (OSError, TimeoutError, socket.error) as exc:
+        client = None
+        print(f"MQTT unavailable during Django startup: {exc}")

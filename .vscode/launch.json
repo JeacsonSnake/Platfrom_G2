@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/zhouyuyan/VScodeProject/Platfrom_G2/esp32_idf/main",
+      "program": "/Users/zhouyuyan/VScodeProject/Platfrom_G2/esp32_idf/main/build/Debug/outDebug"
+    }
+  ]
+}

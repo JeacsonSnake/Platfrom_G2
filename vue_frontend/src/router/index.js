@@ -8,6 +8,7 @@ import MyAccountView from '../views/MyAccount.vue'
 import ChangePasswordView from '../views/ChangePassword.vue'
 import SpinningView from '../views/Dashboard/Spinning.vue'
 import WebsocketView from '../views/Dashboard/Websocket.vue'
+import RecipeDemoView from '../views/Dashboard/RecipeDemo.vue'
 
 import store from '../store'
 
@@ -73,6 +74,14 @@ const router = createRouter({
       path: '/dashboard/websocket',
       name: 'websocket',
       component: WebsocketView,
+      meta:{
+        requireLogin: true
+      }
+    },
+    {
+      path: '/dashboard/material-demo',
+      name: 'material-demo',
+      component: RecipeDemoView,
       meta:{
         requireLogin: true
       }

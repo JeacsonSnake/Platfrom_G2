@@ -139,6 +139,10 @@ struct PID_data{
     double pre_error;
     // 上次输入
     double pre_input;
+    // 上次测量值（用于微分项）
+    double pre_measurement;
+    // 微分滤波状态
+    double d_filtered;
 };
 
 // PID Calculation 计算方法
