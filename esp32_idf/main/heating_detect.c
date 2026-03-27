@@ -313,48 +313,41 @@ static esp_err_t onewire_reset(bool *presence)
 {
     if (presence) *presence = false;
     
-    // 步骤1：配置GPIO为推挽输出，拉低480us
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_OUTPUT);
+    // 关键修复：GPIO14推挽输出高电平失败，改用开漏模式
+    // 步骤1：配置GPIO为开漏输出，拉低480us
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
+    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
     gpio_set_level(s_onewire_pin, 0);
     esp_rom_delay_us(ONEWIRE_RESET_US);
     
-    // 步骤2：释放总线（关键修复）
-    // 先输出高电平，再切换为输入模式，确保总线被拉高
+    // 步骤2：释放总线（开漏模式下写1释放，由上拉电阻拉高）
     gpio_set_level(s_onewire_pin, 1);
-    esp_rom_delay_us(5);  // 短暂延时确保总线上升
+    // 关键延时：等待上拉电阻将总线拉高（给足时间）
+    esp_rom_delay_us(15);
     
-    // 切换到输入模式，启用内部上拉辅助
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
-    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
-    esp_rom_delay_us(ONEWIRE_PRESENCE_WAIT_US - 5);  // 调整剩余等待时间
-    
-    // 步骤3：采样Presence（应在70us时）
+    // 步骤3：第一次采样（约70us时）
     int level1 = gpio_get_level(s_onewire_pin);
-    esp_rom_delay_us(ONEWIRE_PRESENCE_SAMPLE_US - ONEWIRE_PRESENCE_WAIT_US);
+    esp_rom_delay_us(30);  // 从70us到100us
     
-    // 步骤4：第二次采样（应在100us时，检测从机响应）
+    // 步骤4：第二次采样（约100us时，检测从机响应）
     int level2 = gpio_get_level(s_onewire_pin);
     
     // 等待Reset周期结束
-    esp_rom_delay_us(ONEWIRE_RESET_US - ONEWIRE_PRESENCE_SAMPLE_US);
+    esp_rom_delay_us(ONEWIRE_RESET_US - 100);
     
-    ESP_LOGD(TAG, "Reset: level1=%d (at 70us), level2=%d (at 100us)", level1, level2);
+    ESP_LOGD(TAG, "Reset: level1=%d (at ~70us), level2=%d (at ~100us)", level1, level2);
     
-    // 检测Presence：如果总线被从机拉低（低电平）表示存在
-    // 正常时序：level1=1（70us总线上升沿），level2=0（100us从机拉低响应）
+    // 检测Presence
     if (level1 == 1 && level2 == 0) {
         if (presence) *presence = true;
     } else if (level1 == 0 && level2 == 0) {
-        // 总线一直被拉低
-        ESP_LOGW(TAG, "1-Wire bus short to GND detected (level1=%d, level2=%d)", level1, level2);
+        ESP_LOGW(TAG, "1-Wire bus stuck low (level1=%d, level2=%d). Check pull-up resistors.", level1, level2);
         return ESP_ERR_INVALID_STATE;
     } else if (level1 == 1 && level2 == 1) {
-        // 总线一直是高电平（无响应）
-        ESP_LOGW(TAG, "1-Wire bus open circuit or no device detected (level1=%d, level2=%d)", level1, level2);
+        ESP_LOGW(TAG, "1-Wire no device response (level1=%d, level2=%d)", level1, level2);
         return ESP_ERR_NOT_FOUND;
     } else {
-        // level1=0, level2=1 异常情况
-        ESP_LOGW(TAG, "1-Wire unexpected levels: level1=%d, level2=%d", level1, level2);
+        ESP_LOGW(TAG, "1-Wire unexpected: level1=%d, level2=%d", level1, level2);
         return ESP_ERR_INVALID_STATE;
     }
     
@@ -368,27 +361,22 @@ static esp_err_t onewire_reset(bool *presence)
  */
 static esp_err_t onewire_write_bit(uint8_t bit)
 {
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_OUTPUT);
+    // 使用开漏输出模式（GPIO14推挽输出高电平失败）
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
+    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
     
     if (bit & 0x01) {
-        // 写1：拉低10us，然后释放
+        // 写1：拉低10us，然后释放（由上拉电阻拉高）
         gpio_set_level(s_onewire_pin, 0);
         esp_rom_delay_us(ONEWIRE_WRITE1_US);
-        // 先输出高，再切换输入，确保上升沿
-        gpio_set_level(s_onewire_pin, 1);
-        esp_rom_delay_us(2);  // 短暂延时确保上升
-        gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
-        gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
-        esp_rom_delay_us(ONEWIRE_SLOT_US - ONEWIRE_WRITE1_US - 2);
+        gpio_set_level(s_onewire_pin, 1);  // 释放总线
+        esp_rom_delay_us(ONEWIRE_SLOT_US - ONEWIRE_WRITE1_US);
     } else {
         // 写0：拉低70us，然后释放
         gpio_set_level(s_onewire_pin, 0);
         esp_rom_delay_us(ONEWIRE_WRITE0_US);
-        gpio_set_level(s_onewire_pin, 1);
-        esp_rom_delay_us(2);
-        gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
-        gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
-        esp_rom_delay_us(ONEWIRE_RECOVERY_US - 2);
+        gpio_set_level(s_onewire_pin, 1);  // 释放总线
+        esp_rom_delay_us(ONEWIRE_RECOVERY_US);
     }
     
     return ESP_OK;
@@ -403,19 +391,19 @@ static esp_err_t onewire_read_bit(uint8_t *bit)
 {
     if (bit) *bit = 1;
     
-    // 读时隙：主机拉低5us，然后释放，在15us采样
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_OUTPUT);
+    // 使用开漏输出模式（GPIO14推挽输出高电平失败）
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
+    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
+    
+    // 读时隙：主机拉低5us
     gpio_set_level(s_onewire_pin, 0);
     esp_rom_delay_us(ONEWIRE_READ_INIT_US);
     
-    // 释放总线（关键修复：先输出高，再切换输入）
+    // 释放总线，由上拉电阻拉高
     gpio_set_level(s_onewire_pin, 1);
-    esp_rom_delay_us(1);  // 短暂延时
+    esp_rom_delay_us(ONEWIRE_READ_SAMPLE_US - ONEWIRE_READ_INIT_US);
     
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
-    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
-    esp_rom_delay_us(ONEWIRE_READ_SAMPLE_US - ONEWIRE_READ_INIT_US - 1);
-    
+    // 采样
     int level = gpio_get_level(s_onewire_pin);
     if (bit) *bit = level & 0x01;
     
@@ -866,15 +854,17 @@ esp_err_t max31850_init(gpio_num_t onewire_pin)
         s_sensors[i].temperature = 0.0f;
     }
     
-    // 配置GPIO
+    // 配置GPIO为开漏输出模式（GPIO14推挽输出高电平失败，必须用开漏）
     gpio_config_t io_conf = {
         .pin_bit_mask = (1ULL << onewire_pin),
-        .mode = GPIO_MODE_INPUT,
-        .pull_up_en = GPIO_PULLUP_ENABLE,
+        .mode = GPIO_MODE_INPUT_OUTPUT_OD,  // 开漏输出
+        .pull_up_en = GPIO_PULLUP_ENABLE,    // 启用内部上拉
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
         .intr_type = GPIO_INTR_DISABLE,
     };
     ESP_ERROR_CHECK(gpio_config(&io_conf));
+    gpio_set_level(s_onewire_pin, 1);  // 初始状态释放总线
+    ESP_LOGI(TAG, "GPIO%d configured as open-drain with pull-up", onewire_pin);
     
     // 运行GPIO硬件诊断（帮助确认硬件连接）
     onewire_diagnose_bus();
