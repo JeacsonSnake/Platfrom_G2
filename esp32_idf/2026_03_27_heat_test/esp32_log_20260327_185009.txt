@@ -1,0 +1,389 @@
+============================================================
+ESP32-S3 串口日志记录
+开始时间: 2026-03-27 18:50:09
+串口: COM10, 波特率: 115200
+============================================================
+
+[2026-03-27 18:50:09.092] I (664) wifi:state: assoc -> run (0x10)
+[2026-03-27 18:50:09.213] I (794) wifi:connected with WeShare-6148, aid = 13, channel 1, BW20, bssid = c4:70:ab:d9:a0:e2
+[2026-03-27 18:50:09.216] I (794) wifi:security: WPA2-PSK, phy: bgn, rssi: -69
+[2026-03-27 18:50:09.217] I (794) wifi:pm start, type: 0
+[2026-03-27 18:50:09.219] 
+[2026-03-27 18:50:09.226] I (794) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us
+[2026-03-27 18:50:09.233] I (804) wifi:set rx beacon pti, rx_bcn_pti: 0, bcn_timeout: 25000, mt_pti: 0, mt_time: 10000
+[2026-03-27 18:50:10.003] I (814) wifi:AP's beacon interval = 102400 us, DTIM period = 1
+[2026-03-27 18:50:10.005] W (1584) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (1/60)
+[2026-03-27 18:50:10.273] I (1854) ESP32S3_WIFI_EVENT: Got ip:192.168.110.199
+[2026-03-27 18:50:10.274] I (1854) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 18:50:10.278] I (1854) MQTT_MONITOR: ==============================================
+[2026-03-27 18:50:10.282] I (1854) MQTT_MONITOR: 正在启动 SNTP 时间同步...
+[2026-03-27 18:50:10.294] I (1864) MQTT_MONITOR: NTP服务器1: cn.pool.ntp.org (国内)
+[2026-03-27 18:50:10.296] I (1864) MQTT_MONITOR: NTP服务器2: ntp.aliyun.com (阿里云)
+[2026-03-27 18:50:10.299] I (1874) MQTT_MONITOR: NTP服务器3: ntp.tencent.com (腾讯云)
+[2026-03-27 18:50:10.303] I (1874) MQTT_MONITOR: 当前系统时间: 1488 ms
+[2026-03-27 18:50:10.310] I (1884) MQTT_MONITOR: 时区设置: CST-8 (UTC+8, 中国标准时间)
+[2026-03-27 18:50:10.316] I (1884) MQTT_MONITOR: SNTP 初始化完成，等待时间同步...
+[2026-03-27 18:50:10.323] I (1894) MQTT_MONITOR: ==============================================
+[2026-03-27 18:50:10.330] I (1904) esp_netif_handlers: sta ip: 192.168.110.199, mask: 255.255.255.0, gw: 192.168.110.1
+[2026-03-27 18:50:10.334] I (1904) ESP32S3_WIFI_EVENT: Connected to ap!
+[2026-03-27 18:50:10.339] I (1914) ESP32S3_WIFI_EVENT: Waiting for NTP time sync...
+[2026-03-27 18:50:40.333] W (31914) MQTT_MONITOR: 时间同步超时（30000 ms），将继续使用系统时间
+[2026-03-27 18:50:40.337] W (31914) ESP32S3_WIFI_EVENT: NTP time sync timeout, continuing with system time
+[2026-03-27 18:50:45.334] I (36914) MQTT_MONITOR: MQTT连接监控模块已初始化
+[2026-03-27 18:50:45.335] I (36914) MQTT_MONITOR: 统计报告间隔: 0 小时
+[2026-03-27 18:50:45.339] I (36914) MQTT_MONITOR: =================================================
+[2026-03-27 18:50:45.344] I (36914) MQTT_MONITOR:       MQTT连接监控统计系统已启动
+[2026-03-27 18:50:45.350] I (36924) MQTT_MONITOR: =================================================
+[2026-03-27 18:50:45.358] I (36924) MQTT_MONITOR: 提示: 时间将在WiFi连接后通过NTP同步
+[2026-03-27 18:50:45.362] I (36934) MQTT_MONITOR: 等待 SNTP 时间同步完成...
+[2026-03-27 18:50:45.367] I (36944) ESP32S3_MQTT_EVENT: MQTT客户端已启动
+[2026-03-27 18:50:45.372] I (36944) ESP32S3_MQTT_EVENT: MQTT心跳任务已启动
+[2026-03-27 18:50:45.378] I (36944) ESP32S3_MQTT_EVENT: MQTT连接健康检查任务已启动
+[2026-03-27 18:50:45.383] I (36944) PWM_EVENT: PWM timer 0 initiated at clock speed 5000.
+[2026-03-27 18:50:45.392] I (36964) PWM_EVENT: PWM channel 0 initiated on GPIO1 with initial duty 8191 (inverted logic).
+[2026-03-27 18:50:45.400] I (36964) PWM_EVENT: PWM channel 1 initiated on GPIO4 with initial duty 8191 (inverted logic).
+[2026-03-27 18:50:45.409] I (36974) PWM_EVENT: PWM channel 2 initiated on GPIO6 with initial duty 8191 (inverted logic).
+[2026-03-27 18:50:45.417] I (36984) PWM_EVENT: PWM channel 3 initiated on GPIO8 with initial duty 8191 (inverted logic).
+[2026-03-27 18:50:45.423] I (36994) PCNT_EVENT: PCNT channel 0 has been initiated on pin 2.
+[2026-03-27 18:50:45.428] I (37004) PCNT_EVENT: PCNT channel 1 has been initiated on pin 5.
+[2026-03-27 18:50:45.435] I (37004) PCNT_EVENT: PCNT channel 2 has been initiated on pin 7.
+[2026-03-27 18:50:45.440] I (37014) PCNT_EVENT: PCNT channel 3 has been initiated on pin 9.
+[2026-03-27 18:50:45.443] I (37014) PID_EVENT: Index number is: 0
+[2026-03-27 18:50:45.444] 
+[2026-03-27 18:50:45.447] I (37024) PID_EVENT: Index number is: 2
+[2026-03-27 18:50:45.449] 
+[2026-03-27 18:50:45.451] I (37024) PID_EVENT: Index number is: 1
+[2026-03-27 18:50:45.452] 
+[2026-03-27 18:50:45.457] I (37024) MAIN: Initializing MAX31850 temperature sensors...
+[2026-03-27 18:50:45.461] I (37034) MAX31850: Initializing MAX31850 on GPIO14...
+[2026-03-27 18:50:45.465] I (37024) PID_EVENT: Index number is: 3
+[2026-03-27 18:50:45.467] 
+[2026-03-27 18:50:45.472] I (37034) MAX31850: GPIO14 configured as open-drain with pull-up
+[2026-03-27 18:50:45.476] I (37044) MAX31850: ========== GPIO Hardware Diagnostic ==========
+[2026-03-27 18:50:45.485] I (37054) MAX31850: Test 1 - Floating input: 1 (expect: 1 if ext pull-up present)
+[2026-03-27 18:50:45.490] I (37064) MAX31850: Test 2 - Internal pull-up: 1 (expect: 1)
+[2026-03-27 18:50:45.494] I (37064) MAX31850: Test 3 - Forced low: 0 (expect: 0)
+[2026-03-27 18:50:45.499] I (37074) MAX31850: Test 4 - Forced high: 0 (expect: 1)
+[2026-03-27 18:50:45.506] I (37074) MAX31850: Test 5 - Released (input+pullup): 1 (expect: 1)
+[2026-03-27 18:50:45.518] I (37084) MAX31850: ------------------------------------------
+[2026-03-27 18:50:45.520] I (37084) MAX31850: DIAGNOSIS: External pull-up detected, bus appears normal
+[2026-03-27 18:50:45.523] I (37094) MAX31850: ============================================
+[2026-03-27 18:50:45.527] I (37104) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 18:50:45.544] I (37124) MAX31850: Found device 1: ROM ID 3B00000FE1C5A872
+[2026-03-27 18:50:45.561] I (37134) MAX31850: Found device 2: ROM ID 3B08000FE2889E46
+[2026-03-27 18:50:45.578] I (37154) MAX31850: Found device 3: ROM ID 3B04000FE1956BF1
+[2026-03-27 18:50:45.585] E (37164) MAX31850: Search error at bit 18: 1/1
+[2026-03-27 18:50:45.587] W (37164) MAX31850: Initial ROM search failed, will retry in poll task
+[2026-03-27 18:50:45.590] I (37164) MAX31850: ===============================================
+[2026-03-27 18:50:45.596] I (37164) MAX31850: MAX31850 ROM ID List (0 device(s) found):
+[2026-03-27 18:50:45.601] W (37174) MAX31850:   Warning: Expected 4 sensors, found 0
+[2026-03-27 18:50:45.608] I (37174) MAX31850: ===============================================
+[2026-03-27 18:50:45.611] I (37184) MAX31850: Poll task started
+[2026-03-27 18:50:45.616] I (37184) MAX31850: MAX31850 initialized successfully
+[2026-03-27 18:50:45.703] W (37284) MAX31850: No sensors found, retrying search...
+[2026-03-27 18:50:45.705] I (37284) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 18:50:45.720] I (37294) MAX31850: Found device 1: ROM ID 3B00000FE1C5A872
+[2026-03-27 18:50:45.737] I (37314) MAX31850: Found device 2: ROM ID 3B08000FE2889E46
+[2026-03-27 18:50:45.752] I (37334) MAX31850: Found device 3: ROM ID 3B04000FE1956BF1
+[2026-03-27 18:50:45.769] I (37344) MAX31850: Found device 4: ROM ID 3B0C000FE1F08162
+[2026-03-27 18:50:45.771] I (37344) MAX31850: ROM search complete. Found 4 device(s)
+[2026-03-27 18:50:47.613] I (39194) HEATING: Temperature print task started
+[2026-03-27 18:50:47.615] I (39194) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:50:47.617] I (39194) HEATING: Sensor 0 (P1): 1.58 °C  [OK]
+[2026-03-27 18:50:47.620] I (39194) HEATING: Sensor 1 (P2): 1.58 °C  [OK]
+[2026-03-27 18:50:47.625] I (39194) HEATING: Sensor 2 (P3): 1.58 °C  [OK]
+[2026-03-27 18:50:47.628] I (39204) HEATING: Sensor 3 (P4): 1.58 °C  [OK]
+[2026-03-27 18:50:47.633] I (39204) HEATING: =======================================
+[2026-03-27 18:50:49.633] I (41214) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:50:49.635] I (41214) HEATING: Sensor 0 (P1): 1.58 °C  [OK]
+[2026-03-27 18:50:49.637] I (41214) HEATING: Sensor 1 (P2): 1.58 °C  [OK]
+[2026-03-27 18:50:49.640] I (41214) HEATING: Sensor 2 (P3): 1.58 °C  [OK]
+[2026-03-27 18:50:49.645] I (41214) HEATING: Sensor 3 (P4): 1.58 °C  [OK]
+[2026-03-27 18:50:49.650] I (41224) HEATING: =======================================
+[2026-03-27 18:50:50.886] W (42464) MAX31850: Sensor 0: Thermocouple short to GND
+[2026-03-27 18:50:51.017] W (42594) MAX31850: Sensor 1: Thermocouple open circuit (断线)
+[2026-03-27 18:50:51.147] W (42724) MAX31850: Temperature out of valid range: -512.00°C
+[2026-03-27 18:50:51.149] W (42724) MAX31850: Sensor 2: CRC error or data corruption
+[2026-03-27 18:50:51.276] W (42854) MAX31850: Sensor 3: Thermocouple open circuit (断线)
+[2026-03-27 18:50:51.643] I (43224) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:50:51.645] W (43224) HEATING: Sensor 0 (P1): Short to GND  [ONLINE]
+[2026-03-27 18:50:51.648] W (43224) HEATING: Sensor 1 (P2): Thermocouple OPEN (断线)  [ONLINE]
+[2026-03-27 18:50:51.653] W (43224) HEATING: Sensor 2 (P3): CRC Error  [ONLINE]
+[2026-03-27 18:50:51.659] W (43234) HEATING: Sensor 3 (P4): Thermocouple OPEN (断线)  [ONLINE]
+[2026-03-27 18:50:51.665] I (43234) HEATING: =======================================
+[2026-03-27 18:50:52.395] W (43974) MAX31850: Sensor 0: Thermocouple short to GND
+[2026-03-27 18:50:52.526] W (44104) MAX31850: Sensor 1: Thermocouple open circuit (断线)
+[2026-03-27 18:50:52.657] W (44234) MAX31850: Scratchpad CRC error: calc=0xC9, read=0xFF
+[2026-03-27 18:50:52.659] W (44234) MAX31850: Sensor 2: CRC error or data corruption
+[2026-03-27 18:50:52.786] W (44364) MAX31850: Sensor 3: Thermocouple open circuit (断线)
+[2026-03-27 18:50:53.663] I (45244) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:50:53.665] W (45244) HEATING: Sensor 0 (P1): Short to GND  [ONLINE]
+[2026-03-27 18:50:53.669] W (45244) HEATING: Sensor 1 (P2): Thermocouple OPEN (断线)  [ONLINE]
+[2026-03-27 18:50:53.674] W (45244) HEATING: Sensor 2 (P3): CRC Error  [ONLINE]
+[2026-03-27 18:50:53.680] W (45254) HEATING: Sensor 3 (P4): Thermocouple OPEN (断线)  [ONLINE]
+[2026-03-27 18:50:53.685] I (45254) HEATING: =======================================
+[2026-03-27 18:50:53.906] W (45484) MAX31850: Sensor 0: Thermocouple short to GND
+[2026-03-27 18:50:53.908] E (45484) MAX31850: Sensor 0: Marked OFFLINE after 3 consecutive failures
+[2026-03-27 18:50:54.036] W (45614) MAX31850: Sensor 1: Thermocouple open circuit (断线)
+[2026-03-27 18:50:54.038] E (45614) MAX31850: Sensor 1: Marked OFFLINE after 3 consecutive failures
+[2026-03-27 18:50:54.167] W (45744) MAX31850: Temperature out of valid range: -512.00°C
+[2026-03-27 18:50:54.169] W (45744) MAX31850: Sensor 2: CRC error or data corruption
+[2026-03-27 18:50:54.172] E (45744) MAX31850: Sensor 2: Marked OFFLINE after 3 consecutive failures
+[2026-03-27 18:50:54.298] W (45874) MAX31850: Sensor 3: Thermocouple open circuit (断线)
+[2026-03-27 18:50:54.299] E (45874) MAX31850: Sensor 3: Marked OFFLINE after 3 consecutive failures
+[2026-03-27 18:50:55.354] W (46934) MQTT_MONITOR: 仍在等待时间同步... (10/60 秒)
+[2026-03-27 18:50:55.373] E (46954) esp-tls: [sock=54] select() timeout
+[2026-03-27 18:50:55.374] E (46954) transport_base: Failed to open a new connection: 32774
+[2026-03-27 18:50:55.376] E (46954) mqtt_client: Error transport connect
+[2026-03-27 18:50:55.381] E (46954) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-27 18:50:55.388] W (46954) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=1, 总计=1
+[2026-03-27 18:50:55.391] I (46964) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 18:50:55.401] E (46964) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-27 18:50:55.412] W (46974) MQTT_MONITOR: [断开事件] #1 | 时间: 1970-01-01 08:00:46 [运行 00:00:46] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-27 18:50:55.417] I (46984) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-27 18:50:55.424] W (46994) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=2, 总计=2
+[2026-03-27 18:50:55.428] I (47004) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 18:50:55.438] W (47004) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-27 18:50:55.449] W (47014) MQTT_MONITOR: [断开事件] #2 | 时间: 1970-01-01 08:00:46 [运行 00:00:46] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-27 18:50:55.452] I (47024) PCNT_EVENT: Motor 1 idle, PCNT=0
+[2026-03-27 18:50:55.457] I (47024) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-03-27 18:50:55.460] I (47024) PCNT_EVENT: Motor 3 idle, PCNT=0
+[2026-03-27 18:50:55.464] I (47024) PCNT_EVENT: Motor 0 idle, PCNT=0
+[2026-03-27 18:50:55.469] I (47034) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-27 18:50:55.473] I (47034) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-27 18:50:55.479] I (47034) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-03-27 18:50:55.483] I (47044) PWM_EVENT: PWM channel 0 duty set to 8191.
+[2026-03-27 18:50:55.663] I (47244) PCNT_EVENT: Motor 1 startup protection ended, normal PCNT monitoring active
+[2026-03-27 18:50:55.673] I (47254) PCNT_EVENT: Motor 2 startup protection ended, normal PCNT monitoring active
+[2026-03-27 18:50:55.676] I (47254) PCNT_EVENT: Motor 3 startup protection ended, normal PCNT monitoring active
+[2026-03-27 18:50:55.682] I (47264) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:50:55.687] W (47264) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:50:55.693] W (47264) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:50:55.702] I (47264) PCNT_EVENT: Motor 0 startup protection ended, normal PCNT monitoring active
+[2026-03-27 18:50:55.705] W (47274) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:50:55.711] W (47284) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:50:55.716] I (47284) HEATING: =======================================
+[2026-03-27 18:50:57.713] I (49294) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:50:57.715] W (49294) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:50:57.717] W (49294) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:50:57.724] W (49294) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:50:57.728] W (49304) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:50:57.733] I (49304) HEATING: =======================================
+[2026-03-27 18:50:59.734] I (51314) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:50:59.735] W (51314) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:50:59.738] W (51314) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:50:59.743] W (51314) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:50:59.749] W (51324) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:50:59.753] I (51324) HEATING: =======================================
+[2026-03-27 18:51:01.754] I (53334) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:01.755] W (53334) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:01.758] W (53334) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:01.763] W (53334) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:01.769] W (53344) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:01.774] I (53344) HEATING: =======================================
+[2026-03-27 18:51:03.773] I (55354) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:03.775] W (55354) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:03.779] W (55354) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:03.783] W (55354) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:03.789] W (55364) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:03.793] I (55364) HEATING: =======================================
+[2026-03-27 18:51:05.353] W (56934) MQTT_MONITOR: 仍在等待时间同步... (20/60 秒)
+[2026-03-27 18:51:05.374] W (56954) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=1/3, 会话重连=2, 总计=2)
+[2026-03-27 18:51:05.794] I (57374) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:05.795] W (57374) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:05.799] W (57374) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:05.804] W (57374) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:05.808] W (57384) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:05.813] I (57384) HEATING: =======================================
+[2026-03-27 18:51:07.814] I (59394) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:07.816] W (59394) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:07.817] W (59394) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:07.823] W (59394) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:07.829] W (59404) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:07.834] I (59404) HEATING: =======================================
+[2026-03-27 18:51:08.454] E (60034) esp-tls: [sock=54] select() timeout
+[2026-03-27 18:51:08.456] E (60034) transport_base: Failed to open a new connection: 32774
+[2026-03-27 18:51:08.458] E (60034) mqtt_client: Error transport connect
+[2026-03-27 18:51:08.462] E (60034) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-27 18:51:08.468] W (60034) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=3, 总计=3
+[2026-03-27 18:51:08.471] I (60044) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 18:51:08.482] E (60044) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-27 18:51:08.493] W (60054) MQTT_MONITOR: [断开事件] #3 | 时间: 1970-01-01 08:00:59 [运行 00:00:59] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-27 18:51:08.498] I (60064) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-27 18:51:08.504] W (60074) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=4, 总计=4
+[2026-03-27 18:51:08.509] I (60084) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 18:51:08.519] W (60084) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-27 18:51:08.530] W (60094) MQTT_MONITOR: [断开事件] #4 | 时间: 1970-01-01 08:00:59 [运行 00:00:59] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-27 18:51:09.834] I (61414) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:09.836] W (61414) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:09.838] W (61414) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:09.843] W (61414) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:09.850] W (61424) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:09.854] I (61424) HEATING: =======================================
+[2026-03-27 18:51:11.854] I (63434) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:11.855] W (63434) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:11.859] W (63434) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:11.864] W (63434) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:11.869] W (63444) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:11.874] I (63444) HEATING: =======================================
+[2026-03-27 18:51:13.873] I (65454) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:13.875] W (65454) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:13.878] W (65454) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:13.884] W (65454) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:13.889] W (65464) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:13.894] I (65464) HEATING: =======================================
+[2026-03-27 18:51:15.354] W (66934) MQTT_MONITOR: 仍在等待时间同步... (30/60 秒)
+[2026-03-27 18:51:15.373] W (66954) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=2/3, 会话重连=4, 总计=4)
+[2026-03-27 18:51:15.894] I (67474) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:15.896] W (67474) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:15.899] W (67474) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:15.904] W (67474) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:15.909] W (67484) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:15.914] I (67484) HEATING: =======================================
+[2026-03-27 18:51:17.913] I (69494) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:17.915] W (69494) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:17.918] W (69494) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:17.923] W (69494) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:17.929] W (69504) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:17.935] I (69504) HEATING: =======================================
+[2026-03-27 18:51:19.934] I (71514) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:19.936] W (71514) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:19.939] W (71514) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:19.943] W (71514) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:19.950] W (71524) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:19.954] I (71524) HEATING: =======================================
+[2026-03-27 18:51:20.363] W (71944) ESP32S3_MQTT_EVENT: MQTT未连接，跳过本次心跳发送
+[2026-03-27 18:51:21.535] E (73114) esp-tls: [sock=54] select() timeout
+[2026-03-27 18:51:21.537] E (73114) transport_base: Failed to open a new connection: 32774
+[2026-03-27 18:51:21.538] E (73114) mqtt_client: Error transport connect
+[2026-03-27 18:51:21.541] E (73114) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-27 18:51:21.547] W (73114) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=5, 总计=5
+[2026-03-27 18:51:21.552] I (73124) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 18:51:21.563] E (73124) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-27 18:51:21.572] W (73134) MQTT_MONITOR: [断开事件] #5 | 时间: 1970-01-01 08:01:12 [运行 00:01:12] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-27 18:51:21.578] I (73144) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-27 18:51:21.585] W (73154) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=6, 总计=6
+[2026-03-27 18:51:21.589] I (73164) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 18:51:21.599] W (73164) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-27 18:51:21.610] W (73174) MQTT_MONITOR: [断开事件] #6 | 时间: 1970-01-01 08:01:12 [运行 00:01:12] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-27 18:51:21.954] I (73534) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:21.956] W (73534) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:21.958] W (73534) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:21.964] W (73534) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:21.969] W (73544) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:21.974] I (73544) HEATING: =======================================
+[2026-03-27 18:51:23.973] I (75554) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:23.975] W (75554) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:23.978] W (75554) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:23.984] W (75554) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:23.989] W (75564) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:23.994] I (75564) HEATING: =======================================
+[2026-03-27 18:51:25.353] W (76934) MQTT_MONITOR: 仍在等待时间同步... (40/60 秒)
+[2026-03-27 18:51:25.373] W (76954) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=3/3, 会话重连=6, 总计=6)
+[2026-03-27 18:51:25.382] W (76954) ESP32S3_MQTT_EVENT: MQTT连接检查: 连续3次未连接，15000ms后尝试强制重连(退避级别=6)...
+[2026-03-27 18:51:25.993] I (77574) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:25.995] W (77574) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:25.999] W (77574) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:26.003] W (77574) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:26.009] W (77584) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:26.015] I (77584) HEATING: =======================================
+[2026-03-27 18:51:26.814] I (78394) ESP32S3_MQTT_EVENT: Connected to MQTT server.
+[2026-03-27 18:51:26.816] I (78394) ESP32S3_STATUS_LED: LED mode changed to: 3
+[2026-03-27 18:51:26.821] I (78394) MQTT_MONITOR: [连接事件] #1 | 时间: 1970-01-01 08:01:18 [运行 00:01:18]
+[2026-03-27 18:51:26.829] I (78394) ESP32S3_MQTT_EVENT: 已订阅控制频道 'esp32_1/control' (msg_id=64496)
+[2026-03-27 18:51:27.058] I (78634) MQTT_MONITOR: ==============================================
+[2026-03-27 18:51:27.059] I (78634) MQTT_MONITOR: NTP时间同步回调被触发！
+[2026-03-27 18:51:27.063] I (78634) MQTT_MONITOR: 已发送同步完成信号
+[2026-03-27 18:51:27.067] I (78634) MQTT_MONITOR: 时间同步完成！
+[2026-03-27 18:51:27.075] I (78644) MQTT_MONITOR: 当前实际时间: 2026-03-27 18:51:26 [运行 00:01:18]
+[2026-03-27 18:51:27.078] I (78654) MQTT_MONITOR: 开机时间戳: 36547 ms
+[2026-03-27 18:51:27.085] I (78654) MQTT_MONITOR: 实际开机时间: Fri Mar 27 18:50:08 2026
+[2026-03-27 18:51:27.086] 
+[2026-03-27 18:51:27.089] I (78664) MQTT_MONITOR: NTP轮询间隔已恢复为1小时
+[2026-03-27 18:51:27.097] I (78664) MQTT_MONITOR: ==============================================
+[2026-03-27 18:51:27.354] I (78934) MQTT_MONITOR: 时间同步已完成，开始监控任务
+[2026-03-27 18:51:28.014] I (79594) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:28.016] W (79594) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:28.018] W (79594) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:28.024] W (79594) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:28.029] W (79604) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:28.034] I (79604) HEATING: =======================================
+[2026-03-27 18:51:30.034] I (81614) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:30.036] W (81614) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:30.038] W (81614) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:30.043] W (81614) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:30.048] W (81624) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:30.054] I (81624) HEATING: =======================================
+[2026-03-27 18:51:32.055] I (83634) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:32.056] W (83634) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:32.059] W (83634) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:32.065] W (83634) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:32.070] W (83644) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:32.074] I (83644) HEATING: =======================================
+[2026-03-27 18:51:34.075] I (85654) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:34.077] W (85654) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:34.078] W (85654) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:34.084] W (85654) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:34.090] W (85664) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:34.094] I (85664) HEATING: =======================================
+[2026-03-27 18:51:36.094] I (87674) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:36.096] W (87674) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:36.099] W (87674) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:36.104] W (87674) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:36.108] W (87684) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:36.115] I (87684) HEATING: =======================================
+[2026-03-27 18:51:38.114] I (89694) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:38.116] W (89694) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:38.118] W (89694) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:38.125] W (89694) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:38.130] W (89704) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:38.135] I (89704) HEATING: =======================================
+[2026-03-27 18:51:40.134] I (91714) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:40.136] W (91714) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:40.138] W (91714) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:40.144] W (91714) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:40.149] W (91724) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:40.154] I (91724) HEATING: =======================================
+[2026-03-27 18:51:42.154] I (93734) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:42.156] W (93734) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:42.158] W (93734) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:42.164] W (93734) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:42.169] W (93744) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:42.174] I (93744) HEATING: =======================================
+[2026-03-27 18:51:44.174] I (95754) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:44.176] W (95754) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:44.179] W (95754) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:44.184] W (95754) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:44.189] W (95764) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:44.195] I (95764) HEATING: =======================================
+[2026-03-27 18:51:45.365] I (96944) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-27 18:51:45.372] I (96944) ESP32S3_MQTT_EVENT:            MQTT错误类型统计报告 [2026-03-27 18:51:45 [运行 00:01:36]]
+[2026-03-27 18:51:45.377] I (96944) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-27 18:51:45.382] I (96954) ESP32S3_MQTT_EVENT: 传输层超时:        6
+[2026-03-27 18:51:45.387] I (96954) ESP32S3_MQTT_EVENT: PING响应超时:      0
+[2026-03-27 18:51:45.391] I (96964) ESP32S3_MQTT_EVENT: 连接被重置:        0
+[2026-03-27 18:51:45.397] I (96964) ESP32S3_MQTT_EVENT: 写入超时:          0
+[2026-03-27 18:51:45.402] I (96974) ESP32S3_MQTT_EVENT: 连接失败:          0
+[2026-03-27 18:51:45.408] I (96974) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-27 18:51:46.193] I (97774) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:51:46.195] W (97774) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:46.198] W (97774) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:46.204] W (97774) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:46.210] W (97784) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:51:46.215] I (97784) HEATING: =======================================
+
+
+============================================================
+日志记录结束
+结束时间: 2026-03-27 18:51:47
+总运行时间: 1.63 分钟
+总行数: 367
+============================================================
+连接统计:
+  - MQTT连接次数: 1
+  - MQTT断开次数: 6
+  - 连接保持率: 16.67%
+
+错误统计:
+  - TCP_TRANSPORT_ERROR: 12
+============================================================

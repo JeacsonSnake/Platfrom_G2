@@ -1,0 +1,205 @@
+============================================================
+ESP32-S3 串口日志记录
+开始时间: 2026-03-27 18:41:27
+串口: COM10, 波特率: 115200
+============================================================
+
+[2026-03-27 18:41:27.547] I (112) esp_image: segment 1: paddr=00034478 vaddr=3fc9be00 sizeW (1586) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (1/60)
+[2026-03-27 18:41:27.788] I (1826) ESP32S3_WIFI_EVENT: Got ip:192.168.110.199
+[2026-03-27 18:41:27.789] I (1826) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 18:41:27.791] I (1826) MQTT_MONITOR: ==============================================
+[2026-03-27 18:41:27.796] I (1826) MQTT_MONITOR: 正在启动 SNTP 时间同步...
+[2026-03-27 18:41:27.807] I (1826) MQTT_MONITOR: NTP服务器1: cn.pool.ntp.org (国内)
+[2026-03-27 18:41:27.809] I (1836) MQTT_MONITOR: NTP服务器2: ntp.aliyun.com (阿里云)
+[2026-03-27 18:41:27.814] I (1846) MQTT_MONITOR: NTP服务器3: ntp.tencent.com (腾讯云)
+[2026-03-27 18:41:27.818] I (1846) MQTT_MONITOR: 当前系统时间: 1458 ms
+[2026-03-27 18:41:27.824] I (1856) MQTT_MONITOR: 时区设置: CST-8 (UTC+8, 中国标准时间)
+[2026-03-27 18:41:27.830] I (1856) MQTT_MONITOR: SNTP 初始化完成，等待时间同步...
+[2026-03-27 18:41:27.836] I (1866) MQTT_MONITOR: ==============================================
+[2026-03-27 18:41:27.846] I (1876) esp_netif_handlers: sta ip: 192.168.110.199, mask: 255.255.255.0, gw: 192.168.110.1
+[2026-03-27 18:41:27.848] I (1876) ESP32S3_WIFI_EVENT: Connected to ap!
+[2026-03-27 18:41:27.854] I (1886) ESP32S3_WIFI_EVENT: Waiting for NTP time sync...
+[2026-03-27 18:41:31.406] I (5436) MQTT_MONITOR: ==============================================
+[2026-03-27 18:41:31.408] I (5436) MQTT_MONITOR: NTP时间同步回调被触发！
+[2026-03-27 18:41:31.410] I (5436) MQTT_MONITOR: 已发送同步完成信号
+[2026-03-27 18:41:31.416] I (5436) MQTT_MONITOR: ==============================================
+[2026-03-27 18:41:31.421] I (5446) MQTT_MONITOR: 时间同步完成！
+[2026-03-27 18:41:31.427] I (5456) MQTT_MONITOR: 当前实际时间: 2026-03-27 18:41:31 [运行 00:00:05]
+[2026-03-27 18:41:31.432] I (5466) MQTT_MONITOR: 开机时间戳: 1458 ms
+[2026-03-27 18:41:31.438] I (5466) MQTT_MONITOR: 实际开机时间: Fri Mar 27 18:41:26 2026
+[2026-03-27 18:41:31.440] 
+[2026-03-27 18:41:31.443] I (5476) MQTT_MONITOR: NTP轮询间隔已恢复为1小时
+[2026-03-27 18:41:31.450] I (5476) MQTT_MONITOR: ==============================================
+[2026-03-27 18:41:31.453] I (5486) MQTT_MONITOR: 时间同步成功！
+[2026-03-27 18:41:31.458] I (5486) MQTT_MONITOR: 当前时间: 2026-03-27 18:41:31
+[2026-03-27 18:41:31.462] I (5496) MQTT_MONITOR: 开机时间戳: 1458 ms
+[2026-03-27 18:41:31.468] I (5496) MQTT_MONITOR: 实际开机时间: Fri Mar 27 18:41:26 2026
+[2026-03-27 18:41:31.470] 
+[2026-03-27 18:41:31.475] I (5506) MQTT_MONITOR: ==============================================
+[2026-03-27 18:41:31.480] I (5506) ESP32S3_WIFI_EVENT: NTP time sync completed successfully
+[2026-03-27 18:41:36.477] I (10516) MQTT_MONITOR: MQTT连接监控模块已初始化
+[2026-03-27 18:41:36.479] I (10516) MQTT_MONITOR: 统计报告间隔: 0 小时
+[2026-03-27 18:41:36.482] I (10516) MQTT_MONITOR: =================================================
+[2026-03-27 18:41:36.489] I (10516) MQTT_MONITOR:       MQTT连接监控统计系统已启动
+[2026-03-27 18:41:36.496] I (10526) MQTT_MONITOR: =================================================
+[2026-03-27 18:41:36.502] I (10526) MQTT_MONITOR: 提示: 时间将在WiFi连接后通过NTP同步
+[2026-03-27 18:41:36.507] I (10536) MQTT_MONITOR: 等待 SNTP 时间同步完成...
+[2026-03-27 18:41:36.512] I (10536) MQTT_MONITOR: 时间同步已完成，开始监控任务
+[2026-03-27 18:41:36.517] I (10556) ESP32S3_MQTT_EVENT: MQTT客户端已启动
+[2026-03-27 18:41:36.521] I (10556) ESP32S3_MQTT_EVENT: MQTT心跳任务已启动
+[2026-03-27 18:41:36.528] I (10556) ESP32S3_MQTT_EVENT: MQTT连接健康检查任务已启动
+[2026-03-27 18:41:36.534] I (10556) PWM_EVENT: PWM timer 0 initiated at clock speed 5000.
+[2026-03-27 18:41:36.542] I (10566) PWM_EVENT: PWM channel 0 initiated on GPIO1 with initial duty 8191 (inverted logic).
+[2026-03-27 18:41:36.550] I (10576) PWM_EVENT: PWM channel 1 initiated on GPIO4 with initial duty 8191 (inverted logic).
+[2026-03-27 18:41:36.560] I (10586) PWM_EVENT: PWM channel 2 initiated on GPIO6 with initial duty 8191 (inverted logic).
+[2026-03-27 18:41:36.568] I (10596) PWM_EVENT: PWM channel 3 initiated on GPIO8 with initial duty 8191 (inverted logic).
+[2026-03-27 18:41:36.572] I (10606) PCNT_EVENT: PCNT channel 0 has been initiated on pin 2.
+[2026-03-27 18:41:36.579] I (10606) PCNT_EVENT: PCNT channel 1 has been initiated on pin 5.
+[2026-03-27 18:41:36.585] I (10616) PCNT_EVENT: PCNT channel 2 has been initiated on pin 7.
+[2026-03-27 18:41:36.591] I (10616) PCNT_EVENT: PCNT channel 3 has been initiated on pin 9.
+[2026-03-27 18:41:36.594] I (10626) PID_EVENT: Index number is: 0
+[2026-03-27 18:41:36.595] 
+[2026-03-27 18:41:36.597] I (10626) PID_EVENT: Index number is: 1
+[2026-03-27 18:41:36.599] 
+[2026-03-27 18:41:36.601] I (10626) PID_EVENT: Index number is: 2
+[2026-03-27 18:41:36.602] 
+[2026-03-27 18:41:36.607] I (10626) MAIN: Initializing MAX31850 temperature sensors...
+[2026-03-27 18:41:36.612] I (10646) MAX31850: Initializing MAX31850 on GPIO14...
+[2026-03-27 18:41:36.615] I (10626) PID_EVENT: Index number is: 3
+[2026-03-27 18:41:36.617] 
+[2026-03-27 18:41:36.622] I (10646) MAX31850: ========== GPIO Hardware Diagnostic ==========
+[2026-03-27 18:41:36.629] I (10656) MAX31850: Test 1 - Floating input: 1 (expect: 1 if ext pull-up present)
+[2026-03-27 18:41:36.635] I (10666) MAX31850: Test 2 - Internal pull-up: 1 (expect: 1)
+[2026-03-27 18:41:36.639] I (10666) MAX31850: Test 3 - Forced low: 0 (expect: 0)
+[2026-03-27 18:41:36.643] I (10676) MAX31850: Test 4 - Forced high: 0 (expect: 1)
+[2026-03-27 18:41:36.649] I (10676) MAX31850: Test 5 - Released (input+pullup): 1 (expect: 1)
+[2026-03-27 18:41:36.662] I (10686) MAX31850: ------------------------------------------
+[2026-03-27 18:41:36.663] I (10686) MAX31850: DIAGNOSIS: External pull-up detected, bus appears normal
+[2026-03-27 18:41:36.668] I (10696) MAX31850: ============================================
+[2026-03-27 18:41:36.673] I (10706) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 18:41:36.678] W (10706) MAX31850: 1-Wire bus short to GND detected (level1=0, level2=0)
+[2026-03-27 18:41:36.683] E (10716) MAX31850: No device present during search
+[2026-03-27 18:41:36.688] I (10716) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 18:41:36.695] W (10726) MAX31850: Initial ROM search failed, will retry in poll task
+[2026-03-27 18:41:36.702] I (10726) MAX31850: ===============================================
+[2026-03-27 18:41:36.706] I (10736) MAX31850: MAX31850 ROM ID List (0 device(s) found):
+[2026-03-27 18:41:36.712] W (10736) MAX31850:   Warning: Expected 4 sensors, found 0
+[2026-03-27 18:41:36.718] I (10746) MAX31850: ===============================================
+[2026-03-27 18:41:36.721] I (10756) MAX31850: Poll task started
+[2026-03-27 18:41:36.726] I (10756) MAX31850: MAX31850 initialized successfully
+[2026-03-27 18:41:36.816] W (10856) MAX31850: No sensors found, retrying search...
+[2026-03-27 18:41:36.818] I (10856) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 18:41:36.821] W (10856) MAX31850: 1-Wire unexpected levels: level1=0, level2=1
+[2026-03-27 18:41:36.826] E (10856) MAX31850: No device present during search
+[2026-03-27 18:41:36.831] I (10856) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 18:41:38.717] I (12756) HEATING: Temperature print task started
+[2026-03-27 18:41:38.719] I (12756) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:41:38.721] W (12756) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:38.726] W (12756) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:38.732] W (12756) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:38.737] W (12766) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:38.742] I (12776) HEATING: =======================================
+[2026-03-27 18:41:40.737] I (14776) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:41:40.739] W (14776) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:40.742] W (14776) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:40.747] W (14776) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:40.752] W (14786) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:40.757] I (14786) HEATING: =======================================
+[2026-03-27 18:41:41.827] W (15866) MAX31850: No sensors found, retrying search...
+[2026-03-27 18:41:41.829] I (15866) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 18:41:41.831] W (15866) MAX31850: 1-Wire unexpected levels: level1=0, level2=1
+[2026-03-27 18:41:41.835] E (15866) MAX31850: No device present during search
+[2026-03-27 18:41:41.842] I (15866) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 18:41:42.758] I (16796) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:41:42.760] W (16796) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:42.762] W (16796) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:42.768] W (16796) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:42.773] W (16806) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:42.778] I (16806) HEATING: =======================================
+[2026-03-27 18:41:44.777] I (18816) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:41:44.780] W (18816) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:44.781] W (18816) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:44.788] W (18816) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:44.792] W (18826) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:44.797] I (18826) HEATING: =======================================
+[2026-03-27 18:41:46.527] E (20566) esp-tls: [sock=54] select() timeout
+[2026-03-27 18:41:46.529] E (20566) transport_base: Failed to open a new connection: 32774
+[2026-03-27 18:41:46.530] E (20566) mqtt_client: Error transport connect
+[2026-03-27 18:41:46.535] E (20566) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-27 18:41:46.541] W (20566) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=1, 总计=1
+[2026-03-27 18:41:46.546] I (20576) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 18:41:46.557] E (20576) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-27 18:41:46.568] W (20586) MQTT_MONITOR: [断开事件] #1 | 时间: 2026-03-27 18:41:46 [运行 00:00:20] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-27 18:41:46.571] I (20596) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-27 18:41:46.578] W (20606) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=2, 总计=2
+[2026-03-27 18:41:46.583] I (20616) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 18:41:46.593] W (20616) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=32774, stack_err=0, ret_code=0)
+[2026-03-27 18:41:46.603] W (20626) MQTT_MONITOR: [断开事件] #2 | 时间: 2026-03-27 18:41:46 [运行 00:00:20] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-27 18:41:46.607] I (20636) PCNT_EVENT: Motor 1 idle, PCNT=0
+[2026-03-27 18:41:46.611] I (20636) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-03-27 18:41:46.614] I (20636) PCNT_EVENT: Motor 3 idle, PCNT=0
+[2026-03-27 18:41:46.619] I (20636) PCNT_EVENT: Motor 0 idle, PCNT=0
+[2026-03-27 18:41:46.623] I (20646) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-27 18:41:46.628] I (20646) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-27 18:41:46.633] I (20646) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-03-27 18:41:46.637] I (20656) PWM_EVENT: PWM channel 0 duty set to 8191.
+[2026-03-27 18:41:46.798] I (20836) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:41:46.799] W (20836) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:46.803] W (20836) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:46.807] W (20836) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:46.812] W (20846) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:46.818] I (20846) HEATING: =======================================
+[2026-03-27 18:41:46.827] I (20856) PCNT_EVENT: Motor 1 startup protection ended, normal PCNT monitoring active
+[2026-03-27 18:41:46.833] I (20866) PCNT_EVENT: Motor 2 startup protection ended, normal PCNT monitoring active
+[2026-03-27 18:41:46.840] I (20866) PCNT_EVENT: Motor 3 startup protection ended, normal PCNT monitoring active
+[2026-03-27 18:41:46.846] W (20876) MAX31850: No sensors found, retrying search...
+[2026-03-27 18:41:46.849] I (20876) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 18:41:46.857] I (20876) PCNT_EVENT: Motor 0 startup protection ended, normal PCNT monitoring active
+[2026-03-27 18:41:46.863] W (20886) MAX31850: 1-Wire unexpected levels: level1=0, level2=1
+[2026-03-27 18:41:46.868] E (20896) MAX31850: No device present during search
+[2026-03-27 18:41:46.873] I (20906) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 18:41:48.817] I (22856) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:41:48.819] W (22856) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:48.822] W (22856) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:48.827] W (22856) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:48.832] W (22866) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:48.839] I (22866) HEATING: =======================================
+[2026-03-27 18:41:50.838] I (24876) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:41:50.840] W (24876) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:50.842] W (24876) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:50.848] W (24876) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:50.853] W (24886) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:50.858] I (24886) HEATING: =======================================
+[2026-03-27 18:41:51.867] W (25906) MAX31850: No sensors found, retrying search...
+[2026-03-27 18:41:51.869] I (25906) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 18:41:51.871] W (25906) MAX31850: 1-Wire unexpected levels: level1=0, level2=1
+[2026-03-27 18:41:51.876] E (25906) MAX31850: No device present during search
+[2026-03-27 18:41:51.882] I (25906) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 18:41:52.858] I (26896) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:41:52.860] W (26896) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:52.862] W (26896) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:52.868] W (26896) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:52.873] W (26906) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:52.878] I (26906) HEATING: =======================================
+[2026-03-27 18:41:54.877] I (28916) HEATING: ========== Temperature Report ==========
+[2026-03-27 18:41:54.879] W (28916) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:54.882] W (28916) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:54.887] W (28916) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:54.893] W (28926) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 18:41:54.898] I (28926) HEATING: =======================================
+
+
+============================================================
+日志记录结束
+结束时间: 2026-03-27 18:41:56
+总运行时间: 0.49 分钟
+总行数: 183
+============================================================
+连接统计:
+  - MQTT连接次数: 0
+  - MQTT断开次数: 2
+  - 连接保持率: 0.00%
+
+错误统计:
+  - TCP_TRANSPORT_ERROR: 4
+============================================================

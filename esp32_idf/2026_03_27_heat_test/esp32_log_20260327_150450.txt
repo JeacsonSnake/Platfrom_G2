@@ -1,0 +1,666 @@
+============================================================
+ESP32-S3 串口日志记录
+开始时间: 2026-03-27 15:04:50
+串口: COM10, 波特率: 115200
+============================================================
+
+[2026-03-27 15:04:55.136] I (112) esp_image: segment 1: paddr=000340d8 vaddr=3fc9be00 sizeI (11115) MQTT_MONITOR: MQTT连接监控模块已初始化
+[2026-03-27 15:04:55.138] I (11115) MQTT_MONITOR: 统计报告间隔: 0 小时
+[2026-03-27 15:04:55.141] I (11115) MQTT_MONITOR: =================================================
+[2026-03-27 15:04:55.147] I (11115) MQTT_MONITOR:       MQTT连接监控统计系统已启动
+[2026-03-27 15:04:55.152] I (11125) MQTT_MONITOR: =================================================
+[2026-03-27 15:04:55.159] I (11125) MQTT_MONITOR: 提示: 时间将在WiFi连接后通过NTP同步
+[2026-03-27 15:04:55.164] I (11135) MQTT_MONITOR: 等待 SNTP 时间同步完成...
+[2026-03-27 15:04:55.170] I (11135) MQTT_MONITOR: 时间同步已完成，开始监控任务
+[2026-03-27 15:04:55.175] I (11155) ESP32S3_MQTT_EVENT: MQTT客户端已启动
+[2026-03-27 15:04:55.179] I (11155) ESP32S3_MQTT_EVENT: MQTT心跳任务已启动
+[2026-03-27 15:04:55.185] I (11155) ESP32S3_MQTT_EVENT: MQTT连接健康检查任务已启动
+[2026-03-27 15:04:55.191] I (11155) PWM_EVENT: PWM timer 0 initiated at clock speed 5000.
+[2026-03-27 15:04:55.201] I (11165) PWM_EVENT: PWM channel 0 initiated on GPIO1 with initial duty 8191 (inverted logic).
+[2026-03-27 15:04:55.208] I (11175) PWM_EVENT: PWM channel 1 initiated on GPIO4 with initial duty 8191 (inverted logic).
+[2026-03-27 15:04:55.216] I (11185) PWM_EVENT: PWM channel 2 initiated on GPIO6 with initial duty 8191 (inverted logic).
+[2026-03-27 15:04:55.226] I (11195) PWM_EVENT: PWM channel 3 initiated on GPIO8 with initial duty 8191 (inverted logic).
+[2026-03-27 15:04:55.231] I (11205) PCNT_EVENT: PCNT channel 0 has been initiated on pin 2.
+[2026-03-27 15:04:55.236] I (11205) PCNT_EVENT: PCNT channel 1 has been initiated on pin 5.
+[2026-03-27 15:04:55.243] I (11215) PCNT_EVENT: PCNT channel 2 has been initiated on pin 7.
+[2026-03-27 15:04:55.248] I (11215) PCNT_EVENT: PCNT channel 3 has been initiated on pin 9.
+[2026-03-27 15:04:55.251] I (11225) PID_EVENT: Index number is: 0
+[2026-03-27 15:04:55.252] 
+[2026-03-27 15:04:55.256] I (11225) PID_EVENT: Index number is: 1
+[2026-03-27 15:04:55.257] 
+[2026-03-27 15:04:55.259] I (11225) PID_EVENT: Index number is: 2
+[2026-03-27 15:04:55.260] 
+[2026-03-27 15:04:55.266] I (11225) MAIN: Initializing MAX31850 temperature sensors...
+[2026-03-27 15:04:55.267] I (11225) PID_EVENT: Index number is: 3
+[2026-03-27 15:04:55.269] 
+[2026-03-27 15:04:55.274] I (11245) MAX31850: Initializing MAX31850 on GPIO14...
+[2026-03-27 15:04:55.277] I (11245) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:04:55.282] W (11255) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:04:55.287] E (11255) MAX31850: No device present during search
+[2026-03-27 15:04:55.292] I (11265) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:04:55.298] W (11265) MAX31850: Initial ROM search failed, will retry in poll task
+[2026-03-27 15:04:55.305] I (11275) MAX31850: ===============================================
+[2026-03-27 15:04:55.310] I (11275) MAX31850: MAX31850 ROM ID List (0 device(s) found):
+[2026-03-27 15:04:55.314] W (11285) MAX31850:   Warning: Expected 4 sensors, found 0
+[2026-03-27 15:04:55.321] I (11295) MAX31850: ===============================================
+[2026-03-27 15:04:55.324] I (11295) MAX31850: Poll task started
+[2026-03-27 15:04:55.329] I (11295) MAX31850: MAX31850 initialized successfully
+[2026-03-27 15:04:55.416] W (11395) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:04:55.417] I (11395) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:04:55.420] W (11395) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:04:55.423] E (11395) MAX31850: No device present during search
+[2026-03-27 15:04:55.427] I (11395) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:04:57.325] I (13305) HEATING: Temperature print task started
+[2026-03-27 15:04:57.327] I (13305) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:04:57.329] W (13305) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:04:57.335] W (13305) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:04:57.339] W (13305) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:04:57.345] W (13315) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:04:57.349] I (13325) HEATING: =======================================
+[2026-03-27 15:04:59.345] I (15325) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:04:59.347] W (15325) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:04:59.350] W (15325) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:04:59.355] W (15325) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:04:59.361] W (15335) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:04:59.366] I (15335) HEATING: =======================================
+[2026-03-27 15:05:00.425] W (16405) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:05:00.427] I (16405) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:05:00.429] W (16405) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:05:00.433] E (16405) MAX31850: No device present during search
+[2026-03-27 15:05:00.437] I (16405) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:05:01.365] I (17345) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:01.367] W (17345) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:01.369] W (17345) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:01.375] W (17345) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:01.380] W (17355) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:01.385] I (17355) HEATING: =======================================
+[2026-03-27 15:05:03.384] I (19365) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:03.386] W (19365) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:03.389] W (19365) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:03.395] W (19365) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:03.401] W (19375) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:03.405] I (19375) HEATING: =======================================
+[2026-03-27 15:05:05.206] E (21185) mqtt_client: esp_mqtt_connect: mqtt_message_receive() returned 0
+[2026-03-27 15:05:05.207] E (21185) mqtt_client: MQTT connect failed
+[2026-03-27 15:05:05.209] I (21185) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-27 15:05:05.216] W (21185) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=1, 总计=1
+[2026-03-27 15:05:05.220] I (21195) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 15:05:05.232] W (21195) ESP32S3_MQTT_EVENT: 断开原因: PING_OR_UNKNOWN_ERROR (type=0, tls_err=0, stack_err=0, ret_code=0)
+[2026-03-27 15:05:05.241] W (21205) MQTT_MONITOR: [断开事件] #1 | 时间: 2026-03-27 15:05:03 [运行 00:00:20] | 原因: PING_OR_UNKNOWN_ERROR
+[2026-03-27 15:05:05.245] I (21215) PCNT_EVENT: Motor 1 idle, PCNT=0
+[2026-03-27 15:05:05.250] I (21215) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-03-27 15:05:05.253] I (21215) PCNT_EVENT: Motor 3 idle, PCNT=0
+[2026-03-27 15:05:05.256] I (21215) PCNT_EVENT: Motor 0 idle, PCNT=0
+[2026-03-27 15:05:05.261] I (21225) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-03-27 15:05:05.266] I (21225) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-03-27 15:05:05.271] I (21225) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-03-27 15:05:05.275] I (21235) PWM_EVENT: PWM channel 0 duty set to 8191.
+[2026-03-27 15:05:05.405] I (21385) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:05.406] W (21385) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:05.409] W (21385) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:05.415] W (21385) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:05.420] W (21395) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:05.426] I (21395) HEATING: =======================================
+[2026-03-27 15:05:05.436] W (21415) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:05:05.437] I (21415) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:05:05.440] W (21415) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:05:05.444] E (21415) MAX31850: No device present during search
+[2026-03-27 15:05:05.451] I (21415) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:05:05.457] I (21435) PCNT_EVENT: Motor 1 startup protection ended, normal PCNT monitoring active
+[2026-03-27 15:05:05.465] I (21445) PCNT_EVENT: Motor 2 startup protection ended, normal PCNT monitoring active
+[2026-03-27 15:05:05.472] I (21445) PCNT_EVENT: Motor 3 startup protection ended, normal PCNT monitoring active
+[2026-03-27 15:05:05.480] I (21455) PCNT_EVENT: Motor 0 startup protection ended, normal PCNT monitoring active
+[2026-03-27 15:05:07.426] I (23405) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:07.428] W (23405) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:07.430] W (23405) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:07.434] W (23405) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:07.440] W (23415) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:07.445] I (23415) HEATING: =======================================
+[2026-03-27 15:05:09.446] I (25425) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:09.447] W (25425) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:09.450] W (25425) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:09.455] W (25425) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:09.461] W (25435) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:09.466] I (25435) HEATING: =======================================
+[2026-03-27 15:05:10.445] W (26425) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:05:10.447] I (26425) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:05:10.449] W (26425) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:05:10.453] E (26425) MAX31850: No device present during search
+[2026-03-27 15:05:10.458] I (26425) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:05:11.465] I (27445) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:11.467] W (27445) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:11.470] W (27445) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:11.475] W (27445) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:11.480] W (27455) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:11.486] I (27455) HEATING: =======================================
+[2026-03-27 15:05:13.486] I (29465) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:13.487] W (29465) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:13.490] W (29465) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:13.495] W (29465) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:13.501] W (29475) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:13.505] I (29475) HEATING: =======================================
+[2026-03-27 15:05:15.186] W (31165) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=1/3, 会话重连=1, 总计=1)
+[2026-03-27 15:05:15.456] W (31435) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:05:15.458] I (31435) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:05:15.459] W (31435) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:05:15.464] E (31435) MAX31850: No device present during search
+[2026-03-27 15:05:15.469] I (31435) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:05:15.505] I (31485) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:15.507] W (31485) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:15.510] W (31485) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:15.515] W (31485) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:15.521] W (31495) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:15.525] I (31495) HEATING: =======================================
+[2026-03-27 15:05:17.525] I (33505) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:17.528] W (33505) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:17.531] W (33505) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:17.536] W (33505) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:17.541] W (33515) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:17.546] I (33515) HEATING: =======================================
+[2026-03-27 15:05:18.266] E (34245) mqtt_client: esp_mqtt_connect: mqtt_message_receive() returned 0
+[2026-03-27 15:05:18.269] E (34245) mqtt_client: MQTT connect failed
+[2026-03-27 15:05:18.271] I (34245) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-27 15:05:18.277] W (34245) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=2, 总计=2
+[2026-03-27 15:05:18.282] I (34255) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 15:05:18.291] W (34255) ESP32S3_MQTT_EVENT: 断开原因: PING_OR_UNKNOWN_ERROR (type=0, tls_err=0, stack_err=0, ret_code=0)
+[2026-03-27 15:05:18.302] W (34265) MQTT_MONITOR: [断开事件] #2 | 时间: 2026-03-27 15:05:17 [运行 00:00:33] | 原因: PING_OR_UNKNOWN_ERROR
+[2026-03-27 15:05:19.546] I (35525) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:19.548] W (35525) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:19.550] W (35525) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:19.555] W (35525) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:19.560] W (35535) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:19.566] I (35535) HEATING: =======================================
+[2026-03-27 15:05:20.465] W (36445) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:05:20.467] I (36445) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:05:20.469] W (36445) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:05:20.473] E (36445) MAX31850: No device present during search
+[2026-03-27 15:05:20.478] I (36445) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:05:21.566] I (37545) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:21.568] W (37545) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:21.570] W (37545) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:21.575] W (37545) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:21.580] W (37555) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:21.586] I (37555) HEATING: =======================================
+[2026-03-27 15:05:23.586] I (39565) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:23.588] W (39565) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:23.590] W (39565) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:23.596] W (39565) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:23.601] W (39575) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:23.606] I (39575) HEATING: =======================================
+[2026-03-27 15:05:25.186] W (41165) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=2/3, 会话重连=2, 总计=2)
+[2026-03-27 15:05:25.476] W (41455) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:05:25.478] I (41455) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:05:25.479] W (41455) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:05:25.483] E (41455) MAX31850: No device present during search
+[2026-03-27 15:05:25.488] I (41455) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:05:25.606] I (41585) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:25.608] W (41585) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:25.610] W (41585) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:25.616] W (41585) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:25.620] W (41595) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:25.626] I (41595) HEATING: =======================================
+[2026-03-27 15:05:27.626] I (43605) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:27.628] W (43605) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:27.630] W (43605) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:27.635] W (43605) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:27.641] W (43615) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:27.646] I (43615) HEATING: =======================================
+[2026-03-27 15:05:29.645] I (45625) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:29.647] W (45625) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:29.650] W (45625) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:29.655] W (45625) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:29.661] W (45635) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:29.667] I (45635) HEATING: =======================================
+[2026-03-27 15:05:30.175] W (46155) ESP32S3_MQTT_EVENT: MQTT未连接，跳过本次心跳发送
+[2026-03-27 15:05:30.486] W (46465) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:05:30.488] I (46465) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:05:30.489] W (46465) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:05:30.493] E (46465) MAX31850: No device present during search
+[2026-03-27 15:05:30.498] I (46465) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:05:31.316] E (47295) mqtt_client: esp_mqtt_connect: mqtt_message_receive() returned 0
+[2026-03-27 15:05:31.318] E (47295) mqtt_client: MQTT connect failed
+[2026-03-27 15:05:31.321] I (47295) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-27 15:05:31.327] W (47295) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=3, 总计=3
+[2026-03-27 15:05:31.331] I (47305) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 15:05:31.342] W (47305) ESP32S3_MQTT_EVENT: 断开原因: PING_OR_UNKNOWN_ERROR (type=0, tls_err=0, stack_err=0, ret_code=0)
+[2026-03-27 15:05:31.353] W (47315) MQTT_MONITOR: [断开事件] #3 | 时间: 2026-03-27 15:05:30 [运行 00:00:46] | 原因: PING_OR_UNKNOWN_ERROR
+[2026-03-27 15:05:31.666] I (47645) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:31.668] W (47645) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:31.670] W (47645) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:31.676] W (47645) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:31.681] W (47655) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:31.687] I (47655) HEATING: =======================================
+[2026-03-27 15:05:33.686] I (49665) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:33.687] W (49665) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:33.691] W (49665) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:33.695] W (49665) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:33.700] W (49675) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:33.707] I (49675) HEATING: =======================================
+[2026-03-27 15:05:35.186] W (51165) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=3/3, 会话重连=3, 总计=3)
+[2026-03-27 15:05:35.193] W (51165) ESP32S3_MQTT_EVENT: MQTT连接检查: 连续3次未连接，4000ms后尝试强制重连(退避级别=3)...
+[2026-03-27 15:05:35.495] W (51475) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:05:35.498] I (51475) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:05:35.500] W (51475) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:05:35.503] E (51475) MAX31850: No device present during search
+[2026-03-27 15:05:35.509] I (51475) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:05:35.706] I (51685) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:35.707] W (51685) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:35.710] W (51685) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:35.715] W (51685) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:35.722] W (51695) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:35.727] I (51695) HEATING: =======================================
+[2026-03-27 15:05:37.690] E (53665) transport_base: tcp_read error, errno=Connection reset by peer
+[2026-03-27 15:05:37.693] E (53665) mqtt_client: esp_mqtt_handle_transport_read_error: transport_read() error: errno=104
+[2026-03-27 15:05:37.698] E (53665) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-27 15:05:37.703] W (53675) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=4, 总计=4
+[2026-03-27 15:05:37.708] I (53675) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 15:05:37.718] E (53685) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=0, stack_err=0, ret_code=0)
+[2026-03-27 15:05:37.730] W (53695) MQTT_MONITOR: [断开事件] #4 | 时间: 2026-03-27 15:05:36 [运行 00:00:53] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-27 15:05:37.735] E (53705) mqtt_client: esp_mqtt_connect: mqtt_message_receive() returned -2
+[2026-03-27 15:05:37.738] E (53715) mqtt_client: MQTT connect failed
+[2026-03-27 15:05:37.744] I (53705) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:37.750] I (53715) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-27 15:05:37.755] W (53725) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:37.761] W (53725) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=5, 总计=5
+[2026-03-27 15:05:37.766] W (53735) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:37.771] I (53735) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 15:05:37.781] W (53745) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=0, stack_err=0, ret_code=0)
+[2026-03-27 15:05:37.786] W (53755) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:37.796] W (53755) MQTT_MONITOR: [断开事件] #5 | 时间: 2026-03-27 15:05:36 [运行 00:00:53] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-27 15:05:37.802] W (53765) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:37.807] I (53775) HEATING: =======================================
+[2026-03-27 15:05:39.805] I (55785) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:39.807] W (55785) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:39.811] W (55785) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:39.816] W (55785) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:39.821] W (55795) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:39.826] I (55795) HEATING: =======================================
+[2026-03-27 15:05:40.300] I (56275) ESP32S3_MQTT_EVENT: MQTT客户端已重新启动，等待连接...
+[2026-03-27 15:05:40.318] E (56295) mqtt_client: esp_mqtt_handle_transport_read_error: transport_read(): EOF
+[2026-03-27 15:05:40.324] E (56295) mqtt_client: esp_mqtt_handle_transport_read_error: transport_read() error: errno=128
+[2026-03-27 15:05:40.327] E (56295) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-27 15:05:40.334] W (56305) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=6, 总计=6
+[2026-03-27 15:05:40.338] I (56305) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 15:05:40.348] E (56315) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=32776, stack_err=0, ret_code=0)
+[2026-03-27 15:05:40.359] W (56325) MQTT_MONITOR: [断开事件] #6 | 时间: 2026-03-27 15:05:39 [运行 00:00:55] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-27 15:05:40.366] E (56335) mqtt_client: esp_mqtt_connect: mqtt_message_receive() returned -2
+[2026-03-27 15:05:40.369] E (56345) mqtt_client: MQTT connect failed
+[2026-03-27 15:05:40.374] I (56345) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-27 15:05:40.380] W (56345) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=7, 总计=7
+[2026-03-27 15:05:40.385] I (56355) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 15:05:40.396] W (56365) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=32776, stack_err=0, ret_code=0)
+[2026-03-27 15:05:40.407] W (56375) MQTT_MONITOR: [断开事件] #7 | 时间: 2026-03-27 15:05:39 [运行 00:00:56] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-27 15:05:40.506] W (56485) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:05:40.508] I (56485) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:05:40.510] W (56485) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:05:40.513] E (56485) MAX31850: No device present during search
+[2026-03-27 15:05:40.519] I (56485) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:05:41.826] I (57805) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:41.827] W (57805) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:41.830] W (57805) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:41.836] W (57805) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:41.841] W (57815) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:41.846] I (57815) HEATING: =======================================
+[2026-03-27 15:05:43.533] E (59505) mqtt_client: esp_mqtt_handle_transport_read_error: transport_read(): EOF
+[2026-03-27 15:05:43.537] E (59505) mqtt_client: esp_mqtt_handle_transport_read_error: transport_read() error: errno=128
+[2026-03-27 15:05:43.540] E (59515) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-27 15:05:43.549] W (59515) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=8, 总计=8
+[2026-03-27 15:05:43.552] I (59525) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 15:05:43.562] E (59525) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=32776, stack_err=0, ret_code=0)
+[2026-03-27 15:05:43.572] W (59535) MQTT_MONITOR: [断开事件] #8 | 时间: 2026-03-27 15:05:42 [运行 00:00:59] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-27 15:05:43.579] E (59545) mqtt_client: esp_mqtt_connect: mqtt_message_receive() returned -2
+[2026-03-27 15:05:43.583] E (59555) mqtt_client: MQTT connect failed
+[2026-03-27 15:05:43.589] I (59555) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-27 15:05:43.595] W (59565) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=9, 总计=9
+[2026-03-27 15:05:43.599] I (59565) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 15:05:43.611] W (59575) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=32776, stack_err=0, ret_code=0)
+[2026-03-27 15:05:43.620] W (59585) MQTT_MONITOR: [断开事件] #9 | 时间: 2026-03-27 15:05:42 [运行 00:00:59] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-27 15:05:43.845] I (59825) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:43.847] W (59825) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:43.851] W (59825) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:43.857] W (59825) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:43.860] W (59835) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:43.866] I (59835) HEATING: =======================================
+[2026-03-27 15:05:45.517] W (61495) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:05:45.518] I (61495) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:05:45.521] W (61495) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:05:45.524] E (61495) MAX31850: No device present during search
+[2026-03-27 15:05:45.528] I (61495) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:05:45.866] I (61845) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:45.868] W (61845) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:45.870] W (61845) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:45.876] W (61845) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:45.883] W (61855) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:45.886] I (61855) HEATING: =======================================
+[2026-03-27 15:05:46.640] E (62615) mqtt_client: esp_mqtt_handle_transport_read_error: transport_read(): EOF
+[2026-03-27 15:05:46.645] E (62615) mqtt_client: esp_mqtt_handle_transport_read_error: transport_read() error: errno=128
+[2026-03-27 15:05:46.648] E (62615) ESP32S3_MQTT_EVENT: MQTT connection error
+[2026-03-27 15:05:46.655] W (62625) ESP32S3_MQTT_EVENT: MQTT错误次数: 当前会话=10, 总计=10
+[2026-03-27 15:05:46.660] I (62625) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 15:05:46.671] E (62635) ESP32S3_MQTT_EVENT: 错误详情: TCP_TRANSPORT_ERROR (type=1, tls_err=32776, stack_err=0, ret_code=0)
+[2026-03-27 15:05:46.681] W (62645) MQTT_MONITOR: [断开事件] #10 | 时间: 2026-03-27 15:05:45 [运行 00:01:02] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-27 15:05:46.687] E (62655) mqtt_client: esp_mqtt_connect: mqtt_message_receive() returned -2
+[2026-03-27 15:05:46.691] E (62665) mqtt_client: MQTT connect failed
+[2026-03-27 15:05:46.697] I (62665) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-03-27 15:05:46.703] W (62675) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=11, 总计=11
+[2026-03-27 15:05:46.707] I (62675) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-03-27 15:05:46.717] W (62685) ESP32S3_MQTT_EVENT: 断开原因: TCP_TRANSPORT_ERROR (type=1, tls_err=32776, stack_err=0, ret_code=0)
+[2026-03-27 15:05:46.728] W (62695) MQTT_MONITOR: [断开事件] #11 | 时间: 2026-03-27 15:05:45 [运行 00:01:02] | 原因: TCP_TRANSPORT_ERROR
+[2026-03-27 15:05:47.887] I (63865) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:47.889] W (63865) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:47.890] W (63865) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:47.897] W (63865) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:47.901] W (63875) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:47.907] I (63875) HEATING: =======================================
+[2026-03-27 15:05:49.876] I (65845) ESP32S3_MQTT_EVENT: Connected to MQTT server.
+[2026-03-27 15:05:49.878] I (65845) ESP32S3_STATUS_LED: LED mode changed to: 3
+[2026-03-27 15:05:49.880] I (65845) MQTT_MONITOR: [连接事件] #1 | 时间: 2026-03-27 15:05:48 [运行 00:01:05]
+[2026-03-27 15:05:49.889] I (65855) ESP32S3_MQTT_EVENT: 已订阅控制频道 'esp32_1/control' (msg_id=32452)
+[2026-03-27 15:05:49.906] I (65885) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:49.908] W (65885) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:49.911] W (65885) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:49.916] W (65885) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:49.922] W (65895) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:49.926] I (65895) HEATING: =======================================
+[2026-03-27 15:05:50.526] W (66505) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:05:50.528] I (66505) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:05:50.530] W (66505) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:05:50.534] E (66505) MAX31850: No device present during search
+[2026-03-27 15:05:50.539] I (66505) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:05:51.928] I (67905) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:51.930] W (67905) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:51.932] W (67905) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:51.937] W (67905) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:51.942] W (67915) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:51.948] I (67915) HEATING: =======================================
+[2026-03-27 15:05:53.948] I (69925) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:53.950] W (69925) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:53.953] W (69925) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:53.957] W (69925) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:53.963] W (69935) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:53.968] I (69935) HEATING: =======================================
+[2026-03-27 15:05:55.177] I (71155) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-27 15:05:55.183] I (71155) ESP32S3_MQTT_EVENT:            MQTT错误类型统计报告 [2026-03-27 15:05:53 [运行 00:01:10]]
+[2026-03-27 15:05:55.190] I (71155) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-27 15:05:55.194] I (71165) ESP32S3_MQTT_EVENT: 传输层超时:        8
+[2026-03-27 15:05:55.199] I (71165) ESP32S3_MQTT_EVENT: PING响应超时:      3
+[2026-03-27 15:05:55.204] I (71175) ESP32S3_MQTT_EVENT: 连接被重置:        0
+[2026-03-27 15:05:55.208] I (71175) ESP32S3_MQTT_EVENT: 写入超时:          0
+[2026-03-27 15:05:55.213] I (71185) ESP32S3_MQTT_EVENT: 连接失败:          0
+[2026-03-27 15:05:55.221] I (71185) ESP32S3_MQTT_EVENT: =================================================
+[2026-03-27 15:05:55.536] W (71515) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:05:55.537] I (71515) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:05:55.539] W (71515) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:05:55.543] E (71515) MAX31850: No device present during search
+[2026-03-27 15:05:55.549] I (71515) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:05:55.968] I (71945) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:55.970] W (71945) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:55.971] W (71945) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:55.978] W (71945) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:55.984] W (71955) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:55.988] I (71955) HEATING: =======================================
+[2026-03-27 15:05:57.988] I (73965) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:05:57.991] W (73965) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:57.992] W (73965) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:57.998] W (73965) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:58.003] W (73975) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:05:58.009] I (73975) HEATING: =======================================
+[2026-03-27 15:06:00.008] I (75985) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:00.010] W (75985) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:00.012] W (75985) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:00.017] W (75985) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:00.023] W (75995) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:00.028] I (75995) HEATING: =======================================
+[2026-03-27 15:06:00.179] I (76155) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=6194, elapsed=0ms)
+[2026-03-27 15:06:00.546] W (76525) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:06:00.548] I (76525) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:06:00.549] W (76525) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:06:00.554] E (76525) MAX31850: No device present during search
+[2026-03-27 15:06:00.558] I (76525) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:06:02.027] I (78005) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:02.029] W (78005) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:02.031] W (78005) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:02.036] W (78005) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:02.041] W (78015) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:02.047] I (78015) HEATING: =======================================
+[2026-03-27 15:06:04.046] I (80025) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:04.048] W (80025) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:04.051] W (80025) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:04.056] W (80025) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:04.062] W (80035) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:04.066] I (80035) HEATING: =======================================
+[2026-03-27 15:06:05.556] W (81535) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:06:05.559] I (81535) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:06:05.560] W (81535) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:06:05.565] E (81535) MAX31850: No device present during search
+[2026-03-27 15:06:05.570] I (81535) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:06:06.066] I (82045) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:06.067] W (82045) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:06.071] W (82045) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:06.077] W (82045) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:06.082] W (82055) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:06.086] I (82055) HEATING: =======================================
+[2026-03-27 15:06:08.086] I (84065) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:08.088] W (84065) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:08.092] W (84065) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:08.096] W (84065) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:08.101] W (84075) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:08.107] I (84075) HEATING: =======================================
+[2026-03-27 15:06:10.106] I (86085) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:10.107] W (86085) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:10.111] W (86085) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:10.117] W (86085) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:10.121] W (86095) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:10.127] I (86095) HEATING: =======================================
+[2026-03-27 15:06:10.566] W (86545) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:06:10.568] I (86545) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:06:10.570] W (86545) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:06:10.573] E (86545) MAX31850: No device present during search
+[2026-03-27 15:06:10.580] I (86545) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:06:12.127] I (88105) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:12.129] W (88105) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:12.131] W (88105) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:12.136] W (88105) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:12.141] W (88115) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:12.147] I (88115) HEATING: =======================================
+[2026-03-27 15:06:14.146] I (90125) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:14.148] W (90125) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:14.152] W (90125) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:14.156] W (90125) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:14.162] W (90135) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:14.166] I (90135) HEATING: =======================================
+[2026-03-27 15:06:15.577] W (91555) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:06:15.579] I (91555) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:06:15.580] W (91555) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:06:15.585] E (91555) MAX31850: No device present during search
+[2026-03-27 15:06:15.589] I (91555) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:06:16.166] I (92145) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:16.168] W (92145) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:16.171] W (92145) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:16.176] W (92145) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:16.181] W (92155) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:16.188] I (92155) HEATING: =======================================
+[2026-03-27 15:06:18.186] I (94165) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:18.188] W (94165) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:18.190] W (94165) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:18.196] W (94165) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:18.201] W (94175) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:18.207] I (94175) HEATING: =======================================
+[2026-03-27 15:06:20.207] I (96185) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:20.209] W (96185) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:20.211] W (96185) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:20.217] W (96185) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:20.222] W (96195) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:20.228] I (96195) HEATING: =======================================
+[2026-03-27 15:06:20.586] W (96565) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:06:20.588] I (96565) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:06:20.589] W (96565) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:06:20.594] E (96565) MAX31850: No device present during search
+[2026-03-27 15:06:20.600] I (96565) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:06:22.227] I (98205) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:22.229] W (98205) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:22.232] W (98205) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:22.237] W (98205) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:22.242] W (98215) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:22.247] I (98215) HEATING: =======================================
+[2026-03-27 15:06:24.247] I (100225) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:24.249] W (100225) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:24.251] W (100225) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:24.257] W (100225) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:24.262] W (100235) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:24.268] I (100235) HEATING: =======================================
+[2026-03-27 15:06:25.597] W (101575) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:06:25.598] I (101575) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:06:25.600] W (101575) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:06:25.605] E (101575) MAX31850: No device present during search
+[2026-03-27 15:06:25.609] I (101575) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:06:26.267] I (102245) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:26.270] W (102245) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:26.271] W (102245) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:26.278] W (102245) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:26.283] W (102255) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:26.288] I (102255) HEATING: =======================================
+[2026-03-27 15:06:28.287] I (104265) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:28.288] W (104265) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:28.292] W (104265) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:28.297] W (104265) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:28.302] W (104275) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:28.308] I (104275) HEATING: =======================================
+[2026-03-27 15:06:30.178] I (106155) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=31999, elapsed=0ms)
+[2026-03-27 15:06:30.307] I (106285) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:30.309] W (106285) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:30.312] W (106285) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:30.317] W (106285) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:30.323] W (106295) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:30.329] I (106295) HEATING: =======================================
+[2026-03-27 15:06:30.607] W (106585) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:06:30.608] I (106585) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:06:30.610] W (106585) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:06:30.615] E (106585) MAX31850: No device present during search
+[2026-03-27 15:06:30.620] I (106585) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:06:32.327] I (108305) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:32.329] W (108305) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:32.332] W (108305) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:32.336] W (108305) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:32.343] W (108315) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:32.348] I (108315) HEATING: =======================================
+[2026-03-27 15:06:34.347] I (110325) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:34.350] W (110325) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:34.351] W (110325) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:34.357] W (110325) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:34.363] W (110335) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:34.368] I (110335) HEATING: =======================================
+[2026-03-27 15:06:35.616] W (111595) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:06:35.618] I (111595) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:06:35.620] W (111595) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:06:35.625] E (111595) MAX31850: No device present during search
+[2026-03-27 15:06:35.630] I (111595) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:06:36.368] I (112345) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:36.370] W (112345) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:36.371] W (112345) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:36.378] W (112345) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:36.383] W (112355) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:36.388] I (112355) HEATING: =======================================
+[2026-03-27 15:06:38.387] I (114365) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:38.388] W (114365) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:38.392] W (114365) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:38.398] W (114365) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:38.403] W (114375) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:38.408] I (114375) HEATING: =======================================
+[2026-03-27 15:06:40.407] I (116385) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:40.408] W (116385) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:40.411] W (116385) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:40.417] W (116385) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:40.422] W (116395) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:40.428] I (116395) HEATING: =======================================
+[2026-03-27 15:06:40.627] W (116605) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:06:40.628] I (116605) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:06:40.630] W (116605) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:06:40.635] E (116605) MAX31850: No device present during search
+[2026-03-27 15:06:40.640] I (116605) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:06:42.427] I (118405) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:42.429] W (118405) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:42.432] W (118405) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:42.437] W (118405) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:42.443] W (118415) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:42.448] I (118415) HEATING: =======================================
+[2026-03-27 15:06:44.447] I (120425) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:44.449] W (120425) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:44.452] W (120425) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:44.458] W (120425) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:44.462] W (120435) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:44.469] I (120435) HEATING: =======================================
+[2026-03-27 15:06:45.637] W (121615) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:06:45.638] I (121615) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:06:45.640] W (121615) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:06:45.644] E (121615) MAX31850: No device present during search
+[2026-03-27 15:06:45.650] I (121615) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:06:46.467] I (122445) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:46.469] W (122445) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:46.472] W (122445) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:46.477] W (122445) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:46.483] W (122455) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:46.488] I (122455) HEATING: =======================================
+[2026-03-27 15:06:48.487] I (124465) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:48.489] W (124465) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:48.492] W (124465) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:48.498] W (124465) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:48.503] W (124475) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:48.508] I (124475) HEATING: =======================================
+[2026-03-27 15:06:50.507] I (126485) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:50.509] W (126485) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:50.513] W (126485) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:50.517] W (126485) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:50.522] W (126495) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:50.529] I (126495) HEATING: =======================================
+[2026-03-27 15:06:50.647] W (126625) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:06:50.648] I (126625) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:06:50.650] W (126625) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:06:50.655] E (126625) MAX31850: No device present during search
+[2026-03-27 15:06:50.660] I (126625) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:06:52.528] I (128505) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:52.530] W (128505) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:52.532] W (128505) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:52.538] W (128505) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:52.543] W (128515) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:52.548] I (128515) HEATING: =======================================
+[2026-03-27 15:06:54.548] I (130525) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:54.549] W (130525) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:54.551] W (130525) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:54.557] W (130525) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:54.562] W (130535) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:54.569] I (130535) HEATING: =======================================
+[2026-03-27 15:06:55.657] W (131635) MAX31850: No sensors found, retrying search...
+[2026-03-27 15:06:55.658] I (131635) MAX31850: Starting 1-Wire ROM search...
+[2026-03-27 15:06:55.660] W (131635) MAX31850: 1-Wire bus short to GND detected
+[2026-03-27 15:06:55.665] E (131635) MAX31850: No device present during search
+[2026-03-27 15:06:55.671] I (131635) MAX31850: ROM search complete. Found 0 device(s)
+[2026-03-27 15:06:56.568] I (132545) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:56.570] W (132545) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:56.572] W (132545) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:56.578] W (132545) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:56.583] W (132555) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:56.588] I (132555) HEATING: =======================================
+[2026-03-27 15:06:58.587] I (134565) HEATING: ========== Temperature Report ==========
+[2026-03-27 15:06:58.589] W (134565) HEATING: Sensor 0 (P1): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:58.592] W (134565) HEATING: Sensor 1 (P2): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:58.599] W (134565) HEATING: Sensor 2 (P3): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:58.603] W (134575) HEATING: Sensor 3 (P4): Sensor Offline  [OFFLINE]
+[2026-03-27 15:06:58.608] I (134575) HEATING: =======================================
+
+
+============================================================
+日志记录结束
+结束时间: 2026-03-27 15:06:59
+总运行时间: 2.16 分钟
+总行数: 643
+============================================================
+连接统计:
+  - MQTT连接次数: 1
+  - MQTT断开次数: 11
+  - 连接保持率: 9.09%
+
+错误统计:
+  - TCP_TRANSPORT_ERROR: 16
+  - PING_OR_UNKNOWN_ERROR: 6
+============================================================
