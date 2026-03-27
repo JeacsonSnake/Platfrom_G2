@@ -228,7 +228,7 @@ python esp_analysis.py
 
 ### CHB-BLDC2418 Motor Driver Notes
 
-> **详细配置请参考**: [CHB-BLDC2418-Motor-Configuration.md](CHB-BLDC2418-Motor-Configuration.md) - 包含完整的电机规格、FG信号参数、PWM配置、GPIO引脚定义和PID参数。
+> **详细配置请参考**: [CHB-BLDC2418-Motor-Configuration.md](hardware_info/CHB-BLDC2418-Motor-Configuration.md) - 包含完整的电机规格、FG信号参数、PWM配置、GPIO引脚定义和PID参数。
 
 - **Inverted PWM logic**: High level = Motor OFF, Low level = Motor ON
 - **PWM Frequency**: 5KHz (compromise between noise and ESP32-S3 hardware limits)
