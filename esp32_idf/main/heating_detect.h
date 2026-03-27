@@ -35,7 +35,7 @@ extern "C" {
 #define MAX31850_SENSOR_COUNT       4
 
 /** 温度转换时间（毫秒）- MAX31850需要≥100ms */
-#define MAX31850_CONVERSION_TIME_MS 110
+#define MAX31850_CONVERSION_TIME_MS 120  // 增加转换时间，确保转换完成
 
 /** 轮询周期（毫秒）- 每秒读取一次 */
 #define MAX31850_POLL_INTERVAL_MS   1000

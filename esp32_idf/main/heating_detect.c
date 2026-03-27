@@ -401,7 +401,10 @@ static esp_err_t onewire_read_bit(uint8_t *bit)
     
     // 释放总线，由上拉电阻拉高
     gpio_set_level(s_onewire_pin, 1);
-    esp_rom_delay_us(ONEWIRE_READ_SAMPLE_US - ONEWIRE_READ_INIT_US);
+    // 关键延时：等待总线稳定（考虑上拉电阻和总线电容）
+    esp_rom_delay_us(3);
+    // 然后等待到采样点（总共约15us）
+    esp_rom_delay_us(ONEWIRE_READ_SAMPLE_US - ONEWIRE_READ_INIT_US - 3);
     
     // 采样
     int level = gpio_get_level(s_onewire_pin);
@@ -593,11 +596,19 @@ static esp_err_t onewire_match_rom(const uint8_t *rom_id)
 
 /**
  * @brief 启动温度转换
+ * 
+ * 注意：转换期间总线必须保持高电平（由上拉电阻提供电源）
  */
 static esp_err_t max31850_start_conversion(const uint8_t *rom_id)
 {
     ESP_ERROR_CHECK(onewire_match_rom(rom_id));
     onewire_write_byte(MAX31850_CMD_CONVERT_T);
+    
+    // 关键：发送Convert T后，必须释放总线，让上拉电阻拉高
+    // 这样传感器才能从总线获取电源进行转换
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
+    
     return ESP_OK;
 }
 
