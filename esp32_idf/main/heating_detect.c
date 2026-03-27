@@ -129,6 +129,9 @@ static uint32_t s_conversion_start_time = 0;            /**< 转换开始时间 
 //////////////////////// 函数原型 /////////////////////////////
 //////////////////////////////////////////////////////////////
 
+// GPIO诊断
+static void onewire_diagnose_bus(void);
+
 // 底层1-Wire操作
 static esp_err_t onewire_reset(bool *presence);
 static esp_err_t onewire_write_bit(uint8_t bit);
@@ -229,6 +232,72 @@ static size_t rmt_onewire_encoder(rmt_channel_handle_t channel, const void *prim
 }
 
 //////////////////////////////////////////////////////////////
+//////////////////////// GPIO诊断 //////////////////////////////
+//////////////////////////////////////////////////////////////
+
+/**
+ * @brief GPIO硬件诊断函数
+ * 
+ * 在初始化前检测GPIO14的硬件连接状态，帮助诊断问题
+ */
+static void onewire_diagnose_bus(void)
+{
+    ESP_LOGI(TAG, "========== GPIO Hardware Diagnostic ==========");
+    
+    // 保存原始配置
+    gpio_config_t orig_config;
+    // 注意：ESP-IDF没有直接的gpio_get_config函数，我们重新配置
+    
+    // 测试1：输入模式，浮空（检测外部上拉）
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(s_onewire_pin, GPIO_FLOATING);
+    esp_rom_delay_us(100);
+    int level_floating = gpio_get_level(s_onewire_pin);
+    ESP_LOGI(TAG, "Test 1 - Floating input: %d (expect: 1 if ext pull-up present)", level_floating);
+    
+    // 测试2：输入模式，内部上拉
+    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
+    esp_rom_delay_us(100);
+    int level_pullup = gpio_get_level(s_onewire_pin);
+    ESP_LOGI(TAG, "Test 2 - Internal pull-up: %d (expect: 1)", level_pullup);
+    
+    // 测试3：推挽输出，强制低电平
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_OUTPUT);
+    gpio_set_level(s_onewire_pin, 0);
+    esp_rom_delay_us(100);
+    int level_low = gpio_get_level(s_onewire_pin);
+    ESP_LOGI(TAG, "Test 3 - Forced low: %d (expect: 0)", level_low);
+    
+    // 测试4：推挽输出，强制高电平（短暂测试）
+    gpio_set_level(s_onewire_pin, 1);
+    esp_rom_delay_us(100);
+    int level_high = gpio_get_level(s_onewire_pin);
+    ESP_LOGI(TAG, "Test 4 - Forced high: %d (expect: 1)", level_high);
+    
+    // 测试5：输入模式，释放总线
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
+    esp_rom_delay_us(100);
+    int level_released = gpio_get_level(s_onewire_pin);
+    ESP_LOGI(TAG, "Test 5 - Released (input+pullup): %d (expect: 1)", level_released);
+    
+    // 诊断结果
+    ESP_LOGI(TAG, "------------------------------------------");
+    if (level_floating == 0 && level_low == 0 && level_high == 0) {
+        ESP_LOGE(TAG, "DIAGNOSIS: Bus appears shorted to GND!");
+        ESP_LOGE(TAG, "  Check: DQ pin shorted to GND?");
+    } else if (level_floating == 1 && level_released == 1) {
+        ESP_LOGI(TAG, "DIAGNOSIS: External pull-up detected, bus appears normal");
+    } else if (level_floating == 0 && level_pullup == 1 && level_released == 1) {
+        ESP_LOGW(TAG, "DIAGNOSIS: No external pull-up detected!");
+        ESP_LOGW(TAG, "  Check: 4.7K resistor connected to DQ?");
+    } else {
+        ESP_LOGW(TAG, "DIAGNOSIS: Unexpected levels, check wiring");
+    }
+    ESP_LOGI(TAG, "============================================");
+}
+
+//////////////////////////////////////////////////////////////
 //////////////////////// 1-Wire底层操作 ////////////////////////
 //////////////////////////////////////////////////////////////
 
@@ -237,42 +306,56 @@ static size_t rmt_onewire_encoder(rmt_channel_handle_t channel, const void *prim
  * 
  * Reset时序：主机拉低480us，然后释放
  * 从机在15-60us内拉低60-240us表示Presence
+ * 
+ * 修复：添加延时确保总线释放，优化时序
  */
 static esp_err_t onewire_reset(bool *presence)
 {
     if (presence) *presence = false;
     
-    // 使用GPIO直接控制Reset（RMT不适合这种双向时序）
-    // 步骤1：配置GPIO为输出，拉低480us
+    // 步骤1：配置GPIO为推挽输出，拉低480us
     gpio_set_direction(s_onewire_pin, GPIO_MODE_OUTPUT);
     gpio_set_level(s_onewire_pin, 0);
     esp_rom_delay_us(ONEWIRE_RESET_US);
     
-    // 步骤2：释放总线，切换到输入模式
+    // 步骤2：释放总线（关键修复）
+    // 先输出高电平，再切换为输入模式，确保总线被拉高
+    gpio_set_level(s_onewire_pin, 1);
+    esp_rom_delay_us(5);  // 短暂延时确保总线上升
+    
+    // 切换到输入模式，启用内部上拉辅助
     gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
     gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
-    esp_rom_delay_us(ONEWIRE_PRESENCE_WAIT_US);
+    esp_rom_delay_us(ONEWIRE_PRESENCE_WAIT_US - 5);  // 调整剩余等待时间
     
-    // 步骤3：采样Presence（应在60us内检测到）
+    // 步骤3：采样Presence（应在70us时）
     int level1 = gpio_get_level(s_onewire_pin);
     esp_rom_delay_us(ONEWIRE_PRESENCE_SAMPLE_US - ONEWIRE_PRESENCE_WAIT_US);
+    
+    // 步骤4：第二次采样（应在100us时，检测从机响应）
     int level2 = gpio_get_level(s_onewire_pin);
     
     // 等待Reset周期结束
     esp_rom_delay_us(ONEWIRE_RESET_US - ONEWIRE_PRESENCE_SAMPLE_US);
     
+    ESP_LOGD(TAG, "Reset: level1=%d (at 70us), level2=%d (at 100us)", level1, level2);
+    
     // 检测Presence：如果总线被从机拉低（低电平）表示存在
-    // 正常情况下：level1=1（刚释放），level2=0（从机拉低）
+    // 正常时序：level1=1（70us总线上升沿），level2=0（100us从机拉低响应）
     if (level1 == 1 && level2 == 0) {
         if (presence) *presence = true;
     } else if (level1 == 0 && level2 == 0) {
-        // 总线短路到GND
-        ESP_LOGW(TAG, "1-Wire bus short to GND detected");
+        // 总线一直被拉低
+        ESP_LOGW(TAG, "1-Wire bus short to GND detected (level1=%d, level2=%d)", level1, level2);
         return ESP_ERR_INVALID_STATE;
     } else if (level1 == 1 && level2 == 1) {
-        // 总线开路或无设备
-        ESP_LOGW(TAG, "1-Wire bus open circuit or no device");
+        // 总线一直是高电平（无响应）
+        ESP_LOGW(TAG, "1-Wire bus open circuit or no device detected (level1=%d, level2=%d)", level1, level2);
         return ESP_ERR_NOT_FOUND;
+    } else {
+        // level1=0, level2=1 异常情况
+        ESP_LOGW(TAG, "1-Wire unexpected levels: level1=%d, level2=%d", level1, level2);
+        return ESP_ERR_INVALID_STATE;
     }
     
     return ESP_OK;
@@ -280,23 +363,32 @@ static esp_err_t onewire_reset(bool *presence)
 
 /**
  * @brief 写单个位到1-Wire总线
+ * 
+ * 修复：确保总线正确释放，添加内部上拉辅助
  */
 static esp_err_t onewire_write_bit(uint8_t bit)
 {
     gpio_set_direction(s_onewire_pin, GPIO_MODE_OUTPUT);
     
     if (bit & 0x01) {
-        // 写1：低电平10us
+        // 写1：拉低10us，然后释放
         gpio_set_level(s_onewire_pin, 0);
         esp_rom_delay_us(ONEWIRE_WRITE1_US);
+        // 先输出高，再切换输入，确保上升沿
         gpio_set_level(s_onewire_pin, 1);
-        esp_rom_delay_us(ONEWIRE_SLOT_US - ONEWIRE_WRITE1_US);
+        esp_rom_delay_us(2);  // 短暂延时确保上升
+        gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
+        gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
+        esp_rom_delay_us(ONEWIRE_SLOT_US - ONEWIRE_WRITE1_US - 2);
     } else {
-        // 写0：低电平70us
+        // 写0：拉低70us，然后释放
         gpio_set_level(s_onewire_pin, 0);
         esp_rom_delay_us(ONEWIRE_WRITE0_US);
         gpio_set_level(s_onewire_pin, 1);
-        esp_rom_delay_us(ONEWIRE_RECOVERY_US);
+        esp_rom_delay_us(2);
+        gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
+        gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
+        esp_rom_delay_us(ONEWIRE_RECOVERY_US - 2);
     }
     
     return ESP_OK;
@@ -304,6 +396,8 @@ static esp_err_t onewire_write_bit(uint8_t bit)
 
 /**
  * @brief 从1-Wire总线读取单个位
+ * 
+ * 修复：优化时序，确保正确采样
  */
 static esp_err_t onewire_read_bit(uint8_t *bit)
 {
@@ -314,9 +408,13 @@ static esp_err_t onewire_read_bit(uint8_t *bit)
     gpio_set_level(s_onewire_pin, 0);
     esp_rom_delay_us(ONEWIRE_READ_INIT_US);
     
+    // 释放总线（关键修复：先输出高，再切换输入）
+    gpio_set_level(s_onewire_pin, 1);
+    esp_rom_delay_us(1);  // 短暂延时
+    
     gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
     gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
-    esp_rom_delay_us(ONEWIRE_READ_SAMPLE_US - ONEWIRE_READ_INIT_US);
+    esp_rom_delay_us(ONEWIRE_READ_SAMPLE_US - ONEWIRE_READ_INIT_US - 1);
     
     int level = gpio_get_level(s_onewire_pin);
     if (bit) *bit = level & 0x01;
@@ -777,6 +875,9 @@ esp_err_t max31850_init(gpio_num_t onewire_pin)
         .intr_type = GPIO_INTR_DISABLE,
     };
     ESP_ERROR_CHECK(gpio_config(&io_conf));
+    
+    // 运行GPIO硬件诊断（帮助确认硬件连接）
+    onewire_diagnose_bus();
     
     // 创建互斥锁
     s_onewire_mutex = xSemaphoreCreateMutex();
