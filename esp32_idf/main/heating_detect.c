@@ -96,6 +96,7 @@ static rmt_channel_handle_t s_rmt_tx_channel = NULL;    /**< RMT TX通道 */
 static rmt_channel_handle_t s_rmt_rx_channel = NULL;    /**< RMT RX通道 */
 static rmt_encoder_handle_t s_rmt_encoder = NULL;       /**< RMT编码器 */
 static SemaphoreHandle_t s_onewire_mutex = NULL;        /**< 1-Wire总线互斥锁 */
+static portMUX_TYPE s_onewire_mux = portMUX_INITIALIZER_UNLOCKED;  /**< 临界区保护锁 */
 static TaskHandle_t s_poll_task_handle = NULL;          /**< 轮询任务句柄 */
 
 static gpio_num_t s_onewire_pin = GPIO_NUM_NC;          /**< 当前使用的GPIO */
@@ -313,7 +314,7 @@ static esp_err_t onewire_reset(bool *presence)
 {
     if (presence) *presence = false;
     
-    uint32_t int_level = portENTER_CRITICAL_NESTED();
+    portENTER_CRITICAL(&s_onewire_mux);
     
     // 步骤1：拉低480us
     gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
@@ -331,7 +332,7 @@ static esp_err_t onewire_reset(bool *presence)
     // 步骤4：等待剩余时间
     esp_rom_delay_us(410);
     
-    portEXIT_CRITICAL_NESTED(int_level);
+    portEXIT_CRITICAL(&s_onewire_mux);
     
     ESP_LOGD(TAG, "Reset: presence level=%d", level);
     
@@ -354,7 +355,7 @@ static esp_err_t onewire_reset(bool *presence)
 static esp_err_t onewire_write_bit(uint8_t bit)
 {
     // 禁用中断保护关键时序
-    uint32_t int_level = portENTER_CRITICAL_NESTED();
+    portENTER_CRITICAL(&s_onewire_mux);
     
     // 配置为开漏输出
     gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
@@ -373,7 +374,7 @@ static esp_err_t onewire_write_bit(uint8_t bit)
     }
     
     // 恢复中断
-    portEXIT_CRITICAL_NESTED(int_level);
+    portEXIT_CRITICAL(&s_onewire_mux);
     
     return ESP_OK;
 }
@@ -392,7 +393,7 @@ static esp_err_t onewire_read_bit(uint8_t *bit)
     if (bit) *bit = 1;
     
     // 获取当前中断状态并禁用中断（保护微秒级时序）
-    uint32_t int_level = portENTER_CRITICAL_NESTED();
+    portENTER_CRITICAL(&s_onewire_mux);
     
     // 步骤1：配置为开漏输出，准备拉低
     gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
@@ -417,7 +418,7 @@ static esp_err_t onewire_read_bit(uint8_t *bit)
     esp_rom_delay_us(50);
     
     // 恢复中断
-    portEXIT_CRITICAL_NESTED(int_level);
+    portEXIT_CRITICAL(&s_onewire_mux);
     
     return ESP_OK;
 }
