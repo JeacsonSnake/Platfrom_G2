@@ -348,76 +348,67 @@ static esp_err_t onewire_reset(bool *presence)
 }
 
 /**
- * @brief 写单个位到1-Wire总线
+ * @brief 写单个位到1-Wire总线（保守时序版本）
  * 
- * 修复：使用中断保护确保时序精确
+ * 使用更保守的时序，增加稳定时间
  */
 static esp_err_t onewire_write_bit(uint8_t bit)
 {
-    // 禁用中断保护关键时序
     portENTER_CRITICAL(&s_onewire_mux);
     
-    // 配置为开漏输出
     gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
     gpio_set_level(s_onewire_pin, 0);
     
     if (bit & 0x01) {
-        // 写1：拉低1us，然后释放
-        esp_rom_delay_us(1);
-        gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);  // 释放总线
-        esp_rom_delay_us(ONEWIRE_SLOT_US - 1);
+        // 写1：拉低5us（标准允许1-15us），然后释放
+        esp_rom_delay_us(5);
+        gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
+        esp_rom_delay_us(75);  // 总时隙80us
     } else {
-        // 写0：拉低60us
-        esp_rom_delay_us(60);
-        gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);  // 释放总线
-        esp_rom_delay_us(ONEWIRE_RECOVERY_US);
+        // 写0：拉低70us
+        esp_rom_delay_us(70);
+        gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
+        esp_rom_delay_us(10);  // 恢复时间
     }
     
-    // 恢复中断
     portEXIT_CRITICAL(&s_onewire_mux);
     
     return ESP_OK;
 }
 
 /**
- * @brief 从1-Wire总线读取单个位
+ * @brief 从1-Wire总线读取单个位（保守时序版本）
  * 
- * 修复：优化时序，确保正确采样
- * 关键修改：
- * 1. 禁用中断保护关键时序
- * 2. 调整采样点确保在从机驱动期间采样
- * 3. 使用 Busy-wait 确保精确延时
+ * 使用更保守的时序，确保稳定性优先于速度
+ * - 降低速度到标准模式的70%
+ * - 增加采样前的稳定时间到20us
  */
 static esp_err_t onewire_read_bit(uint8_t *bit)
 {
     if (bit) *bit = 1;
     
-    // 获取当前中断状态并禁用中断（保护微秒级时序）
     portENTER_CRITICAL(&s_onewire_mux);
     
-    // 步骤1：配置为开漏输出，准备拉低
+    // 步骤1：拉低初始化（增加到2us确保有效）
     gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
     gpio_set_level(s_onewire_pin, 0);
+    esp_rom_delay_us(2);
     
-    // 步骤2：拉低初始化 1us（标准允许1-15us）
-    esp_rom_delay_us(1);
-    
-    // 步骤3：释放总线 - 切换到输入模式（上拉电阻拉高）
+    // 步骤2：释放总线
     gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
     
-    // 步骤4：关键延时 - 等待到采样点（从机在此期间输出数据）
-    // MAX31850在释放后15us内驱动总线
-    // 我们在13-14us采样（给从机足够时间驱动）
-    esp_rom_delay_us(13);
+    // 步骤3：关键 - 等待总线稳定并采样
+    // 给上拉电阻和从机更多时间（20us代替13us）
+    esp_rom_delay_us(20);
     
-    // 步骤5：采样
+    // 步骤4：采样
     int level = gpio_get_level(s_onewire_pin);
     if (bit) *bit = level & 0x01;
     
-    // 步骤6：等待时隙结束（确保至少60us总时隙）
-    esp_rom_delay_us(50);
+    // 步骤5：等待时隙结束（确保80us总时隙）
+    esp_rom_delay_us(60);
     
-    // 恢复中断
     portEXIT_CRITICAL(&s_onewire_mux);
     
     return ESP_OK;
