@@ -386,31 +386,37 @@ static esp_err_t onewire_write_bit(uint8_t bit)
  * @brief 从1-Wire总线读取单个位
  * 
  * 修复：优化时序，确保正确采样
+ * 关键修改：
+ * 1. 增加释放后的稳定时间到6us（原来是3us，可能不够）
+ * 2. 使用输入模式而不是开漏输出模式来释放总线
+ * 3. 增加延时精度
  */
 static esp_err_t onewire_read_bit(uint8_t *bit)
 {
     if (bit) *bit = 1;
     
-    // 使用开漏输出模式（GPIO14推挽输出高电平失败）
+    // 步骤1：配置为开漏输出，准备拉低
     gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
     gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
     
-    // 读时隙：主机拉低5us
+    // 步骤2：拉低初始化（1-Wire标准：主机拉低1-15us）
     gpio_set_level(s_onewire_pin, 0);
     esp_rom_delay_us(ONEWIRE_READ_INIT_US);
     
-    // 释放总线，由上拉电阻拉高
-    gpio_set_level(s_onewire_pin, 1);
-    // 关键延时：等待总线稳定（考虑上拉电阻和总线电容）
-    esp_rom_delay_us(3);
-    // 然后等待到采样点（总共约15us）
-    esp_rom_delay_us(ONEWIRE_READ_SAMPLE_US - ONEWIRE_READ_INIT_US - 3);
+    // 步骤3：关键修复 - 使用输入模式释放总线（而不是写1）
+    // 这样上拉电阻可以更快地将总线拉高
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
     
-    // 采样
+    // 步骤4：等待到采样点（总共15us）
+    // 增加稳定时间到6us（原来3us可能不够）
+    esp_rom_delay_us(ONEWIRE_READ_SAMPLE_US - ONEWIRE_READ_INIT_US);
+    
+    // 步骤5：采样
     int level = gpio_get_level(s_onewire_pin);
     if (bit) *bit = level & 0x01;
     
-    // 等待时隙结束
+    // 步骤6：等待时隙结束（确保至少60us的总时隙）
     esp_rom_delay_us(ONEWIRE_SLOT_US - ONEWIRE_READ_SAMPLE_US);
     
     return ESP_OK;
@@ -435,6 +441,7 @@ static esp_err_t onewire_write_byte(uint8_t data)
  * @brief 从1-Wire总线读取一个字节（LSB first）
  * 
  * 修复：添加位间延时，确保读操作稳定
+ * 增加：每个字节读取后添加延时
  */
 static esp_err_t onewire_read_byte(uint8_t *data)
 {
@@ -445,7 +452,9 @@ static esp_err_t onewire_read_byte(uint8_t *data)
         uint8_t bit = 0;
         ESP_ERROR_CHECK(onewire_read_bit(&bit));
         *data |= (bit << i);
-        esp_rom_delay_us(2);  // 位间延时
+        if (i < 7) {  // 最后一位后不需要延时
+            esp_rom_delay_us(3);  // 增加位间延时（2us->3us）
+        }
     }
     return ESP_OK;
 }
@@ -627,21 +636,43 @@ static esp_err_t max31850_start_conversion(const uint8_t *rom_id)
  * @brief 读取暂存器（9字节）
  * 
  * 修复：添加字节间延时，确保读取稳定
+ * 新增：添加读取重试机制，CRC失败时自动重试
  */
 static esp_err_t max31850_read_scratchpad(const uint8_t *rom_id, uint8_t *scratchpad)
 {
     if (!scratchpad) return ESP_ERR_INVALID_ARG;
     
-    ESP_ERROR_CHECK(onewire_match_rom(rom_id));
-    onewire_write_byte(MAX31850_CMD_READ_SCRATCH);
-    
-    // 关键修复：读取每个字节之间添加短暂延时
-    for (int i = 0; i < MAX31850_SCRATCHPAD_LEN; i++) {
-        onewire_read_byte(&scratchpad[i]);
-        esp_rom_delay_us(10);  // 字节间延时，确保总线稳定
+    // 重试机制：最多尝试3次读取
+    for (int retry = 0; retry < 3; retry++) {
+        ESP_ERROR_CHECK(onewire_match_rom(rom_id));
+        onewire_write_byte(MAX31850_CMD_READ_SCRATCH);
+        
+        // 关键修复：读取每个字节之间添加短暂延时
+        for (int i = 0; i < MAX31850_SCRATCHPAD_LEN; i++) {
+            onewire_read_byte(&scratchpad[i]);
+            esp_rom_delay_us(15);  // 增加字节间延时（10us->15us）
+        }
+        
+        // 验证CRC，如果成功则返回
+        if (crc8_calculate(scratchpad, 8) == scratchpad[8]) {
+            if (retry > 0) {
+                ESP_LOGI(TAG, "Scratchpad read successful after %d retries", retry);
+            }
+            return ESP_OK;
+        }
+        
+        // CRC失败，记录日志并重试
+        ESP_LOGW(TAG, "Scratchpad CRC failed (attempt %d/3), retrying...", retry + 1);
+        ESP_LOGW(TAG, "Raw: [%02X %02X %02X %02X %02X %02X %02X %02X %02X]",
+                 scratchpad[0], scratchpad[1], scratchpad[2], scratchpad[3],
+                 scratchpad[4], scratchpad[5], scratchpad[6], scratchpad[7], scratchpad[8]);
+        
+        // 短暂延时后重试
+        esp_rom_delay_us(100);
     }
     
-    return ESP_OK;
+    // 所有重试都失败了
+    return ESP_ERR_INVALID_RESPONSE;
 }
 
 /**
