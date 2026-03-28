@@ -604,6 +604,7 @@ static esp_err_t onewire_match_rom(const uint8_t *rom_id)
  * @brief 启动温度转换
  * 
  * 注意：转换期间总线必须保持高电平（由上拉电阻提供电源）
+ * 修复：转换期间保持mutex锁定，防止其他任务干扰总线
  */
 static esp_err_t max31850_start_conversion(const uint8_t *rom_id)
 {
@@ -612,8 +613,12 @@ static esp_err_t max31850_start_conversion(const uint8_t *rom_id)
     
     // 关键：发送Convert T后，必须释放总线，让上拉电阻拉高
     // 这样传感器才能从总线获取电源进行转换
+    // 但保持mutex锁定，防止其他任务在此期间访问总线
     gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
     gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
+    
+    // 添加短暂延时确保总线稳定拉高
+    esp_rom_delay_us(50);
     
     return ESP_OK;
 }
@@ -659,39 +664,56 @@ static max31850_err_t max31850_parse_scratchpad(const uint8_t *scratchpad, float
 {
     if (!scratchpad || !temp_out) return MAX31850_ERR_CRC;
     
+    // 调试输出：打印原始scratchpad数据
+    ESP_LOGD(TAG, "Scratchpad raw: [%02X %02X %02X %02X %02X %02X %02X %02X %02X]",
+             scratchpad[0], scratchpad[1], scratchpad[2], scratchpad[3],
+             scratchpad[4], scratchpad[5], scratchpad[6], scratchpad[7], scratchpad[8]);
+    
     // CRC校验
-    if (crc8_calculate(scratchpad, 8) != scratchpad[8]) {
+    uint8_t calc_crc = crc8_calculate(scratchpad, 8);
+    if (calc_crc != scratchpad[8]) {
         ESP_LOGW(TAG, "Scratchpad CRC error: calc=0x%02X, read=0x%02X",
-                 crc8_calculate(scratchpad, 8), scratchpad[8]);
+                 calc_crc, scratchpad[8]);
+        ESP_LOGW(TAG, "Raw data: [%02X %02X %02X %02X %02X %02X %02X %02X %02X]",
+                 scratchpad[0], scratchpad[1], scratchpad[2], scratchpad[3],
+                 scratchpad[4], scratchpad[5], scratchpad[6], scratchpad[7], scratchpad[8]);
         return MAX31850_ERR_CRC;
     }
     
     // 检查故障寄存器（第4字节）
     uint8_t fault_reg = scratchpad[4];
     if (fault_reg & MAX31850_FAULT_OPEN) {
+        ESP_LOGD(TAG, "Fault detected: OPEN (fault_reg=0x%02X)", fault_reg);
         return MAX31850_ERR_OPEN;
     }
     if (fault_reg & MAX31850_FAULT_SHORT_GND) {
+        ESP_LOGD(TAG, "Fault detected: SHORT_GND (fault_reg=0x%02X)", fault_reg);
         return MAX31850_ERR_SHORT_GND;
     }
     if (fault_reg & MAX31850_FAULT_SHORT_VCC) {
+        ESP_LOGD(TAG, "Fault detected: SHORT_VCC (fault_reg=0x%02X)", fault_reg);
         return MAX31850_ERR_SHORT_VCC;
     }
     
     // 解析温度（第0-1字节，大端）
     int16_t raw_temp = ((int16_t)scratchpad[0] << 8) | scratchpad[1];
     
-    // 扩展符号位（16位有符号）
-    if (raw_temp & 0x8000) {
-        raw_temp |= 0x0000;  // 已经是16位，无需扩展
-    }
+    // 调试输出原始值
+    ESP_LOGD(TAG, "Raw temp bytes: MSB=0x%02X, LSB=0x%02X, combined=0x%04X (%d)",
+             scratchpad[0], scratchpad[1], (uint16_t)raw_temp, raw_temp);
     
     // 转换为摄氏度（分辨率0.0625°C）
     *temp_out = (float)raw_temp * 0.0625f;
     
-    // 检查温度范围有效性（MAX31850范围-270~+1372°C，但超出-200~+1250可能有问题）
+    ESP_LOGD(TAG, "Calculated temperature: %.2f°C", *temp_out);
+    
+    // 检查温度范围有效性（MAX31850范围-270~+1372°C）
     if (*temp_out < -270.0f || *temp_out > 1372.0f) {
-        ESP_LOGW(TAG, "Temperature out of valid range: %.2f°C", *temp_out);
+        ESP_LOGW(TAG, "Temperature out of valid range: %.2f°C (raw=0x%04X)", 
+                 *temp_out, (uint16_t)raw_temp);
+        ESP_LOGW(TAG, "Raw scratchpad: [%02X %02X %02X %02X %02X %02X %02X %02X %02X]",
+                 scratchpad[0], scratchpad[1], scratchpad[2], scratchpad[3],
+                 scratchpad[4], scratchpad[5], scratchpad[6], scratchpad[7], scratchpad[8]);
         return MAX31850_ERR_CRC;  // 使用CRC错误表示数据异常
     }
     
@@ -807,15 +829,10 @@ static void max31850_poll_task(void *pvParameters)
                 continue;
             }
             
-            xSemaphoreGive(s_onewire_mutex);
-            
-            // 步骤2：等待转换完成（非阻塞）
+            // 步骤2：等待转换完成（保持mutex锁定，防止其他任务干扰总线）
+            // 转换期间总线必须保持高电平，但其他任务可能通过GPIO操作干扰
+            // 因此保持mutex锁定直到读取完成
             vTaskDelay(pdMS_TO_TICKS(MAX31850_CONVERSION_TIME_MS));
-            
-            if (xSemaphoreTake(s_onewire_mutex, pdMS_TO_TICKS(100)) != pdTRUE) {
-                ESP_LOGW(TAG, "Failed to acquire bus mutex for reading sensor %d", i);
-                continue;
-            }
             
             // 步骤3：读取暂存器
             err = max31850_read_scratchpad(sensor->rom_id, scratchpad);
@@ -1017,14 +1034,8 @@ max31850_err_t max31850_force_update(uint8_t sensor_id, float *temp_out, TickTyp
         return MAX31850_ERR_TIMEOUT;
     }
     
-    xSemaphoreGive(s_onewire_mutex);
-    
-    // 等待转换完成（阻塞）
+    // 等待转换完成（保持mutex锁定，防止其他任务干扰总线）
     vTaskDelay(pdMS_TO_TICKS(MAX31850_CONVERSION_TIME_MS));
-    
-    if (xSemaphoreTake(s_onewire_mutex, timeout) != pdTRUE) {
-        return MAX31850_ERR_TIMEOUT;
-    }
     
     // 读取暂存器
     uint8_t scratchpad[MAX31850_SCRATCHPAD_LEN];
