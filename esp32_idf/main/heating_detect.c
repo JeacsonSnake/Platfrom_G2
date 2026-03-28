@@ -307,48 +307,40 @@ static void onewire_diagnose_bus(void)
  * Reset时序：主机拉低480us，然后释放
  * 从机在15-60us内拉低60-240us表示Presence
  * 
- * 修复：添加延时确保总线释放，优化时序
+ * 修复：添加中断保护，优化时序
  */
 static esp_err_t onewire_reset(bool *presence)
 {
     if (presence) *presence = false;
     
-    // 关键修复：GPIO14推挽输出高电平失败，改用开漏模式
-    // 步骤1：配置GPIO为开漏输出，拉低480us
+    uint32_t int_level = portENTER_CRITICAL_NESTED();
+    
+    // 步骤1：拉低480us
     gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
-    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
     gpio_set_level(s_onewire_pin, 0);
-    esp_rom_delay_us(ONEWIRE_RESET_US);
+    esp_rom_delay_us(480);
     
-    // 步骤2：释放总线（开漏模式下写1释放，由上拉电阻拉高）
-    gpio_set_level(s_onewire_pin, 1);
-    // 关键延时：等待上拉电阻将总线拉高（给足时间）
-    esp_rom_delay_us(15);
+    // 步骤2：释放总线
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
+    esp_rom_delay_us(70);  // 等待presence窗口
     
-    // 步骤3：第一次采样（约70us时）
-    int level1 = gpio_get_level(s_onewire_pin);
-    esp_rom_delay_us(30);  // 从70us到100us
+    // 步骤3：检测Presence（从机在此期间拉低）
+    int level = gpio_get_level(s_onewire_pin);
     
-    // 步骤4：第二次采样（约100us时，检测从机响应）
-    int level2 = gpio_get_level(s_onewire_pin);
+    // 步骤4：等待剩余时间
+    esp_rom_delay_us(410);
     
-    // 等待Reset周期结束
-    esp_rom_delay_us(ONEWIRE_RESET_US - 100);
+    portEXIT_CRITICAL_NESTED(int_level);
     
-    ESP_LOGD(TAG, "Reset: level1=%d (at ~70us), level2=%d (at ~100us)", level1, level2);
+    ESP_LOGD(TAG, "Reset: presence level=%d", level);
     
-    // 检测Presence
-    if (level1 == 1 && level2 == 0) {
+    // 检测Presence（level=0表示从机响应）
+    if (level == 0) {
         if (presence) *presence = true;
-    } else if (level1 == 0 && level2 == 0) {
-        ESP_LOGW(TAG, "1-Wire bus stuck low (level1=%d, level2=%d). Check pull-up resistors.", level1, level2);
-        return ESP_ERR_INVALID_STATE;
-    } else if (level1 == 1 && level2 == 1) {
-        ESP_LOGW(TAG, "1-Wire no device response (level1=%d, level2=%d)", level1, level2);
-        return ESP_ERR_NOT_FOUND;
     } else {
-        ESP_LOGW(TAG, "1-Wire unexpected: level1=%d, level2=%d", level1, level2);
-        return ESP_ERR_INVALID_STATE;
+        ESP_LOGD(TAG, "1-Wire no device response");
+        return ESP_ERR_NOT_FOUND;
     }
     
     return ESP_OK;
@@ -357,27 +349,31 @@ static esp_err_t onewire_reset(bool *presence)
 /**
  * @brief 写单个位到1-Wire总线
  * 
- * 修复：确保总线正确释放，添加内部上拉辅助
+ * 修复：使用中断保护确保时序精确
  */
 static esp_err_t onewire_write_bit(uint8_t bit)
 {
-    // 使用开漏输出模式（GPIO14推挽输出高电平失败）
+    // 禁用中断保护关键时序
+    uint32_t int_level = portENTER_CRITICAL_NESTED();
+    
+    // 配置为开漏输出
     gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
-    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
+    gpio_set_level(s_onewire_pin, 0);
     
     if (bit & 0x01) {
-        // 写1：拉低10us，然后释放（由上拉电阻拉高）
-        gpio_set_level(s_onewire_pin, 0);
-        esp_rom_delay_us(ONEWIRE_WRITE1_US);
-        gpio_set_level(s_onewire_pin, 1);  // 释放总线
-        esp_rom_delay_us(ONEWIRE_SLOT_US - ONEWIRE_WRITE1_US);
+        // 写1：拉低1us，然后释放
+        esp_rom_delay_us(1);
+        gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);  // 释放总线
+        esp_rom_delay_us(ONEWIRE_SLOT_US - 1);
     } else {
-        // 写0：拉低70us，然后释放
-        gpio_set_level(s_onewire_pin, 0);
-        esp_rom_delay_us(ONEWIRE_WRITE0_US);
-        gpio_set_level(s_onewire_pin, 1);  // 释放总线
+        // 写0：拉低60us
+        esp_rom_delay_us(60);
+        gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);  // 释放总线
         esp_rom_delay_us(ONEWIRE_RECOVERY_US);
     }
+    
+    // 恢复中断
+    portEXIT_CRITICAL_NESTED(int_level);
     
     return ESP_OK;
 }
@@ -387,37 +383,41 @@ static esp_err_t onewire_write_bit(uint8_t bit)
  * 
  * 修复：优化时序，确保正确采样
  * 关键修改：
- * 1. 增加释放后的稳定时间到6us（原来是3us，可能不够）
- * 2. 使用输入模式而不是开漏输出模式来释放总线
- * 3. 增加延时精度
+ * 1. 禁用中断保护关键时序
+ * 2. 调整采样点确保在从机驱动期间采样
+ * 3. 使用 Busy-wait 确保精确延时
  */
 static esp_err_t onewire_read_bit(uint8_t *bit)
 {
     if (bit) *bit = 1;
     
+    // 获取当前中断状态并禁用中断（保护微秒级时序）
+    uint32_t int_level = portENTER_CRITICAL_NESTED();
+    
     // 步骤1：配置为开漏输出，准备拉低
     gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
-    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
-    
-    // 步骤2：拉低初始化（1-Wire标准：主机拉低1-15us）
     gpio_set_level(s_onewire_pin, 0);
-    esp_rom_delay_us(ONEWIRE_READ_INIT_US);
     
-    // 步骤3：关键修复 - 使用输入模式释放总线（而不是写1）
-    // 这样上拉电阻可以更快地将总线拉高
+    // 步骤2：拉低初始化 1us（标准允许1-15us）
+    esp_rom_delay_us(1);
+    
+    // 步骤3：释放总线 - 切换到输入模式（上拉电阻拉高）
     gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
-    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
     
-    // 步骤4：等待到采样点（总共15us）
-    // 增加稳定时间到6us（原来3us可能不够）
-    esp_rom_delay_us(ONEWIRE_READ_SAMPLE_US - ONEWIRE_READ_INIT_US);
+    // 步骤4：关键延时 - 等待到采样点（从机在此期间输出数据）
+    // MAX31850在释放后15us内驱动总线
+    // 我们在13-14us采样（给从机足够时间驱动）
+    esp_rom_delay_us(13);
     
     // 步骤5：采样
     int level = gpio_get_level(s_onewire_pin);
     if (bit) *bit = level & 0x01;
     
-    // 步骤6：等待时隙结束（确保至少60us的总时隙）
-    esp_rom_delay_us(ONEWIRE_SLOT_US - ONEWIRE_READ_SAMPLE_US);
+    // 步骤6：等待时隙结束（确保至少60us总时隙）
+    esp_rom_delay_us(50);
+    
+    // 恢复中断
+    portEXIT_CRITICAL_NESTED(int_level);
     
     return ESP_OK;
 }
@@ -425,14 +425,14 @@ static esp_err_t onewire_read_bit(uint8_t *bit)
 /**
  * @brief 写一个字节到1-Wire总线（LSB first）
  * 
- * 修复：添加位间延时，确保写操作稳定
+ * 修复：位操作内部已保护，这里添加字节间恢复时间
  */
 static esp_err_t onewire_write_byte(uint8_t data)
 {
     for (int i = 0; i < 8; i++) {
         ESP_ERROR_CHECK(onewire_write_bit(data & 0x01));
         data >>= 1;
-        esp_rom_delay_us(2);  // 位间延时
+        esp_rom_delay_us(1);  // 位间恢复时间
     }
     return ESP_OK;
 }
@@ -440,8 +440,7 @@ static esp_err_t onewire_write_byte(uint8_t data)
 /**
  * @brief 从1-Wire总线读取一个字节（LSB first）
  * 
- * 修复：添加位间延时，确保读操作稳定
- * 增加：每个字节读取后添加延时
+ * 修复：位操作内部已保护，添加位间恢复时间
  */
 static esp_err_t onewire_read_byte(uint8_t *data)
 {
@@ -452,9 +451,7 @@ static esp_err_t onewire_read_byte(uint8_t *data)
         uint8_t bit = 0;
         ESP_ERROR_CHECK(onewire_read_bit(&bit));
         *data |= (bit << i);
-        if (i < 7) {  // 最后一位后不需要延时
-            esp_rom_delay_us(3);  // 增加位间延时（2us->3us）
-        }
+        esp_rom_delay_us(1);  // 位间恢复时间
     }
     return ESP_OK;
 }
@@ -635,8 +632,7 @@ static esp_err_t max31850_start_conversion(const uint8_t *rom_id)
 /**
  * @brief 读取暂存器（9字节）
  * 
- * 修复：添加字节间延时，确保读取稳定
- * 新增：添加读取重试机制，CRC失败时自动重试
+ * 修复：添加读取重试机制，CRC失败时自动重试
  */
 static esp_err_t max31850_read_scratchpad(const uint8_t *rom_id, uint8_t *scratchpad)
 {
@@ -644,16 +640,24 @@ static esp_err_t max31850_read_scratchpad(const uint8_t *rom_id, uint8_t *scratc
     
     // 重试机制：最多尝试3次读取
     for (int retry = 0; retry < 3; retry++) {
+        // 每次重试前复位总线
+        bool presence = false;
+        if (onewire_reset(&presence) != ESP_OK || !presence) {
+            ESP_LOGW(TAG, "No device presence (attempt %d/3)", retry + 1);
+            continue;
+        }
+        
+        // Match ROM + Read Scratchpad
         ESP_ERROR_CHECK(onewire_match_rom(rom_id));
         onewire_write_byte(MAX31850_CMD_READ_SCRATCH);
         
-        // 关键修复：读取每个字节之间添加短暂延时
+        // 读取9字节
         for (int i = 0; i < MAX31850_SCRATCHPAD_LEN; i++) {
             onewire_read_byte(&scratchpad[i]);
-            esp_rom_delay_us(15);  // 增加字节间延时（10us->15us）
+            esp_rom_delay_us(5);  // 字节间恢复时间
         }
         
-        // 验证CRC，如果成功则返回
+        // 验证CRC
         if (crc8_calculate(scratchpad, 8) == scratchpad[8]) {
             if (retry > 0) {
                 ESP_LOGI(TAG, "Scratchpad read successful after %d retries", retry);
@@ -667,11 +671,10 @@ static esp_err_t max31850_read_scratchpad(const uint8_t *rom_id, uint8_t *scratc
                  scratchpad[0], scratchpad[1], scratchpad[2], scratchpad[3],
                  scratchpad[4], scratchpad[5], scratchpad[6], scratchpad[7], scratchpad[8]);
         
-        // 短暂延时后重试
-        esp_rom_delay_us(100);
+        // 延时后重试
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
     
-    // 所有重试都失败了
     return ESP_ERR_INVALID_RESPONSE;
 }
 
