@@ -68,7 +68,8 @@ typedef enum {
     MAX31850_ERR_CRC,           /**< Scratchpad CRC 校验失败 */
     MAX31850_ERR_TIMEOUT,       /**< 总线无响应（无 Presence） */
     MAX31850_ERR_BUS_FAULT,     /**< 总线短路到 GND */
-    MAX31850_ERR_OFFLINE        /**< 设备离线 */
+    MAX31850_ERR_OFFLINE,       /**< 设备离线 */
+    MAX31850_ERR_INVALID_ID     /**< 无效的传感器 ID */
 } max31850_err_t;
 
 /**
