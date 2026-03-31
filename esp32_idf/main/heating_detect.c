@@ -20,6 +20,32 @@
 static const char *TAG = "MAX31850";
 
 //////////////////////////////////////////////////////////////
+///////////////////// 调试开关 ///////////////////////////////
+//////////////////////////////////////////////////////////////
+
+#define MAX31850_DEBUG_LEVEL        2   /**< 调试级别: 0=关闭, 1=基本, 2=详细, 3=波形 */
+
+#if MAX31850_DEBUG_LEVEL >= 1
+    #define DEBUG_LOGI(fmt, ...) ESP_LOGI(TAG, fmt, ##__VA_ARGS__)
+    #define DEBUG_LOGW(fmt, ...) ESP_LOGW(TAG, fmt, ##__VA_ARGS__)
+#else
+    #define DEBUG_LOGI(fmt, ...) do {} while(0)
+    #define DEBUG_LOGW(fmt, ...) do {} while(0)
+#endif
+
+#if MAX31850_DEBUG_LEVEL >= 2
+    #define DEBUG_LOGD(fmt, ...) ESP_LOGI(TAG, fmt, ##__VA_ARGS__)
+#else
+    #define DEBUG_LOGD(fmt, ...) do {} while(0)
+#endif
+
+#if MAX31850_DEBUG_LEVEL >= 3
+    #define DEBUG_LOGV(fmt, ...) ESP_LOGI(TAG, fmt, ##__VA_ARGS__)
+#else
+    #define DEBUG_LOGV(fmt, ...) do {} while(0)
+#endif
+
+//////////////////////////////////////////////////////////////
 ///////////////////// 时序参数定义 ////////////////////////////
 //////////////////////////////////////////////////////////////
 /**
@@ -112,6 +138,90 @@ static poll_state_t s_poll_state = POLL_IDLE;           /**< 轮询状态机状�
 
 
 //////////////////////////////////////////////////////////////
+///////////////////// GPIO 诊断功能 //////////////////////////
+//////////////////////////////////////////////////////////////
+
+/**
+ * @brief GPIO 诊断测试 - 验证开漏模式配置
+ * 
+ * 执行 5 个测试来验证 GPIO14 的开漏模式配置是否正确：
+ * 1. 浮空输入检查（应读到高电平，由上拉电阻提供）
+ * 2. 强制低电平检查（开漏应能拉低）
+ * 3. 释放总线检查（应回到高电平）
+ * 4. 输入模式读取
+ * 5. 最终状态检查
+ */
+static esp_err_t onewire_diagnose_gpio(void)
+{
+    int test_results[5];
+    
+    ESP_LOGI(TAG, "========================================");
+    ESP_LOGI(TAG, "GPIO Diagnostic Test on GPIO%d", s_onewire_pin);
+    ESP_LOGI(TAG, "========================================");
+    
+    /* Test 1: 浮空输入检查 - 应读到高电平（上拉电阻作用） */
+    onewire_set_input();
+    onewire_delay_us(50);
+    test_results[0] = onewire_get_level();
+    ESP_LOGI(TAG, "Test 1 - Floating input (pull-up): %d %s", 
+             test_results[0], test_results[0] == 1 ? "✓" : "✗ FAIL");
+    
+    /* Test 2: 强制低电平检查 - 开漏应能拉低 */
+    onewire_set_opendrain();
+    onewire_set_level(0);
+    onewire_delay_us(50);
+    test_results[1] = onewire_get_level();
+    ESP_LOGI(TAG, "Test 2 - Forced low (open-drain): %d %s", 
+             test_results[1], test_results[1] == 0 ? "✓" : "✗ FAIL");
+    
+    /* Test 3: 释放总线检查 - 应回到高电平 */
+    onewire_set_level(1);
+    onewire_set_input();
+    onewire_delay_us(50);
+    test_results[2] = onewire_get_level();
+    ESP_LOGI(TAG, "Test 3 - Released (should be high): %d %s", 
+             test_results[2], test_results[2] == 1 ? "✓" : "✗ FAIL");
+    
+    /* Test 4: 输入模式读取 */
+    onewire_set_input();
+    onewire_delay_us(10);
+    test_results[3] = onewire_get_level();
+    ESP_LOGI(TAG, "Test 4 - Input mode: %d %s", 
+             test_results[3], test_results[3] == 1 ? "✓" : "✗ FAIL");
+    
+    /* Test 5: 最终状态检查 */
+    onewire_set_input();
+    onewire_delay_us(100);
+    test_results[4] = onewire_get_level();
+    ESP_LOGI(TAG, "Test 5 - Final state: %d %s", 
+             test_results[4], test_results[4] == 1 ? "✓" : "✗ FAIL");
+    
+    ESP_LOGI(TAG, "----------------------------------------");
+    
+    /* 分析结果 */
+    bool all_passed = (test_results[0] == 1 && test_results[1] == 0 && 
+                       test_results[2] == 1 && test_results[3] == 1 &&
+                       test_results[4] == 1);
+    
+    if (!all_passed) {
+        ESP_LOGE(TAG, "GPIO DIAGNOSTIC FAILED!");
+        if (test_results[0] == 0) {
+            ESP_LOGE(TAG, "  -> Test 1 FAIL: Check 4.7K pull-up resistor connection");
+        }
+        if (test_results[1] == 1) {
+            ESP_LOGE(TAG, "  -> Test 2 FAIL: Cannot drive LOW - check GPIO configuration");
+        }
+        if (test_results[2] == 0) {
+            ESP_LOGE(TAG, "  -> Test 3 FAIL: Bus stuck LOW - check for short to GND");
+        }
+        return ESP_ERR_INVALID_STATE;
+    }
+    
+    ESP_LOGI(TAG, "GPIO Diagnostic: ALL TESTS PASSED ✓");
+    return ESP_OK;
+}
+
+//////////////////////////////////////////////////////////////
 ///////////////////// 精确延时函数 ////////////////////////////
 //////////////////////////////////////////////////////////////
 
@@ -176,7 +286,7 @@ static inline uint8_t onewire_get_level(void)
 //////////////////////////////////////////////////////////////
 
 /**
- * @brief 1-Wire Reset 脉冲 + Presence 检测
+ * @brief 1-Wire Reset 脉冲 + Presence 检测（带详细波形日志）
  * 
  * 时序：拉低 480μs → 释放 → 等待 70μs → 采样 Presence → 等待 410μs
  * 
@@ -187,38 +297,63 @@ static inline uint8_t onewire_get_level(void)
  */
 static esp_err_t onewire_reset(bool *presence)
 {
-    uint8_t level1, level2;
+    uint8_t level_before, level_during_reset, level_70us, level_100us, level_480us, level_final;
+    
+    /* 记录 Reset 前的总线状态 */
+    level_before = onewire_get_level();
     
     portENTER_CRITICAL(&s_onewire_mux);
     
     /* Step 1: 拉低总线 480μs (Reset 脉冲) */
     onewire_set_opendrain();
     onewire_set_level(0);
-    onewire_delay_us(ONEWIRE_RESET_LOW_US);
+    onewire_delay_us(200);  /* 200μs 后检查 */
+    level_during_reset = onewire_get_level();
+    onewire_delay_us(280);  /* 继续 280μs，总计 480μs */
     
-    /* Step 2: 释放总线，切换到输入模式 */
+    /* Step 2: 释放总线 */
     onewire_set_level(1);
     onewire_set_input();
     
-    /* Step 3: 等待 70μs 后采样 Presence */
-    onewire_delay_us(ONEWIRE_RESET_WAIT_US);
-    level1 = onewire_get_level();
+    /* Step 3: 等待 15μs（Presence 窗口开始）后采样 */
+    onewire_delay_us(15);
+    level_70us = onewire_get_level();  /* 实际上是 15μs 采样 */
     
-    /* Step 4: 再等待到总线恢复 */
-    onewire_delay_us(ONEWIRE_RESET_RECOVERY_US);
-    level2 = onewire_get_level();
+    /* Step 4: 等待到 70μs 再次采样 */
+    onewire_delay_us(55);  /* 总计 70μs */
+    level_100us = onewire_get_level();
+    
+    /* Step 5: 等待到 480μs 采样 */
+    onewire_delay_us(410);  /* 总计 480μs */
+    level_480us = onewire_get_level();
+    
+    /* Step 6: 最终状态 */
+    onewire_delay_us(10);
+    level_final = onewire_get_level();
     
     portEXIT_CRITICAL(&s_onewire_mux);
     
+    /* 详细波形日志 */
+    DEBUG_LOGV("Reset Waveform: before=%d, during_reset=%d, @15us=%d, @70us=%d, @480us=%d, final=%d",
+               level_before, level_during_reset, level_70us, level_100us, level_480us, level_final);
+    
     /* 总线检查 */
-    if (level2 == 0) {
+    if (level_final == 0) {
         /* 总线始终为低，可能短路到 GND */
         ESP_LOGE(TAG, "BUS FAULT: Line stuck LOW (shorted to GND?)");
+        ESP_LOGE(TAG, "  Waveform: before=%d, during=%d, @15us=%d, @70us=%d, @480us=%d, final=%d",
+                 level_before, level_during_reset, level_70us, level_100us, level_480us, level_final);
         return ESP_ERR_INVALID_STATE;
     }
     
     /* Presence 检测：设备会在 15-60μs 内拉低总线 60-240μs */
-    *presence = (level1 == 0);
+    *presence = (level_70us == 0);
+    
+    if (*presence) {
+        DEBUG_LOGD("Reset: Presence detected (@15us=%d, @70us=%d)", level_70us, level_100us);
+    } else {
+        DEBUG_LOGD("Reset: No presence (@15us=%d, @70us=%d)", level_70us, level_100us);
+    }
     
     return ESP_OK;
 }
@@ -343,7 +478,7 @@ static uint8_t onewire_crc8(uint8_t *data, uint8_t len)
 //////////////////////////////////////////////////////////////
 
 /**
- * @brief Search ROM 算法 - 发现总线上所有设备
+ * @brief Search ROM 算法 - 发现总线上所有设备（带位级调试）
  * 
  * 使用 1-Wire 标准二进制搜索树算法，自动发现所有设备的 64-bit ROM ID
  * 
@@ -358,21 +493,27 @@ static esp_err_t onewire_search_rom(uint8_t rom_ids[][8], uint8_t *found_count)
     uint8_t last_zero = 0;
     int device_count = 0;
     bool search_complete = false;
+    uint8_t conflict_count = 0;
     
     *found_count = 0;
+    
+    ESP_LOGI(TAG, "Starting 1-Wire ROM search...");
     
     while (!search_complete && device_count < MAX31850_SENSOR_COUNT) {
         bool presence;
         esp_err_t err = onewire_reset(&presence);
         if (err != ESP_OK || !presence) {
-            ESP_LOGE(TAG, "Search ROM: No device present");
+            ESP_LOGE(TAG, "Search ROM: No device present (reset failed)");
             return ESP_ERR_NOT_FOUND;
         }
+        
+        DEBUG_LOGD("Search iteration %d, last_discrepancy=%d", device_count + 1, last_discrepancy);
         
         /* 发送 Search ROM 命令 */
         onewire_write_byte(ONEWIRE_CMD_SEARCH_ROM);
         
         last_zero = 0;
+        conflict_count = 0;
         
         for (uint8_t bit_pos = 0; bit_pos < 64; bit_pos++) {
             uint8_t bit_actual, bit_complement, selected_bit;
@@ -383,24 +524,30 @@ static esp_err_t onewire_search_rom(uint8_t rom_ids[][8], uint8_t *found_count)
             
             if (bit_actual == 1 && bit_complement == 1) {
                 /* 无设备响应 */
-                ESP_LOGW(TAG, "Search ROM: No response at bit %d", bit_pos);
+                ESP_LOGW(TAG, "Search ROM: No response at bit %d (1/1)", bit_pos);
+                ESP_LOGW(TAG, "  -> bit_actual=1, bit_complement=1 means no devices");
                 return ESP_ERR_NOT_FOUND;
             } else if (bit_actual == 0 && bit_complement == 0) {
                 /* 冲突：多个设备在该位不同 */
+                conflict_count++;
                 if (bit_pos == last_discrepancy) {
                     selected_bit = 1;
+                    DEBUG_LOGV("  Bit %d: Conflict, taking path 1 (last_discrepancy)", bit_pos);
                 } else if (bit_pos > last_discrepancy) {
                     selected_bit = 0;
                     last_zero = bit_pos;
+                    DEBUG_LOGV("  Bit %d: Conflict, taking path 0 (new)", bit_pos);
                 } else {
                     selected_bit = (rom_id[bit_pos / 8] >> (bit_pos % 8)) & 0x01;
                     if (selected_bit == 0) {
                         last_zero = bit_pos;
                     }
+                    DEBUG_LOGV("  Bit %d: Conflict, following previous path=%d", bit_pos, selected_bit);
                 }
             } else {
                 /* 无冲突，所有设备该位相同 */
                 selected_bit = bit_actual;
+                DEBUG_LOGV("  Bit %d: No conflict, value=%d", bit_pos, selected_bit);
             }
             
             /* 写入选择的位 */
@@ -415,24 +562,33 @@ static esp_err_t onewire_search_rom(uint8_t rom_ids[][8], uint8_t *found_count)
         }
         
         /* 验证 ROM CRC */
-        if (onewire_crc8(rom_id, 7) != rom_id[7]) {
-            ESP_LOGW(TAG, "Search ROM: ROM CRC error");
+        uint8_t calc_crc = onewire_crc8(rom_id, 7);
+        if (calc_crc != rom_id[7]) {
+            ESP_LOGW(TAG, "Search ROM: ROM CRC error at device %d", device_count + 1);
+            ESP_LOGW(TAG, "  ROM: %02X-%02X-%02X-%02X-%02X-%02X-%02X-%02X",
+                     rom_id[0], rom_id[1], rom_id[2], rom_id[3],
+                     rom_id[4], rom_id[5], rom_id[6], rom_id[7]);
+            ESP_LOGW(TAG, "  Calc CRC: 0x%02X, Recv CRC: 0x%02X", calc_crc, rom_id[7]);
             return ESP_ERR_INVALID_CRC;
         }
         
         /* 保存发现的设备 */
         memcpy(rom_ids[device_count], rom_id, 8);
         device_count++;
-        ESP_LOGI(TAG, "Found device %d: ROM ID %02X%02X%02X%02X%02X%02X%02X%02X",
+        
+        ESP_LOGI(TAG, "Found device %d: ROM ID %02X-%02X-%02X-%02X-%02X-%02X-%02X-%02X (conflicts=%d)",
                  device_count,
                  rom_id[0], rom_id[1], rom_id[2], rom_id[3],
-                 rom_id[4], rom_id[5], rom_id[6], rom_id[7]);
+                 rom_id[4], rom_id[5], rom_id[6], rom_id[7],
+                 conflict_count);
         
         /* 检查是否还有更多设备 */
         if (last_discrepancy == 0) {
             search_complete = true;
+            ESP_LOGI(TAG, "Search complete: %d device(s) found", device_count);
         } else {
             last_discrepancy = last_zero;
+            DEBUG_LOGD("Continuing search with last_discrepancy=%d", last_discrepancy);
         }
     }
     
@@ -458,7 +614,7 @@ static void onewire_match_rom(uint8_t rom_id[8])
 //////////////////////////////////////////////////////////////
 
 /**
- * @brief 读取 MAX31850 暂存器（9 字节）
+ * @brief 读取 MAX31850 暂存器（9 字节，带详细日志）
  * 
  * MAX31850 是 Read-Only 设备，Match ROM 后芯片自动输出 9 字节数据
  * 无需发送 Read Scratchpad 命令，但为了兼容性可以发送 0xBE
@@ -472,9 +628,11 @@ static esp_err_t max31850_read_scratchpad(uint8_t rom_id[8], uint8_t data[9])
     bool presence;
     esp_err_t err = onewire_reset(&presence);
     if (err != ESP_OK) {
+        DEBUG_LOGD("Read scratchpad: Reset failed");
         return err;
     }
     if (!presence) {
+        DEBUG_LOGD("Read scratchpad: No device present");
         return ESP_ERR_NOT_FOUND;
     }
     
@@ -488,6 +646,11 @@ static esp_err_t max31850_read_scratchpad(uint8_t rom_id[8], uint8_t data[9])
     for (int i = 0; i < 9; i++) {
         data[i] = onewire_read_byte();
     }
+    
+    /* 打印原始数据 */
+    DEBUG_LOGV("Scratchpad raw: [%02X %02X %02X %02X %02X %02X %02X %02X %02X]",
+               data[0], data[1], data[2], data[3], data[4],
+               data[5], data[6], data[7], data[8]);
     
     return ESP_OK;
 }
@@ -515,7 +678,12 @@ static max31850_err_t max31850_parse_data(uint8_t data[9],
                                            uint8_t *fault_out)
 {
     /* CRC 校验 */
-    if (onewire_crc8(data, 8) != data[8]) {
+    uint8_t calc_crc = onewire_crc8(data, 8);
+    if (calc_crc != data[8]) {
+        DEBUG_LOGD("CRC failed: calc=0x%02X, recv=0x%02X", calc_crc, data[8]);
+        DEBUG_LOGD("Data: [%02X %02X %02X %02X %02X %02X %02X %02X]",
+                   data[0], data[1], data[2], data[3],
+                   data[4], data[5], data[6], data[7]);
         return MAX31850_ERR_CRC;
     }
     
@@ -532,14 +700,20 @@ static max31850_err_t max31850_parse_data(uint8_t data[9],
     /* 故障检测 */
     *fault_out = data[4];
     if (*fault_out & MAX31850_FAULT_OPEN) {
+        DEBUG_LOGD("Fault: Thermocouple Open Circuit");
         return MAX31850_ERR_OPEN;
     }
     if (*fault_out & MAX31850_FAULT_SHORT_GND) {
+        DEBUG_LOGD("Fault: Short to GND");
         return MAX31850_ERR_SHORT_GND;
     }
     if (*fault_out & MAX31850_FAULT_SHORT_VCC) {
+        DEBUG_LOGD("Fault: Short to VCC");
         return MAX31850_ERR_SHORT_VCC;
     }
+    
+    DEBUG_LOGV("Parsed: TC=%.2f°C, CJ=%.2f°C, Fault=0x%02X", 
+               *temp_out, *cj_temp_out, *fault_out);
     
     return MAX31850_OK;
 }
@@ -710,21 +884,32 @@ esp_err_t max31850_init(gpio_num_t gpio_num)
     };
     gpio_config(&io_conf);
     
-    /* 设置总线空闲状态（高电平） */
-    onewire_set_level(1);
-    onewire_set_input();
-    
-    /* 检查总线空闲电平 */
-    onewire_delay_us(100);
-    if (onewire_get_level() == 0) {
-        ESP_LOGE(TAG, "BUS FAULT: Line shorted to GND at startup");
-        gpio_uninstall_isr_service();
+    /* 执行 GPIO 诊断测试 */
+    esp_err_t diag_err = onewire_diagnose_gpio();
+    if (diag_err != ESP_OK) {
+        ESP_LOGE(TAG, "GPIO diagnostic failed, aborting init");
         vSemaphoreDelete(s_mutex);
         s_mutex = NULL;
-        return ESP_ERR_INVALID_STATE;
+        return diag_err;
     }
     
     ESP_LOGI(TAG, "MAX31850 Init: GPIO%d configured as open-drain", s_onewire_pin);
+    
+    /* 测试 Reset/Presence */
+    ESP_LOGI(TAG, "Testing 1-Wire Reset/Presence...");
+    bool presence;
+    esp_err_t reset_err = onewire_reset(&presence);
+    if (reset_err != ESP_OK) {
+        ESP_LOGE(TAG, "Reset test failed: %s", 
+                 reset_err == ESP_ERR_INVALID_STATE ? "Bus fault" : "Unknown error");
+        /* 继续初始化，允许后台重试 */
+    } else if (!presence) {
+        ESP_LOGW(TAG, "No device detected during reset test");
+        ESP_LOGW(TAG, "  -> Check sensor power and connections");
+        ESP_LOGW(TAG, "  -> Verify 4.7K pull-up resistors");
+    } else {
+        ESP_LOGI(TAG, "Reset test passed: Device presence detected");
+    }
     
     /* 执行 Search ROM 发现所有设备 */
     uint8_t rom_ids[MAX31850_SENSOR_COUNT][8];
