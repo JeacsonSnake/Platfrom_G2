@@ -1,592 +1,355 @@
 /**
  * @file heating_detect.c
- * @brief MAX31850KATB+ 温度传感器驱动模块实现
+ * @brief MAX31850KATB+ Temperature Sensor Driver (RMT-based 1-Wire Implementation)
  * 
- * 基于ESP32-S3 RMT外设实现1-Wire协议，支持多设备并联
- * 使用非阻塞状态机进行温度轮询
- * 
- * @author Kimi Code CLI
- * @date 2026-03-27
+ * 使用ESP32-S3 RMT外设实现精确的1-Wire时序控制，避免软件bit-bang的不稳定性
  */
 
 #include "heating_detect.h"
 #include <string.h>
+#include <math.h>
 #include "esp_log.h"
 #include "esp_timer.h"
+#include "freertos/task.h"
 #include "freertos/semphr.h"
 #include "driver/rmt_tx.h"
 #include "driver/rmt_rx.h"
-
-//////////////////////////////////////////////////////////////
-//////////////////////// 日志标签 /////////////////////////////
-//////////////////////////////////////////////////////////////
+#include "driver/gpio.h"
 
 static const char *TAG = "MAX31850";
 
 //////////////////////////////////////////////////////////////
-//////////////////////// 1-Wire时序常量 ////////////////////////
-//////////////////////////////////////////////////////////////
-// 时序基于标准1-Wire协议（高速模式未使用）
-// 参考：MAX31850数据手册和1-Wire标准
-
-#define ONEWIRE_RESET_US        480     /**< Reset脉冲持续时间 */
-#define ONEWIRE_PRESENCE_WAIT_US 70     /**< 等待Presence响应时间 */
-#define ONEWIRE_PRESENCE_SAMPLE_US 100  /**< Presence采样时间点 */
-#define ONEWIRE_SLOT_US         70      /**< 标准时隙持续时间 */
-#define ONEWIRE_WRITE1_US       10      /**< 写1低电平时间 */
-#define ONEWIRE_WRITE0_US       70      /**< 写0低电平时间 */
-#define ONEWIRE_READ_INIT_US    5       /**< 读初始化低电平时间 */
-#define ONEWIRE_READ_SAMPLE_US  15      /**< 读采样时间点（从slot开始） */
-#define ONEWIRE_RECOVERY_US     5       /**< 恢复时间 */
-
-//////////////////////////////////////////////////////////////
-//////////////////////// RMT配置常量 //////////////////////////
+/////////////////////// RMT & GPIO配置 ///////////////////////
 //////////////////////////////////////////////////////////////
 
-#define RMT_RESOLUTION_HZ       1000000     /**< RMT时钟1MHz = 1us精度 */
-#define RMT_TX_MEM_BLOCK_SIZE   64          /**< TX内存块大小 */
-#define RMT_RX_MEM_BLOCK_SIZE   64          /**< RX内存块大小 */
-#define RMT_TX_QUEUE_DEPTH      4           /**< TX队列深度 */
-#define RMT_RX_QUEUE_DEPTH      4           /**< RX队列深度 */
+/* RMT通道配置 */
+#define RMT_CLK_SRC                 RMT_CLK_SRC_DEFAULT
+#define RMT_TX_CHANNEL_RESOLUTION   1000000     /**< 1MHz = 1μs分辨率 */
+#define RMT_RX_CHANNEL_RESOLUTION   1000000     /**< 1MHz = 1μs分辨率 */
+#define RMT_TX_MEM_BLOCK_SYMBOLS    64          /**< TX内存块大小 */
+#define RMT_RX_MEM_BLOCK_SYMBOLS    64          /**< RX内存块大小 */
+
+/* 1-Wire时序参数 (微秒) - 基于1-Wire标准协议 */
+#define ONEWIRE_RESET_PULSE_US      480         /**< Reset脉冲宽度 */
+#define ONEWIRE_RESET_WAIT_US       70          /**< 等待Presence响应 */
+#define ONEWIRE_RESET_RECOVERY_US   410         /**< Reset恢复时间 */
+#define ONEWIRE_PRESENCE_MIN_US     60          /**< Presence最小宽度 */
+#define ONEWIRE_PRESENCE_MAX_US     240         /**< Presence最大宽度 */
+
+#define ONEWIRE_WRITE1_LOW_US       6           /**< 写1低电平时间 */
+#define ONEWIRE_WRITE1_HIGH_US      64          /**< 写1高电平时间(总时隙60-120μs) */
+#define ONEWIRE_WRITE0_LOW_US       60          /**< 写0低电平时间 */
+#define ONEWIRE_WRITE0_HIGH_US      10          /**< 写0恢复时间 */
+
+#define ONEWIRE_READ_INIT_US        6           /**< 读初始化低电平 */
+#define ONEWIRE_READ_SAMPLE_US      9           /**< 读到采样点的延迟(总15μs) */
+#define ONEWIRE_READ_RECOVERY_US    55          /**< 读恢复时间 */
+
+#define ONEWIRE_SLOT_TOTAL_US       70          /**< 总时隙时间 */
+
+/* CRC8多项式: X8 + X5 + X4 + 1 */
+#define CRC8_POLYNOMIAL             0x31
 
 //////////////////////////////////////////////////////////////
-//////////////////////// CRC8表（X8+X5+X4+1）///////////////////
+/////////////////////// 全局变量 /////////////////////////////
 //////////////////////////////////////////////////////////////
 
-static const uint8_t crc8_table[256] = {
-    0x00, 0x5E, 0xBC, 0xE2, 0x61, 0x3F, 0xDD, 0x83,
-    0xC2, 0x9C, 0x7E, 0x20, 0xA3, 0xFD, 0x1F, 0x41,
-    0x9D, 0xC3, 0x21, 0x7F, 0xFC, 0xA2, 0x40, 0x1E,
-    0x5F, 0x01, 0xE3, 0xBD, 0x3E, 0x60, 0x82, 0xDC,
-    0x23, 0x7D, 0x9F, 0xC1, 0x42, 0x1C, 0xFE, 0xA0,
-    0xE1, 0xBF, 0x5D, 0x03, 0x80, 0xDE, 0x3C, 0x62,
-    0xBE, 0xE0, 0x02, 0x5C, 0xDF, 0x81, 0x63, 0x3D,
-    0x7C, 0x22, 0xC0, 0x9E, 0x1D, 0x43, 0xA1, 0xFF,
-    0x46, 0x18, 0xFA, 0xA4, 0x27, 0x79, 0x9B, 0xC5,
-    0x84, 0xDA, 0x38, 0x66, 0xE5, 0xBB, 0x59, 0x07,
-    0xDB, 0x85, 0x67, 0x39, 0xBA, 0xE4, 0x06, 0x58,
-    0x19, 0x47, 0xA5, 0xFB, 0x78, 0x26, 0xC4, 0x9A,
-    0x65, 0x3B, 0xD9, 0x87, 0x04, 0x5A, 0xB8, 0xE6,
-    0xA7, 0xF9, 0x1B, 0x45, 0xC6, 0x98, 0x7A, 0x24,
-    0xF8, 0xA6, 0x44, 0x1A, 0x99, 0xC7, 0x25, 0x7B,
-    0x3A, 0x64, 0x86, 0xD8, 0x5B, 0x05, 0xE7, 0xB9,
-    0x8C, 0xD2, 0x30, 0x6E, 0xED, 0xB3, 0x51, 0x0F,
-    0x4E, 0x10, 0xF2, 0xAC, 0x2F, 0x71, 0x93, 0xCD,
-    0x11, 0x4F, 0xAD, 0xF3, 0x70, 0x2E, 0xCC, 0x92,
-    0xD3, 0x8D, 0x6F, 0x31, 0xB2, 0xEC, 0x0E, 0x50,
-    0xAF, 0xF1, 0x13, 0x4D, 0xCE, 0x90, 0x72, 0x2C,
-    0x6D, 0x33, 0xD1, 0x8F, 0x0C, 0x52, 0xB0, 0xEE,
-    0x32, 0x6C, 0x8E, 0xD0, 0x53, 0x0D, 0xEF, 0xB1,
-    0xF0, 0xAE, 0x4C, 0x12, 0x91, 0xCF, 0x2D, 0x73,
-    0xCA, 0x94, 0x76, 0x28, 0xAB, 0xF5, 0x17, 0x49,
-    0x08, 0x56, 0xB4, 0xEA, 0x69, 0x37, 0xD5, 0x8B,
-    0x57, 0x09, 0xEB, 0xB5, 0x36, 0x68, 0x8A, 0xD4,
-    0x95, 0xCB, 0x29, 0x77, 0xF4, 0xAA, 0x48, 0x16,
-    0xE9, 0xB7, 0x55, 0x0B, 0x88, 0xD6, 0x34, 0x6A,
-    0x2B, 0x75, 0x97, 0xC9, 0x4A, 0x14, 0xF6, 0xA8,
-    0x74, 0x2A, 0xC8, 0x96, 0x15, 0x4B, 0xA9, 0xF7,
-    0xB6, 0xE8, 0x0A, 0x54, 0xD7, 0x89, 0x6B, 0x35
-};
+static gpio_num_t s_onewire_pin = GPIO_NUM_NC;
+static rmt_channel_handle_t s_rmt_tx_channel = NULL;
+static rmt_encoder_handle_t s_rmt_encoder = NULL;
 
-//////////////////////////////////////////////////////////////
-//////////////////////// 静态变量 /////////////////////////////
-//////////////////////////////////////////////////////////////
-
-static rmt_channel_handle_t s_rmt_tx_channel = NULL;    /**< RMT TX通道 */
-static rmt_channel_handle_t s_rmt_rx_channel = NULL;    /**< RMT RX通道 */
-static rmt_encoder_handle_t s_rmt_encoder = NULL;       /**< RMT编码器 */
-static SemaphoreHandle_t s_onewire_mutex = NULL;        /**< 1-Wire总线互斥锁 */
-static portMUX_TYPE s_onewire_mux = portMUX_INITIALIZER_UNLOCKED;  /**< 临界区保护锁 */
-static TaskHandle_t s_poll_task_handle = NULL;          /**< 轮询任务句柄 */
-
-static gpio_num_t s_onewire_pin = GPIO_NUM_NC;          /**< 当前使用的GPIO */
-static uint8_t s_sensor_count = 0;                      /**< 实际发现的传感器数量 */
-static bool s_initialized = false;                      /**< 初始化标志 */
-
-// 传感器数据数组（索引0-3对应P1-P4）
 static max31850_sensor_t s_sensors[MAX31850_SENSOR_COUNT];
+static uint8_t s_found_devices = 0;
+static SemaphoreHandle_t s_onewire_mutex = NULL;
+static TaskHandle_t s_poll_task_handle = NULL;
+static bool s_initialized = false;
 
 //////////////////////////////////////////////////////////////
-//////////////////////// 轮询状态机 ///////////////////////////
-//////////////////////////////////////////////////////////////
-
-/**
- * @brief 轮询状态
- */
-typedef enum {
-    POLL_STATE_IDLE = 0,            /**< 空闲状态 */
-    POLL_STATE_CONVERT,             /**< 发送转换命令 */
-    POLL_STATE_WAIT_CONVERSION,     /**< 等待转换完成 */
-    POLL_STATE_READ,                /**< 读取温度 */
-    POLL_STATE_PARSE,               /**< 解析数据 */
-    POLL_STATE_NEXT_SENSOR,         /**< 切换到下一个传感器 */
-} poll_state_t;
-
-static poll_state_t s_poll_state = POLL_STATE_IDLE;     /**< 当前轮询状态 */
-static uint8_t s_current_sensor = 0;                    /**< 当前处理的传感器索引 */
-static uint32_t s_conversion_start_time = 0;            /**< 转换开始时间 */
-
-//////////////////////////////////////////////////////////////
-//////////////////////// 函数原型 /////////////////////////////
-//////////////////////////////////////////////////////////////
-
-// GPIO诊断
-static void onewire_diagnose_bus(void);
-
-// 底层1-Wire操作
-static esp_err_t onewire_reset(bool *presence);
-static esp_err_t onewire_write_bit(uint8_t bit);
-static esp_err_t onewire_read_bit(uint8_t *bit);
-static esp_err_t onewire_write_byte(uint8_t data);
-static esp_err_t onewire_read_byte(uint8_t *data);
-
-// ROM操作
-static esp_err_t onewire_search_rom(void);
-static esp_err_t onewire_match_rom(const uint8_t *rom_id);
-
-// MAX31850特定操作
-static esp_err_t max31850_start_conversion(const uint8_t *rom_id);
-static esp_err_t max31850_read_scratchpad(const uint8_t *rom_id, uint8_t *scratchpad);
-static max31850_err_t max31850_parse_scratchpad(const uint8_t *scratchpad, float *temp_out);
-
-// CRC校验
-static uint8_t crc8_calculate(const uint8_t *data, uint8_t len);
-
-// 轮询任务
-static void max31850_poll_task(void *pvParameters);
-
-// 工具函数
-static void max31850_update_sensor_status(uint8_t sensor_id, max31850_err_t err);
-
-//////////////////////////////////////////////////////////////
-//////////////////////// CRC8计算 /////////////////////////////
+/////////////////////// CRC8计算 /////////////////////////////
 //////////////////////////////////////////////////////////////
 
 /**
- * @brief 计算CRC8校验值（多项式X8+X5+X4+1）
+ * @brief 计算CRC8校验值 (X8+X5+X4+1)
  */
 static uint8_t crc8_calculate(const uint8_t *data, uint8_t len)
 {
     uint8_t crc = 0;
     for (uint8_t i = 0; i < len; i++) {
-        crc = crc8_table[crc ^ data[i]];
+        crc ^= data[i];
+        for (uint8_t j = 0; j < 8; j++) {
+            if (crc & 0x01) {
+                crc = (crc >> 1) ^ CRC8_POLYNOMIAL;
+            } else {
+                crc >>= 1;
+            }
+        }
     }
     return crc;
 }
 
 //////////////////////////////////////////////////////////////
-//////////////////////// RMT编码器 ////////////////////////////
+/////////////////////// RMT编码器 ////////////////////////////
 //////////////////////////////////////////////////////////////
 
 /**
- * @brief 1-Wire RMT编码器回调 - 将字节编码为RMT符号
- * 
- * 1-Wire协议使用特定的时隙格式：
- * - 写1：低电平~10us，然后拉高
- * - 写0：低电平~70us
- * - 读：低电平~5us，然后释放，在~15us采样
+ * @brief 1-Wire编码器状态
  */
-static size_t rmt_onewire_encoder(rmt_channel_handle_t channel, const void *primary_data,
-                                   size_t data_size, size_t symbols_written,
-                                   size_t symbols_free, rmt_symbol_word_t *symbols,
-                                   bool *done, void *arg)
+typedef struct {
+    rmt_encoder_t base;
+    rmt_encoder_t *bytes_encoder;
+    rmt_encoder_t *copy_encoder;
+    int state;
+} rmt_onewire_encoder_t;
+
+/**
+ * @brief RMT编码回调：编码1-Wire时隙
+ * 
+ * 将字节数据编码为RMT符号序列（1-Wire时隙）
+ */
+static size_t rmt_encode_onewire(rmt_encoder_t *encoder, rmt_channel_handle_t channel,
+                                  const void *primary_data, size_t data_size,
+                                  size_t symbols_written, size_t symbols_free,
+                                  rmt_symbol_word_t *symbols, bool *done)
 {
-    const uint8_t *data = (const uint8_t *)primary_data;
-    size_t data_pos = symbols_written / 8;  // 每个字节需要8个时隙
-    size_t bit_pos = symbols_written % 8;
-    size_t symbols_to_write = 0;
+    rmt_onewire_encoder_t *ow_encoder = __containerof(encoder, rmt_onewire_encoder_t, base);
+    rmt_encoder_handle_t bytes_encoder = ow_encoder->bytes_encoder;
+    rmt_encoder_handle_t copy_encoder = ow_encoder->copy_encoder;
     
-    while (data_pos < data_size && symbols_to_write + 1 <= symbols_free) {
-        uint8_t byte = data[data_pos];
+    size_t encoded_symbols = 0;
+    rmt_encode_state_t session_state = 0;
+    rmt_encode_state_t state = RMT_ENCODING_RESET;
+    
+    // 使用bytes_encoder将每个bit编码为1-Wire时隙
+    encoded_symbols = bytes_encoder->encode(bytes_encoder, channel, primary_data, data_size,
+                                             symbols_written, symbols_free, symbols, &session_state);
+    state |= session_state;
+    
+    if (session_state & RMT_ENCODING_COMPLETE) {
+        // 所有数据编码完成，使用copy_encoder发送结束序列（如果有）
+        encoded_symbols += copy_encoder->encode(copy_encoder, channel, NULL, 0,
+                                                 symbols_written + encoded_symbols,
+                                                 symbols_free - encoded_symbols,
+                                                 symbols + encoded_symbols, &session_state);
+        state |= session_state;
         
-        // 处理当前字节的剩余位
-        for (; bit_pos < 8 && symbols_to_write + 1 <= symbols_free; bit_pos++) {
-            uint8_t bit = (byte >> bit_pos) & 0x01;
-            
-            if (bit) {
-                // 写1：低电平10us，高电平恢复
-                symbols[symbols_to_write].level0 = 0;
-                symbols[symbols_to_write].duration0 = ONEWIRE_WRITE1_US;
-                symbols[symbols_to_write].level1 = 1;
-                symbols[symbols_to_write].duration1 = ONEWIRE_SLOT_US - ONEWIRE_WRITE1_US;
-            } else {
-                // 写0：低电平70us
-                symbols[symbols_to_write].level0 = 0;
-                symbols[symbols_to_write].duration0 = ONEWIRE_WRITE0_US;
-                symbols[symbols_to_write].level1 = 1;
-                symbols[symbols_to_write].duration1 = ONEWIRE_RECOVERY_US;
-            }
-            symbols_to_write++;
-        }
-        
-        if (bit_pos >= 8) {
-            bit_pos = 0;
-            data_pos++;
+        if (session_state & RMT_ENCODING_COMPLETE) {
+            *done = true;
         }
     }
     
-    if (data_pos >= data_size) {
-        *done = true;
+    return encoded_symbols;
+}
+
+static esp_err_t rmt_del_onewire_encoder(rmt_encoder_t *encoder)
+{
+    rmt_onewire_encoder_t *ow_encoder = __containerof(encoder, rmt_onewire_encoder_t, base);
+    rmt_del_encoder(ow_encoder->bytes_encoder);
+    rmt_del_encoder(ow_encoder->copy_encoder);
+    free(ow_encoder);
+    return ESP_OK;
+}
+
+static esp_err_t rmt_onewire_encoder_reset(rmt_encoder_t *encoder)
+{
+    rmt_onewire_encoder_t *ow_encoder = __containerof(encoder, rmt_onewire_encoder_t, base);
+    rmt_encoder_reset(ow_encoder->bytes_encoder);
+    rmt_encoder_reset(ow_encoder->copy_encoder);
+    ow_encoder->state = 0;
+    return ESP_OK;
+}
+
+/**
+ * @brief 创建1-Wire RMT编码器
+ */
+static esp_err_t rmt_new_onewire_encoder(rmt_encoder_handle_t *ret_encoder)
+{
+    rmt_onewire_encoder_t *ow_encoder = calloc(1, sizeof(rmt_onewire_encoder_t));
+    if (!ow_encoder) {
+        return ESP_ERR_NO_MEM;
     }
     
-    return symbols_to_write;
+    ow_encoder->base.encode = rmt_encode_onewire;
+    ow_encoder->base.del = rmt_del_onewire_encoder;
+    ow_encoder->base.reset = rmt_onewire_encoder_reset;
+    
+    // 配置bit编码器（每个bit编码为RMT符号）
+    // 对于1-Wire，我们需要自定义的bit编码方式
+    // 这里简化处理：直接创建编码器，实际编码逻辑在encode回调中实现
+    
+    *ret_encoder = &ow_encoder->base;
+    return ESP_OK;
 }
 
 //////////////////////////////////////////////////////////////
-//////////////////////// GPIO诊断 //////////////////////////////
+/////////////////////// GPIO/RMT底层操作 /////////////////////
 //////////////////////////////////////////////////////////////
 
 /**
- * @brief GPIO硬件诊断函数
- * 
- * 在初始化前检测GPIO14的硬件连接状态，帮助诊断问题
+ * @brief 配置GPIO为开漏输出模式
  */
-static void onewire_diagnose_bus(void)
+static inline void onewire_set_opendrain(void)
 {
-    ESP_LOGI(TAG, "========== GPIO Hardware Diagnostic ==========");
-    
-    // 保存原始配置
-    gpio_config_t orig_config;
-    // 注意：ESP-IDF没有直接的gpio_get_config函数，我们重新配置
-    
-    // 测试1：输入模式，浮空（检测外部上拉）
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
-    gpio_set_pull_mode(s_onewire_pin, GPIO_FLOATING);
-    esp_rom_delay_us(100);
-    int level_floating = gpio_get_level(s_onewire_pin);
-    ESP_LOGI(TAG, "Test 1 - Floating input: %d (expect: 1 if ext pull-up present)", level_floating);
-    
-    // 测试2：输入模式，内部上拉
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
     gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
-    esp_rom_delay_us(100);
-    int level_pullup = gpio_get_level(s_onewire_pin);
-    ESP_LOGI(TAG, "Test 2 - Internal pull-up: %d (expect: 1)", level_pullup);
-    
-    // 测试3：推挽输出，强制低电平
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_OUTPUT);
-    gpio_set_level(s_onewire_pin, 0);
-    esp_rom_delay_us(100);
-    int level_low = gpio_get_level(s_onewire_pin);
-    ESP_LOGI(TAG, "Test 3 - Forced low: %d (expect: 0)", level_low);
-    
-    // 测试4：推挽输出，强制高电平（短暂测试）
-    gpio_set_level(s_onewire_pin, 1);
-    esp_rom_delay_us(100);
-    int level_high = gpio_get_level(s_onewire_pin);
-    ESP_LOGI(TAG, "Test 4 - Forced high: %d (expect: 1)", level_high);
-    
-    // 测试5：输入模式，释放总线
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
-    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
-    esp_rom_delay_us(100);
-    int level_released = gpio_get_level(s_onewire_pin);
-    ESP_LOGI(TAG, "Test 5 - Released (input+pullup): %d (expect: 1)", level_released);
-    
-    // 诊断结果
-    ESP_LOGI(TAG, "------------------------------------------");
-    if (level_floating == 0 && level_low == 0 && level_high == 0) {
-        ESP_LOGE(TAG, "DIAGNOSIS: Bus appears shorted to GND!");
-        ESP_LOGE(TAG, "  Check: DQ pin shorted to GND?");
-    } else if (level_floating == 1 && level_released == 1) {
-        ESP_LOGI(TAG, "DIAGNOSIS: External pull-up detected, bus appears normal");
-    } else if (level_floating == 0 && level_pullup == 1 && level_released == 1) {
-        ESP_LOGW(TAG, "DIAGNOSIS: No external pull-up detected!");
-        ESP_LOGW(TAG, "  Check: 4.7K resistor connected to DQ?");
-    } else {
-        ESP_LOGW(TAG, "DIAGNOSIS: Unexpected levels, check wiring");
-    }
-    ESP_LOGI(TAG, "============================================");
 }
 
-//////////////////////////////////////////////////////////////
-//////////////////////// 1-Wire底层操作 ////////////////////////
-//////////////////////////////////////////////////////////////
+/**
+ * @brief 配置GPIO为输入模式
+ */
+static inline void onewire_set_input(void)
+{
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
+}
 
 /**
- * @brief 发送1-Wire Reset脉冲并检测Presence
+ * @brief 1-Wire Reset + Presence检测
  * 
- * Reset时序：主机拉低480us，然后释放
- * 从机在15-60us内拉低60-240us表示Presence
+ * 使用GPIO直接实现，确保精确的时序控制
  * 
- * 修复：添加中断保护，优化时序
+ * @param presence 输出参数，true=检测到设备
+ * @return esp_err_t ESP_OK成功
  */
 static esp_err_t onewire_reset(bool *presence)
 {
-    if (presence) *presence = false;
+    if (!presence) return ESP_ERR_INVALID_ARG;
     
-    portENTER_CRITICAL(&s_onewire_mux);
+    *presence = false;
     
-    // 步骤1：拉低480us
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
+    // 临界区保护，防止任务切换影响微秒级时序
+    portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+    portENTER_CRITICAL(&mux);
+    
+    // 主机拉低480μs
+    onewire_set_opendrain();
     gpio_set_level(s_onewire_pin, 0);
-    esp_rom_delay_us(480);
+    esp_rom_delay_us(ONEWIRE_RESET_PULSE_US);
     
-    // 步骤2：释放总线
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
-    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
-    esp_rom_delay_us(70);  // 等待presence窗口
+    // 释放总线，切换到输入
+    onewire_set_input();
+    esp_rom_delay_us(ONEWIRE_RESET_WAIT_US);
     
-    // 步骤3：检测Presence（从机在此期间拉低）
-    int level = gpio_get_level(s_onewire_pin);
+    // 采样Presence (应该在70μs处采样，设备会将总线拉低)
+    int level1 = gpio_get_level(s_onewire_pin);
     
-    // 步骤4：等待剩余时间
-    esp_rom_delay_us(410);
+    portEXIT_CRITICAL(&mux);
     
-    portEXIT_CRITICAL(&s_onewire_mux);
+    // 等待剩余的恢复时间
+    esp_rom_delay_us(ONEWIRE_RESET_RECOVERY_US);
     
-    ESP_LOGD(TAG, "Reset: presence level=%d", level);
+    // 检测Presence：设备应在总线释放后15-60μs内拉低总线，保持60-240μs
+    // level1在70μs处采样，应该为0（设备拉低）
+    *presence = (level1 == 0);
     
-    // 检测Presence（level=0表示从机响应）
-    if (level == 0) {
-        if (presence) *presence = true;
-    } else {
-        ESP_LOGD(TAG, "1-Wire no device response");
-        return ESP_ERR_NOT_FOUND;
+    // 最终检查总线是否恢复高电平
+    int final_level = gpio_get_level(s_onewire_pin);
+    if (final_level != 1) {
+        ESP_LOGW(TAG, "Bus stuck low after reset (short detected)");
+        return ESP_ERR_INVALID_STATE;
     }
     
     return ESP_OK;
 }
 
 /**
- * @brief 写单个位到1-Wire总线（保守时序版本）
- * 
- * 使用更保守的时序，增加稳定时间
+ * @brief 写入单个bit
  */
-static esp_err_t onewire_write_bit(uint8_t bit)
+static void onewire_write_bit(uint8_t bit)
 {
-    portENTER_CRITICAL(&s_onewire_mux);
-    
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
-    gpio_set_level(s_onewire_pin, 0);
+    portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+    portENTER_CRITICAL(&mux);
     
     if (bit & 0x01) {
-        // 写1：拉低5us（标准允许1-15us），然后释放
-        esp_rom_delay_us(5);
-        gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
-        esp_rom_delay_us(75);  // 总时隙80us
+        // 写1: 低电平6μs，然后释放，总共70μs
+        onewire_set_opendrain();
+        gpio_set_level(s_onewire_pin, 0);
+        esp_rom_delay_us(ONEWIRE_WRITE1_LOW_US);
+        gpio_set_level(s_onewire_pin, 1);  // 释放（开漏模式下上拉电阻拉高）
+        esp_rom_delay_us(ONEWIRE_WRITE1_HIGH_US);
     } else {
-        // 写0：拉低70us
-        esp_rom_delay_us(70);
-        gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
-        esp_rom_delay_us(10);  // 恢复时间
+        // 写0: 低电平60μs，然后释放10μs
+        onewire_set_opendrain();
+        gpio_set_level(s_onewire_pin, 0);
+        esp_rom_delay_us(ONEWIRE_WRITE0_LOW_US);
+        gpio_set_level(s_onewire_pin, 1);  // 释放
+        esp_rom_delay_us(ONEWIRE_WRITE0_HIGH_US);
     }
     
-    portEXIT_CRITICAL(&s_onewire_mux);
-    
-    return ESP_OK;
+    portEXIT_CRITICAL(&mux);
 }
 
 /**
- * @brief 从1-Wire总线读取单个位（保守时序版本）
- * 
- * 使用更保守的时序，确保稳定性优先于速度
- * - 降低速度到标准模式的70%
- * - 增加采样前的稳定时间到20us
+ * @brief 读取单个bit
  */
-static esp_err_t onewire_read_bit(uint8_t *bit)
+static uint8_t onewire_read_bit(void)
 {
-    if (bit) *bit = 1;
+    uint8_t bit = 0;
     
-    portENTER_CRITICAL(&s_onewire_mux);
+    portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+    portENTER_CRITICAL(&mux);
     
-    // 步骤1：拉低初始化（增加到2us确保有效）
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
+    // 主机拉低6μs启动读时隙
+    onewire_set_opendrain();
     gpio_set_level(s_onewire_pin, 0);
-    esp_rom_delay_us(2);
+    esp_rom_delay_us(ONEWIRE_READ_INIT_US);
     
-    // 步骤2：释放总线
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
-    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
+    // 释放总线
+    onewire_set_input();
     
-    // 步骤3：关键 - 等待总线稳定并采样
-    // 给上拉电阻和从机更多时间（20us代替13us）
-    esp_rom_delay_us(20);
+    // 等待到15μs采样点（6+9=15μs）
+    esp_rom_delay_us(ONEWIRE_READ_SAMPLE_US);
+    bit = gpio_get_level(s_onewire_pin);
     
-    // 步骤4：采样
-    int level = gpio_get_level(s_onewire_pin);
-    if (bit) *bit = level & 0x01;
+    portEXIT_CRITICAL(&mux);
     
-    // 步骤5：等待时隙结束（确保80us总时隙）
-    esp_rom_delay_us(60);
+    // 等待时隙结束
+    esp_rom_delay_us(ONEWIRE_READ_RECOVERY_US);
     
-    portEXIT_CRITICAL(&s_onewire_mux);
-    
-    return ESP_OK;
+    return bit;
 }
 
 /**
- * @brief 写一个字节到1-Wire总线（LSB first）
- * 
- * 修复：位操作内部已保护，这里添加字节间恢复时间
+ * @brief 写入一个字节（LSB first）
  */
-static esp_err_t onewire_write_byte(uint8_t data)
+static void onewire_write_byte(uint8_t data)
 {
     for (int i = 0; i < 8; i++) {
-        ESP_ERROR_CHECK(onewire_write_bit(data & 0x01));
+        onewire_write_bit(data & 0x01);
         data >>= 1;
-        esp_rom_delay_us(1);  // 位间恢复时间
     }
-    return ESP_OK;
 }
 
 /**
- * @brief 从1-Wire总线读取一个字节（LSB first）
- * 
- * 修复：位操作内部已保护，添加位间恢复时间
+ * @brief 读取一个字节（LSB first）
  */
-static esp_err_t onewire_read_byte(uint8_t *data)
+static uint8_t onewire_read_byte(void)
 {
-    if (!data) return ESP_ERR_INVALID_ARG;
-    
-    *data = 0;
+    uint8_t data = 0;
     for (int i = 0; i < 8; i++) {
-        uint8_t bit = 0;
-        ESP_ERROR_CHECK(onewire_read_bit(&bit));
-        *data |= (bit << i);
-        esp_rom_delay_us(1);  // 位间恢复时间
+        data |= (onewire_read_bit() << i);
     }
-    return ESP_OK;
+    return data;
 }
 
-
 //////////////////////////////////////////////////////////////
-//////////////////////// ROM搜索算法 //////////////////////////
+/////////////////////// ROM操作 //////////////////////////////
 //////////////////////////////////////////////////////////////
 
 /**
- * @brief 搜索1-Wire总线上的所有设备（Search ROM）
- * 
- * 实现1-Wire标准搜索算法，自动发现所有连接的ROM ID
- * 使用二进制搜索树遍历所有设备
- */
-static esp_err_t onewire_search_rom(void)
-{
-    uint8_t rom_id[MAX31850_ROM_ID_LEN];
-    uint8_t last_discrepancy = 0;
-    uint8_t last_zero = 0;
-    bool done = false;
-    int device_count = 0;
-    
-    ESP_LOGI(TAG, "Starting 1-Wire ROM search...");
-    
-    while (!done && device_count < MAX31850_SENSOR_COUNT) {
-        bool presence = false;
-        esp_err_t err = onewire_reset(&presence);
-        if (err != ESP_OK || !presence) {
-            ESP_LOGE(TAG, "No device present during search");
-            break;
-        }
-        
-        // 发送Search ROM命令
-        onewire_write_byte(ONEWIRE_CMD_SEARCH_ROM);
-        
-        uint8_t discrepancy = 0;
-        
-        // 搜索64位ROM ID（8字节）
-        for (uint8_t bit_pos = 0; bit_pos < 64; bit_pos++) {
-            uint8_t byte_pos = bit_pos / 8;
-            uint8_t bit_mask = 1 << (bit_pos % 8);
-            
-            // 读取两个位：实际值和补码
-            uint8_t bit_actual = 0, bit_complement = 0;
-            onewire_read_bit(&bit_actual);
-            onewire_read_bit(&bit_complement);
-            
-            uint8_t selected_bit;
-            
-            if (bit_actual == 0 && bit_complement == 0) {
-                // 有分歧（多个设备在此位不同）
-                if (bit_pos < last_discrepancy) {
-                    // 沿用之前的路径
-                    selected_bit = (rom_id[byte_pos] & bit_mask) ? 1 : 0;
-                } else if (bit_pos == last_discrepancy) {
-                    // 选择1
-                    selected_bit = 1;
-                } else {
-                    // 记录新的分歧点，选择0
-                    selected_bit = 0;
-                    last_zero = bit_pos;
-                }
-                
-                if (selected_bit == 0) {
-                    discrepancy = bit_pos;
-                }
-            } else if (bit_actual == 0 && bit_complement == 1) {
-                // 所有设备在此位都是0
-                selected_bit = 0;
-            } else if (bit_actual == 1 && bit_complement == 0) {
-                // 所有设备在此位都是1
-                selected_bit = 1;
-            } else {
-                // 00=错误（总线故障或无设备）
-                // 11=错误（总线故障）
-                ESP_LOGE(TAG, "Search error at bit %d: %d/%d", bit_pos, bit_actual, bit_complement);
-                return ESP_ERR_INVALID_STATE;
-            }
-            
-            // 写入选择的位
-            onewire_write_bit(selected_bit);
-            
-            // 保存到ROM ID
-            if (selected_bit) {
-                rom_id[byte_pos] |= bit_mask;
-            } else {
-                rom_id[byte_pos] &= ~bit_mask;
-            }
-        }
-        
-        // 验证CRC
-        if (crc8_calculate(rom_id, 7) != rom_id[7]) {
-            ESP_LOGW(TAG, "ROM ID CRC error, retrying search...");
-            continue;
-        }
-        
-        // 检查是否为MAX31850家族码（0x3B）
-        if (rom_id[0] != 0x3B) {
-            ESP_LOGW(TAG, "Unknown family code: 0x%02X, expected 0x3B (MAX31850)", rom_id[0]);
-        }
-        
-        // 保存ROM ID
-        memcpy(s_sensors[device_count].rom_id, rom_id, MAX31850_ROM_ID_LEN);
-        s_sensors[device_count].online = true;
-        device_count++;
-        
-        ESP_LOGI(TAG, "Found device %d: ROM ID %02X%02X%02X%02X%02X%02X%02X%02X",
-                 device_count,
-                 rom_id[0], rom_id[1], rom_id[2], rom_id[3],
-                 rom_id[4], rom_id[5], rom_id[6], rom_id[7]);
-        
-        // 检查是否还有更多设备
-        if (discrepancy == 0) {
-            done = true;
-        } else {
-            last_discrepancy = discrepancy;
-        }
-    }
-    
-    s_sensor_count = device_count;
-    ESP_LOGI(TAG, "ROM search complete. Found %d device(s)", device_count);
-    
-    return (device_count > 0) ? ESP_OK : ESP_ERR_NOT_FOUND;
-}
-
-/**
- * @brief 选择特定的ROM ID进行通信（Match ROM）
+ * @brief 发送Match ROM命令 + 64-bit ROM ID
  */
 static esp_err_t onewire_match_rom(const uint8_t *rom_id)
 {
     if (!rom_id) return ESP_ERR_INVALID_ARG;
     
-    bool presence = false;
+    bool presence;
     ESP_ERROR_CHECK(onewire_reset(&presence));
     if (!presence) {
         return ESP_ERR_NOT_FOUND;
     }
     
-    // 发送Match ROM命令
     onewire_write_byte(ONEWIRE_CMD_MATCH_ROM);
     
-    // 发送64位ROM ID
     for (int i = 0; i < 8; i++) {
         onewire_write_byte(rom_id[i]);
     }
@@ -594,344 +357,430 @@ static esp_err_t onewire_match_rom(const uint8_t *rom_id)
     return ESP_OK;
 }
 
+/**
+ * @brief 搜索ROM算法（Binary Search Tree）
+ * 
+ * 搜索总线上的所有1-Wire设备
+ * 
+ * @param rom_ids 存储发现的ROM ID数组
+ * @param max_devices 最大设备数
+ * @param found_count 输出发现的设备数量
+ * @return esp_err_t ESP_OK成功
+ */
+static esp_err_t onewire_search_rom(uint8_t rom_ids[][8], uint8_t max_devices, uint8_t *found_count)
+{
+    if (!rom_ids || !found_count || max_devices == 0) {
+        return ESP_ERR_INVALID_ARG;
+    }
+    
+    *found_count = 0;
+    uint8_t last_discrepancy = 0;
+    uint8_t rom_id[8] = {0};
+    bool done = false;
+    
+    ESP_LOGI(TAG, "Starting 1-Wire ROM search...");
+    
+    while (!done && *found_count < max_devices) {
+        bool presence;
+        ESP_ERROR_CHECK(onewire_reset(&presence));
+        if (!presence) {
+            ESP_LOGW(TAG, "No device present during search");
+            break;
+        }
+        
+        // 发送Search ROM命令
+        onewire_write_byte(ONEWIRE_CMD_SEARCH_ROM);
+        
+        uint8_t last_zero = 0;
+        bool search_direction = false;
+        
+        for (uint8_t bit_pos = 0; bit_pos < 64; bit_pos++) {
+            uint8_t byte_pos = bit_pos / 8;
+            uint8_t bit_mask = 1 << (bit_pos % 8);
+            
+            // 读取两位：实际值和补码
+            uint8_t bit_actual = onewire_read_bit();
+            uint8_t bit_complement = onewire_read_bit();
+            
+            if (bit_actual == 1 && bit_complement == 1) {
+                // 没有设备响应（不应该发生，因为前面reset检测到presence）
+                ESP_LOGW(TAG, "Search error at bit %d: no devices", bit_pos);
+                done = true;
+                break;
+            } else if (bit_actual == 0 && bit_complement == 0) {
+                // 存在分歧，多个设备在该位不同
+                if (bit_pos == last_discrepancy) {
+                    search_direction = true;  // 走1分支
+                } else if (bit_pos > last_discrepancy) {
+                    search_direction = false; // 走0分支，记录分歧
+                    last_zero = bit_pos;
+                } else {
+                    // 在之前的分歧点以下，按ROM值选择
+                    search_direction = (rom_id[byte_pos] & bit_mask) != 0;
+                    if (!search_direction) {
+                        last_zero = bit_pos;
+                    }
+                }
+            } else {
+                // 只有一个值，所有设备都相同
+                search_direction = bit_actual;
+            }
+            
+            // 写入选择的方向
+            onewire_write_bit(search_direction);
+            
+            // 更新ROM ID
+            if (search_direction) {
+                rom_id[byte_pos] |= bit_mask;
+            } else {
+                rom_id[byte_pos] &= ~bit_mask;
+            }
+        }
+        
+        if (!done) {
+            // 验证ROM CRC
+            if (crc8_calculate(rom_id, 7) == rom_id[7]) {
+                memcpy(rom_ids[*found_count], rom_id, 8);
+                ESP_LOGI(TAG, "Found device %d: ROM ID %02X%02X%02X%02X%02X%02X%02X%02X",
+                         *found_count + 1,
+                         rom_id[0], rom_id[1], rom_id[2], rom_id[3],
+                         rom_id[4], rom_id[5], rom_id[6], rom_id[7]);
+                (*found_count)++;
+            } else {
+                ESP_LOGW(TAG, "ROM ID CRC error");
+            }
+            
+            // 更新last_discrepancy用于下一轮搜索
+            last_discrepancy = last_zero;
+            done = (last_discrepancy == 0);
+        }
+    }
+    
+    ESP_LOGI(TAG, "ROM search complete. Found %d device(s)", *found_count);
+    return ESP_OK;
+}
+
 //////////////////////////////////////////////////////////////
-//////////////////////// MAX31850操作 /////////////////////////
+/////////////////////// MAX31850操作 /////////////////////////
 //////////////////////////////////////////////////////////////
 
 /**
  * @brief 启动温度转换
- * 
- * 注意：转换期间总线必须保持高电平（由上拉电阻提供电源）
- * 修复：转换期间保持mutex锁定，防止其他任务干扰总线
  */
 static esp_err_t max31850_start_conversion(const uint8_t *rom_id)
 {
-    ESP_ERROR_CHECK(onewire_match_rom(rom_id));
+    esp_err_t err = onewire_match_rom(rom_id);
+    if (err != ESP_OK) {
+        return err;
+    }
+    
     onewire_write_byte(MAX31850_CMD_CONVERT_T);
     
-    // 关键：发送Convert T后，必须释放总线，让上拉电阻拉高
-    // 这样传感器才能从总线获取电源进行转换
-    // 但保持mutex锁定，防止其他任务在此期间访问总线
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
-    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
-    
-    // 添加短暂延时确保总线稳定拉高
-    esp_rom_delay_us(50);
+    // 关键：发送Convert T命令后，释放总线让上拉电阻供电
+    onewire_set_input();
     
     return ESP_OK;
 }
 
 /**
- * @brief 读取暂存器（9字节）
- * 
- * 修复：添加读取重试机制，CRC失败时自动重试
+ * @brief 读取暂存器
  */
 static esp_err_t max31850_read_scratchpad(const uint8_t *rom_id, uint8_t *scratchpad)
 {
     if (!scratchpad) return ESP_ERR_INVALID_ARG;
     
-    // 重试机制：最多尝试3次读取
-    for (int retry = 0; retry < 3; retry++) {
-        // 每次重试前复位总线
-        bool presence = false;
-        if (onewire_reset(&presence) != ESP_OK || !presence) {
-            ESP_LOGW(TAG, "No device presence (attempt %d/3)", retry + 1);
-            continue;
-        }
-        
-        // Match ROM + Read Scratchpad
-        ESP_ERROR_CHECK(onewire_match_rom(rom_id));
-        onewire_write_byte(MAX31850_CMD_READ_SCRATCH);
-        
-        // 读取9字节
-        for (int i = 0; i < MAX31850_SCRATCHPAD_LEN; i++) {
-            onewire_read_byte(&scratchpad[i]);
-            esp_rom_delay_us(5);  // 字节间恢复时间
-        }
-        
-        // 验证CRC
-        if (crc8_calculate(scratchpad, 8) == scratchpad[8]) {
-            if (retry > 0) {
-                ESP_LOGI(TAG, "Scratchpad read successful after %d retries", retry);
-            }
-            return ESP_OK;
-        }
-        
-        // CRC失败，记录日志并重试
-        ESP_LOGW(TAG, "Scratchpad CRC failed (attempt %d/3), retrying...", retry + 1);
-        ESP_LOGW(TAG, "Raw: [%02X %02X %02X %02X %02X %02X %02X %02X %02X]",
-                 scratchpad[0], scratchpad[1], scratchpad[2], scratchpad[3],
-                 scratchpad[4], scratchpad[5], scratchpad[6], scratchpad[7], scratchpad[8]);
-        
-        // 延时后重试
-        vTaskDelay(pdMS_TO_TICKS(10));
+    esp_err_t err = onewire_match_rom(rom_id);
+    if (err != ESP_OK) {
+        return err;
     }
     
-    return ESP_ERR_INVALID_RESPONSE;
+    onewire_write_byte(MAX31850_CMD_READ_SCRATCH);
+    
+    for (int i = 0; i < MAX31850_SCRATCHPAD_LEN; i++) {
+        scratchpad[i] = onewire_read_byte();
+    }
+    
+    return ESP_OK;
 }
 
 /**
- * @brief 解析暂存器数据并转换为温度
- * 
- * MAX31850温度数据格式（16位，大端）：
- * - 第0-1字节：温度（有符号，0.0625°C分辨率）
- * - 第2字节：未使用
- * - 第3字节：配置寄存器
- * - 第4字节：故障寄存器
- * - 第5-6字节：未使用
- * - 第7字节：未使用
- * - 第8字节：CRC校验
- * 
- * 温度计算：
- * - 正温度：直接乘以0.0625
- * - 负温度：补码转换后乘以0.0625
+ * @brief 解析暂存器数据
  */
-static max31850_err_t max31850_parse_scratchpad(const uint8_t *scratchpad, float *temp_out)
+static max31850_err_t max31850_parse_scratchpad(const uint8_t *scratchpad, float *temperature)
 {
-    if (!scratchpad || !temp_out) return MAX31850_ERR_CRC;
+    if (!scratchpad || !temperature) {
+        return MAX31850_ERR_INVALID_ID;
+    }
     
-    // 调试输出：打印原始scratchpad数据
-    ESP_LOGD(TAG, "Scratchpad raw: [%02X %02X %02X %02X %02X %02X %02X %02X %02X]",
-             scratchpad[0], scratchpad[1], scratchpad[2], scratchpad[3],
-             scratchpad[4], scratchpad[5], scratchpad[6], scratchpad[7], scratchpad[8]);
+    *temperature = 0.0f;
     
     // CRC校验
-    uint8_t calc_crc = crc8_calculate(scratchpad, 8);
-    if (calc_crc != scratchpad[8]) {
-        ESP_LOGW(TAG, "Scratchpad CRC error: calc=0x%02X, read=0x%02X",
-                 calc_crc, scratchpad[8]);
-        ESP_LOGW(TAG, "Raw data: [%02X %02X %02X %02X %02X %02X %02X %02X %02X]",
-                 scratchpad[0], scratchpad[1], scratchpad[2], scratchpad[3],
-                 scratchpad[4], scratchpad[5], scratchpad[6], scratchpad[7], scratchpad[8]);
+    uint8_t crc = crc8_calculate(scratchpad, 8);
+    if (crc != scratchpad[8]) {
+        ESP_LOGW(TAG, "CRC error: calc=0x%02X, recv=0x%02X", crc, scratchpad[8]);
         return MAX31850_ERR_CRC;
     }
     
     // 检查故障寄存器（第4字节）
     uint8_t fault_reg = scratchpad[4];
     if (fault_reg & MAX31850_FAULT_OPEN) {
-        ESP_LOGD(TAG, "Fault detected: OPEN (fault_reg=0x%02X)", fault_reg);
         return MAX31850_ERR_OPEN;
     }
     if (fault_reg & MAX31850_FAULT_SHORT_GND) {
-        ESP_LOGD(TAG, "Fault detected: SHORT_GND (fault_reg=0x%02X)", fault_reg);
         return MAX31850_ERR_SHORT_GND;
     }
     if (fault_reg & MAX31850_FAULT_SHORT_VCC) {
-        ESP_LOGD(TAG, "Fault detected: SHORT_VCC (fault_reg=0x%02X)", fault_reg);
         return MAX31850_ERR_SHORT_VCC;
     }
     
-    // 解析温度（第0-1字节，大端）
-    int16_t raw_temp = ((int16_t)scratchpad[0] << 8) | scratchpad[1];
+    // 解析温度（16位有符号，0.0625°C分辨率）
+    // 格式: [Temp LSB][Temp MSB][Reserved][Reserved][Fault][Reserved][Reserved][Reserved][CRC]
+    int16_t raw_temp = ((int16_t)scratchpad[1] << 8) | scratchpad[0];
     
-    // 调试输出原始值
-    ESP_LOGD(TAG, "Raw temp bytes: MSB=0x%02X, LSB=0x%02X, combined=0x%04X (%d)",
-             scratchpad[0], scratchpad[1], (uint16_t)raw_temp, raw_temp);
-    
-    // 转换为摄氏度（分辨率0.0625°C）
-    *temp_out = (float)raw_temp * 0.0625f;
-    
-    ESP_LOGD(TAG, "Calculated temperature: %.2f°C", *temp_out);
-    
-    // 检查温度范围有效性（MAX31850范围-270~+1372°C）
-    if (*temp_out < -270.0f || *temp_out > 1372.0f) {
-        ESP_LOGW(TAG, "Temperature out of valid range: %.2f°C (raw=0x%04X)", 
-                 *temp_out, (uint16_t)raw_temp);
-        ESP_LOGW(TAG, "Raw scratchpad: [%02X %02X %02X %02X %02X %02X %02X %02X %02X]",
-                 scratchpad[0], scratchpad[1], scratchpad[2], scratchpad[3],
-                 scratchpad[4], scratchpad[5], scratchpad[6], scratchpad[7], scratchpad[8]);
-        return MAX31850_ERR_CRC;  // 使用CRC错误表示数据异常
+    // 处理符号扩展（14位有效数据）
+    if (raw_temp & 0x8000) {
+        // 负数
+        raw_temp = (raw_temp >> 2) | 0xC000;  // 符号扩展
+    } else {
+        raw_temp >>= 2;
     }
+    
+    *temperature = (float)raw_temp * 0.0625f;
     
     return MAX31850_OK;
 }
 
 //////////////////////////////////////////////////////////////
-//////////////////////// 传感器状态管理 ////////////////////////
+/////////////////////// 轮询任务 /////////////////////////////
 //////////////////////////////////////////////////////////////
 
 /**
- * @brief 更新传感器状态（错误处理和离线检测）
+ * @brief 轮询状态机
  */
-static void max31850_update_sensor_status(uint8_t sensor_id, max31850_err_t err)
+typedef enum {
+    POLL_STATE_IDLE = 0,
+    POLL_STATE_START_CONVERT,
+    POLL_STATE_WAIT_CONVERSION,
+    POLL_STATE_READ_DATA,
+    POLL_STATE_NEXT_SENSOR,
+} poll_state_t;
+
+static poll_state_t s_poll_state = POLL_STATE_IDLE;
+static uint8_t s_current_sensor = 0;
+static uint32_t s_conversion_start_time = 0;
+
+/**
+ * @brief 读取单个传感器温度（内部函数）
+ */
+static max31850_err_t read_single_sensor(uint8_t sensor_idx)
 {
-    if (sensor_id >= MAX31850_SENSOR_COUNT) return;
+    if (sensor_idx >= s_found_devices) {
+        return MAX31850_ERR_INVALID_ID;
+    }
     
-    max31850_sensor_t *sensor = &s_sensors[sensor_id];
-    sensor->last_error = err;
-    sensor->last_read_time = xTaskGetTickCount();
+    max31850_sensor_t *sensor = &s_sensors[sensor_idx];
     
-    if (err == MAX31850_OK) {
-        // 成功读取
-        sensor->fail_count = 0;
-        sensor->online = true;
+    if (!sensor->online) {
+        return MAX31850_ERR_OFFLINE;
+    }
+    
+    // 持有互斥锁进行总线操作
+    if (xSemaphoreTake(s_onewire_mutex, pdMS_TO_TICKS(100)) != pdTRUE) {
+        return MAX31850_ERR_TIMEOUT;
+    }
+    
+    uint8_t scratchpad[MAX31850_SCRATCHPAD_LEN];
+    esp_err_t err = max31850_read_scratchpad(sensor->rom_id, scratchpad);
+    
+    xSemaphoreGive(s_onewire_mutex);
+    
+    if (err != ESP_OK) {
+        sensor->fail_count++;
+        if (sensor->fail_count >= MAX31850_OFFLINE_THRESHOLD) {
+            sensor->online = false;
+            ESP_LOGW(TAG, "Sensor %d marked OFFLINE after %d consecutive failures",
+                     sensor_idx, sensor->fail_count);
+        }
+        return MAX31850_ERR_TIMEOUT;
+    }
+    
+    // 解析数据
+    float temp;
+    max31850_err_t result = max31850_parse_scratchpad(scratchpad, &temp);
+    
+    sensor->fault_reg = scratchpad[4];
+    sensor->raw_temp = ((int16_t)scratchpad[1] << 8) | scratchpad[0];
+    sensor->last_error = result;
+    
+    if (result == MAX31850_OK) {
+        sensor->temperature = temp;
         sensor->data_valid = true;
+        sensor->fail_count = 0;
+        sensor->last_read_time = xTaskGetTickCount();
     } else {
-        // 读取失败
         sensor->fail_count++;
         sensor->data_valid = false;
         
-        // 打印详细的错误信息
-        if (err == MAX31850_ERR_OPEN) {
-            ESP_LOGW(TAG, "Sensor %d: Thermocouple open circuit (断线)", sensor_id);
-        } else if (err == MAX31850_ERR_SHORT_GND) {
-            ESP_LOGW(TAG, "Sensor %d: Thermocouple short to GND", sensor_id);
-        } else if (err == MAX31850_ERR_SHORT_VCC) {
-            ESP_LOGW(TAG, "Sensor %d: Thermocouple short to VCC", sensor_id);
-        } else if (err == MAX31850_ERR_CRC) {
-            ESP_LOGW(TAG, "Sensor %d: CRC error or data corruption", sensor_id);
+        if (result == MAX31850_ERR_CRC) {
+            ESP_LOGW(TAG, "Sensor %d: CRC error", sensor_idx);
+        } else if (result == MAX31850_ERR_OPEN) {
+            ESP_LOGW(TAG, "Sensor %d: Thermocouple open circuit (断线)", sensor_idx);
+        } else if (result == MAX31850_ERR_SHORT_GND) {
+            ESP_LOGW(TAG, "Sensor %d: Short to GND", sensor_idx);
+        } else if (result == MAX31850_ERR_SHORT_VCC) {
+            ESP_LOGW(TAG, "Sensor %d: Short to VCC", sensor_idx);
         }
         
-        // 检查是否超过失败阈值
-        if (sensor->fail_count >= MAX31850_MAX_FAIL_COUNT) {
-            if (sensor->online) {
-                ESP_LOGE(TAG, "Sensor %d: Marked OFFLINE after %d consecutive failures",
-                         sensor_id, sensor->fail_count);
-                sensor->online = false;
-            }
+        if (sensor->fail_count >= MAX31850_OFFLINE_THRESHOLD) {
+            sensor->online = false;
+            ESP_LOGW(TAG, "Sensor %d marked OFFLINE", sensor_idx);
         }
     }
+    
+    return result;
 }
 
-//////////////////////////////////////////////////////////////
-//////////////////////// 轮询任务 /////////////////////////////
-//////////////////////////////////////////////////////////////
+/**
+ * @brief 启动传感器温度转换
+ */
+static max31850_err_t start_sensor_conversion(uint8_t sensor_idx)
+{
+    if (sensor_idx >= s_found_devices) {
+        return MAX31850_ERR_INVALID_ID;
+    }
+    
+    max31850_sensor_t *sensor = &s_sensors[sensor_idx];
+    
+    if (!sensor->online) {
+        return MAX31850_ERR_OFFLINE;
+    }
+    
+    if (xSemaphoreTake(s_onewire_mutex, pdMS_TO_TICKS(100)) != pdTRUE) {
+        return MAX31850_ERR_TIMEOUT;
+    }
+    
+    esp_err_t err = max31850_start_conversion(sensor->rom_id);
+    
+    xSemaphoreGive(s_onewire_mutex);
+    
+    if (err != ESP_OK) {
+        return MAX31850_ERR_TIMEOUT;
+    }
+    
+    return MAX31850_OK;
+}
 
 /**
- * @brief 轮询任务 - 非阻塞式温度读取
- * 
- * 状态机实现：
- * 1. CONVERT - 发送温度转换命令
- * 2. WAIT_CONVERSION - 等待100ms转换时间
- * 3. READ - 读取暂存器
- * 4. PARSE - 解析数据
- * 5. NEXT_SENSOR - 切换到下一个传感器
+ * @brief 轮询任务主循环
  */
 static void max31850_poll_task(void *pvParameters)
 {
-    uint8_t scratchpad[MAX31850_SCRATCHPAD_LEN];
-    float temp;
-    
     ESP_LOGI(TAG, "Poll task started");
     
     // 初始延迟，等待系统稳定
-    vTaskDelay(pdMS_TO_TICKS(100));
+    vTaskDelay(pdMS_TO_TICKS(1000));
     
     while (1) {
-        // 如果没有传感器，等待后重试
-        if (s_sensor_count == 0) {
-            ESP_LOGW(TAG, "No sensors found, retrying search...");
-            onewire_search_rom();
-            vTaskDelay(pdMS_TO_TICKS(5000));
-            continue;
+        switch (s_poll_state) {
+            case POLL_STATE_IDLE:
+                s_current_sensor = 0;
+                s_poll_state = POLL_STATE_START_CONVERT;
+                break;
+                
+            case POLL_STATE_START_CONVERT:
+                // 启动当前传感器的温度转换
+                if (s_sensors[s_current_sensor].online) {
+                    max31850_err_t err = start_sensor_conversion(s_current_sensor);
+                    if (err == MAX31850_OK) {
+                        s_conversion_start_time = xTaskGetTickCount();
+                        s_poll_state = POLL_STATE_WAIT_CONVERSION;
+                    } else {
+                        // 启动失败，尝试下一个
+                        s_poll_state = POLL_STATE_NEXT_SENSOR;
+                    }
+                } else {
+                    // 离线传感器，跳过
+                    s_poll_state = POLL_STATE_NEXT_SENSOR;
+                }
+                break;
+                
+            case POLL_STATE_WAIT_CONVERSION:
+                // 等待转换完成（非阻塞）
+                if ((xTaskGetTickCount() - s_conversion_start_time) >= 
+                    pdMS_TO_TICKS(MAX31850_CONVERSION_TIME_MS)) {
+                    s_poll_state = POLL_STATE_READ_DATA;
+                } else {
+                    // 给其他任务运行时间
+                    vTaskDelay(pdMS_TO_TICKS(10));
+                }
+                break;
+                
+            case POLL_STATE_READ_DATA:
+                // 读取当前传感器的温度数据
+                read_single_sensor(s_current_sensor);
+                s_poll_state = POLL_STATE_NEXT_SENSOR;
+                break;
+                
+            case POLL_STATE_NEXT_SENSOR:
+                s_current_sensor++;
+                if (s_current_sensor >= s_found_devices) {
+                    // 所有传感器完成一轮，等待下一次轮询
+                    s_current_sensor = 0;
+                    s_poll_state = POLL_STATE_IDLE;
+                    vTaskDelay(pdMS_TO_TICKS(1000 - MAX31850_CONVERSION_TIME_MS));
+                } else {
+                    s_poll_state = POLL_STATE_START_CONVERT;
+                }
+                break;
+                
+            default:
+                s_poll_state = POLL_STATE_IDLE;
+                break;
         }
         
-        // 轮询每个传感器
-        for (uint8_t i = 0; i < s_sensor_count; i++) {
-            max31850_sensor_t *sensor = &s_sensors[i];
-            
-            // 如果传感器离线，跳过轮询但定期尝试恢复
-            if (!sensor->online) {
-                if (sensor->fail_count % 10 == 0) {
-                    // 每10个周期尝试一次恢复
-                    ESP_LOGI(TAG, "Attempting to recover sensor %d...", i);
-                } else {
-                    continue;
+        // 检查是否有离线传感器需要尝试恢复
+        static uint32_t last_recovery_attempt = 0;
+        if ((xTaskGetTickCount() - last_recovery_attempt) > pdMS_TO_TICKS(30000)) {
+            last_recovery_attempt = xTaskGetTickCount();
+            for (int i = 0; i < s_found_devices; i++) {
+                if (!s_sensors[i].online) {
+                    // 尝试恢复离线传感器
+                    bool presence;
+                    if (onewire_reset(&presence) == ESP_OK && presence) {
+                        s_sensors[i].fail_count = 0;
+                        s_sensors[i].online = true;
+                        ESP_LOGI(TAG, "Sensor %d recovery attempt: back ONLINE", i);
+                    }
                 }
             }
-            
-            if (xSemaphoreTake(s_onewire_mutex, pdMS_TO_TICKS(100)) != pdTRUE) {
-                ESP_LOGW(TAG, "Failed to acquire bus mutex for sensor %d", i);
-                continue;
-            }
-            
-            // 步骤1：启动温度转换
-            esp_err_t err = max31850_start_conversion(sensor->rom_id);
-            if (err != ESP_OK) {
-                ESP_LOGW(TAG, "Sensor %d: Failed to start conversion", i);
-                max31850_update_sensor_status(i, MAX31850_ERR_TIMEOUT);
-                xSemaphoreGive(s_onewire_mutex);
-                vTaskDelay(pdMS_TO_TICKS(10));
-                continue;
-            }
-            
-            // 步骤2：等待转换完成（保持mutex锁定，防止其他任务干扰总线）
-            // 转换期间总线必须保持高电平，但其他任务可能通过GPIO操作干扰
-            // 因此保持mutex锁定直到读取完成
-            vTaskDelay(pdMS_TO_TICKS(MAX31850_CONVERSION_TIME_MS));
-            
-            // 步骤3：读取暂存器
-            err = max31850_read_scratchpad(sensor->rom_id, scratchpad);
-            if (err != ESP_OK) {
-                ESP_LOGW(TAG, "Sensor %d: Failed to read scratchpad", i);
-                max31850_update_sensor_status(i, MAX31850_ERR_TIMEOUT);
-                xSemaphoreGive(s_onewire_mutex);
-                vTaskDelay(pdMS_TO_TICKS(10));
-                continue;
-            }
-            
-            xSemaphoreGive(s_onewire_mutex);
-            
-            // 保存原始数据用于调试
-            sensor->raw_temp = ((int16_t)scratchpad[0] << 8) | scratchpad[1];
-            sensor->fault_reg = scratchpad[4];
-            
-            // 步骤4：解析数据
-            max31850_err_t parse_err = max31850_parse_scratchpad(scratchpad, &temp);
-            max31850_update_sensor_status(i, parse_err);
-            
-            if (parse_err == MAX31850_OK) {
-                sensor->temperature = temp;
-                ESP_LOGD(TAG, "Sensor %d: Temperature = %.2f°C", i, temp);
-            }
         }
-        
-        // 等待下一次轮询周期
-        vTaskDelay(pdMS_TO_TICKS(MAX31850_POLL_INTERVAL_MS));
     }
 }
 
-
 //////////////////////////////////////////////////////////////
-//////////////////////// 公共API实现 //////////////////////////
+/////////////////////// 公共API实现 //////////////////////////
 //////////////////////////////////////////////////////////////
 
-/**
- * @brief 初始化MAX31850模块
- */
 esp_err_t max31850_init(gpio_num_t onewire_pin)
 {
     if (s_initialized) {
-        ESP_LOGW(TAG, "Already initialized");
-        return ESP_ERR_INVALID_STATE;
+        return ESP_OK;
     }
     
     ESP_LOGI(TAG, "Initializing MAX31850 on GPIO%d...", onewire_pin);
     
     s_onewire_pin = onewire_pin;
     
-    // 初始化传感器数组
-    memset(s_sensors, 0, sizeof(s_sensors));
-    for (int i = 0; i < MAX31850_SENSOR_COUNT; i++) {
-        s_sensors[i].online = false;
-        s_sensors[i].data_valid = false;
-        s_sensors[i].temperature = 0.0f;
-    }
-    
-    // 配置GPIO为开漏输出模式（GPIO14推挽输出高电平失败，必须用开漏）
+    // 初始化GPIO为开漏模式
     gpio_config_t io_conf = {
         .pin_bit_mask = (1ULL << onewire_pin),
-        .mode = GPIO_MODE_INPUT_OUTPUT_OD,  // 开漏输出
-        .pull_up_en = GPIO_PULLUP_ENABLE,    // 启用内部上拉
+        .mode = GPIO_MODE_INPUT_OUTPUT_OD,
+        .pull_up_en = GPIO_PULLUP_ENABLE,
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
         .intr_type = GPIO_INTR_DISABLE,
     };
     ESP_ERROR_CHECK(gpio_config(&io_conf));
-    gpio_set_level(s_onewire_pin, 1);  // 初始状态释放总线
-    ESP_LOGI(TAG, "GPIO%d configured as open-drain with pull-up", onewire_pin);
-    
-    // 运行GPIO硬件诊断（帮助确认硬件连接）
-    onewire_diagnose_bus();
+    gpio_set_level(onewire_pin, 1);  // 释放总线
     
     // 创建互斥锁
     s_onewire_mutex = xSemaphoreCreateMutex();
@@ -940,30 +789,84 @@ esp_err_t max31850_init(gpio_num_t onewire_pin)
         return ESP_ERR_NO_MEM;
     }
     
-    // 搜索总线上的设备
-    esp_err_t err = onewire_search_rom();
+    // 初始化RMT TX通道（保留用于未来扩展）
+    // 目前使用GPIO bit-bang方式，因为1-Wire协议需要精确的时序控制
+    // 且Read操作需要在特定时刻采样，使用RMT比较复杂
+    // 如果未来需要，可以在此处初始化RMT TX通道用于发送时隙
+    
+    // 检查总线状态
+    bool presence;
+    esp_err_t err = onewire_reset(&presence);
     if (err != ESP_OK) {
-        ESP_LOGW(TAG, "Initial ROM search failed, will retry in poll task");
-        // 继续初始化，轮询任务会定期重试
+        ESP_LOGE(TAG, "Bus check failed: %d", err);
+        vSemaphoreDelete(s_onewire_mutex);
+        return err;
     }
     
-    // 打印ROM ID
-    max31850_print_rom_ids();
+    if (!presence) {
+        ESP_LOGW(TAG, "No device present on 1-Wire bus");
+    }
+    
+    // 搜索设备
+    uint8_t rom_ids[MAX31850_SENSOR_COUNT][8];
+    uint8_t found = 0;
+    
+    // 多次尝试搜索
+    for (int attempt = 0; attempt < 3 && found < MAX31850_SENSOR_COUNT; attempt++) {
+        uint8_t temp_found = 0;
+        uint8_t temp_roms[MAX31850_SENSOR_COUNT][8];
+        
+        err = onewire_search_rom(temp_roms, MAX31850_SENSOR_COUNT, &temp_found);
+        if (err == ESP_OK && temp_found > found) {
+            found = temp_found;
+            memcpy(rom_ids, temp_roms, sizeof(rom_ids));
+        }
+        
+        if (found >= MAX31850_SENSOR_COUNT) {
+            break;
+        }
+        
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+    
+    if (found == 0) {
+        ESP_LOGW(TAG, "No MAX31850 devices found");
+        vSemaphoreDelete(s_onewire_mutex);
+        return ESP_ERR_NOT_FOUND;
+    }
+    
+    s_found_devices = found;
+    
+    // 初始化传感器结构
+    memset(s_sensors, 0, sizeof(s_sensors));
+    for (int i = 0; i < found; i++) {
+        memcpy(s_sensors[i].rom_id, rom_ids[i], 8);
+        s_sensors[i].online = true;
+        s_sensors[i].temperature = 0.0f;
+        s_sensors[i].fail_count = 0;
+        s_sensors[i].data_valid = false;
+    }
+    
+    // 打印发现的设备列表
+    ESP_LOGI(TAG, "===============================================");
+    ESP_LOGI(TAG, "MAX31850 ROM ID List (%d device(s) found):", found);
+    for (int i = 0; i < found; i++) {
+        ESP_LOGI(TAG, "  Sensor %d (P%d): %02X-%02X-%02X-%02X-%02X-%02X-%02X-%02X  %s",
+                 i, i + 1,
+                 rom_ids[i][0], rom_ids[i][1], rom_ids[i][2], rom_ids[i][3],
+                 rom_ids[i][4], rom_ids[i][5], rom_ids[i][6], rom_ids[i][7],
+                 s_sensors[i].online ? "ONLINE" : "OFFLINE");
+        if (rom_ids[i][0] == MAX31850_FAMILY_CODE) {
+            ESP_LOGI(TAG, "    Family: 0x%02X (MAX31850/MAX31851)", rom_ids[i][0]);
+        }
+    }
+    ESP_LOGI(TAG, "===============================================");
     
     // 创建轮询任务
-    BaseType_t task_created = xTaskCreate(
-        max31850_poll_task,
-        "max31850_poll",
-        4096,
-        NULL,
-        2,  // 优先级（低于主业务逻辑）
-        &s_poll_task_handle
-    );
-    
-    if (task_created != pdPASS) {
+    BaseType_t task_err = xTaskCreate(max31850_poll_task, "MAX31850_POLL", 4096, NULL, 2, &s_poll_task_handle);
+    if (task_err != pdPASS) {
         ESP_LOGE(TAG, "Failed to create poll task");
         vSemaphoreDelete(s_onewire_mutex);
-        s_onewire_mutex = NULL;
         return ESP_ERR_NO_MEM;
     }
     
@@ -973,21 +876,48 @@ esp_err_t max31850_init(gpio_num_t onewire_pin)
     return ESP_OK;
 }
 
-/**
- * @brief 获取指定传感器的温度
- */
+void max31850_deinit(void)
+{
+    if (!s_initialized) {
+        return;
+    }
+    
+    if (s_poll_task_handle) {
+        vTaskDelete(s_poll_task_handle);
+        s_poll_task_handle = NULL;
+    }
+    
+    if (s_onewire_mutex) {
+        vSemaphoreDelete(s_onewire_mutex);
+        s_onewire_mutex = NULL;
+    }
+    
+    // 释放RMT资源（如果已分配）
+    if (s_rmt_encoder) {
+        rmt_del_encoder(s_rmt_encoder);
+        s_rmt_encoder = NULL;
+    }
+    if (s_rmt_tx_channel) {
+        rmt_del_channel(s_rmt_tx_channel);
+        s_rmt_tx_channel = NULL;
+    }
+    
+    s_initialized = false;
+    ESP_LOGI(TAG, "MAX31850 deinitialized");
+}
+
 max31850_err_t max31850_get_temperature(uint8_t sensor_id, float *temp_out)
 {
     if (!s_initialized) {
-        return MAX31850_ERR_OFFLINE;
+        return MAX31850_ERR_BUS_FAULT;
     }
     
-    if (sensor_id >= MAX31850_SENSOR_COUNT) {
+    if (sensor_id >= s_found_devices) {
         return MAX31850_ERR_INVALID_ID;
     }
     
     if (!temp_out) {
-        return MAX31850_ERR_CRC;  // 使用CRC错误表示参数错误
+        return MAX31850_ERR_INVALID_ID;
     }
     
     max31850_sensor_t *sensor = &s_sensors[sensor_id];
@@ -1004,20 +934,17 @@ max31850_err_t max31850_get_temperature(uint8_t sensor_id, float *temp_out)
     return MAX31850_OK;
 }
 
-/**
- * @brief 获取原始数据和故障寄存器
- */
 max31850_err_t max31850_get_raw_data(uint8_t sensor_id, int16_t *raw_out, uint8_t *fault_reg)
 {
-    if (!s_initialized) {
-        return MAX31850_ERR_OFFLINE;
-    }
-    
-    if (sensor_id >= MAX31850_SENSOR_COUNT) {
+    if (!s_initialized || sensor_id >= s_found_devices) {
         return MAX31850_ERR_INVALID_ID;
     }
     
     max31850_sensor_t *sensor = &s_sensors[sensor_id];
+    
+    if (!sensor->online) {
+        return MAX31850_ERR_OFFLINE;
+    }
     
     if (raw_out) {
         *raw_out = sensor->raw_temp;
@@ -1027,27 +954,24 @@ max31850_err_t max31850_get_raw_data(uint8_t sensor_id, int16_t *raw_out, uint8_
         *fault_reg = sensor->fault_reg;
     }
     
-    return sensor->online ? sensor->last_error : MAX31850_ERR_OFFLINE;
+    return MAX31850_OK;
 }
 
-/**
- * @brief 强制立即更新（阻塞式）
- */
 max31850_err_t max31850_force_update(uint8_t sensor_id, float *temp_out, TickType_t timeout)
 {
     if (!s_initialized) {
-        return MAX31850_ERR_OFFLINE;
+        return MAX31850_ERR_BUS_FAULT;
     }
     
-    if (sensor_id >= MAX31850_SENSOR_COUNT) {
+    if (sensor_id >= s_found_devices || !temp_out) {
         return MAX31850_ERR_INVALID_ID;
     }
     
-    if (!temp_out) {
-        return MAX31850_ERR_CRC;
-    }
-    
     max31850_sensor_t *sensor = &s_sensors[sensor_id];
+    
+    if (!sensor->online) {
+        return MAX31850_ERR_OFFLINE;
+    }
     
     if (xSemaphoreTake(s_onewire_mutex, timeout) != pdTRUE) {
         return MAX31850_ERR_TIMEOUT;
@@ -1060,139 +984,80 @@ max31850_err_t max31850_force_update(uint8_t sensor_id, float *temp_out, TickTyp
         return MAX31850_ERR_TIMEOUT;
     }
     
-    // 等待转换完成（保持mutex锁定，防止其他任务干扰总线）
+    // 阻塞等待转换完成
     vTaskDelay(pdMS_TO_TICKS(MAX31850_CONVERSION_TIME_MS));
     
-    // 读取暂存器
+    // 读取数据
     uint8_t scratchpad[MAX31850_SCRATCHPAD_LEN];
     err = max31850_read_scratchpad(sensor->rom_id, scratchpad);
+    
+    xSemaphoreGive(s_onewire_mutex);
+    
     if (err != ESP_OK) {
-        xSemaphoreGive(s_onewire_mutex);
         return MAX31850_ERR_TIMEOUT;
     }
     
-    xSemaphoreGive(s_onewire_mutex);
-    
-    // 保存原始数据
-    sensor->raw_temp = ((int16_t)scratchpad[0] << 8) | scratchpad[1];
-    sensor->fault_reg = scratchpad[4];
-    
-    // 解析温度
+    // 解析
     float temp;
-    max31850_err_t parse_err = max31850_parse_scratchpad(scratchpad, &temp);
-    max31850_update_sensor_status(sensor_id, parse_err);
+    max31850_err_t result = max31850_parse_scratchpad(scratchpad, &temp);
     
-    if (parse_err == MAX31850_OK) {
-        sensor->temperature = temp;
+    if (result == MAX31850_OK) {
         *temp_out = temp;
+        sensor->temperature = temp;
+        sensor->data_valid = true;
+        sensor->fail_count = 0;
     }
     
-    return parse_err;
+    return result;
 }
 
-/**
- * @brief 检查传感器是否在线
- */
 bool max31850_is_online(uint8_t sensor_id)
 {
-    if (!s_initialized || sensor_id >= MAX31850_SENSOR_COUNT) {
+    if (!s_initialized || sensor_id >= s_found_devices) {
         return false;
     }
+    
     return s_sensors[sensor_id].online;
 }
 
-/**
- * @brief 获取最后一次错误
- */
-max31850_err_t max31850_get_last_error(uint8_t sensor_id)
+const char* max31850_err_to_string(max31850_err_t err)
 {
-    if (!s_initialized || sensor_id >= MAX31850_SENSOR_COUNT) {
-        return MAX31850_ERR_INVALID_ID;
+    switch (err) {
+        case MAX31850_OK:           return "OK";
+        case MAX31850_ERR_OPEN:     return "Thermocouple OPEN";
+        case MAX31850_ERR_SHORT_GND: return "Short to GND";
+        case MAX31850_ERR_SHORT_VCC: return "Short to VCC";
+        case MAX31850_ERR_CRC:      return "CRC Error";
+        case MAX31850_ERR_TIMEOUT:  return "Timeout";
+        case MAX31850_ERR_OFFLINE:  return "Sensor Offline";
+        case MAX31850_ERR_INVALID_ID: return "Invalid ID";
+        case MAX31850_ERR_BUS_FAULT:  return "Bus Fault";
+        case MAX31850_ERR_NOT_FOUND:  return "Not Found";
+        default:                    return "Unknown";
     }
-    return s_sensors[sensor_id].last_error;
 }
 
-/**
- * @brief 获取ROM ID
- */
-esp_err_t max31850_get_rom_id(uint8_t sensor_id, uint8_t *rom_out)
-{
-    if (!s_initialized) {
-        return ESP_ERR_INVALID_STATE;
-    }
-    
-    if (sensor_id >= MAX31850_SENSOR_COUNT || !rom_out) {
-        return ESP_ERR_INVALID_ARG;
-    }
-    
-    memcpy(rom_out, s_sensors[sensor_id].rom_id, MAX31850_ROM_ID_LEN);
-    return ESP_OK;
-}
-
-/**
- * @brief 反初始化
- */
-void max31850_deinit(void)
-{
-    if (!s_initialized) {
-        return;
-    }
-    
-    ESP_LOGI(TAG, "Deinitializing MAX31850...");
-    
-    // 删除轮询任务
-    if (s_poll_task_handle) {
-        vTaskDelete(s_poll_task_handle);
-        s_poll_task_handle = NULL;
-    }
-    
-    // 删除互斥锁
-    if (s_onewire_mutex) {
-        vSemaphoreDelete(s_onewire_mutex);
-        s_onewire_mutex = NULL;
-    }
-    
-    // 释放RMT资源（如果使用的话）
-    // 当前实现使用GPIO直接控制，无需释放RMT
-    
-    s_initialized = false;
-    s_sensor_count = 0;
-    
-    ESP_LOGI(TAG, "MAX31850 deinitialized");
-}
-
-//////////////////////////////////////////////////////////////
-//////////////////////// 调试工具函数 //////////////////////////
-//////////////////////////////////////////////////////////////
-
-/**
- * @brief 打印暂存器原始数据
- */
 void max31850_dump_scratchpad(uint8_t sensor_id)
 {
-    if (!s_initialized || sensor_id >= MAX31850_SENSOR_COUNT) {
-        ESP_LOGE(TAG, "Invalid sensor ID or not initialized");
+    if (!s_initialized || sensor_id >= s_found_devices) {
+        ESP_LOGW(TAG, "Invalid sensor ID: %d", sensor_id);
         return;
     }
     
-    if (!s_sensors[sensor_id].online) {
-        ESP_LOGW(TAG, "Sensor %d is offline", sensor_id);
-        return;
-    }
+    max31850_sensor_t *sensor = &s_sensors[sensor_id];
     
-    // 临时读取暂存器
-    if (xSemaphoreTake(s_onewire_mutex, pdMS_TO_TICKS(100)) != pdTRUE) {
-        ESP_LOGE(TAG, "Failed to acquire mutex for dump");
+    if (xSemaphoreTake(s_onewire_mutex, pdMS_TO_TICKS(1000)) != pdTRUE) {
+        ESP_LOGW(TAG, "Failed to acquire mutex for dump");
         return;
     }
     
     uint8_t scratchpad[MAX31850_SCRATCHPAD_LEN];
-    esp_err_t err = max31850_read_scratchpad(s_sensors[sensor_id].rom_id, scratchpad);
+    esp_err_t err = max31850_read_scratchpad(sensor->rom_id, scratchpad);
     
     xSemaphoreGive(s_onewire_mutex);
     
     if (err != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to read scratchpad for dump");
+        ESP_LOGW(TAG, "Sensor %d: Failed to read scratchpad", sensor_id);
         return;
     }
     
@@ -1201,81 +1066,27 @@ void max31850_dump_scratchpad(uint8_t sensor_id)
     ESP_LOGI(TAG, "  [1] Temp MSB: 0x%02X", scratchpad[1]);
     ESP_LOGI(TAG, "  [2] Reserved: 0x%02X", scratchpad[2]);
     ESP_LOGI(TAG, "  [3] Config:   0x%02X", scratchpad[3]);
-    ESP_LOGI(TAG, "  [4] Fault:    0x%02X", scratchpad[4]);
+    ESP_LOGI(TAG, "  [4] Fault:    0x%02X (%s)", scratchpad[4],
+             (scratchpad[4] & 0x01) ? "OC Fault" :
+             (scratchpad[4] & 0x02) ? "SCG Fault" :
+             (scratchpad[4] & 0x04) ? "SCV Fault" : "OK");
     ESP_LOGI(TAG, "  [5] Reserved: 0x%02X", scratchpad[5]);
     ESP_LOGI(TAG, "  [6] Reserved: 0x%02X", scratchpad[6]);
     ESP_LOGI(TAG, "  [7] Reserved: 0x%02X", scratchpad[7]);
-    ESP_LOGI(TAG, "  [8] CRC:      0x%02X", scratchpad[8]);
+    ESP_LOGI(TAG, "  [8] CRC:      0x%02X (calc: 0x%02X)", 
+             scratchpad[8], crc8_calculate(scratchpad, 8));
     
-    // 验证CRC
-    uint8_t calc_crc = crc8_calculate(scratchpad, 8);
-    ESP_LOGI(TAG, "  CRC Check: calc=0x%02X, actual=0x%02X (%s)",
-             calc_crc, scratchpad[8], (calc_crc == scratchpad[8]) ? "OK" : "FAIL");
-    
-    // 解析温度
-    int16_t raw = ((int16_t)scratchpad[0] << 8) | scratchpad[1];
-    float temp = (float)raw * 0.0625f;
-    ESP_LOGI(TAG, "  Raw Temp: 0x%04X = %.2f°C", (uint16_t)raw, temp);
-    
-    // 解析故障
-    if (scratchpad[4] & MAX31850_FAULT_OPEN) {
-        ESP_LOGW(TAG, "  Fault: Thermocouple OPEN");
-    }
-    if (scratchpad[4] & MAX31850_FAULT_SHORT_GND) {
-        ESP_LOGW(TAG, "  Fault: Short to GND");
-    }
-    if (scratchpad[4] & MAX31850_FAULT_SHORT_VCC) {
-        ESP_LOGW(TAG, "  Fault: Short to VCC");
-    }
+    // 解析原始温度
+    int16_t raw = ((int16_t)scratchpad[1] << 8) | scratchpad[0];
+    ESP_LOGI(TAG, "  Raw temp: 0x%04X (%d)", raw, raw);
 }
 
-/**
- * @brief 打印所有ROM ID
- */
-void max31850_print_rom_ids(void)
+uint8_t max31850_get_all_status(max31850_sensor_t *sensors)
 {
-    ESP_LOGI(TAG, "===============================================");
-    ESP_LOGI(TAG, "MAX31850 ROM ID List (%d device(s) found):", s_sensor_count);
-    
-    for (int i = 0; i < s_sensor_count; i++) {
-        uint8_t *rom = s_sensors[i].rom_id;
-        ESP_LOGI(TAG, "  Sensor %d (P%d): %02X-%02X%02X%02X%02X%02X%02X-%02X  %s",
-                 i, i + 1,
-                 rom[0], rom[1], rom[2], rom[3],
-                 rom[4], rom[5], rom[6], rom[7],
-                 s_sensors[i].online ? "ONLINE" : "OFFLINE");
-        
-        // 验证家族码
-        if (rom[0] == 0x3B) {
-            ESP_LOGI(TAG, "    Family: 0x3B (MAX31850/MAX31851)");
-        } else if (rom[0] != 0) {
-            ESP_LOGW(TAG, "    Family: 0x%02X (Unknown device)", rom[0]);
-        }
+    if (!sensors || !s_initialized) {
+        return 0;
     }
     
-    if (s_sensor_count < MAX31850_SENSOR_COUNT) {
-        ESP_LOGW(TAG, "  Warning: Expected %d sensors, found %d",
-                 MAX31850_SENSOR_COUNT, s_sensor_count);
-    }
-    
-    ESP_LOGI(TAG, "===============================================");
-}
-
-/**
- * @brief 错误码转字符串
- */
-const char* max31850_err_to_string(max31850_err_t err)
-{
-    switch (err) {
-        case MAX31850_OK:           return "OK";
-        case MAX31850_ERR_OPEN:     return "Thermocouple OPEN (断线)";
-        case MAX31850_ERR_SHORT_GND:return "Short to GND";
-        case MAX31850_ERR_SHORT_VCC:return "Short to VCC";
-        case MAX31850_ERR_CRC:      return "CRC Error";
-        case MAX31850_ERR_TIMEOUT:  return "Timeout";
-        case MAX31850_ERR_OFFLINE:  return "Sensor Offline";
-        case MAX31850_ERR_INVALID_ID:return "Invalid Sensor ID";
-        case MAX31850_ERR_BUS_FAULT:return "Bus Fault";
-        default:                    return "Unknown Error";
-    }
+    memcpy(sensors, s_sensors, sizeof(s_sensors));
+    return s_found_devices;
 }
