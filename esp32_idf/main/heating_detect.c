@@ -77,6 +77,28 @@ static uint8_t crc8_calculate(const uint8_t *data, uint8_t len)
 }
 
 //////////////////////////////////////////////////////////////
+/////////////////////// GPIO底层操作 /////////////////////////
+//////////////////////////////////////////////////////////////
+
+/**
+ * @brief 配置GPIO为开漏输出模式
+ */
+static inline void onewire_set_opendrain(void)
+{
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
+    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
+}
+
+/**
+ * @brief 配置GPIO为输入模式
+ */
+static inline void onewire_set_input(void)
+{
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
+}
+
+//////////////////////////////////////////////////////////////
 /////////////////////// 调试诊断函数 /////////////////////////
 //////////////////////////////////////////////////////////////
 
@@ -179,26 +201,8 @@ static esp_err_t onewire_diagnose_gpio(void)
 }
 
 //////////////////////////////////////////////////////////////
-/////////////////////// GPIO底层操作 /////////////////////////
+/////////////////////// 1-Wire底层操作 ///////////////////////
 //////////////////////////////////////////////////////////////
-
-/**
- * @brief 配置GPIO为开漏输出模式
- */
-static inline void onewire_set_opendrain(void)
-{
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
-    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
-}
-
-/**
- * @brief 配置GPIO为输入模式
- */
-static inline void onewire_set_input(void)
-{
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
-    gpio_set_pull_mode(s_onewire_pin, GPIO_PULLUP_ONLY);
-}
 
 /**
  * @brief 1-Wire Reset + Presence检测（详细调试版本）
