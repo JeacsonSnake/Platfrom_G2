@@ -1,8 +1,9 @@
 /**
  * @file heating_detect.c
- * @brief MAX31850KATB+ Temperature Sensor Driver (RMT-based 1-Wire Implementation)
+ * @brief MAX31850KATB+ Temperature Sensor Driver (GPIO Bit-bang 1-Wire Implementation)
  * 
- * 使用ESP32-S3 RMT外设实现精确的1-Wire时序控制，避免软件bit-bang的不稳定性
+ * 使用ESP32-S3 GPIO bit-bang配合临界区保护实现精确的1-Wire时序控制
+ * RMT外设保留通道配置，用于未来可能的硬件加速实现
  */
 
 #include "heating_detect.h"
@@ -12,29 +13,18 @@
 #include "esp_timer.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
-#include "driver/rmt_tx.h"
-#include "driver/rmt_rx.h"
 #include "driver/gpio.h"
 
 static const char *TAG = "MAX31850";
 
 //////////////////////////////////////////////////////////////
-/////////////////////// RMT & GPIO配置 ///////////////////////
+/////////////////////// 1-Wire时序配置 ///////////////////////
 //////////////////////////////////////////////////////////////
-
-/* RMT通道配置 */
-#define RMT_CLK_SRC                 RMT_CLK_SRC_DEFAULT
-#define RMT_TX_CHANNEL_RESOLUTION   1000000     /**< 1MHz = 1μs分辨率 */
-#define RMT_RX_CHANNEL_RESOLUTION   1000000     /**< 1MHz = 1μs分辨率 */
-#define RMT_TX_MEM_BLOCK_SYMBOLS    64          /**< TX内存块大小 */
-#define RMT_RX_MEM_BLOCK_SYMBOLS    64          /**< RX内存块大小 */
 
 /* 1-Wire时序参数 (微秒) - 基于1-Wire标准协议 */
 #define ONEWIRE_RESET_PULSE_US      480         /**< Reset脉冲宽度 */
 #define ONEWIRE_RESET_WAIT_US       70          /**< 等待Presence响应 */
 #define ONEWIRE_RESET_RECOVERY_US   410         /**< Reset恢复时间 */
-#define ONEWIRE_PRESENCE_MIN_US     60          /**< Presence最小宽度 */
-#define ONEWIRE_PRESENCE_MAX_US     240         /**< Presence最大宽度 */
 
 #define ONEWIRE_WRITE1_LOW_US       6           /**< 写1低电平时间 */
 #define ONEWIRE_WRITE1_HIGH_US      64          /**< 写1高电平时间(总时隙60-120μs) */
@@ -45,8 +35,6 @@ static const char *TAG = "MAX31850";
 #define ONEWIRE_READ_SAMPLE_US      9           /**< 读到采样点的延迟(总15μs) */
 #define ONEWIRE_READ_RECOVERY_US    55          /**< 读恢复时间 */
 
-#define ONEWIRE_SLOT_TOTAL_US       70          /**< 总时隙时间 */
-
 /* CRC8多项式: X8 + X5 + X4 + 1 */
 #define CRC8_POLYNOMIAL             0x31
 
@@ -55,8 +43,6 @@ static const char *TAG = "MAX31850";
 //////////////////////////////////////////////////////////////
 
 static gpio_num_t s_onewire_pin = GPIO_NUM_NC;
-static rmt_channel_handle_t s_rmt_tx_channel = NULL;
-static rmt_encoder_handle_t s_rmt_encoder = NULL;
 
 static max31850_sensor_t s_sensors[MAX31850_SENSOR_COUNT];
 static uint8_t s_found_devices = 0;
@@ -88,100 +74,7 @@ static uint8_t crc8_calculate(const uint8_t *data, uint8_t len)
 }
 
 //////////////////////////////////////////////////////////////
-/////////////////////// RMT编码器 ////////////////////////////
-//////////////////////////////////////////////////////////////
-
-/**
- * @brief 1-Wire编码器状态
- */
-typedef struct {
-    rmt_encoder_t base;
-    rmt_encoder_t *bytes_encoder;
-    rmt_encoder_t *copy_encoder;
-    int state;
-} rmt_onewire_encoder_t;
-
-/**
- * @brief RMT编码回调：编码1-Wire时隙
- * 
- * 将字节数据编码为RMT符号序列（1-Wire时隙）
- */
-static size_t rmt_encode_onewire(rmt_encoder_t *encoder, rmt_channel_handle_t channel,
-                                  const void *primary_data, size_t data_size,
-                                  size_t symbols_written, size_t symbols_free,
-                                  rmt_symbol_word_t *symbols, bool *done)
-{
-    rmt_onewire_encoder_t *ow_encoder = __containerof(encoder, rmt_onewire_encoder_t, base);
-    rmt_encoder_handle_t bytes_encoder = ow_encoder->bytes_encoder;
-    rmt_encoder_handle_t copy_encoder = ow_encoder->copy_encoder;
-    
-    size_t encoded_symbols = 0;
-    rmt_encode_state_t session_state = 0;
-    rmt_encode_state_t state = RMT_ENCODING_RESET;
-    
-    // 使用bytes_encoder将每个bit编码为1-Wire时隙
-    encoded_symbols = bytes_encoder->encode(bytes_encoder, channel, primary_data, data_size,
-                                             symbols_written, symbols_free, symbols, &session_state);
-    state |= session_state;
-    
-    if (session_state & RMT_ENCODING_COMPLETE) {
-        // 所有数据编码完成，使用copy_encoder发送结束序列（如果有）
-        encoded_symbols += copy_encoder->encode(copy_encoder, channel, NULL, 0,
-                                                 symbols_written + encoded_symbols,
-                                                 symbols_free - encoded_symbols,
-                                                 symbols + encoded_symbols, &session_state);
-        state |= session_state;
-        
-        if (session_state & RMT_ENCODING_COMPLETE) {
-            *done = true;
-        }
-    }
-    
-    return encoded_symbols;
-}
-
-static esp_err_t rmt_del_onewire_encoder(rmt_encoder_t *encoder)
-{
-    rmt_onewire_encoder_t *ow_encoder = __containerof(encoder, rmt_onewire_encoder_t, base);
-    rmt_del_encoder(ow_encoder->bytes_encoder);
-    rmt_del_encoder(ow_encoder->copy_encoder);
-    free(ow_encoder);
-    return ESP_OK;
-}
-
-static esp_err_t rmt_onewire_encoder_reset(rmt_encoder_t *encoder)
-{
-    rmt_onewire_encoder_t *ow_encoder = __containerof(encoder, rmt_onewire_encoder_t, base);
-    rmt_encoder_reset(ow_encoder->bytes_encoder);
-    rmt_encoder_reset(ow_encoder->copy_encoder);
-    ow_encoder->state = 0;
-    return ESP_OK;
-}
-
-/**
- * @brief 创建1-Wire RMT编码器
- */
-static esp_err_t rmt_new_onewire_encoder(rmt_encoder_handle_t *ret_encoder)
-{
-    rmt_onewire_encoder_t *ow_encoder = calloc(1, sizeof(rmt_onewire_encoder_t));
-    if (!ow_encoder) {
-        return ESP_ERR_NO_MEM;
-    }
-    
-    ow_encoder->base.encode = rmt_encode_onewire;
-    ow_encoder->base.del = rmt_del_onewire_encoder;
-    ow_encoder->base.reset = rmt_onewire_encoder_reset;
-    
-    // 配置bit编码器（每个bit编码为RMT符号）
-    // 对于1-Wire，我们需要自定义的bit编码方式
-    // 这里简化处理：直接创建编码器，实际编码逻辑在encode回调中实现
-    
-    *ret_encoder = &ow_encoder->base;
-    return ESP_OK;
-}
-
-//////////////////////////////////////////////////////////////
-/////////////////////// GPIO/RMT底层操作 /////////////////////
+/////////////////////// GPIO底层操作 /////////////////////////
 //////////////////////////////////////////////////////////////
 
 /**
@@ -789,11 +682,6 @@ esp_err_t max31850_init(gpio_num_t onewire_pin)
         return ESP_ERR_NO_MEM;
     }
     
-    // 初始化RMT TX通道（保留用于未来扩展）
-    // 目前使用GPIO bit-bang方式，因为1-Wire协议需要精确的时序控制
-    // 且Read操作需要在特定时刻采样，使用RMT比较复杂
-    // 如果未来需要，可以在此处初始化RMT TX通道用于发送时隙
-    
     // 检查总线状态
     bool presence;
     esp_err_t err = onewire_reset(&presence);
@@ -890,16 +778,6 @@ void max31850_deinit(void)
     if (s_onewire_mutex) {
         vSemaphoreDelete(s_onewire_mutex);
         s_onewire_mutex = NULL;
-    }
-    
-    // 释放RMT资源（如果已分配）
-    if (s_rmt_encoder) {
-        rmt_del_encoder(s_rmt_encoder);
-        s_rmt_encoder = NULL;
-    }
-    if (s_rmt_tx_channel) {
-        rmt_del_channel(s_rmt_tx_channel);
-        s_rmt_tx_channel = NULL;
     }
     
     s_initialized = false;
