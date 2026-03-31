@@ -523,6 +523,33 @@ static esp_err_t max31850_start_conversion(const uint8_t *rom_id)
 }
 
 /**
+ * @brief 使用Skip ROM读取暂存器（单设备测试用）
+ */
+static esp_err_t max31850_read_scratchpad_skip_rom(uint8_t *scratchpad)
+{
+    if (!scratchpad) return ESP_ERR_INVALID_ARG;
+    
+    bool presence;
+    esp_err_t err = onewire_reset(&presence);
+    if (err != ESP_OK || !presence) {
+        return ESP_ERR_NOT_FOUND;
+    }
+    
+    // 发送Skip ROM命令（仅当总线上只有一个设备时有效）
+    onewire_write_byte(ONEWIRE_CMD_SKIP_ROM);
+    esp_rom_delay_us(10);
+    
+    onewire_write_byte(MAX31850_CMD_READ_SCRATCH);
+    esp_rom_delay_us(10);
+    
+    for (int i = 0; i < MAX31850_SCRATCHPAD_LEN; i++) {
+        scratchpad[i] = onewire_read_byte();
+    }
+    
+    return ESP_OK;
+}
+
+/**
  * @brief 读取暂存器
  */
 static esp_err_t max31850_read_scratchpad(const uint8_t *rom_id, uint8_t *scratchpad)
@@ -879,6 +906,27 @@ esp_err_t max31850_init(gpio_num_t onewire_pin)
     
     if (found == 0) {
         ESP_LOGW(TAG, "No MAX31850 devices found after all attempts");
+        
+        // 尝试使用Skip ROM直接读取（仅测试单设备）
+        ESP_LOGI(TAG, "Trying Skip ROM method for single device test...");
+        uint8_t scratchpad[MAX31850_SCRATCHPAD_LEN];
+        if (max31850_read_scratchpad_skip_rom(scratchpad) == ESP_OK) {
+            ESP_LOGI(TAG, "Skip ROM read successful!");
+            ESP_LOGI(TAG, "Scratchpad: [%02X %02X %02X %02X %02X %02X %02X %02X %02X]",
+                     scratchpad[0], scratchpad[1], scratchpad[2], scratchpad[3],
+                     scratchpad[4], scratchpad[5], scratchpad[6], scratchpad[7], scratchpad[8]);
+            
+            float temp;
+            max31850_err_t parse_err = max31850_parse_scratchpad(scratchpad, &temp);
+            if (parse_err == MAX31850_OK) {
+                ESP_LOGI(TAG, "Temperature read via Skip ROM: %.2f C", temp);
+            } else {
+                ESP_LOGW(TAG, "Skip ROM parse error: %s", max31850_err_to_string(parse_err));
+            }
+        } else {
+            ESP_LOGW(TAG, "Skip ROM read also failed");
+        }
+        
         vSemaphoreDelete(s_onewire_mutex);
         return ESP_ERR_NOT_FOUND;
     }
