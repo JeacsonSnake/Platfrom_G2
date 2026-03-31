@@ -24,19 +24,21 @@ static const char *TAG = "MAX31850";
 /////////////////////// 1-Wire时序配置 ///////////////////////
 //////////////////////////////////////////////////////////////
 
-/* 1-Wire时序参数 (微秒) - 基于1-Wire标准协议 */
+/* 1-Wire时序参数 (微秒) - 基于1-Wire标准协议，使用保守时序 */
 #define ONEWIRE_RESET_PULSE_US      480         /**< Reset脉冲宽度 */
 #define ONEWIRE_RESET_WAIT_US       70          /**< 等待Presence响应 */
 #define ONEWIRE_RESET_RECOVERY_US   410         /**< Reset恢复时间 */
 
-#define ONEWIRE_WRITE1_LOW_US       6           /**< 写1低电平时间 */
-#define ONEWIRE_WRITE1_HIGH_US      64          /**< 写1高电平时间(总时隙60-120μs) */
-#define ONEWIRE_WRITE0_LOW_US       60          /**< 写0低电平时间 */
+#define ONEWIRE_WRITE1_LOW_US       10          /**< 写1低电平时间 (保守值) */
+#define ONEWIRE_WRITE1_HIGH_US      60          /**< 写1高电平时间(总时隙70μs) */
+#define ONEWIRE_WRITE0_LOW_US       65          /**< 写0低电平时间 (保守值) */
 #define ONEWIRE_WRITE0_HIGH_US      10          /**< 写0恢复时间 */
 
-#define ONEWIRE_READ_INIT_US        6           /**< 读初始化低电平 */
-#define ONEWIRE_READ_SAMPLE_US      9           /**< 读到采样点的延迟(总15μs) */
-#define ONEWIRE_READ_RECOVERY_US    55          /**< 读恢复时间 */
+#define ONEWIRE_READ_INIT_US        5           /**< 读初始化低电平 */
+#define ONEWIRE_READ_SAMPLE_US      10          /**< 读到采样点的延迟(总15μs) */
+#define ONEWIRE_READ_RECOVERY_US    50          /**< 读恢复时间 */
+
+#define ONEWIRE_INTER_BYTE_DELAY_US 5           /**< 字节间延迟 */
 
 /* CRC8多项式: X8 + X5 + X4 + 1 */
 #define CRC8_POLYNOMIAL             0x31
@@ -259,6 +261,9 @@ static esp_err_t onewire_reset(bool *presence)
         return ESP_ERR_INVALID_STATE;
     }
     
+    // Reset后额外恢复时间，确保设备准备就绪
+    esp_rom_delay_us(10);
+    
     return ESP_OK;
 }
 
@@ -330,7 +335,11 @@ static void onewire_write_byte(uint8_t data)
     for (int i = 0; i < 8; i++) {
         onewire_write_bit(data & 0x01);
         data >>= 1;
+        // 位间微小延迟，确保设备稳定
+        esp_rom_delay_us(2);
     }
+    // 字节间延迟
+    esp_rom_delay_us(ONEWIRE_INTER_BYTE_DELAY_US);
 }
 
 /**
@@ -341,7 +350,11 @@ static uint8_t onewire_read_byte(void)
     uint8_t data = 0;
     for (int i = 0; i < 8; i++) {
         data |= (onewire_read_bit() << i);
+        // 位间微小延迟
+        esp_rom_delay_us(2);
     }
+    // 字节间延迟
+    esp_rom_delay_us(ONEWIRE_INTER_BYTE_DELAY_US);
 #if MAX31850_DEBUG_LEVEL >= 4
     ESP_LOGI(TAG, "  Read byte: 0x%02X", data);
 #endif
@@ -410,6 +423,9 @@ static esp_err_t onewire_search_rom(uint8_t rom_ids[][8], uint8_t max_devices, u
         ESP_LOGI(TAG, "  Search iteration %d, last_discrepancy=%d", 
                  *found_count + 1, last_discrepancy);
         onewire_write_byte(ONEWIRE_CMD_SEARCH_ROM);
+        
+        // Search ROM命令后增加恢复时间
+        esp_rom_delay_us(10);
         
         uint8_t last_zero = 0;
         bool search_direction = false;
