@@ -63,20 +63,20 @@ static const char *TAG = "MAX31850";
 #define ONEWIRE_RESET_SAMPLE_US     0       /**< 在 70μs 处采样 */
 #define ONEWIRE_RESET_RECOVERY_US   410     /**< Reset 后恢复时间 */
 
-/* Write 时序 (μs) - 保守值 */
-#define ONEWIRE_WRITE1_LOW_US       8       /**< 写 1 低电平时间 (≤15μs)，保守值 8μs */
-#define ONEWIRE_WRITE1_HIGH_US      62      /**< 写 1 高电平时间，总时隙 70μs */
-#define ONEWIRE_WRITE0_LOW_US       75      /**< 写 0 低电平时间 (≥60μs)，保守值 75μs */
-#define ONEWIRE_WRITE0_HIGH_US      10      /**< 写 0 高电平时间，增加恢复时间 */
+/* Write 时序 (μs) - 基于标准 1-Wire 协议 */
+#define ONEWIRE_WRITE1_LOW_US       6       /**< 写 1 低电平时间：标准 5-15μs */
+#define ONEWIRE_WRITE1_HIGH_US      64      /**< 写 1 高电平时间，总时隙 70μs */
+#define ONEWIRE_WRITE0_LOW_US       70      /**< 写 0 低电平时间：标准 60-120μs */
+#define ONEWIRE_WRITE0_HIGH_US      10      /**< 写 0 恢复时间：标准 ≥1μs */
 
-/* Read 时序 (μs) - 保守值 */
-#define ONEWIRE_READ_INIT_US        2       /**< 读初始化低电平时间，稍短 */
-#define ONEWIRE_READ_SAMPLE_US      13      /**< 等待到采样点（总计 15μs） */
-#define ONEWIRE_READ_RECOVERY_US    55      /**< 读恢复时间，增加 5μs */
+/* Read 时序 (μs) - 基于标准 1-Wire 协议 */
+#define ONEWIRE_READ_INIT_US        3       /**< 读初始化低电平：标准 1-15μs */
+#define ONEWIRE_READ_SAMPLE_US      12      /**< 等待到采样点：标准 15μs 总时间 */
+#define ONEWIRE_READ_RECOVERY_US    55      /**< 读恢复时间 */
 
-/* 间隔时序 - 增加恢复时间 */
-#define ONEWIRE_INTER_BIT_US        5       /**< 位间恢复时间，增加 3μs */
-#define ONEWIRE_INTER_BYTE_US       10      /**< 字节间恢复时间，增加 5μs */
+/* 间隔时序 */
+#define ONEWIRE_INTER_BIT_US        3       /**< 位间恢复时间：标准 ≥1μs */
+#define ONEWIRE_INTER_BYTE_US       8       /**< 字节间恢复时间 */
 
 //////////////////////////////////////////////////////////////
 ///////////////////// CRC8 表（X8+X5+X4+1）///////////////////
@@ -519,9 +519,8 @@ static esp_err_t onewire_search_rom(uint8_t rom_ids[][8], uint8_t *found_count)
         for (uint8_t bit_pos = 0; bit_pos < 64; bit_pos++) {
             uint8_t bit_actual, bit_complement, selected_bit;
             
-            /* 读取两位：实际值和补码 */
+            /* 读取两位：实际值和补码（连续读取，无额外延迟） */
             bit_actual = onewire_read_bit();
-            onewire_delay_us(ONEWIRE_INTER_BIT_US);  /* 额外恢复时间 */
             bit_complement = onewire_read_bit();
             
             if (bit_actual == 1 && bit_complement == 1) {
