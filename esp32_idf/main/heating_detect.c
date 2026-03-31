@@ -34,9 +34,9 @@ static const char *TAG = "MAX31850";
 #define ONEWIRE_WRITE0_LOW_US       65          /**< 写0低电平时间 (保守值) */
 #define ONEWIRE_WRITE0_HIGH_US      10          /**< 写0恢复时间 */
 
-#define ONEWIRE_READ_INIT_US        5           /**< 读初始化低电平 */
-#define ONEWIRE_READ_SAMPLE_US      10          /**< 读到采样点的延迟(总15μs) */
-#define ONEWIRE_READ_RECOVERY_US    50          /**< 读恢复时间 */
+#define ONEWIRE_READ_INIT_US        3           /**< 读初始化低电平 (标准1-5μs) */
+#define ONEWIRE_READ_SAMPLE_US      12          /**< 读到采样点的延迟 (总15μs) */
+#define ONEWIRE_READ_RECOVERY_US    60          /**< 读恢复时间 (更保守) */
 
 #define ONEWIRE_INTER_BYTE_DELAY_US 5           /**< 字节间延迟 */
 
@@ -268,23 +268,28 @@ static esp_err_t onewire_reset(bool *presence)
 }
 
 /**
- * @brief 写入单个bit（带调试）
+ * @brief 写入单个bit（保守版本）
+ * 
+ * 1-Wire写时隙：
+ * - 写1: 低电平1-15μs，然后释放，总时隙60-120μs
+ * - 写0: 低电平60-120μs，然后释放
  */
 static void onewire_write_bit(uint8_t bit)
 {
     portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
     portENTER_CRITICAL(&mux);
     
+    // 确保在开漏模式
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
+    
     if (bit & 0x01) {
-        // 写1: 低电平6μs，然后释放，总共70μs
-        onewire_set_opendrain();
+        // 写1: 低电平后快速释放
         gpio_set_level(s_onewire_pin, 0);
         esp_rom_delay_us(ONEWIRE_WRITE1_LOW_US);
-        gpio_set_level(s_onewire_pin, 1);  // 释放（开漏模式下上拉电阻拉高）
+        gpio_set_level(s_onewire_pin, 1);  // 释放，上拉电阻拉高
         esp_rom_delay_us(ONEWIRE_WRITE1_HIGH_US);
     } else {
-        // 写0: 低电平60μs，然后释放10μs
-        onewire_set_opendrain();
+        // 写0: 保持低电平较长时间
         gpio_set_level(s_onewire_pin, 0);
         esp_rom_delay_us(ONEWIRE_WRITE0_LOW_US);
         gpio_set_level(s_onewire_pin, 1);  // 释放
@@ -295,7 +300,13 @@ static void onewire_write_bit(uint8_t bit)
 }
 
 /**
- * @brief 读取单个bit（带调试）
+ * @brief 读取单个bit（保守版本）
+ * 
+ * 1-Wire读时隙：
+ * 1. 主机拉低1-5μs
+ * 2. 释放总线（从机开始驱动）
+ * 3. 等待到15μs采样
+ * 4. 等待时隙结束（总60μs以上）
  */
 static uint8_t onewire_read_bit(void)
 {
@@ -304,21 +315,22 @@ static uint8_t onewire_read_bit(void)
     portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
     portENTER_CRITICAL(&mux);
     
-    // 主机拉低6μs启动读时隙
-    onewire_set_opendrain();
+    // Step 1: 主机拉低启动读时隙
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT_OUTPUT_OD);
     gpio_set_level(s_onewire_pin, 0);
     esp_rom_delay_us(ONEWIRE_READ_INIT_US);
     
-    // 释放总线
-    onewire_set_input();
+    // Step 2: 释放总线（切换到输入，上拉电阻拉高）
+    gpio_set_level(s_onewire_pin, 1);
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
     
-    // 等待到15μs采样点（6+9=15μs）
+    // Step 3: 等待到采样点（总共15μs）
     esp_rom_delay_us(ONEWIRE_READ_SAMPLE_US);
     bit = gpio_get_level(s_onewire_pin);
     
     portEXIT_CRITICAL(&mux);
     
-    // 等待时隙结束
+    // Step 4: 等待时隙结束
     esp_rom_delay_us(ONEWIRE_READ_RECOVERY_US);
     
     return bit;
