@@ -645,10 +645,7 @@ static esp_err_t onewire_search_rom(void)
             ESP_LOGW(TAG, "    2. Check for bus capacitance (wire length)");
             ESP_LOGW(TAG, "    3. Verify 3.3V power stability");
         } else {
-            ESP_LOGI(TAG, "ROM ID CRC OK: calc=0x%02X, recv=0x%02X", crc_calc, rom_id[7]); 
-                     crc8_calculate(rom_id, 7), rom_id[7]);
-            // 继续搜索，不保存此设备
-        } else {
+            ESP_LOGI(TAG, "ROM ID CRC OK: calc=0x%02X, recv=0x%02X", crc_calc, rom_id[7]);
             // 保存ROM ID
             if (s_sensor_count < MAX31850_SENSOR_COUNT) {
                 memcpy(s_rom_ids[s_sensor_count], rom_id, 8);
