@@ -71,10 +71,12 @@ extern "C" {
 #define ONEWIRE_READ_SAMPLE_US      9           /**< Read: 9μs后采样（总共12μs） */
 #define ONEWIRE_READ_RECOVERY_US    60          /**< Read: 60μs恢复时间 */
 #define ONEWIRE_BIT_INTERVAL_US     10          /**< 位间间隔：10μs（多设备需要更长） */
+#define ONEWIRE_BYTE_INTERVAL_US    20          /**< 字节间间隔：20μs */
 
 /** @name 系统参数 */
 #define MAX31850_POLL_INTERVAL_MS   250         /**< 单个传感器轮询间隔 */
 #define MAX31850_TASK_STACK_SIZE    4096        /**< 轮询任务栈大小 */
+#define MAX31850_ROM_SEARCH_RETRY   5           /**< ROM搜索重试次数 */
 #define MAX31850_TASK_PRIORITY      2           /**< 轮询任务优先级 */
 #define MAX31850_MAX_RETRY          3           /**< 最大重试次数 */
 

@@ -453,6 +453,8 @@ static void onewire_write_byte(uint8_t data)
         onewire_write_bit(data & 0x01);
         data >>= 1;
     }
+    // 字节间间隔
+    onewire_delay_us(ONEWIRE_BYTE_INTERVAL_US);
 }
 
 /**
@@ -466,6 +468,8 @@ static uint8_t onewire_read_byte(void)
     for (int i = 0; i < 8; i++) {
         data |= (onewire_read_bit() << i);
     }
+    // 字节间间隔
+    onewire_delay_us(ONEWIRE_BYTE_INTERVAL_US);
     return data;
 }
 
@@ -562,104 +566,148 @@ static esp_err_t onewire_match_rom(const uint8_t *rom_id)
  * 
  * @note 使用二叉树搜索算法遍历所有设备
  */
-static esp_err_t onewire_search_rom(void)
+/**
+ * @brief 执行一次ROM搜索迭代
+ * 
+ * @param last_discrepancy 上次分歧位置（输入/输出）
+ * @param rom_id 输出的ROM ID
+ * @return true 成功读取有效ROM ID
+ * @return false CRC错误或通信失败
+ */
+static bool onewire_search_rom_iteration(uint8_t *last_discrepancy, uint8_t *rom_id)
 {
     bool presence;
+    uint8_t last_zero = 0;
+    
+    // Reset并检查Presence
+    if (onewire_reset(&presence) != ESP_OK || !presence) {
+        return false;
+    }
+    
+    // 发送Search ROM命令
+    onewire_write_byte(ONEWIRE_CMD_SEARCH_ROM);
+    
+    // 遍历64个bit
+    for (uint8_t bit_pos = 0; bit_pos < 64; bit_pos++) {
+        // 读取实际位和补码位
+        uint8_t bit_actual = onewire_read_bit();
+        uint8_t bit_complement = onewire_read_bit();
+        
+        uint8_t selected_bit;
+        
+        if (bit_actual == 0 && bit_complement == 0) {
+            // 有分歧，多个设备在此位不同
+            if (bit_pos == *last_discrepancy) {
+                selected_bit = 1;
+            } else if (bit_pos > *last_discrepancy) {
+                selected_bit = 0;
+                last_zero = bit_pos;
+            } else {
+                // bit_pos < last_discrepancy
+                selected_bit = (rom_id[bit_pos / 8] >> (bit_pos % 8)) & 0x01;
+                if (selected_bit == 0) {
+                    last_zero = bit_pos;
+                }
+            }
+        } else if (bit_actual == 0 && bit_complement == 1) {
+            // 所有设备在此位为0
+            selected_bit = 0;
+        } else if (bit_actual == 1 && bit_complement == 0) {
+            // 所有设备在此位为1
+            selected_bit = 1;
+        } else {
+            // 11 = 无设备
+            ESP_LOGW(TAG, "Search error at bit %d: no devices (11)", bit_pos);
+            return false;
+        }
+        
+        // 写入选择的位
+        onewire_write_bit(selected_bit);
+        
+        // 更新ROM ID
+        if (selected_bit) {
+            rom_id[bit_pos / 8] |= (1 << (bit_pos % 8));
+        } else {
+            rom_id[bit_pos / 8] &= ~(1 << (bit_pos % 8));
+        }
+    }
+    
+    // 验证ROM CRC（byte 7是bytes 0-6的CRC）
+    uint8_t crc_calc = crc8_calculate(rom_id, 7);
+    if (crc_calc != rom_id[7]) {
+        return false;  // CRC错误
+    }
+    
+    // 更新分歧位置
+    *last_discrepancy = last_zero;
+    return true;
+}
+
+/**
+ * @brief ROM搜索主函数（带重试机制）
+ * 
+ * 对于每个设备，如果CRC错误会重试多次
+ */
+static esp_err_t onewire_search_rom(void)
+{
     uint8_t last_discrepancy = 0;
     uint8_t rom_id[8] = {0};
-    uint8_t last_zero = 0;
     
     s_sensor_count = 0;
     
-    ESP_LOGI(TAG, "Starting ROM search with optimized timing...");
-    ESP_LOGI(TAG, "  Bit interval: %dμs (for 4.7K multi-device bus)", ONEWIRE_BIT_INTERVAL_US);
+    ESP_LOGI(TAG, "Starting ROM search with retry mechanism...");
+    ESP_LOGI(TAG, "  Bit interval: %dμs, Byte interval: %dμs", 
+             ONEWIRE_BIT_INTERVAL_US, ONEWIRE_BYTE_INTERVAL_US);
     
-    do {
-        // Reset并检查Presence
-        ESP_ERROR_CHECK(onewire_reset(&presence));
-        if (!presence) {
-            ESP_LOGW(TAG, "No device present during search");
-            break;
-        }
+    while (s_sensor_count < MAX31850_SENSOR_COUNT) {
+        bool device_found = false;
         
-        // 发送Search ROM命令
-        onewire_write_byte(ONEWIRE_CMD_SEARCH_ROM);
-        
-        last_zero = 0;
-        
-        // 遍历64个bit
-        for (uint8_t bit_pos = 0; bit_pos < 64; bit_pos++) {
-            // 读取实际位和补码位
-            uint8_t bit_actual = onewire_read_bit();
-            uint8_t bit_complement = onewire_read_bit();
+        // 对每个设备尝试多次
+        for (int retry = 0; retry < MAX31850_ROM_SEARCH_RETRY; retry++) {
+            // 清空ROM ID缓冲区
+            memset(rom_id, 0, 8);
             
-            uint8_t selected_bit;
-            
-            if (bit_actual == 0 && bit_complement == 0) {
-                // 有分歧，多个设备在此位不同
-                if (bit_pos == last_discrepancy) {
-                    selected_bit = 1;
-                } else if (bit_pos > last_discrepancy) {
-                    selected_bit = 0;
-                    last_zero = bit_pos;
-                } else {
-                    // bit_pos < last_discrepancy
-                    selected_bit = (rom_id[bit_pos / 8] >> (bit_pos % 8)) & 0x01;
-                    if (selected_bit == 0) {
-                        last_zero = bit_pos;
-                    }
-                }
-            } else if (bit_actual == 0 && bit_complement == 1) {
-                // 所有设备在此位为0
-                selected_bit = 0;
-            } else if (bit_actual == 1 && bit_complement == 0) {
-                // 所有设备在此位为1
-                selected_bit = 1;
-            } else {
-                // 11 = 无设备
-                ESP_LOGW(TAG, "Search error at bit %d: no devices (11)", bit_pos);
-                ESP_LOGW(TAG, "  Bit pattern at error: actual=%d, comp=%d", bit_actual, bit_complement);
-                return ESP_ERR_NOT_FOUND;
-            }
-            
-            // 写入选择的位
-            onewire_write_bit(selected_bit);
-            
-            // 更新ROM ID
-            if (selected_bit) {
-                rom_id[bit_pos / 8] |= (1 << (bit_pos % 8));
-            } else {
-                rom_id[bit_pos / 8] &= ~(1 << (bit_pos % 8));
-            }
-        }
-        
-        // 验证ROM CRC（byte 7是bytes 0-6的CRC）
-        uint8_t crc_calc = crc8_calculate(rom_id, 7);
-        if (crc_calc != rom_id[7]) {
-            ESP_LOGW(TAG, "ROM ID CRC error: calc=0x%02X, recv=0x%02X", crc_calc, rom_id[7]);
-            ESP_LOGW(TAG, "  ROM data: %02X%02X%02X%02X%02X%02X%02X%02X",
-                     rom_id[0], rom_id[1], rom_id[2], rom_id[3],
-                     rom_id[4], rom_id[5], rom_id[6], rom_id[7]);
-            ESP_LOGW(TAG, "  This usually indicates signal integrity issues:");
-            ESP_LOGW(TAG, "    1. Try reducing pull-up resistor to 2.2KΩ");
-            ESP_LOGW(TAG, "    2. Check for bus capacitance (wire length)");
-            ESP_LOGW(TAG, "    3. Verify 3.3V power stability");
-        } else {
-            ESP_LOGI(TAG, "ROM ID CRC OK: calc=0x%02X, recv=0x%02X", crc_calc, rom_id[7]);
-            // 保存ROM ID
-            if (s_sensor_count < MAX31850_SENSOR_COUNT) {
+            if (onewire_search_rom_iteration(&last_discrepancy, rom_id)) {
+                // CRC验证成功
+                ESP_LOGI(TAG, "ROM ID CRC OK (attempt %d)", retry + 1);
+                
+                // 保存ROM ID
                 memcpy(s_rom_ids[s_sensor_count], rom_id, 8);
                 ESP_LOGI(TAG, "Found device %d: ROM ID %02X%02X%02X%02X%02X%02X%02X%02X",
                          s_sensor_count + 1,
                          rom_id[0], rom_id[1], rom_id[2], rom_id[3],
                          rom_id[4], rom_id[5], rom_id[6], rom_id[7]);
+                
                 s_sensor_count++;
+                device_found = true;
+                break;  // 成功，跳出重试循环
+            } else {
+                // CRC错误或通信失败
+                if (retry < MAX31850_ROM_SEARCH_RETRY - 1) {
+                    ESP_LOGW(TAG, "ROM search attempt %d failed, retrying...", retry + 1);
+                    // 短暂延时后重试
+                    esp_rom_delay_us(100);
+                }
             }
         }
         
-        last_discrepancy = last_zero;
+        if (!device_found) {
+            // 所有重试都失败了
+            if (s_sensor_count == 0) {
+                ESP_LOGW(TAG, "ROM search failed after %d retries", MAX31850_ROM_SEARCH_RETRY);
+                ESP_LOGW(TAG, "  Signal integrity issue - suggestions:");
+                ESP_LOGW(TAG, "    1. Reduce pull-up resistor to 2.2KΩ");
+                ESP_LOGW(TAG, "    2. Shorten bus wires (<10m)");
+                ESP_LOGW(TAG, "    3. Check 3.3V power stability");
+            }
+            break;  // 没有更多设备了
+        }
         
-    } while (last_discrepancy != 0 && s_sensor_count < MAX31850_SENSOR_COUNT);
+        // 如果没有更多分歧，搜索完成
+        if (last_discrepancy == 0) {
+            break;
+        }
+    }
     
     ESP_LOGI(TAG, "ROM search complete. Found %d device(s)", s_sensor_count);
     
