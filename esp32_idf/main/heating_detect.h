@@ -100,6 +100,7 @@ typedef struct {
     bool online;                    /**< 在线状态 */
     bool data_valid;                /**< 数据有效标志 */
     uint8_t fail_count;             /**< 连续失败计数 */
+    max31850_err_t last_error;      /**< 最后错误代码 */
     float thermocouple_temp;        /**< 热电偶温度（°C） */
     float cold_junction_temp;       /**< 冷端温度（°C） */
     uint8_t fault_reg;              /**< 故障寄存器 */

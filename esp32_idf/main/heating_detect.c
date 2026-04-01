@@ -672,7 +672,6 @@ esp_err_t max31850_init(gpio_num_t gpio_num)
     // 如果找到传感器，执行初始读取
     for (int i = 0; i < s_sensor_count && i < MAX31850_SENSOR_COUNT; i++) {
         uint8_t data[9];
-        float temp;
         
         // 重试几次
         for (int retry = 0; retry < MAX31850_MAX_RETRY; retry++) {
