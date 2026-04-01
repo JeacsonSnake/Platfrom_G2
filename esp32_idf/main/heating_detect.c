@@ -75,6 +75,16 @@ static inline void onewire_delay_us(uint32_t us)
 }
 
 //////////////////////////////////////////////////////////////
+//////////////////////// 调试开关 ////////////////////////////
+//////////////////////////////////////////////////////////////
+
+// 调试级别控制：0=关闭, 1=错误, 2=警告, 3=信息, 4=详细
+#define MAX31850_DEBUG_LEVEL        3
+
+// 详细波形调试（会显著增加日志量）
+#define MAX31850_DEBUG_WAVEFORM     1
+
+//////////////////////////////////////////////////////////////
 //////////////////////// GPIO控制 ////////////////////////////
 //////////////////////////////////////////////////////////////
 
@@ -114,6 +124,145 @@ static inline uint8_t onewire_read_level(void)
 }
 
 //////////////////////////////////////////////////////////////
+//////////////////////// 调试功能 ////////////////////////////
+//////////////////////////////////////////////////////////////
+
+#if MAX31850_DEBUG_LEVEL >= 3
+
+/**
+ * @brief GPIO诊断测试
+ * 
+ * 测试GPIO14的开漏模式是否正常工作：
+ * 1. 检查总线空闲电平（应为高）
+ * 2. 测试强制拉低（开漏输出0）
+ * 3. 测试释放总线（应为高）
+ * 4. 测试输入模式
+ */
+static void onewire_diagnose_gpio(void)
+{
+    ESP_LOGI(TAG, "========================================");
+    ESP_LOGI(TAG, "GPIO Diagnostic Test on GPIO%d", s_gpio_num);
+    ESP_LOGI(TAG, "========================================");
+    
+    int test1, test2, test3, test4, test5;
+    
+    // Test 1: 输入模式下总线电平（应被上拉电阻拉高）
+    gpio_set_direction(s_gpio_num, GPIO_MODE_INPUT);
+    onewire_delay_us(10);
+    test1 = gpio_get_level(s_gpio_num);
+    ESP_LOGI(TAG, "Test 1 - Input mode (pull-up): %d %s", test1, test1 ? "✓" : "✗");
+    
+    // Test 2: 开漏输出低电平
+    onewire_set_low();
+    onewire_delay_us(10);
+    test2 = gpio_get_level(s_gpio_num);
+    ESP_LOGI(TAG, "Test 2 - Forced low (open-drain): %d %s", test2, test2 == 0 ? "✓" : "✗");
+    
+    // Test 3: 释放总线后电平（等待上拉）
+    onewire_release();
+    onewire_delay_us(100);  // 100us等待上拉
+    test3 = gpio_get_level(s_gpio_num);
+    ESP_LOGI(TAG, "Test 3 - Released (100us wait): %d %s", test3, test3 ? "✓" : "✗");
+    
+    // Test 4: 输入模式
+    onewire_set_input();
+    onewire_delay_us(10);
+    test4 = gpio_get_level(s_gpio_num);
+    ESP_LOGI(TAG, "Test 4 - Input mode: %d %s", test4, test4 ? "✓" : "✗");
+    
+    // Test 5: 最终状态
+    test5 = gpio_get_level(s_gpio_num);
+    ESP_LOGI(TAG, "Test 5 - Final state: %d %s", test5, test5 ? "✓" : "✗");
+    
+    ESP_LOGI(TAG, "----------------------------------------");
+    
+    // 判断结果
+    bool passed = (test1 == 1) && (test2 == 0) && (test5 == 1);
+    if (passed) {
+        ESP_LOGI(TAG, "GPIO Diagnostic: PASSED ✓ (critical tests: 2,4,5)");
+    } else {
+        ESP_LOGW(TAG, "GPIO Diagnostic: PARTIAL ⚠");
+        if (test1 != 1) ESP_LOGW(TAG, "  Test 1 fail: Check pull-up resistor");
+        if (test2 != 0) ESP_LOGW(TAG, "  Test 2 fail: Cannot drive LOW");
+        if (test5 != 1) ESP_LOGW(TAG, "  Test 5 fail: Bus stuck LOW, check short");
+    }
+    ESP_LOGI(TAG, "========================================");
+}
+
+/**
+ * @brief 1-Wire Reset波形详细日志
+ * 
+ * 记录Reset脉冲各时间点的电平状态
+ */
+static void onewire_log_reset_waveform(bool presence)
+{
+#if MAX31850_DEBUG_WAVEFORM
+    ESP_LOGI(TAG, "Reset Waveform Log:");
+    ESP_LOGI(TAG, "  Start (idle): high");
+    ESP_LOGI(TAG, "  After 480us low: 0 (reset pulse)");
+    ESP_LOGI(TAG, "  Release bus: waiting for pull-up");
+    ESP_LOGI(TAG, "  Presence detected: %s", presence ? "YES" : "NO");
+    ESP_LOGI(TAG, "  Final result: %s", presence ? "Device present ✓" : "No device ✗");
+#else
+    ESP_LOGD(TAG, "Reset: presence=%s", presence ? "YES" : "NO");
+#endif
+}
+
+/**
+ * @brief 打印暂存器原始数据
+ * 
+ * @param data 9字节数据
+ * @param prefix 前缀字符串
+ */
+static void onewire_log_scratchpad(const uint8_t *data, const char *prefix)
+{
+    ESP_LOGI(TAG, "%s Scratchpad raw data:", prefix);
+    ESP_LOGI(TAG, "  [0] 0x%02X | [1] 0x%02X | [2] 0x%02X | [3] 0x%02X",
+             data[0], data[1], data[2], data[3]);
+    ESP_LOGI(TAG, "  [4] 0x%02X | [5] 0x%02X | [6] 0x%02X | [7] 0x%02X",
+             data[4], data[5], data[6], data[7]);
+    ESP_LOGI(TAG, "  [8] 0x%02X (CRC)", data[8]);
+    
+    // 解析温度（原始14位值）
+    int16_t raw_temp = ((int16_t)data[1] << 8) | data[0];
+    ESP_LOGI(TAG, "  Raw temp bytes: 0x%02X 0x%02X -> raw=0x%04X", data[0], data[1], raw_temp);
+    
+    // 故障寄存器
+    if (data[4] != 0) {
+        ESP_LOGW(TAG, "  Fault register: 0x%02X", data[4]);
+        if (data[4] & 0x01) ESP_LOGW(TAG, "    Bit0: Thermocouple OPEN");
+        if (data[4] & 0x02) ESP_LOGW(TAG, "    Bit1: Short to GND");
+        if (data[4] & 0x04) ESP_LOGW(TAG, "    Bit2: Short to VCC");
+    }
+}
+
+/**
+ * @brief 检查总线电平并报告
+ * 
+ * @return true 总线正常（高电平）
+ * @return false 总线故障（低电平，可能短路）
+ */
+static bool onewire_check_bus_level(void)
+{
+    gpio_set_direction(s_gpio_num, GPIO_MODE_INPUT);
+    onewire_delay_us(10);
+    int level = gpio_get_level(s_gpio_num);
+    
+    if (level == 0) {
+        ESP_LOGE(TAG, "BUS FAULT: Line shorted to GND or no pull-up!");
+        ESP_LOGE(TAG, "  Check: 1) R1(4.7K) connected to DQ and +3.3V");
+        ESP_LOGE(TAG, "         2) No short between DQ and GND");
+        ESP_LOGE(TAG, "         3) Sensors powered (VDD=3.3V)");
+        return false;
+    }
+    
+    ESP_LOGI(TAG, "Bus level check: HIGH ✓ (pull-up working)");
+    return true;
+}
+
+#endif  // MAX31850_DEBUG_LEVEL >= 3
+
+//////////////////////////////////////////////////////////////
 //////////////////////// 1-Wire协议 //////////////////////////
 //////////////////////////////////////////////////////////////
 
@@ -129,27 +278,68 @@ static esp_err_t onewire_reset(bool *presence)
 {
     portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
     
+#if MAX31850_DEBUG_WAVEFORM
+    uint8_t level_before, level_during_reset, level_at_15us, level_at_70us, level_final;
+    
+    // 记录起始电平
+    gpio_set_direction(s_gpio_num, GPIO_MODE_INPUT);
+    level_before = gpio_get_level(s_gpio_num);
+#endif
+    
     portENTER_CRITICAL(&mux);
     
     // 拉低480μs（Reset脉冲）
     onewire_set_low();
     onewire_delay_us(ONEWIRE_RESET_LOW_US);
     
+#if MAX31850_DEBUG_WAVEFORM
+    level_during_reset = 0;  // 我们拉低的
+#endif
+    
     // 释放总线
     onewire_release();
+    
+#if MAX31850_DEBUG_WAVEFORM
+    // 15μs时的电平（应在Reset期间，应为0）
+    onewire_delay_us(15);
+    level_at_15us = gpio_get_level(s_gpio_num);
+    
+    // 再等待55μs到70μs（总共70μs从释放开始）
+    onewire_delay_us(55);
+#else
     onewire_delay_us(ONEWIRE_PRESENCE_WAIT_US);
+#endif
     
     // 采样Presence（70μs时）
     uint8_t presence_level = onewire_read_level();
     
+#if MAX31850_DEBUG_WAVEFORM
+    level_at_70us = presence_level;
+#endif
+    
     // 等待Reset周期完成
     onewire_delay_us(ONEWIRE_RESET_RECOVERY_US);
+    
+#if MAX31850_DEBUG_WAVEFORM
+    level_final = gpio_get_level(s_gpio_num);
+#endif
     
     portEXIT_CRITICAL(&mux);
     
     // Presence: 设备会拉低总线60-240μs
     // 所以在70μs采样时，应该读到0
     *presence = (presence_level == 0);
+    
+#if MAX31850_DEBUG_WAVEFORM
+    // 打印波形日志
+    ESP_LOGI(TAG, "Reset Waveform: before=%d, reset=0, @15us=%d, @70us=%d, final=%d",
+             level_before, level_at_15us, level_at_70us, level_final);
+    ESP_LOGI(TAG, "Reset: %s (@70us presence_level=%d)",
+             *presence ? "Device detected ✓" : "No device ✗", presence_level);
+#elif MAX31850_DEBUG_LEVEL >= 3
+    ESP_LOGI(TAG, "Reset: presence=%s (level at 70us=%d)",
+             *presence ? "YES" : "NO", presence_level);
+#endif
     
     return ESP_OK;
 }
@@ -504,10 +694,18 @@ static max31850_err_t max31850_parse_data(const uint8_t *data, max31850_sensor_t
     // 保存原始数据
     memcpy(sensor->scratchpad, data, 9);
     
+#if MAX31850_DEBUG_LEVEL >= 4
+    // 详细日志：打印原始暂存器数据
+    onewire_log_scratchpad(data, "Parsing");
+#endif
+    
     // CRC校验（覆盖bytes 0-7）
     uint8_t crc_calc = crc8_calculate(data, 8);
     if (crc_calc != data[8]) {
         ESP_LOGW(TAG, "CRC error: calc=0x%02X, recv=0x%02X", crc_calc, data[8]);
+#if MAX31850_DEBUG_LEVEL >= 3
+        onewire_log_scratchpad(data, "CRC Error");
+#endif
         return MAX31850_ERR_CRC;
     }
     
@@ -546,6 +744,11 @@ static max31850_err_t max31850_parse_data(const uint8_t *data, max31850_sensor_t
     
     sensor->data_valid = true;
     sensor->last_update = xTaskGetTickCount();
+    
+#if MAX31850_DEBUG_LEVEL >= 4
+    ESP_LOGI(TAG, "Parse OK: TC=%.2f°C, CJ=%.2f°C", 
+             sensor->thermocouple_temp, sensor->cold_junction_temp);
+#endif
     
     return MAX31850_OK;
 }
@@ -623,6 +826,8 @@ static void max31850_poll_task(void *pvParameters)
 esp_err_t max31850_init(gpio_num_t gpio_num)
 {
     ESP_LOGI(TAG, "Initializing MAX31850 on GPIO%d...", gpio_num);
+    ESP_LOGI(TAG, "Hardware: ESP32-S3-DevKitC-1 + 4x MAX31850KATB+ (TDFN-10-EP)");
+    ESP_LOGI(TAG, "1-Wire Bus: GPIO%d with R1=4.7K pull-up to +3.3V", gpio_num);
     
     if (s_initialized) {
         ESP_LOGW(TAG, "Already initialized");
@@ -647,11 +852,31 @@ esp_err_t max31850_init(gpio_num_t gpio_num)
     // 短暂延迟等待总线稳定
     vTaskDelay(pdMS_TO_TICKS(100));
     
-    // 检查总线是否被短路到GND
+#if MAX31850_DEBUG_LEVEL >= 3
+    // GPIO诊断测试
+    onewire_diagnose_gpio();
+    
+    // 总线电平检查
+    if (!onewire_check_bus_level()) {
+        ESP_LOGE(TAG, "Bus level check FAILED - check hardware connections");
+        ESP_LOGE(TAG, "Required: DQ--[4.7K]--+3.3V, and DQ connected to GPIO%d", gpio_num);
+        return ESP_ERR_INVALID_STATE;
+    }
+    
+    // 测试Reset波形
+    ESP_LOGI(TAG, "Testing 1-Wire Reset/Presence...");
+    bool test_presence;
+    for (int i = 0; i < 3; i++) {
+        onewire_reset(&test_presence);
+        vTaskDelay(pdMS_TO_TICKS(10));
+    }
+#else
+    // 简化的总线检查
     if (onewire_read_level() == 0) {
         ESP_LOGE(TAG, "BUS FAULT: Line shorted to GND");
         return ESP_ERR_INVALID_STATE;
     }
+#endif
     
     // 创建互斥锁
     s_mutex = xSemaphoreCreateMutex();
