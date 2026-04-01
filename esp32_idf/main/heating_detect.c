@@ -79,7 +79,7 @@ static inline void onewire_delay_us(uint32_t us)
 //////////////////////////////////////////////////////////////
 
 // 调试级别控制：0=关闭, 1=错误, 2=警告, 3=信息, 4=详细
-#define MAX31850_DEBUG_LEVEL        3
+#define MAX31850_DEBUG_LEVEL        4
 
 // 详细波形调试（会显著增加日志量）
 #define MAX31850_DEBUG_WAVEFORM     1
@@ -190,49 +190,73 @@ static void onewire_diagnose_gpio(void)
 }
 
 /**
- * @brief 1-Wire Reset波形详细日志
- * 
- * 记录Reset脉冲各时间点的电平状态
- */
-static void onewire_log_reset_waveform(bool presence)
-{
-#if MAX31850_DEBUG_WAVEFORM
-    ESP_LOGI(TAG, "Reset Waveform Log:");
-    ESP_LOGI(TAG, "  Start (idle): high");
-    ESP_LOGI(TAG, "  After 480us low: 0 (reset pulse)");
-    ESP_LOGI(TAG, "  Release bus: waiting for pull-up");
-    ESP_LOGI(TAG, "  Presence detected: %s", presence ? "YES" : "NO");
-    ESP_LOGI(TAG, "  Final result: %s", presence ? "Device present ✓" : "No device ✗");
-#else
-    ESP_LOGD(TAG, "Reset: presence=%s", presence ? "YES" : "NO");
-#endif
-}
-
-/**
  * @brief 打印暂存器原始数据
  * 
  * @param data 9字节数据
  * @param prefix 前缀字符串
  */
+/**
+ * @brief 详细解析并打印暂存器数据
+ * 
+ * 基于MAX31850 datasheet的9字节scratchpad结构：
+ * Byte 0: TC Temp LSB + Fault Bits (D0=Fault, D1=Open, D2=Short GND, D3=Short VCC)
+ * Byte 1: TC Temp MSB (14-bit signed, left-aligned)
+ * Byte 2: CJ Temp LSB
+ * Byte 3: CJ Temp MSB (12-bit signed, left-aligned)
+ * Byte 4: Config Register (AD[3:0] hardware address bits)
+ * Byte 5-7: Reserved (reads FFh)
+ * Byte 8: CRC
+ */
 static void onewire_log_scratchpad(const uint8_t *data, const char *prefix)
 {
-    ESP_LOGI(TAG, "%s Scratchpad raw data:", prefix);
+    ESP_LOGI(TAG, "%s Scratchpad (MAX31850 K-Type):", prefix);
     ESP_LOGI(TAG, "  [0] 0x%02X | [1] 0x%02X | [2] 0x%02X | [3] 0x%02X",
              data[0], data[1], data[2], data[3]);
     ESP_LOGI(TAG, "  [4] 0x%02X | [5] 0x%02X | [6] 0x%02X | [7] 0x%02X",
              data[4], data[5], data[6], data[7]);
     ESP_LOGI(TAG, "  [8] 0x%02X (CRC)", data[8]);
     
-    // 解析温度（原始14位值）
-    int16_t raw_temp = ((int16_t)data[1] << 8) | data[0];
-    ESP_LOGI(TAG, "  Raw temp bytes: 0x%02X 0x%02X -> raw=0x%04X", data[0], data[1], raw_temp);
+    // 解析热电偶温度（14-bit有符号，字节0-1）
+    // 注意：字节0的低4位包含故障标志
+    int16_t raw_tc = ((int16_t)data[1] << 8) | data[0];
+    // 保留14位数据（右移2位）
+    int16_t tc_temp = raw_tc >> 2;
+    float tc_celsius = tc_temp * 0.25f;
     
-    // 故障寄存器
-    if (data[4] != 0) {
-        ESP_LOGW(TAG, "  Fault register: 0x%02X", data[4]);
-        if (data[4] & 0x01) ESP_LOGW(TAG, "    Bit0: Thermocouple OPEN");
-        if (data[4] & 0x02) ESP_LOGW(TAG, "    Bit1: Short to GND");
-        if (data[4] & 0x04) ESP_LOGW(TAG, "    Bit2: Short to VCC");
+    ESP_LOGI(TAG, "  Thermocouple (K-Type):");
+    ESP_LOGI(TAG, "    Raw: 0x%04X -> %d counts -> %.2f°C", 
+             (uint16_t)raw_tc, tc_temp, tc_celsius);
+    ESP_LOGI(TAG, "    Range: -270°C to +1372°C, Res: 0.25°C");
+    
+    // 解析冷端温度（12-bit有符号，字节2-3）
+    int16_t raw_cj = ((int16_t)data[3] << 8) | data[2];
+    int16_t cj_temp = raw_cj >> 4;
+    float cj_celsius = cj_temp * 0.0625f;
+    
+    ESP_LOGI(TAG, "  Cold Junction:");
+    ESP_LOGI(TAG, "    Raw: 0x%04X -> %d counts -> %.2f°C",
+             (uint16_t)raw_cj, cj_temp, cj_celsius);
+    ESP_LOGI(TAG, "    Range: -55°C to +125°C, Res: 0.0625°C");
+    
+    // 故障状态（字节0的低4位）
+    uint8_t fault_bits = data[0] & 0x0F;
+    if (fault_bits != 0) {
+        ESP_LOGW(TAG, "  Fault Status (Byte0[3:0]=0x%X):", fault_bits);
+        if (fault_bits & 0x01) ESP_LOGW(TAG, "    FAULT: Any fault detected");
+        if (fault_bits & 0x02) ESP_LOGW(TAG, "    OPEN: Thermocouple open circuit");
+        if (fault_bits & 0x04) ESP_LOGW(TAG, "    SHORT GND: Thermocouple short to GND");
+        if (fault_bits & 0x08) ESP_LOGW(TAG, "    SHORT VCC: Thermocouple short to VCC");
+    }
+    
+    // 配置寄存器（字节4）
+    uint8_t hw_addr = data[4] & 0x03;  // AD[1:0] bits
+    ESP_LOGI(TAG, "  Config Register: 0x%02X", data[4]);
+    ESP_LOGI(TAG, "    Hardware Address (AD[1:0]): %d (AD1=%d, AD0=%d)",
+             hw_addr, (data[4] >> 1) & 0x01, data[4] & 0x01);
+    
+    // 保留字节检查
+    if (data[5] != 0xFF || data[6] != 0xFF || data[7] != 0xFF) {
+        ESP_LOGW(TAG, "  Warning: Reserved bytes [5-7] != FFh");
     }
 }
 
@@ -279,7 +303,7 @@ static esp_err_t onewire_reset(bool *presence)
     portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
     
 #if MAX31850_DEBUG_WAVEFORM
-    uint8_t level_before, level_during_reset, level_at_15us, level_at_70us, level_final;
+    uint8_t level_before, level_at_15us, level_at_70us, level_final;
     
     // 记录起始电平
     gpio_set_direction(s_gpio_num, GPIO_MODE_INPUT);
@@ -291,10 +315,6 @@ static esp_err_t onewire_reset(bool *presence)
     // 拉低480μs（Reset脉冲）
     onewire_set_low();
     onewire_delay_us(ONEWIRE_RESET_LOW_US);
-    
-#if MAX31850_DEBUG_WAVEFORM
-    level_during_reset = 0;  // 我们拉低的
-#endif
     
     // 释放总线
     onewire_release();
@@ -629,7 +649,7 @@ static esp_err_t onewire_search_rom(void)
 /**
  * @brief 从ROM ID提取硬件地址
  * 
- * 基于原理图确认的硬件连接：
+ * 基于MAX31850 datasheet和原理图：
  * | PCB | AD1 | AD0 | HW_ADDR |
  * |-----|-----|-----|---------|
  * | U1  | GND | GND | 00 (0)  |
@@ -637,24 +657,22 @@ static esp_err_t onewire_search_rom(void)
  * | U3  | 3.3V| GND | 10 (2)  |
  * | U4  | 3.3V| 3.3V| 11 (3)  |
  * 
- * MAX31850的硬件地址编码在ROM ID byte 1的bit 4-5中：
- * - ROM[1] bit 4 = AD0
- * - ROM[1] bit 5 = AD1
+ * MAX31850的硬件地址在64-bit ROM ID的序列号部分编码。
+ * 实际地址需要从scratchpad byte 4 (Config Register)的AD[1:0]位读取。
  * 
  * @param rom_id ROM ID (8 bytes)
  * @return uint8_t 硬件地址（0-3）
  */
 static uint8_t max31850_get_hw_addr(const uint8_t *rom_id)
 {
-    // MAX31850 address is encoded in ROM ID byte 1, bits 4-5
-    // Bit 4 = AD0, Bit 5 = AD1
-    // Address = (AD1 << 1) | AD0
-    uint8_t addr = ((rom_id[1] >> 4) & 0x02) | ((rom_id[1] >> 4) & 0x01);
+    // ROM ID structure: [Family(1)][Serial(6)][CRC(1)]
+    // Family code for MAX31850 is 0x3B
+    // Hardware address is NOT directly in ROM ID
+    // It must be read from scratchpad byte 4 after device selection
     
-    // Fallback: use lower 2 bits if out of range
-    if (addr >= MAX31850_SENSOR_COUNT) {
-        addr = rom_id[1] & 0x03;
-    }
+    // For now, use a hash of serial number to assign index
+    // This will be corrected after first read of scratchpad
+    uint8_t addr = (rom_id[1] ^ rom_id[2] ^ rom_id[3]) & 0x03;
     
     return addr;
 }
@@ -826,8 +844,12 @@ static void max31850_poll_task(void *pvParameters)
 esp_err_t max31850_init(gpio_num_t gpio_num)
 {
     ESP_LOGI(TAG, "Initializing MAX31850 on GPIO%d...", gpio_num);
-    ESP_LOGI(TAG, "Hardware: ESP32-S3-DevKitC-1 + 4x MAX31850KATB+ (TDFN-10-EP)");
-    ESP_LOGI(TAG, "1-Wire Bus: GPIO%d with R1=4.7K pull-up to +3.3V", gpio_num);
+    ESP_LOGI(TAG, "Sensor: MAX31850KATB+ K-Type Thermocouple Digitizer");
+    ESP_LOGI(TAG, "  Range: -270°C to +1372°C, Accuracy: ±2°C (-200°C to +700°C)");
+    ESP_LOGI(TAG, "  Resolution: TC=0.25°C (14-bit), CJ=0.0625°C (12-bit)");
+    ESP_LOGI(TAG, "  Conversion: Auto-continuous (~100ms)");
+    ESP_LOGI(TAG, "Hardware: ESP32-S3-DevKitC-1 + 4x MAX31850");
+    ESP_LOGI(TAG, "1-Wire Bus: GPIO%d, Pull-up: R1=4.7K to +3.3V", gpio_num);
     
     if (s_initialized) {
         ESP_LOGW(TAG, "Already initialized");
