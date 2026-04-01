@@ -28,7 +28,7 @@
 
 #include "heating_detect.h"
 #include "esp_timer.h"      // For esp_timer_get_time() timing verification
-#include "esp_rom.h"        // For esp_rom_delay_us()
+#include "esp_rom_sys.h"    // For esp_rom_delay_us()
 #include "esp_log.h"
 #include "freertos/task.h"
 #include "string.h"
