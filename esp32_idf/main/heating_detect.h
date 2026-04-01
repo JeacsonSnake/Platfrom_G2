@@ -52,18 +52,25 @@ extern "C" {
 #define MAX31850_FAULT_SHORT_GND    0x02        /**< Bit1: 短接到GND */
 #define MAX31850_FAULT_SHORT_VCC    0x04        /**< Bit2: 短接到VCC */
 
-/** @name 1-Wire时序参数（ESP32-S3 @ 240MHz，单位：微秒） */
-#define ONEWIRE_RESET_LOW_US        480         /**< Reset低电平时间 */
-#define ONEWIRE_PRESENCE_WAIT_US    70          /**< 等待Presence响应 */
-#define ONEWIRE_RESET_RECOVERY_US   410         /**< Reset恢复时间 */
-#define ONEWIRE_WRITE1_LOW_US       5           /**< 写1低电平时间 */
-#define ONEWIRE_WRITE1_RECOVERY_US  55          /**< 写1恢复时间 */
-#define ONEWIRE_WRITE0_LOW_US       70          /**< 写0低电平时间 */
-#define ONEWIRE_WRITE0_RECOVERY_US  5           /**< 写0恢复时间 */
-#define ONEWIRE_READ_INIT_US        3           /**< 读初始化低电平 */
-#define ONEWIRE_READ_SAMPLE_US      10          /**< 读到采样点延迟 */
-#define ONEWIRE_READ_RECOVERY_US    50          /**< 读恢复时间 */
-#define ONEWIRE_BIT_INTERVAL_US     2           /**< 位间间隔（额外裕量） */
+/** @name 1-Wire时序参数（基于MAX31850 datasheet和4.7K上拉）
+ * 
+ * Standard 1-Wire Requirements:
+ * - Write 1: Low 1-15μs
+ * - Write 0: Low 60-120μs
+ * - Read: Init low 1-15μs, sample within 15μs
+ * - Multi-device bus needs longer recovery times
+ */
+#define ONEWIRE_RESET_LOW_US        480         /**< Reset: 480μs低电平 */
+#define ONEWIRE_PRESENCE_WAIT_US    70          /**< Reset: 等待70μs后采样 */
+#define ONEWIRE_RESET_RECOVERY_US   410         /**< Reset: 410μs恢复 */
+#define ONEWIRE_WRITE1_LOW_US       6           /**< Write 1: 6μs低电平（保守值） */
+#define ONEWIRE_WRITE1_RECOVERY_US  60          /**< Write 1: 60μs恢复 */
+#define ONEWIRE_WRITE0_LOW_US       70          /**< Write 0: 70μs低电平 */
+#define ONEWIRE_WRITE0_RECOVERY_US  10          /**< Write 0: 10μs恢复 */
+#define ONEWIRE_READ_INIT_US        3           /**< Read: 3μs初始化低电平 */
+#define ONEWIRE_READ_SAMPLE_US      9           /**< Read: 9μs后采样（总共12μs） */
+#define ONEWIRE_READ_RECOVERY_US    60          /**< Read: 60μs恢复时间 */
+#define ONEWIRE_BIT_INTERVAL_US     10          /**< 位间间隔：10μs（多设备需要更长） */
 
 /** @name 系统参数 */
 #define MAX31850_POLL_INTERVAL_MS   250         /**< 单个传感器轮询间隔 */

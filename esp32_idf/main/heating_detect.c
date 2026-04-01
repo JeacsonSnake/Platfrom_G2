@@ -369,6 +369,11 @@ static esp_err_t onewire_reset(bool *presence)
 /**
  * @brief 写入单个位
  * 
+ * 1-Wire Write Timing (optimized for multi-device with 4.7K pull-up):
+ * - Write 1: Low 6μs, Release, Recovery 60μs
+ * - Write 0: Low 70μs, Release, Recovery 10μs
+ * - Bit interval: 10μs between bits
+ * 
  * @param bit 要写入的位（0或1）
  */
 static void onewire_write_bit(uint8_t bit)
@@ -378,20 +383,20 @@ static void onewire_write_bit(uint8_t bit)
     portENTER_CRITICAL(&mux);
     
     if (bit & 0x01) {
-        // 写1: 拉低5μs → 释放 → 等待55μs
+        // 写1: 拉低6μs → 释放 → 等待60μs
         onewire_set_low();
         onewire_delay_us(ONEWIRE_WRITE1_LOW_US);
         onewire_release();
         onewire_delay_us(ONEWIRE_WRITE1_RECOVERY_US);
     } else {
-        // 写0: 拉低70μs → 释放 → 等待5μs
+        // 写0: 拉低70μs → 释放 → 等待10μs
         onewire_set_low();
         onewire_delay_us(ONEWIRE_WRITE0_LOW_US);
         onewire_release();
         onewire_delay_us(ONEWIRE_WRITE0_RECOVERY_US);
     }
     
-    // 位间间隔
+    // 位间间隔（多设备总线需要更长恢复时间）
     onewire_delay_us(ONEWIRE_BIT_INTERVAL_US);
     
     portEXIT_CRITICAL(&mux);
@@ -399,6 +404,12 @@ static void onewire_write_bit(uint8_t bit)
 
 /**
  * @brief 读取单个位
+ * 
+ * 1-Wire Read Timing (optimized for multi-device):
+ * - Init low: 3μs
+ * - Release and wait: 9μs
+ * - Sample at: 12μs from start (within 15μs requirement)
+ * - Recovery: 60μs
  * 
  * @return 读取到的位（0或1）
  */
@@ -417,10 +428,10 @@ static uint8_t onewire_read_bit(void)
     onewire_release();
     onewire_delay_us(ONEWIRE_READ_SAMPLE_US);
     
-    // 采样（总共13μs）
+    // 采样（总共12μs，在15μs要求内）
     bit = onewire_read_level();
     
-    // 等待时隙结束
+    // 等待时隙结束（确保总线恢复）
     onewire_delay_us(ONEWIRE_READ_RECOVERY_US);
     
     // 位间间隔
@@ -560,6 +571,9 @@ static esp_err_t onewire_search_rom(void)
     
     s_sensor_count = 0;
     
+    ESP_LOGI(TAG, "Starting ROM search with optimized timing...");
+    ESP_LOGI(TAG, "  Bit interval: %dμs (for 4.7K multi-device bus)", ONEWIRE_BIT_INTERVAL_US);
+    
     do {
         // Reset并检查Presence
         ESP_ERROR_CHECK(onewire_reset(&presence));
@@ -603,7 +617,8 @@ static esp_err_t onewire_search_rom(void)
                 selected_bit = 1;
             } else {
                 // 11 = 无设备
-                ESP_LOGW(TAG, "Search error at bit %d: no devices", bit_pos);
+                ESP_LOGW(TAG, "Search error at bit %d: no devices (11)", bit_pos);
+                ESP_LOGW(TAG, "  Bit pattern at error: actual=%d, comp=%d", bit_actual, bit_complement);
                 return ESP_ERR_NOT_FOUND;
             }
             
@@ -619,8 +634,18 @@ static esp_err_t onewire_search_rom(void)
         }
         
         // 验证ROM CRC（byte 7是bytes 0-6的CRC）
-        if (crc8_calculate(rom_id, 7) != rom_id[7]) {
-            ESP_LOGW(TAG, "ROM ID CRC error: calc=0x%02X, recv=0x%02X", 
+        uint8_t crc_calc = crc8_calculate(rom_id, 7);
+        if (crc_calc != rom_id[7]) {
+            ESP_LOGW(TAG, "ROM ID CRC error: calc=0x%02X, recv=0x%02X", crc_calc, rom_id[7]);
+            ESP_LOGW(TAG, "  ROM data: %02X%02X%02X%02X%02X%02X%02X%02X",
+                     rom_id[0], rom_id[1], rom_id[2], rom_id[3],
+                     rom_id[4], rom_id[5], rom_id[6], rom_id[7]);
+            ESP_LOGW(TAG, "  This usually indicates signal integrity issues:");
+            ESP_LOGW(TAG, "    1. Try reducing pull-up resistor to 2.2KΩ");
+            ESP_LOGW(TAG, "    2. Check for bus capacitance (wire length)");
+            ESP_LOGW(TAG, "    3. Verify 3.3V power stability");
+        } else {
+            ESP_LOGI(TAG, "ROM ID CRC OK: calc=0x%02X, recv=0x%02X", crc_calc, rom_id[7]); 
                      crc8_calculate(rom_id, 7), rom_id[7]);
             // 继续搜索，不保存此设备
         } else {
