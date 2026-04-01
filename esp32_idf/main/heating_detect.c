@@ -5,7 +5,24 @@
  * 1-Wire Bit-Bang implementation for ESP32-S3 @ 240MHz
  * Critical section protection during 1-Wire transactions
  * 
- * @version 3.0
+ * Hardware Configuration (Extracted from ESP32-S3-DevKitC-1主控.SchDoc):
+ * - MCU: ESP32-S3-DevKitC-1 @ 240MHz
+ * - 1-Wire Bus: GPIO14 (IO14 network)
+ * - Pull-up: R1=4.7KΩ (R 0805_L) per sensor to +3.3V
+ * - Sensors: 4× MAX31850KATB+ (TDFN-10-EP 3x4)
+ * 
+ * Hardware Address Configuration (AD0/AD1 pins):
+ * | Sensor | PCB | AD1 | AD0 | HW_ADDR |
+ * |--------|-----|-----|-----|---------|
+ * | P1     | U1  | GND | GND | 00 (0)  |
+ * | P2     | U2  | GND | 3.3V| 01 (1)  |
+ * | P3     | U3  | 3.3V| GND | 10 (2)  |
+ * | P4     | U4  | 3.3V| 3.3V| 11 (3)  |
+ * 
+ * @note Search ROM returns devices in bit-conflict resolution order,
+ *       NOT hardware address order. Driver maps ROM IDs to HW_ADDR.
+ * 
+ * @version 3.1
  * @date 2026-04-01
  */
 
@@ -420,33 +437,33 @@ static esp_err_t onewire_search_rom(void)
 //////////////////////////////////////////////////////////////
 
 /**
- * @brief 从硬件地址推断传感器索引
+ * @brief 从ROM ID提取硬件地址
  * 
- * MAX31850的硬件地址由AD0/AD1引脚决定：
- * - AD1=0, AD0=0 -> 地址0
- * - AD1=0, AD0=1 -> 地址1
- * - AD1=1, AD0=0 -> 地址2
- * - AD1=1, AD0=1 -> 地址3
+ * 基于原理图确认的硬件连接：
+ * | PCB | AD1 | AD0 | HW_ADDR |
+ * |-----|-----|-----|---------|
+ * | U1  | GND | GND | 00 (0)  |
+ * | U2  | GND | 3.3V| 01 (1)  |
+ * | U3  | 3.3V| GND | 10 (2)  |
+ * | U4  | 3.3V| 3.3V| 11 (3)  |
  * 
- * ROM ID的byte 1-2包含地址信息
+ * MAX31850的硬件地址编码在ROM ID byte 1的bit 4-5中：
+ * - ROM[1] bit 4 = AD0
+ * - ROM[1] bit 5 = AD1
  * 
- * @param rom_id ROM ID
+ * @param rom_id ROM ID (8 bytes)
  * @return uint8_t 硬件地址（0-3）
  */
 static uint8_t max31850_get_hw_addr(const uint8_t *rom_id)
 {
-    // MAX31850的地址编码在ROM ID中
-    // 通常byte 1包含地址信息
-    // 简化处理：根据ROM ID的序列号推断
-    // 实际应根据硬件连接顺序匹配
+    // MAX31850 address is encoded in ROM ID byte 1, bits 4-5
+    // Bit 4 = AD0, Bit 5 = AD1
+    // Address = (AD1 << 1) | AD0
+    uint8_t addr = ((rom_id[1] >> 4) & 0x02) | ((rom_id[1] >> 4) & 0x01);
     
-    // 这里使用简单的哈希来分配索引
-    // 实际应用中应该根据已知ROM ID列表映射
-    uint8_t addr = (rom_id[1] & 0x03);
-    
-    // 限制在有效范围内
+    // Fallback: use lower 2 bits if out of range
     if (addr >= MAX31850_SENSOR_COUNT) {
-        addr = 0;
+        addr = rom_id[1] & 0x03;
     }
     
     return addr;
@@ -660,13 +677,17 @@ esp_err_t max31850_init(gpio_num_t gpio_num)
         s_sensors[i].data_valid = false;
         s_sensors[i].fail_count = 0;
         
-        ESP_LOGI(TAG, "Sensor [%d]: ROM=%02X%02X%02X%02X%02X%02X%02X%02X, HW_ADDR=%02X",
+        // Map HW_ADDR to PCB label: 0->U1(P1), 1->U2(P2), 2->U3(P3), 3->U4(P4)
+        const char* pcb_label[] = {"U1(P1)", "U2(P2)", "U3(P3)", "U4(P4)"};
+        uint8_t addr = s_sensors[i].hw_addr;
+        
+        ESP_LOGI(TAG, "Sensor [%d]: ROM=%02X%02X%02X%02X%02X%02X%02X%02X, HW_ADDR=%02X (%s)",
                  i,
                  s_sensors[i].rom_id[0], s_sensors[i].rom_id[1],
                  s_sensors[i].rom_id[2], s_sensors[i].rom_id[3],
                  s_sensors[i].rom_id[4], s_sensors[i].rom_id[5],
                  s_sensors[i].rom_id[6], s_sensors[i].rom_id[7],
-                 s_sensors[i].hw_addr);
+                 addr, (addr < 4) ? pcb_label[addr] : "?");
     }
     
     // 如果找到传感器，执行初始读取
@@ -895,20 +916,21 @@ void heating_print_task(void *pvParameters)
 {
     float temp;
     max31850_err_t err;
+    // PCB label mapping based on schematic: U1(P1), U2(P2), U3(P3), U4(P4)
+    const char* pcb_label[] = {"U1(P1)", "U2(P2)", "U3(P3)", "U4(P4)"};
     
     vTaskDelay(pdMS_TO_TICKS(2000));
-    ESP_LOGI("HEATING", "Temperature print task started");
+    ESP_LOGI("HEATING", "Temperature print task started (GPIO14, 4.7K pull-up)");
     
     while (1) {
         ESP_LOGI("HEATING", "========== Temperature Report ==========");
         for (uint8_t i = 0; i < MAX31850_SENSOR_COUNT; i++) {
             err = max31850_get_temperature(i, &temp);
             if (err == MAX31850_OK) {
-                ESP_LOGI("HEATING", "Sensor %d (P%d): %.2f°C  [OK]", 
-                         i, i + 1, temp);
+                ESP_LOGI("HEATING", "[%s]: %.2f°C  [OK]", pcb_label[i], temp);
             } else {
-                ESP_LOGW("HEATING", "Sensor %d (P%d): %s  [%s]",
-                         i, i + 1, max31850_err_to_string(err),
+                ESP_LOGW("HEATING", "[%s]: %s  [%s]", pcb_label[i],
+                         max31850_err_to_string(err),
                          max31850_is_online(i) ? "ONLINE" : "OFFLINE");
             }
         }
