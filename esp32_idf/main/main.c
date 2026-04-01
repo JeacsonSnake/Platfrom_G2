@@ -73,16 +73,24 @@ void app_main(void){
 
 /**
  * @brief 温度打印任务 - 每2秒打印4个通道温度及状态
+ * 
+ * PCB mapping based on schematic:
+ * - Sensor 0: U1 (P1) - AD0=GND,  AD1=GND  -> HW_ADDR 00
+ * - Sensor 1: U2 (P2) - AD0=3.3V, AD1=GND  -> HW_ADDR 01
+ * - Sensor 2: U3 (P3) - AD0=GND,  AD1=3.3V -> HW_ADDR 10
+ * - Sensor 3: U4 (P4) - AD0=3.3V, AD1=3.3V -> HW_ADDR 11
  */
 void heating_print_task(void *pvParameters)
 {
     float temp;
     max31850_err_t err;
+    // PCB label mapping: U1(P1), U2(P2), U3(P3), U4(P4)
+    const char* pcb_label[] = {"U1(P1)", "U2(P2)", "U3(P3)", "U4(P4)"};
     
     // 等待初始化完成
     vTaskDelay(pdMS_TO_TICKS(2000));
     
-    ESP_LOGI("HEATING", "Temperature print task started");
+    ESP_LOGI("HEATING", "Temperature print task started (GPIO14, 4.7K pull-up)");
     
     while (1) {
         ESP_LOGI("HEATING", "========== Temperature Report ==========");
@@ -91,12 +99,12 @@ void heating_print_task(void *pvParameters)
             err = max31850_get_temperature(i, &temp);
             
             if (err == MAX31850_OK) {
-                ESP_LOGI("HEATING", "Sensor %d (P%d): %.2f °C  [OK]", i, i + 1, temp);
+                ESP_LOGI("HEATING", "[%s]: %.2f°C  [OK]", pcb_label[i], temp);
             } else {
                 const char *err_str = max31850_err_to_string(err);
                 bool online = max31850_is_online(i);
-                ESP_LOGW("HEATING", "Sensor %d (P%d): %s  [%s]",
-                         i, i + 1, err_str, online ? "ONLINE" : "OFFLINE");
+                ESP_LOGW("HEATING", "[%s]: %s  [%s]",
+                         pcb_label[i], err_str, online ? "ONLINE" : "OFFLINE");
             }
         }
         

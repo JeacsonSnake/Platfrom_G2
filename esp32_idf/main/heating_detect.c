@@ -912,30 +912,5 @@ void max31850_deinit(void)
 //////////////////////// 调试任务 ////////////////////////////
 //////////////////////////////////////////////////////////////
 
-void heating_print_task(void *pvParameters)
-{
-    float temp;
-    max31850_err_t err;
-    // PCB label mapping based on schematic: U1(P1), U2(P2), U3(P3), U4(P4)
-    const char* pcb_label[] = {"U1(P1)", "U2(P2)", "U3(P3)", "U4(P4)"};
-    
-    vTaskDelay(pdMS_TO_TICKS(2000));
-    ESP_LOGI("HEATING", "Temperature print task started (GPIO14, 4.7K pull-up)");
-    
-    while (1) {
-        ESP_LOGI("HEATING", "========== Temperature Report ==========");
-        for (uint8_t i = 0; i < MAX31850_SENSOR_COUNT; i++) {
-            err = max31850_get_temperature(i, &temp);
-            if (err == MAX31850_OK) {
-                ESP_LOGI("HEATING", "[%s]: %.2f°C  [OK]", pcb_label[i], temp);
-            } else {
-                ESP_LOGW("HEATING", "[%s]: %s  [%s]", pcb_label[i],
-                         max31850_err_to_string(err),
-                         max31850_is_online(i) ? "ONLINE" : "OFFLINE");
-            }
-        }
-        ESP_LOGI("HEATING", "=======================================");
-        
-        vTaskDelay(pdMS_TO_TICKS(2000));
-    }
-}
+// NOTE: heating_print_task() is implemented in main.c
+// This avoids duplicate definition linker error
