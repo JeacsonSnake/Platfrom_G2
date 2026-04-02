@@ -24,6 +24,31 @@
 #include "esp_err.h"
 
 //////////////////////////////////////////////////////////////
+//////////////////////// DEBUG CONFIG ////////////////////////
+//////////////////////////////////////////////////////////////
+
+/** @brief 启用详细调试日志 */
+#define MAX31850_DEBUG_ENABLE           1
+
+/** @brief 调试日志级别 */
+#define MAX31850_LOG_LEVEL              ESP_LOG_INFO
+
+/** @brief GPIO诊断功能 */
+#define MAX31850_DEBUG_GPIO             1
+
+/** @brief 1-Wire波形日志 */
+#define MAX31850_DEBUG_WAVEFORM         1
+
+/** @brief ROM搜索位级调试 */
+#define MAX31850_DEBUG_ROM_SEARCH       1
+
+/** @brief 暂存器数据打印 */
+#define MAX31850_DEBUG_SCRATCHPAD       1
+
+/** @brief 总线电平检查 */
+#define MAX31850_DEBUG_BUS_LEVEL        1
+
+//////////////////////////////////////////////////////////////
 //////////////////////// CONFIGURATION ///////////////////////
 //////////////////////////////////////////////////////////////
 

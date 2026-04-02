@@ -89,6 +89,165 @@ static const uint8_t crc8_table[256] = {
 };
 
 //////////////////////////////////////////////////////////////
+//////////////////////// DEBUG MACROS ////////////////////////
+//////////////////////////////////////////////////////////////
+
+#if MAX31850_DEBUG_ENABLE
+    #define MAX31850_LOGD(fmt, ...)     ESP_LOGD(TAG, fmt, ##__VA_ARGS__)
+    #define MAX31850_LOGI(fmt, ...)     ESP_LOGI(TAG, fmt, ##__VA_ARGS__)
+    #define MAX31850_LOGW(fmt, ...)     ESP_LOGW(TAG, fmt, ##__VA_ARGS__)
+    #define MAX31850_LOGE(fmt, ...)     ESP_LOGE(TAG, fmt, ##__VA_ARGS__)
+#else
+    #define MAX31850_LOGD(fmt, ...)     ((void)0)
+    #define MAX31850_LOGI(fmt, ...)     ((void)0)
+    #define MAX31850_LOGW(fmt, ...)     ((void)0)
+    #define MAX31850_LOGE(fmt, ...)     ((void)0)
+#endif
+
+//////////////////////////////////////////////////////////////
+//////////////////////// GPIO DIAGNOSTICS ////////////////////
+//////////////////////////////////////////////////////////////
+
+#if MAX31850_DEBUG_GPIO
+/**
+ * @brief GPIO诊断信息结构
+ */
+typedef struct {
+    gpio_mode_t mode;
+    gpio_pull_mode_t pull_up;
+    gpio_pull_mode_t pull_down;
+    int level;
+} gpio_diag_info_t;
+
+/**
+ * @brief 获取GPIO诊断信息
+ */
+static void gpio_get_diag_info(gpio_num_t gpio, gpio_diag_info_t *info)
+{
+    gpio_get_drive_capability(gpio, NULL);  // 仅用于检查GPIO是否有效
+    info->mode = GPIO_MODE_INPUT_OUTPUT_OD; // 我们使用的模式
+    info->pull_up = GPIO_PULLUP_ENABLE;
+    info->pull_down = GPIO_PULLDOWN_DISABLE;
+    info->level = gpio_get_level(gpio);
+}
+
+/**
+ * @brief 打印GPIO诊断信息
+ */
+static void gpio_print_diag(gpio_num_t gpio)
+{
+    gpio_diag_info_t info;
+    gpio_get_diag_info(gpio, &info);
+    
+    ESP_LOGI(TAG, "=== GPIO%d Diagnostic ===", gpio);
+    ESP_LOGI(TAG, "  Mode: INPUT_OUTPUT_OD (Open-Drain)");
+    ESP_LOGI(TAG, "  Pull-up: ENABLED (4.7K external recommended)");
+    ESP_LOGI(TAG, "  Pull-down: DISABLED");
+    ESP_LOGI(TAG, "  Current Level: %d", info.level);
+    ESP_LOGI(TAG, "  Expected idle level: 1 (pulled high)");
+    
+    // 检查总线状态
+    if (info.level == 0) {
+        ESP_LOGW(TAG, "  WARNING: Bus is LOW, possible short or missing pull-up!");
+    } else {
+        ESP_LOGI(TAG, "  Bus state: OK (high)");
+    }
+}
+
+/**
+ * @brief 测试开漏模式
+ * 
+ * 验证GPIO正确配置为开漏模式：
+ * 1. 设置为输出0，检查总线是否为低
+ * 2. 设置为输出1（释放），检查总线是否被拉高
+ */
+static bool gpio_test_open_drain(gpio_num_t gpio)
+{
+    ESP_LOGI(TAG, "=== Testing Open-Drain Mode on GPIO%d ===", gpio);
+    
+    // 测试1: 拉低总线
+    gpio_set_level(gpio, 0);
+    esp_rom_delay_us(100);
+    int level_low = gpio_get_level(gpio);
+    ESP_LOGI(TAG, "  Drive LOW: %d (expected 0)", level_low);
+    
+    // 测试2: 释放总线
+    gpio_set_level(gpio, 1);
+    esp_rom_delay_us(100);
+    int level_high = gpio_get_level(gpio);
+    ESP_LOGI(TAG, "  Release (pull-up): %d (expected 1)", level_high);
+    
+    bool test_pass = (level_low == 0) && (level_high == 1);
+    ESP_LOGI(TAG, "  Open-drain test: %s", test_pass ? "PASS" : "FAIL");
+    
+    return test_pass;
+}
+#endif
+
+//////////////////////////////////////////////////////////////
+//////////////////////// BUS LEVEL CHECK /////////////////////
+//////////////////////////////////////////////////////////////
+
+#if MAX31850_DEBUG_BUS_LEVEL
+/**
+ * @brief 检查总线电平
+ * 
+ * @param expected 期望电平 (0或1)
+ * @param timeout_us 超时时间(微秒)
+ * @return true 电平符合预期，false 超时或电平不符
+ */
+static bool check_bus_level(uint8_t expected, uint32_t timeout_us)
+{
+    uint32_t start = esp_cpu_get_cycle_count();
+    uint32_t timeout_cycles = timeout_us * (ESP_ROM_GET_CPU_FREQ() / 1000000);
+    
+    while ((esp_cpu_get_cycle_count() - start) < timeout_cycles) {
+        if (gpio_get_level(g_driver.gpio_num) == expected) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief 打印总线电平采样
+ * 
+ * 在指定时间内多次采样总线电平，用于波形分析
+ */
+static void print_bus_waveform(const char *label, uint32_t sample_count, uint32_t interval_us)
+{
+    ESP_LOGI(TAG, "=== Bus Waveform: %s ===", label);
+    
+    // 分配缓冲区存储采样数据
+    uint8_t *samples = malloc(sample_count);
+    if (!samples) {
+        ESP_LOGE(TAG, "Failed to allocate waveform buffer");
+        return;
+    }
+    
+    // 采样总线电平
+    for (uint32_t i = 0; i < sample_count; i++) {
+        samples[i] = gpio_get_level(g_driver.gpio_num);
+        esp_rom_delay_us(interval_us);
+    }
+    
+    // 打印波形（每80个字符一行）
+    char line[81];
+    uint32_t line_idx = 0;
+    for (uint32_t i = 0; i < sample_count; i++) {
+        line[line_idx++] = samples[i] ? '_' : '-';
+        if (line_idx >= 80 || i == sample_count - 1) {
+            line[line_idx] = '\0';
+            ESP_LOGI(TAG, "  %s", line);
+            line_idx = 0;
+        }
+    }
+    
+    free(samples);
+}
+#endif
+
+//////////////////////////////////////////////////////////////
 //////////////////////// GPIO HELPERS ////////////////////////
 //////////////////////////////////////////////////////////////
 
@@ -180,24 +339,54 @@ static bool verify_scratchpad_crc(const max31850_scratchpad_t *scratch)
 static bool one_wire_reset(void)
 {
     bool presence = false;
+    int level_before = 0, level_during = 0, level_after = 0;
+    
+#if MAX31850_DEBUG_WAVEFORM
+    ESP_LOGI(TAG, "=== 1-Wire Reset Waveform ===");
+    ESP_LOGI(TAG, "  Timing: reset=%dus, wait=%dus, presence=%dus",
+             ONE_WIRE_RESET_TIME, ONE_WIRE_RESET_WAIT, ONE_WIRE_RESET_PRESENCE);
+#endif
     
     ONE_WIRE_CRITICAL_ENTER();
     
-    // 主机拉低总线 >=480us
+    // 步骤1: 记录初始电平
+    level_before = gpio_get_level_fast(g_driver.gpio_num);
+    
+    // 步骤2: 主机拉低总线 >=480us
     gpio_set_level_fast(g_driver.gpio_num, 0);
     esp_rom_delay_us(ONE_WIRE_RESET_TIME);
     
-    // 释放总线（开漏模式下设为输入/高阻）
+    // 步骤3: 释放总线（开漏模式下设为高电平输出1）
     gpio_set_level_fast(g_driver.gpio_num, 1);
+    
+    // 步骤4: 等待从机响应开始
     esp_rom_delay_us(ONE_WIRE_RESET_WAIT);
     
-    // 采样presence信号（从机会拉低60-240us）
-    presence = (gpio_get_level_fast(g_driver.gpio_num) == 0);
+    // 步骤5: 采样presence信号（从机应拉低总线）
+    level_during = gpio_get_level_fast(g_driver.gpio_num);
+    presence = (level_during == 0);
     
     ONE_WIRE_CRITICAL_EXIT();
     
-    // 等待剩余时间，确保时隙完成
+    // 步骤6: 等待剩余时间，确保时隙完成
     esp_rom_delay_us(ONE_WIRE_RESET_PRESENCE);
+    
+    // 步骤7: 记录最终电平
+    level_after = gpio_get_level_fast(g_driver.gpio_num);
+    
+#if MAX31850_DEBUG_WAVEFORM
+    ESP_LOGI(TAG, "  Level before reset: %d (expected 1)", level_before);
+    ESP_LOGI(TAG, "  Level during presence window: %d (0=detected)", level_during);
+    ESP_LOGI(TAG, "  Level after reset: %d (expected 1)", level_after);
+    ESP_LOGI(TAG, "  Presence detected: %s", presence ? "YES" : "NO");
+    
+    if (level_before != 1) {
+        ESP_LOGW(TAG, "  WARNING: Bus was not high before reset!");
+    }
+    if (level_after != 1) {
+        ESP_LOGW(TAG, "  WARNING: Bus did not return to high after reset!");
+    }
+#endif
     
     return presence;
 }
@@ -331,8 +520,15 @@ static bool one_wire_search_rom(max31850_rom_id_t *rom, int *last_discrepancy)
     uint8_t id_bit, cmp_id_bit;
     bool search_result = false;
     
+#if MAX31850_DEBUG_ROM_SEARCH
+    ESP_LOGI(TAG, "=== ROM Search Started (last_discrepancy=%d) ===", *last_discrepancy);
+    char bit_log[128];
+    int bit_log_idx = 0;
+#endif
+    
     // 如果没有设备，直接返回
     if (!one_wire_reset()) {
+        ESP_LOGW(TAG, "ROM Search: No presence pulse");
         return false;
     }
     
@@ -343,6 +539,19 @@ static bool one_wire_search_rom(max31850_rom_id_t *rom, int *last_discrepancy)
         id_bit = one_wire_read_bit();
         cmp_id_bit = one_wire_read_bit();
         
+#if MAX31850_DEBUG_ROM_SEARCH
+        // 位级调试日志
+        if (id_bit && cmp_id_bit) {
+            ESP_LOGW(TAG, "  Bit %2d: NO RESPONSE (id=1, cmp=1)", id_bit_number);
+        } else if (id_bit != cmp_id_bit) {
+            ESP_LOGI(TAG, "  Bit %2d: CONSISTENT (value=%d)", id_bit_number, id_bit);
+        } else {
+            ESP_LOGI(TAG, "  Bit %2d: CONFLICT (0 and 1), choosing %d", 
+                     id_bit_number, (id_bit_number <= *last_discrepancy) ? 
+                     ((rom->bytes[rom_byte_number] & rom_byte_mask) ? 1 : 0) : 0);
+        }
+#endif
+        
         if (id_bit && cmp_id_bit) {
             // 没有设备响应
             return false;
@@ -350,15 +559,19 @@ static bool one_wire_search_rom(max31850_rom_id_t *rom, int *last_discrepancy)
         
         if (id_bit != cmp_id_bit) {
             // 所有设备在这一位相同
-            search_result = true;
+            search_result = id_bit ? true : false;
         } else {
             // 有分歧，需要选择路径
             if (id_bit_number == *last_discrepancy) {
                 search_result = true;
             } else if (id_bit_number > *last_discrepancy) {
                 search_result = false;
+                last_zero = id_bit_number;
             } else {
                 search_result = (rom->bytes[rom_byte_number] & rom_byte_mask) != 0;
+                if (!search_result) {
+                    last_zero = id_bit_number;
+                }
             }
             
             if (!search_result) {
@@ -376,6 +589,13 @@ static bool one_wire_search_rom(max31850_rom_id_t *rom, int *last_discrepancy)
             rom->bytes[rom_byte_number] &= ~rom_byte_mask;
         }
         
+#if MAX31850_DEBUG_ROM_SEARCH
+        // 记录选择的位
+        if (bit_log_idx < sizeof(bit_log) - 1) {
+            bit_log[bit_log_idx++] = search_result ? '1' : '0';
+        }
+#endif
+        
         id_bit_number++;
         rom_byte_mask <<= 1;
         if (rom_byte_mask == 0) {
@@ -386,8 +606,19 @@ static bool one_wire_search_rom(max31850_rom_id_t *rom, int *last_discrepancy)
     
     *last_discrepancy = last_zero;
     
+#if MAX31850_DEBUG_ROM_SEARCH
+    bit_log[bit_log_idx] = '\0';
+    ESP_LOGI(TAG, "  ROM bits: %s", bit_log);
+    ESP_LOGI(TAG, "  Next discrepancy: %d", last_zero);
+#endif
+    
     // 验证ROM CRC
-    return verify_rom_crc(rom);
+    bool crc_ok = verify_rom_crc(rom);
+#if MAX31850_DEBUG_ROM_SEARCH
+    ESP_LOGI(TAG, "  CRC check: %s", crc_ok ? "PASS" : "FAIL");
+#endif
+    
+    return crc_ok;
 }
 
 /**
@@ -509,10 +740,22 @@ static void max31850_convert_t(const max31850_rom_id_t *rom)
  */
 static bool max31850_read_scratchpad(const max31850_rom_id_t *rom, max31850_scratchpad_t *scratch)
 {
+#if MAX31850_DEBUG_SCRATCHPAD
+    ESP_LOGI(TAG, "=== Reading Scratchpad ===");
+#endif
+    
     if (rom != NULL) {
         max31850_match_rom(rom);
+#if MAX31850_DEBUG_SCRATCHPAD
+        ESP_LOGI(TAG, "  Matched ROM: %02X%02X%02X%02X%02X%02X%02X%02X",
+                 rom->bytes[0], rom->bytes[1], rom->bytes[2], rom->bytes[3],
+                 rom->bytes[4], rom->bytes[5], rom->bytes[6], rom->bytes[7]);
+#endif
     } else {
         max31850_skip_rom();
+#if MAX31850_DEBUG_SCRATCHPAD
+        ESP_LOGI(TAG, "  Skip ROM (broadcast)");
+#endif
     }
     
     one_wire_write_byte(MAX31850_CMD_READ_SCRATCH);
@@ -520,6 +763,44 @@ static bool max31850_read_scratchpad(const max31850_rom_id_t *rom, max31850_scra
     for (int i = 0; i < 9; i++) {
         scratch->bytes[i] = one_wire_read_byte();
     }
+    
+#if MAX31850_DEBUG_SCRATCHPAD
+    // 打印原始数据
+    ESP_LOGI(TAG, "  Raw Scratchpad Data:");
+    ESP_LOGI(TAG, "    [0] Temp LSB : 0x%02X (Fault=%d)", 
+             scratch->temp_lsb, scratch->temp_lsb & 0x01);
+    ESP_LOGI(TAG, "    [1] Temp MSB : 0x%02X", scratch->temp_msb);
+    ESP_LOGI(TAG, "    [2] CJ LSB   : 0x%02X (Fault bits: OC=%d SCG=%d SCV=%d)",
+             scratch->cj_lsb,
+             (scratch->cj_lsb >> 0) & 0x01,  // OC
+             (scratch->cj_lsb >> 1) & 0x01,  // SCG
+             (scratch->cj_lsb >> 2) & 0x01); // SCV
+    ESP_LOGI(TAG, "    [3] CJ MSB   : 0x%02X", scratch->cj_msb);
+    ESP_LOGI(TAG, "    [4] Config   : 0x%02X (HW_ADDR=%d)", 
+             scratch->config, scratch->config & 0x0F);
+    ESP_LOGI(TAG, "    [5] Reserved : 0x%02X", scratch->bytes[5]);
+    ESP_LOGI(TAG, "    [6] Reserved : 0x%02X", scratch->bytes[6]);
+    ESP_LOGI(TAG, "    [7] Reserved : 0x%02X", scratch->bytes[7]);
+    ESP_LOGI(TAG, "    [8] CRC      : 0x%02X", scratch->crc);
+    
+    // 计算并显示CRC
+    uint8_t calc_crc = calc_crc8(scratch->bytes, 8);
+    ESP_LOGI(TAG, "  CRC: Calculated=0x%02X, Read=0x%02X, %s",
+             calc_crc, scratch->crc, (calc_crc == scratch->crc) ? "MATCH" : "MISMATCH");
+    
+    // 解析温度原始值
+    int16_t temp_raw = ((int16_t)(scratch->temp_msb) << 8) | scratch->temp_lsb;
+    temp_raw >>= 2;  // 14-bit value, right-aligned
+    ESP_LOGI(TAG, "  Temp Raw: 0x%04X (%d), Fault bit: %d",
+             ((scratch->temp_msb << 8) | scratch->temp_lsb), temp_raw,
+             scratch->temp_lsb & 0x01);
+    
+    // 解析冷端温度原始值
+    int16_t cj_raw = ((int16_t)(scratch->cj_msb) << 8) | scratch->cj_lsb;
+    cj_raw >>= 4;  // 12-bit value, right-aligned
+    ESP_LOGI(TAG, "  CJ Raw: 0x%04X (%d)",
+             ((scratch->cj_msb << 8) | scratch->cj_lsb), cj_raw);
+#endif
     
     return verify_scratchpad_crc(scratch);
 }
@@ -720,12 +1001,17 @@ static void max31850_polling_task(void *pvParameters)
 
 esp_err_t max31850_init(gpio_num_t gpio_num)
 {
+    ESP_LOGI(TAG, "=== MAX31850 Driver Initialization ===");
+    
     if (g_driver.initialized) {
+        ESP_LOGW(TAG, "Already initialized");
         return ESP_ERR_INVALID_STATE;
     }
     
     // 保存GPIO号
     g_driver.gpio_num = gpio_num;
+    
+    ESP_LOGI(TAG, "Configuring GPIO%d as open-drain with pull-up", gpio_num);
     
     // 配置GPIO为开漏输出模式
     gpio_config_t io_conf = {
@@ -745,6 +1031,27 @@ esp_err_t max31850_init(gpio_num_t gpio_num)
     // 设置GPIO高电平（释放总线）
     gpio_set_level(gpio_num, 1);
     
+#if MAX31850_DEBUG_GPIO
+    // GPIO诊断
+    gpio_print_diag(gpio_num);
+    
+    // 开漏模式测试
+    if (!gpio_test_open_drain(gpio_num)) {
+        ESP_LOGE(TAG, "GPIO open-drain test FAILED!");
+    }
+#endif
+    
+#if MAX31850_DEBUG_BUS_LEVEL
+    // 总线电平检查
+    ESP_LOGI(TAG, "Checking bus level...");
+    vTaskDelay(pdMS_TO_TICKS(1));
+    int bus_level = gpio_get_level(gpio_num);
+    ESP_LOGI(TAG, "Bus idle level: %d (expected 1)", bus_level);
+    if (bus_level != 1) {
+        ESP_LOGE(TAG, "BUS ERROR: Line is not high! Check pull-up resistor.");
+    }
+#endif
+    
     // 创建互斥锁
     g_driver.mutex = xSemaphoreCreateMutex();
     if (g_driver.mutex == NULL) {
@@ -759,10 +1066,12 @@ esp_err_t max31850_init(gpio_num_t gpio_num)
         g_driver.sensors[i].hw_addr = i;
     }
     
-    // 等待总线稳定
+    // 等待总线稳定（DataSheet: 上电后等待10ms）
+    ESP_LOGI(TAG, "Waiting for bus stabilization (10ms)...");
     vTaskDelay(pdMS_TO_TICKS(10));
     
     // 执行Search ROM发现设备
+    ESP_LOGI(TAG, "Starting device discovery...");
     uint8_t found = max31850_search_all();
     ESP_LOGI(TAG, "MAX31850 Init: Found %d sensors on GPIO%d", found, gpio_num);
     
@@ -773,6 +1082,8 @@ esp_err_t max31850_init(gpio_num_t gpio_num)
     g_driver.sensor_count = found;
     g_driver.initialized = true;
     g_driver.polling_task = NULL;
+    
+    ESP_LOGI(TAG, "=== Initialization Complete ===");
     
     return ESP_OK;
 }

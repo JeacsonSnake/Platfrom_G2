@@ -35,18 +35,6 @@ void app_main(void){
     wifi_init();
     vTaskDelay(5000 / portTICK_PERIOD_MS);
     
-    // 初始化MAX31850温度传感器（使用GPIO14）
-    // 在WiFi初始化之后进行，避免1-Wire时序受WiFi初始化影响
-    esp_err_t ret = max31850_init(MAX31850_ONE_WIRE_GPIO);
-    if (ret == ESP_OK) {
-        // 启动温度轮询任务
-        max31850_start_polling();
-        // 打印传感器信息
-        max31850_print_sensor_info();
-    } else {
-        ESP_LOGE("MAIN", "MAX31850 initialization failed: %s", esp_err_to_name(ret));
-    }
-    
     // 创建MQTT连接监控任务（在WiFi连接后创建，确保NTP同步能正常进行）
     xTaskCreate(monitor_task, "MONITOR_TASK", 4096, NULL, 3, NULL);
     // 创建MQTT初始化任务（初始化完成后会自删除）
@@ -65,6 +53,18 @@ void app_main(void){
     pcnt_monitor_init();
     // 初始化pid线程
     pid_process_init();
+    
+    // 初始化MAX31850温度传感器（使用GPIO14）
+    // 在PID初始化之后进行，避免与其他外设初始化冲突
+    esp_err_t ret = max31850_init(MAX31850_ONE_WIRE_GPIO);
+    if (ret == ESP_OK) {
+        // 启动温度轮询任务
+        max31850_start_polling();
+        // 打印传感器信息
+        max31850_print_sensor_info();
+    } else {
+        ESP_LOGE("MAIN", "MAX31850 initialization failed: %s", esp_err_to_name(ret));
+    }
 
     // 防止主线程结束
     while(1)
