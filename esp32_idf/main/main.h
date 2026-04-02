@@ -23,6 +23,7 @@
 #include "led_strip_encoder.h"
 #include "esp_sntp.h"
 #include "monitor.h"
+#include "heating_detect.h"
 
 
 //////////////////////////////////////////////////////////////
@@ -193,3 +194,17 @@ void PID_init(void* params);
 void pid_process_init();
 // PID Task Creation 创建一个控制任务
 void control_cmd(void *params);
+
+//////////////////////////////////////////////////////////////
+//////////////////////// MAX31850 ////////////////////////////
+//////////////////////////////////////////////////////////////
+// MAX31850KATB+ Temperature Sensor Configuration
+#define MAX31850_ONE_WIRE_GPIO  GPIO_NUM_14     // 1-Wire总线GPIO
+#define MAX31850_SENSOR_NUM     4               // 传感器数量
+
+// MAX31850 API Functions
+esp_err_t max31850_init(gpio_num_t gpio_num);
+esp_err_t max31850_get_temperature(uint8_t hw_addr, float *temp);
+esp_err_t max31850_start_polling(void);
+esp_err_t max31850_stop_polling(void);
+void max31850_print_sensor_info(void);

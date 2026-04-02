@@ -30,6 +30,18 @@ void app_main(void){
     // 创建LED状态指示任务（优先级2，低于WiFi初始化，避免影响WiFi连接）
     xTaskCreate(status_led_task, "LED_TASK", 4096, NULL, 2, NULL);
     
+    // 初始化MAX31850温度传感器（使用GPIO14）
+    // 注：温度传感器不依赖WiFi，可以优先初始化
+    esp_err_t ret = max31850_init(MAX31850_ONE_WIRE_GPIO);
+    if (ret == ESP_OK) {
+        // 启动温度轮询任务
+        max31850_start_polling();
+        // 打印传感器信息
+        max31850_print_sensor_info();
+    } else {
+        ESP_LOGE("MAIN", "MAX31850 initialization failed: %s", esp_err_to_name(ret));
+    }
+    
     // 初始化WiFi，并等待WiFi连接
     // 注意：监控任务需要在WiFi连接后创建，确保NTP同步能正常进行
     wifi_init();
