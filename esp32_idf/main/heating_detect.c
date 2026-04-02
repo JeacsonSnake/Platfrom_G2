@@ -11,6 +11,8 @@
 
 #include "heating_detect.h"
 #include "esp_rom_sys.h"
+#include "esp_cpu.h"
+#include "hal/cpu_hal.h"
 
 //////////////////////////////////////////////////////////////
 //////////////////////// MACROS //////////////////////////////
@@ -188,7 +190,7 @@ static bool gpio_test_open_drain(gpio_num_t gpio)
 //////////////////////// BUS LEVEL CHECK /////////////////////
 //////////////////////////////////////////////////////////////
 
-#if MAX31850_DEBUG_BUS_LEVEL
+#if MAX31850_DEBUG_BUS_LEVEL && MAX31850_DEBUG_ENABLE
 /**
  * @brief 检查总线电平
  * 
@@ -199,7 +201,9 @@ static bool gpio_test_open_drain(gpio_num_t gpio)
 static bool check_bus_level(uint8_t expected, uint32_t timeout_us)
 {
     uint32_t start = esp_cpu_get_cycle_count();
-    uint32_t timeout_cycles = timeout_us * (ESP_ROM_GET_CPU_FREQ() / 1000000);
+    // ESP32-S3 CPU频率为240MHz
+    uint32_t cpu_freq_mhz = 240;
+    uint32_t timeout_cycles = timeout_us * cpu_freq_mhz;
     
     while ((esp_cpu_get_cycle_count() - start) < timeout_cycles) {
         if (gpio_get_level(g_driver.gpio_num) == expected) {
