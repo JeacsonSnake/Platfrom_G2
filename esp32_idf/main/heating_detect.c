@@ -17,6 +17,16 @@ static SemaphoreHandle_t s_sensor_mutex = NULL;
 static portMUX_TYPE s_ow_spinlock = portMUX_INITIALIZER_UNLOCKED;
 
 //////////////////////////////////////////////////////////////
+//////////////////// 调试开关 ////////////////////////////////
+//////////////////////////////////////////////////////////////
+
+#define OW_DEBUG_GPIO_DIAG          1
+#define OW_DEBUG_RESET_PRESENCE     1
+#define OW_DEBUG_ROM_SEARCH_BIT     1
+#define OW_DEBUG_SCRATCHPAD_RAW     1
+#define OW_DEBUG_BUS_LEVEL          1
+
+//////////////////////////////////////////////////////////////
 //////////////////// 底层 1-Wire Bit-Bang ////////////////////
 //////////////////////////////////////////////////////////////
 
@@ -35,20 +45,44 @@ static inline int ow_read_level(void)
     return gpio_get_level(s_ow_gpio);
 }
 
-// 1-Wire Reset 时序，返回 presence 脉冲
+// 检查总线电平（调试用）
+static void ow_check_bus_level(const char *label)
+{
+    if (!OW_DEBUG_BUS_LEVEL) return;
+    int level = ow_read_level();
+    ESP_LOGI(TAG, "[BUS_LEVEL] %s -> GPIO%d = %d", label, s_ow_gpio, level);
+}
+
+// 1-Wire Reset 时序，返回 presence 脉冲（带详细波形日志）
 static uint8_t ow_reset(void)
 {
     uint8_t presence = 0;
 
+    if (OW_DEBUG_RESET_PRESENCE) {
+        ESP_LOGI(TAG, "[OW_RESET] Start reset on GPIO%d", s_ow_gpio);
+    }
+
     portENTER_CRITICAL_SAFE(&s_ow_spinlock);
     ow_set_low();
+    if (OW_DEBUG_RESET_PRESENCE) ow_check_bus_level("After set low");
     esp_rom_delay_us(480);
     ow_set_release();
+    if (OW_DEBUG_RESET_PRESENCE) ow_check_bus_level("After release (t=0)");
     portEXIT_CRITICAL_SAFE(&s_ow_spinlock);
 
     esp_rom_delay_us(70);
-    presence = (ow_read_level() == 0);
+    int level_after_70us = ow_read_level();
+    if (OW_DEBUG_RESET_PRESENCE) {
+        ESP_LOGI(TAG, "[OW_RESET] After 70us level = %d", level_after_70us);
+    }
+    presence = (level_after_70us == 0);
+
     esp_rom_delay_us(410);
+    int level_after_480us = ow_read_level();
+    if (OW_DEBUG_RESET_PRESENCE) {
+        ESP_LOGI(TAG, "[OW_RESET] After 480us level = %d (presence=%d)",
+                 level_after_480us, presence);
+    }
     return presence;
 }
 
@@ -136,19 +170,34 @@ static int ow_search_rom(uint64_t *rom_codes, int max_devices)
     uint8_t rom_no[8] = {0};
     int num_devices = 0;
     int done = 0;
+    int search_cycle = 0;
+
+    if (OW_DEBUG_ROM_SEARCH_BIT) {
+        ESP_LOGI(TAG, "[ROM_SEARCH] Start Search ROM...");
+    }
 
     while (!done && num_devices < max_devices) {
+        search_cycle++;
         if (!ow_reset()) {
+            ESP_LOGW(TAG, "[ROM_SEARCH] No presence in cycle %d", search_cycle);
             break;
         }
 
         int last_zero = 0;
         ow_write_byte(OW_CMD_SEARCH_ROM);
 
+        if (OW_DEBUG_ROM_SEARCH_BIT) {
+            ESP_LOGI(TAG, "[ROM_SEARCH] Cycle %d, last_discrepancy=%d", search_cycle, last_discrepancy);
+        }
+
         for (int i = 0; i < 64; i++) {
             int id_bit = ow_read_bit();
             int cmp_id_bit = ow_read_bit();
             int search_direction;
+
+            if (OW_DEBUG_ROM_SEARCH_BIT && (i < 16 || (id_bit == 1 && cmp_id_bit == 1))) {
+                ESP_LOGI(TAG, "[ROM_SEARCH] Bit[%02d] id=%d cmp=%d", i, id_bit, cmp_id_bit);
+            }
 
             if (id_bit == 1 && cmp_id_bit == 1) {
                 // 总线上无设备响应
@@ -197,10 +246,20 @@ static int ow_search_rom(uint64_t *rom_codes, int max_devices)
             }
             if (rom_no[0] == MAX31850_FAMILY_CODE) {
                 rom_codes[num_devices++] = rom_id;
+                if (OW_DEBUG_ROM_SEARCH_BIT) {
+                    ESP_LOGI(TAG, "[ROM_SEARCH] Found device #%d: ROM=0x%016llX", num_devices, rom_id);
+                }
+            } else {
+                ESP_LOGW(TAG, "[ROM_SEARCH] Unknown family code 0x%02X", rom_no[0]);
             }
+        } else {
+            ESP_LOGW(TAG, "[ROM_SEARCH] CRC mismatch in cycle %d", search_cycle);
         }
     }
 
+    if (OW_DEBUG_ROM_SEARCH_BIT) {
+        ESP_LOGI(TAG, "[ROM_SEARCH] Done. Found %d device(s)", num_devices);
+    }
     return num_devices;
 }
 
@@ -225,12 +284,21 @@ static esp_err_t max31850_read_scratchpad(uint64_t rom_id, uint8_t *scratchpad)
         scratchpad[i] = ow_read_byte();
     }
 
+    if (OW_DEBUG_SCRATCHPAD_RAW) {
+        ESP_LOGI(TAG, "[SCRATCHPAD_RAW] ROM=0x%016llX: %02X %02X %02X %02X %02X %02X %02X %02X %02X",
+                 rom_id,
+                 scratchpad[0], scratchpad[1], scratchpad[2],
+                 scratchpad[3], scratchpad[4], scratchpad[5],
+                 scratchpad[6], scratchpad[7], scratchpad[8]);
+    }
+
     // CRC 校验 (覆盖 Byte 0-7)
     uint8_t crc = 0;
     for (int i = 0; i < 8; i++) {
         crc = ow_crc8_byte(crc, scratchpad[i]);
     }
     if (crc != scratchpad[8]) {
+        ESP_LOGW(TAG, "[SCRATCHPAD_RAW] CRC mismatch: calc=0x%02X, recv=0x%02X", crc, scratchpad[8]);
         return ESP_ERR_INVALID_CRC;
     }
 
@@ -339,6 +407,12 @@ esp_err_t max31850_init(gpio_num_t gpio_num)
     ESP_ERROR_CHECK(gpio_config(&io_conf));
     gpio_set_level(s_ow_gpio, 1); // 释放总线
 
+    if (OW_DEBUG_GPIO_DIAG) {
+        ESP_LOGI(TAG, "[GPIO_DIAG] Configured GPIO%d as INPUT_OUTPUT_OD", s_ow_gpio);
+        ESP_LOGI(TAG, "[GPIO_DIAG] Internal pull-up/pull-down disabled, relying on external 4.7K pull-up");
+        ow_check_bus_level("After init release");
+    }
+
     s_sensor_mutex = xSemaphoreCreateMutex();
     if (s_sensor_mutex == NULL) {
         ESP_LOGE(TAG, "Failed to create mutex");
@@ -372,6 +446,10 @@ esp_err_t max31850_init(gpio_num_t gpio_num)
 
         // 硬件地址由 Configuration Register (Byte 4) 的 AD[1:0] 决定
         uint8_t hw_addr = scratchpad[4] & 0x03;
+        if (OW_DEBUG_SCRATCHPAD_RAW) {
+            ESP_LOGI(TAG, "[INIT_MAP] ROM=0x%016llX -> HW_ADDR=%d (cfg_reg=0x%02X)",
+                     rom_list[i], hw_addr, scratchpad[4]);
+        }
         if (hw_addr >= MAX31850_SENSOR_COUNT) {
             ESP_LOGE(TAG, "Invalid HW address %d for ROM 0x%016llX", hw_addr, rom_list[i]);
             return ESP_ERR_INVALID_ARG;
