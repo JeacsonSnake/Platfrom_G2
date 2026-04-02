@@ -52,8 +52,6 @@ void app_main(void){
     pcnt_monitor_init();
     // 初始化pid线程
     pid_process_init();
-    // 初始化 MAX31850 温度采集 (GPIO14, 4 通道 K 型热电偶)
-    max31850_init(GPIO_NUM_14);
 
     // 防止主线程结束
     while(1)

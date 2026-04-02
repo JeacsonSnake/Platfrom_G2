@@ -23,7 +23,6 @@
 #include "led_strip_encoder.h"
 #include "esp_sntp.h"
 #include "monitor.h"
-#include "heating_detect.h"
 
 
 //////////////////////////////////////////////////////////////
