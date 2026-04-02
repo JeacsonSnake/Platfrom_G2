@@ -193,12 +193,3 @@ void PID_init(void* params);
 void pid_process_init();
 // PID Task Creation 创建一个控制任务
 void control_cmd(void *params);
-
-//////////////////////////////////////////////////////////////
-//////////////////////// HEATING /////////////////////////////
-//////////////////////////////////////////////////////////////
-// MAX31850 Temperature Sensors 温度传感器
-#include "heating_detect.h"
-
-// Heating Print Task 温度打印任务（每2秒打印4个通道温度）
-void heating_print_task(void *pvParameters);
