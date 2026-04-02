@@ -12,8 +12,8 @@
  * @note MAX31850 is Read-Only: No Write Scratchpad(0x4E), Copy(0x48), Convert T(0x44)
  * @note Auto-continuous conversion: ~100ms cycle after power-on
  * 
- * @version 3.0
- * @date 2026-04-01
+ * @version 3.2 - Software Fix for Weak Pull-up
+ * @date 2026-04-02
  */
 
 #ifndef HEATING_DETECT_H
@@ -52,33 +52,47 @@ extern "C" {
 #define MAX31850_FAULT_SHORT_GND    0x02        /**< Bit1: 短接到GND */
 #define MAX31850_FAULT_SHORT_VCC    0x04        /**< Bit2: 短接到VCC */
 
-/** @name 1-Wire时序参数（基于MAX31850 datasheet和4.7K上拉）
+/** @name 软件修复选项 - 针对4.7K弱上拉的软件优化
+ * 
+ * 硬件限制：4.7KΩ上拉电阻导致信号上升时间过慢
+ * 修复策略：使用软件主动驱动来补偿弱上拉
+ */
+#define ONEWIRE_USE_STRONG_PU       1           /**< 启用主动上拉（Push-Pull驱动高电平） */
+#define ONEWIRE_STRONG_PU_US        5           /**< 主动上拉持续时间（μs） */
+#define ONEWIRE_READ_SAMPLE_TIMES   3           /**< 位读取采样次数（取多数） */
+#define ONEWIRE_BUS_RECOVERY_US     30          /**< 总线恢复等待时间（μs） */
+
+/** @name 1-Wire时序参数（针对4.7K上拉优化）
  * 
  * Standard 1-Wire Requirements:
  * - Write 1: Low 1-15μs
  * - Write 0: Low 60-120μs
  * - Read: Init low 1-15μs, sample within 15μs
- * - Multi-device bus needs longer recovery times
+ * 
+ * 针对弱上拉的优化：
+ * - 增加恢复时间
+ * - 降低位速率
+ * - 延长采样窗口
  */
 #define ONEWIRE_RESET_LOW_US        480         /**< Reset: 480μs低电平 */
 #define ONEWIRE_PRESENCE_WAIT_US    70          /**< Reset: 等待70μs后采样 */
-#define ONEWIRE_RESET_RECOVERY_US   410         /**< Reset: 410μs恢复 */
-#define ONEWIRE_WRITE1_LOW_US       6           /**< Write 1: 6μs低电平（保守值） */
-#define ONEWIRE_WRITE1_RECOVERY_US  60          /**< Write 1: 60μs恢复 */
+#define ONEWIRE_RESET_RECOVERY_US   500         /**< Reset: 500μs恢复（增加） */
+#define ONEWIRE_WRITE1_LOW_US       6           /**< Write 1: 6μs低电平 */
+#define ONEWIRE_WRITE1_RECOVERY_US  80          /**< Write 1: 80μs恢复（增加） */
 #define ONEWIRE_WRITE0_LOW_US       70          /**< Write 0: 70μs低电平 */
-#define ONEWIRE_WRITE0_RECOVERY_US  10          /**< Write 0: 10μs恢复 */
+#define ONEWIRE_WRITE0_RECOVERY_US  30          /**< Write 0: 30μs恢复（增加） */
 #define ONEWIRE_READ_INIT_US        3           /**< Read: 3μs初始化低电平 */
-#define ONEWIRE_READ_SAMPLE_US      9           /**< Read: 9μs后采样（总共12μs） */
-#define ONEWIRE_READ_RECOVERY_US    60          /**< Read: 60μs恢复时间 */
-#define ONEWIRE_BIT_INTERVAL_US     10          /**< 位间间隔：10μs（多设备需要更长） */
-#define ONEWIRE_BYTE_INTERVAL_US    20          /**< 字节间间隔：20μs */
+#define ONEWIRE_READ_SAMPLE_US      12          /**< Read: 12μs后采样（延迟增加） */
+#define ONEWIRE_READ_RECOVERY_US    80          /**< Read: 80μs恢复时间（增加） */
+#define ONEWIRE_BIT_INTERVAL_US     20          /**< 位间间隔：20μs（增加） */
+#define ONEWIRE_BYTE_INTERVAL_US    50          /**< 字节间间隔：50μs（增加） */
 
 /** @name 系统参数 */
 #define MAX31850_POLL_INTERVAL_MS   250         /**< 单个传感器轮询间隔 */
 #define MAX31850_TASK_STACK_SIZE    4096        /**< 轮询任务栈大小 */
-#define MAX31850_ROM_SEARCH_RETRY   5           /**< ROM搜索重试次数 */
+#define MAX31850_ROM_SEARCH_RETRY   10          /**< ROM搜索重试次数（增加） */
 #define MAX31850_TASK_PRIORITY      2           /**< 轮询任务优先级 */
-#define MAX31850_MAX_RETRY          3           /**< 最大重试次数 */
+#define MAX31850_MAX_RETRY          5           /**< 最大重试次数（增加） */
 
 //////////////////////////////////////////////////////////////
 //////////////////////// 数据类型 ////////////////////////////
@@ -128,6 +142,7 @@ typedef struct {
  * @return esp_err_t ESP_OK成功，其他失败
  * 
  * @note 该函数会执行ROM Search自动发现4个传感器
+ * @note 使用软件主动上拉补偿4.7K弱上拉
  */
 esp_err_t max31850_init(gpio_num_t gpio_num);
 
