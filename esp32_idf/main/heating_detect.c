@@ -62,12 +62,11 @@ static uint8_t ow_reset(void)
         ESP_LOGI(TAG, "[OW_RESET] Start reset on GPIO%d", s_ow_gpio);
     }
 
+    // 注意：关中断期间禁止调用任何可能触发调度或中断依赖的函数（如 ESP_LOGI）
     portENTER_CRITICAL_SAFE(&s_ow_spinlock);
     ow_set_low();
-    if (OW_DEBUG_RESET_PRESENCE) ow_check_bus_level("After set low");
     esp_rom_delay_us(480);
     ow_set_release();
-    if (OW_DEBUG_RESET_PRESENCE) ow_check_bus_level("After release (t=0)");
     portEXIT_CRITICAL_SAFE(&s_ow_spinlock);
 
     esp_rom_delay_us(70);
