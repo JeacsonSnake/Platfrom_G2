@@ -396,7 +396,7 @@ For production deployment, enable security features via `menuconfig` and use enc
 ## Reference Documentation
 
 ### Project Documents
-- [CHB-BLDC2418-Motor-Configuration.md](CHB-BLDC2418-Motor-Configuration.md) - CHB-BLDC2418电机完整配置文档（规格参数、GPIO定义、PID设置）
+- [CHB-BLDC2418-Motor-Configuration.md](hardware_info/CHB-BLDC2418-Motor-Configuration.md) - CHB-BLDC2418电机完整配置文档（规格参数、GPIO定义、PID设置）
 
 ### External Documentation
 - [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/v5.5.2/esp32s3/index.html)
