@@ -453,8 +453,8 @@ static uint8_t max31850_search_all(void)
         uint8_t hw_addr = scratch.config & 0x0F;
         
         // 映射到数组索引 (0xF0-0xF3 -> 0-3)
-        if (hw_addr >= 0x00 && hw_addr <= 0x03) {
-            // 有些版本使用0x00-0x03
+        if (hw_addr <= 0x03) {
+            // 有些版本使用0x00-0x03，直接作为索引
             // 不做转换
         } else if (hw_addr >= 0xF0 && hw_addr <= 0xF3) {
             // 转换为0-3

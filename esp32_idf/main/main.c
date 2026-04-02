@@ -30,8 +30,13 @@ void app_main(void){
     // 创建LED状态指示任务（优先级2，低于WiFi初始化，避免影响WiFi连接）
     xTaskCreate(status_led_task, "LED_TASK", 4096, NULL, 2, NULL);
     
+    // 初始化WiFi，并等待WiFi连接
+    // 注意：监控任务需要在WiFi连接后创建，确保NTP同步能正常进行
+    wifi_init();
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
+    
     // 初始化MAX31850温度传感器（使用GPIO14）
-    // 注：温度传感器不依赖WiFi，可以优先初始化
+    // 在WiFi初始化之后进行，避免1-Wire时序受WiFi初始化影响
     esp_err_t ret = max31850_init(MAX31850_ONE_WIRE_GPIO);
     if (ret == ESP_OK) {
         // 启动温度轮询任务
@@ -42,10 +47,6 @@ void app_main(void){
         ESP_LOGE("MAIN", "MAX31850 initialization failed: %s", esp_err_to_name(ret));
     }
     
-    // 初始化WiFi，并等待WiFi连接
-    // 注意：监控任务需要在WiFi连接后创建，确保NTP同步能正常进行
-    wifi_init();
-    vTaskDelay(5000 / portTICK_PERIOD_MS);
     // 创建MQTT连接监控任务（在WiFi连接后创建，确保NTP同步能正常进行）
     xTaskCreate(monitor_task, "MONITOR_TASK", 4096, NULL, 3, NULL);
     // 创建MQTT初始化任务（初始化完成后会自删除）
@@ -71,4 +72,3 @@ void app_main(void){
         vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
 }
-
