@@ -198,7 +198,7 @@ static bool gpio_test_open_drain(gpio_num_t gpio)
  * @param timeout_us 超时时间(微秒)
  * @return true 电平符合预期，false 超时或电平不符
  */
-static bool check_bus_level(uint8_t expected, uint32_t timeout_us)
+__attribute__((unused)) static bool check_bus_level(uint8_t expected, uint32_t timeout_us)
 {
     uint32_t start = esp_cpu_get_cycle_count();
     // ESP32-S3 CPU频率为240MHz
@@ -218,7 +218,7 @@ static bool check_bus_level(uint8_t expected, uint32_t timeout_us)
  * 
  * 在指定时间内多次采样总线电平，用于波形分析
  */
-static void print_bus_waveform(const char *label, uint32_t sample_count, uint32_t interval_us)
+__attribute__((unused)) static void print_bus_waveform(const char *label, uint32_t sample_count, uint32_t interval_us)
 {
     ESP_LOGI(TAG, "=== Bus Waveform: %s ===", label);
     
