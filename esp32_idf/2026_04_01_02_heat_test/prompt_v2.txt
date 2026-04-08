@@ -1,0 +1,120 @@
+在“feature/heating”这一GIT 分支下继续操作，注意仅提交你自己所书写的代码/文件。
+---
+
+【任务】:
+实现基于 ESP32-S3 (240MHz) 与 MAX31850KATB+ (Read-Only 1-Wire) 的 1-Wire 温度采集驱动开发4个MAX31850KATB+温度传感器的驱动模块。
+
+【已知硬件信息】（请注意）:
+硬件使用K型热电偶，其所连接的ESP32-S3主控板基于提供的原理图设计（请分析以下文件夹中的硬件连接信息：“hardware_info\ESP32-S3-DevKitC-1-master”文件夹下文件），该主控板内部的MAX31850传感器的相关设定参考“hardware_info\max31850-max31851.pdf”。
+
+【输入文件】（请分析以下文件夹/文件中的硬件连接信息）：
+- hardware_info\ESP32-S3-DevKitC-1-master
+- hardware_info\max31850-max31851.pdf
+
+【从原理图提取的关键信息】（请验证）：
+1. 主控芯片：ESP32-S3（请在.SchDoc中确认U5的型号为ESP32-S3-DevKitC-1）
+2. 1-Wire总线：GPIO14（请在.SchDoc中确认DQ引脚连接到IO14网络）
+3. 传感器：4× MAX31850KATB+（U1-U4），并联在单一1-Wire总线上
+4. 上拉电阻：4.7KΩ（R1）连接到+3.3V
+5. 硬件地址配置（根据.SchDoc中AD0/AD1引脚连接确认）：
+   - U1: AD0=GND, AD1=GND → 配置寄存器读取值为 0xF0 (Location 0)
+   - U2: AD0=3.3V, AD1=GND → 配置寄存器读取值为 0xF1 (Location 1)  
+   - U3: AD0=GND, AD1=3.3V → 配置寄存器读取值为 0xF2 (Location 2)
+   - U4: AD0=3.3V, AD1=3.3V → 配置寄存器读取值为 0xF3 (Location 3)
+6. 注意：硬件地址需通过读取Scratchpad Byte 4（Configuration Register）的低4位(AD3-AD0)确认，非ROM ID顺序
+
+【芯片协议规范】（MAX31850KATB+关键特性，请经数据手册Page 12-16验证）：
+- 设备命令支持：MAX31850 支持标准 1-Wire 命令集，包括：
+  1. MAX31850/MAX31851 Function Commands：
+   - Convert T (0x44): 触发单次转换（芯片支持此命令，但上电后温度寄存器默认值为 00h，不会自动转换，必须通过 Convert T 命令触发温度寄存器单次转换，转换完成后数据才写入 Scratchpad）
+   - Read Scratchpad (0xBE): 读取9字节数据（必须在 Match ROM 后发送）（请在max31850-max31851.pdf中确认）
+  2. MAX31850/MAX31851 Function Commands
+   - Match ROM (0x55): 选中特定64-bit ROM ID设备（请在max31850-max31851.pdf中确认）
+   - Search ROM (0xF0): 搜索总线上所有设备（请在max31850-max31851.pdf中确认）
+   - Skip ROM (0xCC): 广播地址，同时选中总线上所有设备（Page 16 明确支持，仅适用于**无需从机返回数据**的命令，例如多设备同步触发 Convert T，典型用法为`Skip ROM` + `Convert T (0x44)`。但注意：当且仅当总线只有单个设备时，才允许用 Skip ROM 时 可以 + Read Scratchpad，否则多设备会同时回传导致数据冲突。）
+- 转换时间：转换时间 tCONV MAX = 100ms & TYP = 72ms (Page 4)，非阻塞轮询间隔建议 ≥ 100ms（请在max31850-max31851.pdf中确认）
+- 数据获取流程（供参考）：
+  i. 单次温度采集完整流程（经数据手册 Page 16-18 验证）：
+    1. Reset → Presence
+    2. Match ROM (0x55) + 64-bit ROM ID  // 选中特定传感器
+    3. Convert T (0x44)                    // 触发转换（必须！上电后不会自动转换）
+    4. 延时等待 100ms (tCONV) 或轮询状态   // Page 4: tCONV MAX = 100ms
+    5. Reset → Presence                    // 转换完成后必须重新初始化总线
+    6. Match ROM (0x55) + 64-bit ROM ID    // 重新选中设备
+    7. Read Scratchpad (0xBE)              // 发送读取命令
+    8. 读取 9 Bytes 数据
+  ii. 多设备同步采集流程：
+    1. Reset → Presence
+    2. Skip ROM (0xCC)                     // 广播地址所有设备（此时仅用于广播Convert T！此时所有设备同时开始转换，总线无数据返回）
+    3. Convert T (0x44)                     // 所有设备同时开始转换（必须！上电后不会自动转换）
+    4. 延时 100ms (tCONV)              // 此阶段禁止任何1-Wire总线活动
+    5. 对每个设备依次**单独**执行（必须用Match ROM，不能用Skip ROM）：
+       - Reset → Presence
+       - Match ROM (0x55) + 对应 64-bit ROM ID   // 单独寻址特定设备，避免数据冲突
+       - Read Scratchpad (0xBE)                                  // 读取该设备数据
+       - 读取 9 Bytes
+- 数据帧格式&内存映射（请在max31850-max31851.pdf中确认：Page 12, Figure 4）：
+   - Byte 0: 热电偶温度 LSB (Bit 1 保留，Bit 0 是 Fault 标志)
+   - Byte 1: 热电偶温度 MSB (14-bit, 有符号，二进制补码，分辨率 0.25°C)
+   - Byte 2: 冷端温度 LSB (12-bit, Bit 0-2 是故障位：OC/SCG/SCV，分辨率 0.0625°C)
+   - Byte 3: 冷端温度 MSB (12-bit, 有符号，二进制补码，分辨率 0.0625°C)
+   - Byte 4: 配置寄存器 (AD3-AD0 硬件地址)
+   - Byte 5-7: 保留 (0xFF)
+   - Byte 8: CRC8 (多项式 X8+X5+X4+1 = 0x31，覆盖 Byte 0-7)
+
+【硬件约束】（严格遵循）：
+- 仅使用GPIO14，禁止占用IO10-IO13
+- GPIO模式：开漏输出（GPIO_MODE_INPUT_OUTPUT_OD）
+- 时序要求：复位脉冲低电平≥480μs，写0低电平60-120μs，写1低电平1-15μs，读采样窗口在15μs内（见Page 20，主控发起读时隙（拉低总线）后，必须在 15μs 之内 完成释放总线和采样）
+- 初始化关键时序：After minimum VDD has been reached during power-up, wait 10ms before initiating temperature conversions. （见 Page 4，Note 14）
+
+【软件架构要求】：
+1. 文件：
+   - main/heating_detect.c
+   - main/heating_detect.h
+   - 修改 main/main.c 添加初始化与任务调用
+   - 修改 main/main.h 添加头文件包含
+
+2. 底层实现：
+   - Bit-Bang 1-Wire协议，使用ESP32-S3 GPIO操作
+   - 关键时序段需关中断（portENTER_CRITICAL）确保精确延时（μs级）
+   - CRC8校验实现（多项式0x31，初始值0x00）
+
+3. 中间层：
+   - ROM Search算法（0xF0）自动发现4个设备，建立ROM ID与硬件地址映射表
+   - Match ROM(0x55)单选设备，支持通过硬件地址(0-3)索引访问
+
+4. 应用层API：
+   - max31850_init(gpio_num_t gpio_num)：初始化GPIO，执行Search ROM发现设备，验证4个传感器存在，建立地址映射表
+   - max31850_get_temperature(uint8_t hw_addr, float *temp)：非阻塞读取缓存温度（hw_addr为硬件地址0-3）
+   - max31850_force_update(uint8_t hw_addr, float *temp, TickType_t timeout)：阻塞式强制更新（等待转换完成）
+   - 内部状态机轮询任务：每秒轮询4个传感器，互斥锁保护数据一致性
+
+5. 地址映射逻辑：
+   - 初始化时通过Search ROM获取所有ROM ID
+   - 对每个ROM ID执行Match ROM + Read Scratchpad，读取Byte 4获取AD3-AD0
+   - 建立数组映射：hw_addr(0-3) ↔ ROM ID ↔ 温度缓存
+
+【关键陷阱提醒】（请验证）：
+- ROM发现顺序≠硬件地址顺序：Search ROM返回的ID顺序是总线仲裁结果，必须通过读取Configuration Register(Byte 4)的低4位确认真实硬件地址(AD0/AD1决定)
+- 禁止跳过Read Scratchpad命令：Match ROM后必须发送0xBE命令，不能直接读取数据，否则总线无响应
+- 14-bit数据在16-bit寄存器中左对齐（Bit 2-15），计算时必须右移2位，不可直接当int16_t × 0.25
+- CRC校验范围：仅覆盖Byte 0-7，Byte 8是CRC值本身，不可参与计算
+- 强制复位要求: After every Search ROM cycle, the bus master must return to step 1 (initialization) in the transaction sequence.
+
+【调试输出】：
+- 初始化阶段："MAX31850 Init: Found 4 sensors on GPIO14"
+- 每当传感器发现："Sensor [0]: ROM=0x3Bxxxxxxxxxxxx, HW_ADDR=00, Location confirmed"
+- 正常运行："Sensor [HW_ADDR=00]: Temp=25.50°C, CJ=28.25°C"
+- 故障报警："Sensor [HW_ADDR=02] FAULT: Thermocouple Open Circuit (Byte2=0x01)"
+- CRC错误："Sensor [HW_ADDR=01] CRC Error: Calculated=0xXX, Read=0xYY"
+
+【输出】：
+- main/heating_detect.c  （驱动实现）
+- main/heating_detect.h  （API接口与数据结构）
+- main/main.c            （示例调用代码）
+- main/main.h            （宏定义与配置）
+
+【ESP32S3编译方式】：
+- VSCode + ESP-IDF扩展（v5.0+）
+- target: esp32s3

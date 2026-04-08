@@ -1,0 +1,191 @@
+============================================================
+ESP32-S3 串口日志记录
+开始时间: 2026-04-02 13:47:26
+串口: COM10, 波特率: 115200
+============================================================
+
+[2026-04-02 13:47:27.247] W (1587) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (1/60)
+[2026-04-02 13:47:27.527] I (1867) ESP32S3_WIFI_EVENT: Got ip:192.168.110.199
+[2026-04-02 13:47:27.529] I (1867) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-04-02 13:47:27.531] I (1867) MQTT_MONITOR: ==============================================
+[2026-04-02 13:47:27.536] I (1867) MQTT_MONITOR: 正在启动 SNTP 时间同步...
+[2026-04-02 13:47:27.548] I (1877) MQTT_MONITOR: NTP服务器1: cn.pool.ntp.org (国内)
+[2026-04-02 13:47:27.550] I (1877) MQTT_MONITOR: NTP服务器2: ntp.aliyun.com (阿里云)
+[2026-04-02 13:47:27.554] I (1887) MQTT_MONITOR: NTP服务器3: ntp.tencent.com (腾讯云)
+[2026-04-02 13:47:27.557] I (1887) MQTT_MONITOR: 当前系统时间: 1498 ms
+[2026-04-02 13:47:27.564] I (1897) MQTT_MONITOR: 时区设置: CST-8 (UTC+8, 中国标准时间)
+[2026-04-02 13:47:27.570] I (1897) MQTT_MONITOR: SNTP 初始化完成，等待时间同步...
+[2026-04-02 13:47:27.576] I (1907) MQTT_MONITOR: ==============================================
+[2026-04-02 13:47:27.584] I (1917) esp_netif_handlers: sta ip: 192.168.110.199, mask: 255.255.255.0, gw: 192.168.110.1
+[2026-04-02 13:47:27.587] I (1917) ESP32S3_WIFI_EVENT: Connected to ap!
+[2026-04-02 13:47:27.594] I (1927) ESP32S3_WIFI_EVENT: Waiting for NTP time sync...
+[2026-04-02 13:47:28.113] I (2447) MQTT_MONITOR: ==============================================
+[2026-04-02 13:47:28.115] I (2447) MQTT_MONITOR: NTP时间同步回调被触发！
+[2026-04-02 13:47:28.117] I (2447) MQTT_MONITOR: 已发送同步完成信号
+[2026-04-02 13:47:28.123] I (2447) MQTT_MONITOR: ==============================================
+[2026-04-02 13:47:28.126] I (2457) MQTT_MONITOR: 时间同步完成！
+[2026-04-02 13:47:28.135] I (2467) MQTT_MONITOR: 当前实际时间: 2026-04-02 13:47:26 [运行 00:00:02]
+[2026-04-02 13:47:28.139] I (2467) MQTT_MONITOR: 开机时间戳: 1498 ms
+[2026-04-02 13:47:28.145] I (2477) MQTT_MONITOR: 实际开机时间: Thu Apr  2 13:47:24 2026
+[2026-04-02 13:47:28.146] 
+[2026-04-02 13:47:28.150] I (2477) MQTT_MONITOR: NTP轮询间隔已恢复为1小时
+[2026-04-02 13:47:28.155] I (2487) MQTT_MONITOR: ==============================================
+[2026-04-02 13:47:28.160] I (2497) MQTT_MONITOR: 时间同步成功！
+[2026-04-02 13:47:28.165] I (2497) MQTT_MONITOR: 当前时间: 2026-04-02 13:47:26
+[2026-04-02 13:47:28.170] I (2497) MQTT_MONITOR: 开机时间戳: 1498 ms
+[2026-04-02 13:47:28.175] I (2507) MQTT_MONITOR: 实际开机时间: Thu Apr  2 13:47:24 2026
+[2026-04-02 13:47:28.177] 
+[2026-04-02 13:47:28.182] I (2507) MQTT_MONITOR: ==============================================
+[2026-04-02 13:47:28.188] I (2517) ESP32S3_WIFI_EVENT: NTP time sync completed successfully
+[2026-04-02 13:47:33.187] I (7527) MQTT_MONITOR: MQTT连接监控模块已初始化
+[2026-04-02 13:47:33.189] I (7527) MQTT_MONITOR: 统计报告间隔: 0 小时
+[2026-04-02 13:47:33.192] I (7527) MQTT_MONITOR: =================================================
+[2026-04-02 13:47:33.197] I (7527) MQTT_MONITOR:       MQTT连接监控统计系统已启动
+[2026-04-02 13:47:33.204] I (7537) MQTT_MONITOR: =================================================
+[2026-04-02 13:47:33.211] I (7537) MQTT_MONITOR: 提示: 时间将在WiFi连接后通过NTP同步
+[2026-04-02 13:47:33.215] I (7547) MQTT_MONITOR: 等待 SNTP 时间同步完成...
+[2026-04-02 13:47:33.221] I (7547) MQTT_MONITOR: 时间同步已完成，开始监控任务
+[2026-04-02 13:47:33.225] I (7557) ESP32S3_MQTT_EVENT: MQTT客户端已启动
+[2026-04-02 13:47:33.230] I (7567) ESP32S3_MQTT_EVENT: MQTT心跳任务已启动
+[2026-04-02 13:47:33.236] I (7567) ESP32S3_MQTT_EVENT: MQTT连接健康检查任务已启动
+[2026-04-02 13:47:33.251] I (7577) PWM_EVENT: PWM timer 0 initiated at clock speed 5000.
+[2026-04-02 13:47:33.253] I (7577) PWM_EVENT: PWM channel 0 initiated on GPIO1 with initial duty 8191 (inverted logic).
+[2026-04-02 13:47:33.258] I (7587) PWM_EVENT: PWM channel 1 initiated on GPIO4 with initial duty 8191 (inverted logic).
+[2026-04-02 13:47:33.266] I (7597) PWM_EVENT: PWM channel 2 initiated on GPIO6 with initial duty 8191 (inverted logic).
+[2026-04-02 13:47:33.276] I (7607) PWM_EVENT: PWM channel 3 initiated on GPIO8 with initial duty 8191 (inverted logic).
+[2026-04-02 13:47:33.281] I (7607) PCNT_EVENT: PCNT channel 0 has been initiated on pin 2.
+[2026-04-02 13:47:33.286] I (7617) PCNT_EVENT: PCNT channel 1 has been initiated on pin 5.
+[2026-04-02 13:47:33.291] I (7627) PCNT_EVENT: PCNT channel 2 has been initiated on pin 7.
+[2026-04-02 13:47:33.298] I (7627) PCNT_EVENT: PCNT channel 3 has been initiated on pin 9.
+[2026-04-02 13:47:33.301] I (7637) PID_EVENT: Index number is: 0
+[2026-04-02 13:47:33.302] 
+[2026-04-02 13:47:33.304] I (7637) PID_EVENT: Index number is: 1
+[2026-04-02 13:47:33.305] 
+[2026-04-02 13:47:33.309] I (7637) PID_EVENT: Index number is: 2
+[2026-04-02 13:47:33.310] 
+[2026-04-02 13:47:33.313] I (7637) MAIN: Initializing MAX31850 temperature sensors...
+[2026-04-02 13:47:33.318] I (7637) PID_EVENT: Index number is: 3
+[2026-04-02 13:47:33.319] 
+[2026-04-02 13:47:33.323] I (7647) MAX31850: Initializing MAX31850 on GPIO14...
+[2026-04-02 13:47:33.329] I (7657) MAX31850: Sensor: MAX31850KATB+ K-Type Thermocouple Digitizer
+[2026-04-02 13:47:33.337] I (7667) MAX31850:   Range: -270°C to +1372°C, Accuracy: ±2°C (-200°C to +700°C)
+[2026-04-02 13:47:33.344] I (7677) MAX31850:   Resolution: TC=0.25°C (14-bit), CJ=0.0625°C (12-bit)
+[2026-04-02 13:47:33.349] I (7677) MAX31850:   Conversion: Auto-continuous (~100ms)
+[2026-04-02 13:47:33.353] I (7687) MAX31850: Hardware: ESP32-S3-DevKitC-1 + 4x MAX31850
+[2026-04-02 13:47:33.360] I (7687) MAX31850: 1-Wire Bus: GPIO14, Pull-up: R1=4.7K to +3.3V
+[2026-04-02 13:47:33.368] I (7697) MAX31850: Software Fix: Strong PU enabled, Multi-sampling enabled
+[2026-04-02 13:47:33.371] I (7707) ESP32S3_MQTT_EVENT: Connected to MQTT server.
+[2026-04-02 13:47:33.376] I (7707) ESP32S3_STATUS_LED: LED mode changed to: 3
+[2026-04-02 13:47:33.384] I (7717) MQTT_MONITOR: [连接事件] #1 | 时间: 2026-04-02 13:47:32 [运行 00:00:07]
+[2026-04-02 13:47:33.390] I (7717) ESP32S3_MQTT_EVENT: 已订阅控制频道 'esp32_1/control' (msg_id=11732)
+[2026-04-02 13:47:33.394] I (7727) PCNT_EVENT: Motor 0 idle, PCNT=0
+[2026-04-02 13:47:33.399] I (7727) PWM_EVENT: PWM channel 0 duty set to 8191.
+[2026-04-02 13:47:33.402] I (7727) PCNT_EVENT: Motor 1 idle, PCNT=0
+[2026-04-02 13:47:33.407] I (7737) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-04-02 13:47:33.411] I (7737) PCNT_EVENT: Motor 3 idle, PCNT=0
+[2026-04-02 13:47:33.414] I (7737) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-04-02 13:47:33.420] I (7747) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-04-02 13:47:33.423] I (7747) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-04-02 13:47:33.467] I (7807) MAX31850: ========================================
+[2026-04-02 13:47:33.469] I (7807) MAX31850: GPIO Diagnostic Test on GPIO14
+[2026-04-02 13:47:33.470] I (7807) MAX31850: ========================================
+[2026-04-02 13:47:33.476] I (7807) MAX31850: Test 1 - Input mode (pull-up): 1 ✓
+[2026-04-02 13:47:33.481] I (7817) MAX31850: Test 2 - Forced low (open-drain): 0 ✓
+[2026-04-02 13:47:33.494] I (7817) MAX31850: Test 3 - Released with strong PU (100us): 0 ✗
+[2026-04-02 13:47:33.496] I (7827) MAX31850: Test 4 - Input mode: 1 ✓
+[2026-04-02 13:47:33.497] I (7827) MAX31850: Test 5 - Final state: 1 ✓
+[2026-04-02 13:47:33.501] I (7827) MAX31850: ----------------------------------------
+[2026-04-02 13:47:33.504] I (7837) MAX31850: GPIO Diagnostic: PASSED ✓
+[2026-04-02 13:47:33.510] I (7837) MAX31850: ========================================
+[2026-04-02 13:47:33.520] I (7847) MAX31850: Bus level check: HIGH ✓ (pull-up working)
+[2026-04-02 13:47:33.522] I (7847) MAX31850: Testing 1-Wire Reset/Presence...
+[2026-04-02 13:47:33.527] I (7857) MAX31850: Reset Waveform: before=1, reset=0, @15us=1, @70us=0, final=1
+[2026-04-02 13:47:33.533] I (7867) MAX31850: Reset: Device detected ✓ (@70us presence_level=0)
+[2026-04-02 13:47:33.540] I (7877) MAX31850: Reset Waveform: before=1, reset=0, @15us=1, @70us=0, final=1
+[2026-04-02 13:47:33.546] I (7877) MAX31850: Reset: Device detected ✓ (@70us presence_level=0)
+[2026-04-02 13:47:33.558] I (7897) MAX31850: Reset Waveform: before=1, reset=0, @15us=1, @70us=0, final=1
+[2026-04-02 13:47:33.560] I (7897) MAX31850: Reset: Device detected ✓ (@70us presence_level=0)
+[2026-04-02 13:47:33.572] I (7907) MAX31850: Starting ROM search with retry mechanism...
+[2026-04-02 13:47:33.574] I (7907) MAX31850:   Software fix enabled: Strong PU=1, Sample times=3
+[2026-04-02 13:47:33.584] I (7907) MAX31850:   Bit interval: 20μs, Byte interval: 50μs
+[2026-04-02 13:47:33.586] I (7917) MAX31850: Reset Waveform: before=1, reset=0, @15us=1, @70us=0, final=1
+[2026-04-02 13:47:33.591] I (7917) MAX31850: Reset: Device detected ✓ (@70us presence_level=0)
+[2026-04-02 13:47:33.611] W (7947) MAX31850: Search error at bit 44: no devices (11)
+[2026-04-02 13:47:33.612] W (7947) MAX31850: ROM search attempt 1 failed, retrying...
+[2026-04-02 13:47:33.617] I (7947) MAX31850: Reset Waveform: before=1, reset=0, @15us=1, @70us=0, final=1
+[2026-04-02 13:47:33.624] I (7957) MAX31850: Reset: Device detected ✓ (@70us presence_level=0)
+[2026-04-02 13:47:33.649] W (7987) MAX31850: ROM search attempt 2 failed, retrying...
+[2026-04-02 13:47:33.652] I (7987) MAX31850: Reset Waveform: before=1, reset=0, @15us=1, @70us=0, final=1
+[2026-04-02 13:47:33.658] I (7987) MAX31850: Reset: Device detected ✓ (@70us presence_level=0)
+[2026-04-02 13:47:33.685] W (8017) MAX31850: ROM search attempt 3 failed, retrying...
+[2026-04-02 13:47:33.687] I (8017) MAX31850: Reset Waveform: before=1, reset=0, @15us=1, @70us=0, final=1
+[2026-04-02 13:47:33.692] I (8017) MAX31850: Reset: Device detected ✓ (@70us presence_level=0)
+[2026-04-02 13:47:33.713] W (8047) MAX31850: Search error at bit 47: no devices (11)
+[2026-04-02 13:47:33.715] W (8047) MAX31850: ROM search attempt 4 failed, retrying...
+[2026-04-02 13:47:33.725] I (8047) MAX31850: Reset Waveform: before=1, reset=0, @15us=1, @70us=0, final=1
+[2026-04-02 13:47:33.727] I (8057) MAX31850: Reset: Device detected ✓ (@70us presence_level=0)
+[2026-04-02 13:47:33.732] W (8067) MAX31850: Search error at bit 0: no devices (11)
+[2026-04-02 13:47:33.736] W (8067) MAX31850: ROM search attempt 5 failed, retrying...
+[2026-04-02 13:47:33.743] I (8077) MAX31850: Reset Waveform: before=1, reset=0, @15us=1, @70us=0, final=1
+[2026-04-02 13:47:33.749] I (8077) MAX31850: Reset: Device detected ✓ (@70us presence_level=0)
+[2026-04-02 13:47:33.776] W (8117) MAX31850: ROM search attempt 6 failed, retrying...
+[2026-04-02 13:47:33.778] I (8117) MAX31850: Reset Waveform: before=1, reset=0, @15us=1, @70us=0, final=1
+[2026-04-02 13:47:33.784] I (8117) MAX31850: Reset: Device detected ✓ (@70us presence_level=0)
+[2026-04-02 13:47:33.811] W (8147) MAX31850: ROM search attempt 7 failed, retrying...
+[2026-04-02 13:47:33.813] I (8147) MAX31850: Reset Waveform: before=1, reset=0, @15us=1, @70us=0, final=1
+[2026-04-02 13:47:33.818] I (8147) MAX31850: Reset: Device detected ✓ (@70us presence_level=0)
+[2026-04-02 13:47:33.845] W (8177) MAX31850: ROM search attempt 8 failed, retrying...
+[2026-04-02 13:47:33.847] I (8187) MAX31850: Reset Waveform: before=1, reset=0, @15us=1, @70us=0, final=1
+[2026-04-02 13:47:33.852] I (8187) MAX31850: Reset: Device detected ✓ (@70us presence_level=0)
+[2026-04-02 13:47:33.879] W (8217) MAX31850: ROM search attempt 9 failed, retrying...
+[2026-04-02 13:47:33.881] I (8217) MAX31850: Reset Waveform: before=1, reset=0, @15us=1, @70us=0, final=1
+[2026-04-02 13:47:33.886] I (8217) MAX31850: Reset: Device detected ✓ (@70us presence_level=0)
+[2026-04-02 13:47:33.913] W (8247) MAX31850: ROM search failed after 10 retries
+[2026-04-02 13:47:33.914] W (8247) MAX31850:   Hardware issue - suggestions:
+[2026-04-02 13:47:33.918] W (8247) MAX31850:     1. Reduce pull-up resistor to 2.2KΩ (hardware fix)
+[2026-04-02 13:47:33.922] W (8257) MAX31850:     2. Shorten bus wires (<10m)
+[2026-04-02 13:47:33.927] W (8257) MAX31850:     3. Check 3.3V power stability
+[2026-04-02 13:47:33.933] I (8267) MAX31850: ROM search complete. Found 0 device(s)
+[2026-04-02 13:47:33.937] W (8267) MAX31850: ROM search failed: 261
+[2026-04-02 13:47:33.938] I (8277) MAX31850: Poll task started
+[2026-04-02 13:47:33.946] I (8277) MAX31850: MAX31850 initialized successfully, found 0 sensor(s)
+[2026-04-02 13:47:33.951] W (8287) MAIN: MAX31850 init returned 261, will retry in background
+[2026-04-02 13:47:35.946] I (10287) HEATING: Temperature print task started (GPIO14, 4.7K pull-up)
+[2026-04-02 13:47:35.948] I (10287) HEATING: ========== Temperature Report ==========
+[2026-04-02 13:47:35.952] W (10287) HEATING: [U1(P1)]: Offline  [OFFLINE]
+[2026-04-02 13:47:35.955] W (10287) HEATING: [U2(P2)]: Offline  [OFFLINE]
+[2026-04-02 13:47:35.959] W (10287) HEATING: [U3(P3)]: Offline  [OFFLINE]
+[2026-04-02 13:47:35.964] W (10297) HEATING: [U4(P4)]: Offline  [OFFLINE]
+[2026-04-02 13:47:35.968] I (10297) HEATING: =======================================
+[2026-04-02 13:47:36.407] I (10747) PCNT_EVENT: Motor 0 startup protection ended, normal PCNT monitoring active
+[2026-04-02 13:47:36.411] I (10747) PCNT_EVENT: Motor 1 startup protection ended, normal PCNT monitoring active
+[2026-04-02 13:47:36.419] I (10757) PCNT_EVENT: Motor 3 startup protection ended, normal PCNT monitoring active
+[2026-04-02 13:47:36.425] I (10757) PCNT_EVENT: Motor 2 startup protection ended, normal PCNT monitoring active
+[2026-04-02 13:47:37.967] I (12307) HEATING: ========== Temperature Report ==========
+[2026-04-02 13:47:37.970] W (12307) HEATING: [U1(P1)]: Offline  [OFFLINE]
+[2026-04-02 13:47:37.971] W (12307) HEATING: [U2(P2)]: Offline  [OFFLINE]
+[2026-04-02 13:47:37.973] W (12307) HEATING: [U3(P3)]: Offline  [OFFLINE]
+[2026-04-02 13:47:37.978] W (12307) HEATING: [U4(P4)]: Offline  [OFFLINE]
+[2026-04-02 13:47:37.983] I (12317) HEATING: =======================================
+[2026-04-02 13:47:39.977] I (14317) HEATING: ========== Temperature Report ==========
+[2026-04-02 13:47:39.978] W (14317) HEATING: [U1(P1)]: Offline  [OFFLINE]
+[2026-04-02 13:47:39.980] W (14317) HEATING: [U2(P2)]: Offline  [OFFLINE]
+[2026-04-02 13:47:39.983] W (14317) HEATING: [U3(P3)]: Offline  [OFFLINE]
+[2026-04-02 13:47:39.987] W (14317) HEATING: [U4(P4)]: Offline  [OFFLINE]
+[2026-04-02 13:47:39.992] I (14327) HEATING: =======================================
+
+
+============================================================
+日志记录结束
+结束时间: 2026-04-02 13:47:40
+总运行时间: 0.23 分钟
+总行数: 169
+============================================================
+连接统计:
+  - MQTT连接次数: 1
+  - MQTT断开次数: 0
+  - 连接保持率: 100.00%
+
+错误统计:
+  - 无错误记录
+============================================================

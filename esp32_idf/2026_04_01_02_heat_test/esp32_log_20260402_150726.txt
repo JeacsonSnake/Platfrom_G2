@@ -1,0 +1,600 @@
+============================================================
+ESP32-S3 串口日志记录
+开始时间: 2026-04-02 15:07:26
+串口: COM10, 波特率: 115200
+============================================================
+
+[2026-04-02 15:07:26.621] I (112) esp_image: segment 1: paddr=00033930 vaddr=3fc9be00 sizeW (1585) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (1/60)
+[2026-04-02 15:07:26.841] I (1805) ESP32S3_WIFI_EVENT: Got ip:192.168.110.199
+[2026-04-02 15:07:26.842] I (1805) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-04-02 15:07:26.845] I (1805) MQTT_MONITOR: ==============================================
+[2026-04-02 15:07:26.850] I (1805) MQTT_MONITOR: 正在启动 SNTP 时间同步...
+[2026-04-02 15:07:26.860] I (1805) MQTT_MONITOR: NTP服务器1: cn.pool.ntp.org (国内)
+[2026-04-02 15:07:26.862] I (1815) MQTT_MONITOR: NTP服务器2: ntp.aliyun.com (阿里云)
+[2026-04-02 15:07:26.867] I (1825) MQTT_MONITOR: NTP服务器3: ntp.tencent.com (腾讯云)
+[2026-04-02 15:07:26.870] I (1825) MQTT_MONITOR: 当前系统时间: 1438 ms
+[2026-04-02 15:07:26.877] I (1835) MQTT_MONITOR: 时区设置: CST-8 (UTC+8, 中国标准时间)
+[2026-04-02 15:07:26.883] I (1835) MQTT_MONITOR: SNTP 初始化完成，等待时间同步...
+[2026-04-02 15:07:26.889] I (1845) MQTT_MONITOR: ==============================================
+[2026-04-02 15:07:26.897] I (1855) esp_netif_handlers: sta ip: 192.168.110.199, mask: 255.255.255.0, gw: 192.168.110.1
+[2026-04-02 15:07:26.901] I (1855) ESP32S3_WIFI_EVENT: Connected to ap!
+[2026-04-02 15:07:26.907] I (1865) ESP32S3_WIFI_EVENT: Waiting for NTP time sync...
+[2026-04-02 15:07:26.957] I (1915) MQTT_MONITOR: ==============================================
+[2026-04-02 15:07:26.959] I (1915) MQTT_MONITOR: NTP时间同步回调被触发！
+[2026-04-02 15:07:26.961] I (1915) MQTT_MONITOR: 已发送同步完成信号
+[2026-04-02 15:07:26.967] I (1915) MQTT_MONITOR: ==============================================
+[2026-04-02 15:07:26.970] I (1925) MQTT_MONITOR: 时间同步完成！
+[2026-04-02 15:07:26.979] I (1935) MQTT_MONITOR: 当前实际时间: 2026-04-02 15:07:25 [运行 00:00:01]
+[2026-04-02 15:07:26.982] I (1935) MQTT_MONITOR: 开机时间戳: 1438 ms
+[2026-04-02 15:07:26.989] I (1945) MQTT_MONITOR: 实际开机时间: Thu Apr  2 15:07:24 2026
+[2026-04-02 15:07:26.990] 
+[2026-04-02 15:07:26.994] I (1945) MQTT_MONITOR: NTP轮询间隔已恢复为1小时
+[2026-04-02 15:07:26.999] I (1955) MQTT_MONITOR: ==============================================
+[2026-04-02 15:07:27.004] I (1965) MQTT_MONITOR: 时间同步成功！
+[2026-04-02 15:07:27.009] I (1965) MQTT_MONITOR: 当前时间: 2026-04-02 15:07:25
+[2026-04-02 15:07:27.012] I (1965) MQTT_MONITOR: 开机时间戳: 1438 ms
+[2026-04-02 15:07:27.019] I (1975) MQTT_MONITOR: 实际开机时间: Thu Apr  2 15:07:24 2026
+[2026-04-02 15:07:27.020] 
+[2026-04-02 15:07:27.025] I (1975) MQTT_MONITOR: ==============================================
+[2026-04-02 15:07:27.032] I (1985) ESP32S3_WIFI_EVENT: NTP time sync completed successfully
+[2026-04-02 15:07:32.031] I (6995) MQTT_MONITOR: MQTT连接监控模块已初始化
+[2026-04-02 15:07:32.033] I (6995) MQTT_MONITOR: 统计报告间隔: 0 小时
+[2026-04-02 15:07:32.035] I (6995) MQTT_MONITOR: =================================================
+[2026-04-02 15:07:32.041] I (6995) MQTT_MONITOR:       MQTT连接监控统计系统已启动
+[2026-04-02 15:07:32.047] I (7005) MQTT_MONITOR: =================================================
+[2026-04-02 15:07:32.054] I (7005) MQTT_MONITOR: 提示: 时间将在WiFi连接后通过NTP同步
+[2026-04-02 15:07:32.059] I (7015) MQTT_MONITOR: 等待 SNTP 时间同步完成...
+[2026-04-02 15:07:32.064] I (7015) MQTT_MONITOR: 时间同步已完成，开始监控任务
+[2026-04-02 15:07:32.069] I (7025) ESP32S3_MQTT_EVENT: MQTT客户端已启动
+[2026-04-02 15:07:32.075] I (7035) ESP32S3_MQTT_EVENT: MQTT心跳任务已启动
+[2026-04-02 15:07:32.079] I (7035) ESP32S3_MQTT_EVENT: MQTT连接健康检查任务已启动
+[2026-04-02 15:07:32.093] I (7035) PWM_EVENT: PWM timer 0 initiated at clock speed 5000.
+[2026-04-02 15:07:32.095] I (7045) PWM_EVENT: PWM channel 0 initiated on GPIO1 with initial duty 8191 (inverted logic).
+[2026-04-02 15:07:32.103] I (7055) PWM_EVENT: PWM channel 1 initiated on GPIO4 with initial duty 8191 (inverted logic).
+[2026-04-02 15:07:32.110] I (7065) PWM_EVENT: PWM channel 2 initiated on GPIO6 with initial duty 8191 (inverted logic).
+[2026-04-02 15:07:32.119] I (7075) PWM_EVENT: PWM channel 3 initiated on GPIO8 with initial duty 8191 (inverted logic).
+[2026-04-02 15:07:32.124] I (7075) ESP32S3_MQTT_EVENT: Connected to MQTT server.
+[2026-04-02 15:07:32.128] I (7085) ESP32S3_STATUS_LED: LED mode changed to: 3
+[2026-04-02 15:07:32.136] I (7085) MQTT_MONITOR: [连接事件] #1 | 时间: 2026-04-02 15:07:30 [运行 00:00:06]
+[2026-04-02 15:07:32.141] I (7095) PCNT_EVENT: PCNT channel 0 has been initiated on pin 2.
+[2026-04-02 15:07:32.149] I (7095) ESP32S3_MQTT_EVENT: 已订阅控制频道 'esp32_1/control' (msg_id=7070)
+[2026-04-02 15:07:32.154] I (7115) PCNT_EVENT: PCNT channel 1 has been initiated on pin 5.
+[2026-04-02 15:07:32.160] I (7115) PCNT_EVENT: PCNT channel 2 has been initiated on pin 7.
+[2026-04-02 15:07:32.167] I (7125) PCNT_EVENT: PCNT channel 3 has been initiated on pin 9.
+[2026-04-02 15:07:32.170] I (7125) PCNT_EVENT: Motor 0 idle, PCNT=0
+[2026-04-02 15:07:32.174] I (7135) PWM_EVENT: PWM channel 0 duty set to 8191.
+[2026-04-02 15:07:32.177] I (7135) PID_EVENT: Index number is: 0
+[2026-04-02 15:07:32.178] 
+[2026-04-02 15:07:32.182] I (7135) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-04-02 15:07:32.186] I (7145) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-04-02 15:07:32.190] I (7135) PID_EVENT: Index number is: 2
+[2026-04-02 15:07:32.191] 
+[2026-04-02 15:07:32.197] I (7135) MAX31850: [GPIO_DIAG] Configured GPIO14 as INPUT_OUTPUT_OD
+[2026-04-02 15:07:32.198] I (7135) PID_EVENT: Index number is: 3
+[2026-04-02 15:07:32.200] 
+[2026-04-02 15:07:32.204] I (7135) PCNT_EVENT: Motor 1 idle, PCNT=0
+[2026-04-02 15:07:32.207] I (7135) PCNT_EVENT: Motor 3 idle, PCNT=0
+[2026-04-02 15:07:32.212] I (7165) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-04-02 15:07:32.222] I (7155) MAX31850: [GPIO_DIAG] Internal pull-up/pull-down disabled, relying on external 4.7K pull-up
+[2026-04-02 15:07:32.225] I (7165) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-04-02 15:07:32.229] I (7135) PID_EVENT: Index number is: 1
+[2026-04-02 15:07:32.231] 
+[2026-04-02 15:07:32.236] I (7185) MAX31850: [BUS_LEVEL] After init release -> GPIO14 = 1
+[2026-04-02 15:07:32.239] I (7195) MAX31850: [OW_RESET] Start reset on GPIO14
+[2026-04-02 15:07:32.289] 
+[2026-04-02 15:07:32.291] abort() was called at PC 0x4037689f on core 0
+[2026-04-02 15:07:32.292] 
+[2026-04-02 15:07:32.294] 
+[2026-04-02 15:07:32.298] Backtrace: 0x4037d169:0x3fca9280 0x4037d131:0x3fca92a0 0x40385811:0x3fca92c0 0x4037689f:0x3fca9330 0x403769b5:0x3fca9360 0x40376a7f:0x3fca9380 0x4209b7b3:0x3fca93b0 0x4208fda5:0x3fca96d0 0x4038474f:0x3fca9700 0x4200db59:0x3fca9760 0x4200dbb1:0x3fca9790 0x4200e38a:0x3fca97c0 0x4200c2f1:0x3fca9840 0x420ac550:0x3fca9870 0x4037de19:0x3fca98a0
+[2026-04-02 15:07:32.299] 
+[2026-04-02 15:07:32.301] 
+[2026-04-02 15:07:32.302] 
+[2026-04-02 15:07:32.304] 
+[2026-04-02 15:07:32.306] ELF file SHA256: f16d81ea4
+[2026-04-02 15:07:32.307] 
+[2026-04-02 15:07:32.309] Rebooting...
+[2026-04-02 15:07:32.310] ESP-ROM:esp32s3-20210327
+[2026-04-02 15:07:32.312] Build:Mar 27 2021
+[2026-04-02 15:07:32.314] rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+[2026-04-02 15:07:32.315] Saved PC:0x4037d2b8
+[2026-04-02 15:07:32.317] SPIWP:0xee
+[2026-04-02 15:07:32.318] mode:DIO, clock div:1
+[2026-04-02 15:07:32.320] load:0x3fce2820,len:0x158c
+[2026-04-02 15:07:32.321] load:0x403c8700,len:0xd24
+[2026-04-02 15:07:32.323] load:0x403cb700,len:0x2f34
+[2026-04-02 15:07:32.325] entry 0x403c8924
+[2026-04-02 15:07:32.327] I (24) boot: ESP-IDF v5.5.2 2nd stage bootloader
+[2026-04-02 15:07:32.328] I (24) boot: compile time Apr  2 2026 15:02:24
+[2026-04-02 15:07:32.330] I (24) boot: Multicore bootloader
+[2026-04-02 15:07:32.332] I (24) boot: chip revision: v0.1
+[2026-04-02 15:07:32.333] I (27) boot: efuse block revision: v1.2
+[2026-04-02 15:07:32.335] I (31) boot.esp32s3: Boot SPI Speed : 80MHz
+[2026-04-02 15:07:32.336] I (34) boot.esp32s3: SPI Mode       : DIO
+[2026-04-02 15:07:32.337] I (38) boot.esp32s3: SPI Flash Size : 2MB
+[2026-04-02 15:07:32.339] I (42) boot: Enabling RNG early entropy source...
+[2026-04-02 15:07:32.340] I (46) boot: Partition Table:
+[2026-04-02 15:07:32.345] I (49) boot: ## Label            Usage          Type ST Offset   Length
+[2026-04-02 15:07:32.350] I (55) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+[2026-04-02 15:07:32.357] I (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+[2026-04-02 15:07:32.364] I (68) boot:  2 factory          factory app      00 00 00010000 00100000
+[2026-04-02 15:07:32.367] I (75) boot: End of partition table
+[2026-04-02 15:07:32.375] I (78) esp_image: segment 0: paddr=00010020 vaddr=3c0b0020 size=23908h (145672) map
+[2026-04-02 15:07:32.401] I (111) esp_image: segment 1: paddr=00033930 vaddr=3fc9be00 size=04da8h ( 19880) load
+[2026-04-02 15:07:32.405] I (116) esp_image: segment 2: paddr=000386e0 vaddr=40374000 size=07938h ( 31032) load
+[2026-04-02 15:07:32.413] I (123) esp_image: segment 3: paddr=00040020 vaddr=42000020 size=ad3dch (709596) map
+[2026-04-02 15:07:32.538] I (248) esp_image: segment 4: paddr=000ed404 vaddr=4037b938 size=104ach ( 66732) load
+[2026-04-02 15:07:32.553] I (263) esp_image: segment 5: paddr=000fd8b8 vaddr=50000000 size=00020h (    32) load
+[2026-04-02 15:07:32.562] I (273) boot: Loaded app from partition at offset 0x10000
+[2026-04-02 15:07:32.564] I (273) boot: Disabling RNG early entropy source...
+[2026-04-02 15:07:32.573] I (283) cpu_start: Multicore app
+[2026-04-02 15:07:32.581] I (292) cpu_start: GPIO 44 and 43 are used as console UART I/O pins
+[2026-04-02 15:07:32.583] I (293) cpu_start: Pro cpu start user code
+[2026-04-02 15:07:32.585] I (293) cpu_start: cpu freq: 160000000 Hz
+[2026-04-02 15:07:32.586] I (294) app_init: Application information:
+[2026-04-02 15:07:32.591] I (298) app_init: Project name:     test
+[2026-04-02 15:07:32.594] I (302) app_init: App version:      393e349
+[2026-04-02 15:07:32.600] I (305) app_init: Compile time:     Apr  2 2026 15:02:11
+[2026-04-02 15:07:32.603] I (311) app_init: ELF file SHA256:  f16d81ea4...
+[2026-04-02 15:07:32.608] I (315) app_init: ESP-IDF:          v5.5.2
+[2026-04-02 15:07:32.611] I (319) efuse_init: Min chip rev:     v0.0
+[2026-04-02 15:07:32.616] I (322) efuse_init: Max chip rev:     v0.99
+[2026-04-02 15:07:32.619] I (326) efuse_init: Chip rev:         v0.1
+[2026-04-02 15:07:32.626] I (330) heap_init: Initializing. RAM available for dynamic allocation:
+[2026-04-02 15:07:32.630] I (337) heap_init: At 3FCA5D60 len 000439B0 (270 KiB): RAM
+[2026-04-02 15:07:32.636] I (342) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM
+[2026-04-02 15:07:32.642] I (347) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM
+[2026-04-02 15:07:32.647] I (352) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM
+[2026-04-02 15:07:32.650] I (359) spi_flash: detected chip: generic
+[2026-04-02 15:07:32.653] I (361) spi_flash: flash io: dio
+[2026-04-02 15:07:32.666] W (364) spi_flash: Detected size(8192k) larger than the size in the binary image header(2048k). Using the size in the binary image header.
+[2026-04-02 15:07:32.671] I (377) sleep_gpio: Configure to isolate all GPIO pins in sleep state
+[2026-04-02 15:07:32.678] I (383) sleep_gpio: Enable automatic switching of GPIO sleep configuration
+[2026-04-02 15:07:32.681] I (390) main_task: Started on CPU0
+[2026-04-02 15:07:32.689] I (400) main_task: Calling app_main()
+[2026-04-02 15:07:32.691] I (400) ESP32S3_STATUS_LED: WS2812 RGB LED initialized on GPIO 48
+[2026-04-02 15:07:32.708] I (420) pp: pp rom version: e7ae62f
+[2026-04-02 15:07:32.710] I (420) net80211: net80211 rom version: e7ae62f
+[2026-04-02 15:07:32.714] I (430) wifi:wifi driver task: 3fceea04, prio:23, stack:6656, core=0
+[2026-04-02 15:07:32.725] I (440) wifi:wifi firmware version: ee91c8c
+[2026-04-02 15:07:32.727] I (440) wifi:wifi certification version: v7.0
+[2026-04-02 15:07:32.729] I (440) wifi:config NVS flash: enabled
+[2026-04-02 15:07:32.731] I (440) wifi:config nano formatting: disabled
+[2026-04-02 15:07:32.734] I (440) wifi:Init data frame dynamic rx buffer num: 32
+[2026-04-02 15:07:32.739] I (450) wifi:Init static rx mgmt buffer num: 5
+[2026-04-02 15:07:32.742] I (450) wifi:Init management short buffer num: 32
+[2026-04-02 15:07:32.747] I (450) wifi:Init dynamic tx buffer num: 32
+[2026-04-02 15:07:32.750] I (460) wifi:Init static tx FG buffer num: 2
+[2026-04-02 15:07:32.755] I (460) wifi:Init static rx buffer size: 1600
+[2026-04-02 15:07:32.758] I (470) wifi:Init static rx buffer num: 10
+[2026-04-02 15:07:32.763] I (470) wifi:Init dynamic rx buffer num: 32
+[2026-04-02 15:07:32.766] I (470) wifi_init: rx ba win: 6
+[2026-04-02 15:07:32.768] I (480) wifi_init: accept mbox: 6
+[2026-04-02 15:07:32.771] I (480) wifi_init: tcpip mbox: 32
+[2026-04-02 15:07:32.774] I (480) wifi_init: udp mbox: 6
+[2026-04-02 15:07:32.777] I (490) wifi_init: tcp mbox: 6
+[2026-04-02 15:07:32.780] I (490) wifi_init: tcp tx win: 5760
+[2026-04-02 15:07:32.783] I (490) wifi_init: tcp rx win: 5760
+[2026-04-02 15:07:32.786] I (490) wifi_init: tcp mss: 1440
+[2026-04-02 15:07:32.790] I (500) wifi_init: WiFi IRAM OP enabled
+[2026-04-02 15:07:32.794] I (500) wifi_init: WiFi RX IRAM OP enabled
+[2026-04-02 15:07:32.802] W (510) wifi:Password length matches WPA2 standards, authmode threshold changes from OPEN to WPA2
+[2026-04-02 15:07:32.807] I (510) phy_init: phy_version 711,97bcf0a2,Aug 25 2025,19:04:10
+[2026-04-02 15:07:32.853] I (560) wifi:mode : sta (7c:df:a1:f2:5a:78)
+[2026-04-02 15:07:32.855] I (560) wifi:enable tsf
+[2026-04-02 15:07:32.857] I (570) ESP32S3_WIFI_EVENT: Begin to connect the AP
+[2026-04-02 15:07:32.859] I (570) ESP32S3_STATUS_LED: LED mode changed to: 1
+[2026-04-02 15:07:32.862] I (570) wifi:Set ps type: 0, coexist: 0
+[2026-04-02 15:07:32.863] 
+[2026-04-02 15:07:32.869] I (580) wifi:new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1, snd_ch_cfg:0x0
+[2026-04-02 15:07:32.872] I (580) wifi:state: init -> auth (0xb0)
+[2026-04-02 15:07:32.887] I (600) wifi:state: auth -> assoc (0x0)
+[2026-04-02 15:07:32.944] I (650) wifi:state: assoc -> run (0x10)
+[2026-04-02 15:07:33.049] I (760) wifi:connected with WeShare-6148, aid = 13, channel 1, BW20, bssid = c4:70:ab:d9:a0:e2
+[2026-04-02 15:07:33.051] I (760) wifi:security: WPA2-PSK, phy: bgn, rssi: -72
+[2026-04-02 15:07:33.053] I (760) wifi:pm start, type: 0
+[2026-04-02 15:07:33.054] 
+[2026-04-02 15:07:33.061] I (760) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us
+[2026-04-02 15:07:33.069] I (770) wifi:set rx beacon pti, rx_bcn_pti: 0, bcn_timeout: 25000, mt_pti: 0, mt_time: 10000
+[2026-04-02 15:07:33.855] I (830) wifi:AP's beacon interval = 102400 us, DTIM period = 1
+[2026-04-02 15:07:33.857] W (1570) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (1/60)
+[2026-04-02 15:07:34.075] I (1790) ESP32S3_WIFI_EVENT: Got ip:192.168.110.199
+[2026-04-02 15:07:34.077] I (1790) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-04-02 15:07:34.079] I (1790) MQTT_MONITOR: ==============================================
+[2026-04-02 15:07:34.084] I (1790) MQTT_MONITOR: 正在启动 SNTP 时间同步...
+[2026-04-02 15:07:34.095] I (1790) MQTT_MONITOR: NTP服务器1: cn.pool.ntp.org (国内)
+[2026-04-02 15:07:34.097] I (1800) MQTT_MONITOR: NTP服务器2: ntp.aliyun.com (阿里云)
+[2026-04-02 15:07:34.102] I (1810) MQTT_MONITOR: NTP服务器3: ntp.tencent.com (腾讯云)
+[2026-04-02 15:07:34.106] I (1810) MQTT_MONITOR: 当前系统时间: 1428 ms
+[2026-04-02 15:07:34.112] I (1820) MQTT_MONITOR: 时区设置: CST-8 (UTC+8, 中国标准时间)
+[2026-04-02 15:07:34.118] I (1820) MQTT_MONITOR: SNTP 初始化完成，等待时间同步...
+[2026-04-02 15:07:34.123] I (1830) MQTT_MONITOR: ==============================================
+[2026-04-02 15:07:34.132] I (1840) esp_netif_handlers: sta ip: 192.168.110.199, mask: 255.255.255.0, gw: 192.168.110.1
+[2026-04-02 15:07:34.136] I (1840) ESP32S3_WIFI_EVENT: Connected to ap!
+[2026-04-02 15:07:34.141] I (1850) ESP32S3_WIFI_EVENT: Waiting for NTP time sync...
+[2026-04-02 15:07:35.608] I (3320) MQTT_MONITOR: ==============================================
+[2026-04-02 15:07:35.610] I (3320) MQTT_MONITOR: NTP时间同步回调被触发！
+[2026-04-02 15:07:35.612] I (3320) MQTT_MONITOR: 已发送同步完成信号
+[2026-04-02 15:07:35.619] I (3320) MQTT_MONITOR: ==============================================
+[2026-04-02 15:07:35.622] I (3320) MQTT_MONITOR: 时间同步完成！
+[2026-04-02 15:07:35.630] I (3330) MQTT_MONITOR: 当前实际时间: 2026-04-02 15:07:34 [运行 00:00:02]
+[2026-04-02 15:07:35.633] I (3340) MQTT_MONITOR: 开机时间戳: 1428 ms
+[2026-04-02 15:07:35.640] I (3340) MQTT_MONITOR: 实际开机时间: Thu Apr  2 15:07:32 2026
+[2026-04-02 15:07:35.641] 
+[2026-04-02 15:07:35.645] I (3350) MQTT_MONITOR: NTP轮询间隔已恢复为1小时
+[2026-04-02 15:07:35.652] I (3360) MQTT_MONITOR: ==============================================
+[2026-04-02 15:07:35.655] I (3360) MQTT_MONITOR: 时间同步成功！
+[2026-04-02 15:07:35.660] I (3370) MQTT_MONITOR: 当前时间: 2026-04-02 15:07:34
+[2026-04-02 15:07:35.664] I (3370) MQTT_MONITOR: 开机时间戳: 1428 ms
+[2026-04-02 15:07:35.670] I (3380) MQTT_MONITOR: 实际开机时间: Thu Apr  2 15:07:32 2026
+[2026-04-02 15:07:35.672] 
+[2026-04-02 15:07:35.678] I (3380) MQTT_MONITOR: ==============================================
+[2026-04-02 15:07:35.683] I (3390) ESP32S3_WIFI_EVENT: NTP time sync completed successfully
+[2026-04-02 15:07:40.675] I (8390) MQTT_MONITOR: MQTT连接监控模块已初始化
+[2026-04-02 15:07:40.677] I (8390) MQTT_MONITOR: 统计报告间隔: 0 小时
+[2026-04-02 15:07:40.680] I (8390) MQTT_MONITOR: =================================================
+[2026-04-02 15:07:40.685] I (8390) MQTT_MONITOR:       MQTT连接监控统计系统已启动
+[2026-04-02 15:07:40.692] I (8400) MQTT_MONITOR: =================================================
+[2026-04-02 15:07:40.699] I (8400) MQTT_MONITOR: 提示: 时间将在WiFi连接后通过NTP同步
+[2026-04-02 15:07:40.703] I (8410) MQTT_MONITOR: 等待 SNTP 时间同步完成...
+[2026-04-02 15:07:40.708] I (8410) MQTT_MONITOR: 时间同步已完成，开始监控任务
+[2026-04-02 15:07:40.714] I (8420) ESP32S3_MQTT_EVENT: MQTT客户端已启动
+[2026-04-02 15:07:40.719] I (8430) ESP32S3_MQTT_EVENT: MQTT心跳任务已启动
+[2026-04-02 15:07:40.725] I (8430) ESP32S3_MQTT_EVENT: MQTT连接健康检查任务已启动
+[2026-04-02 15:07:40.739] I (8430) PWM_EVENT: PWM timer 0 initiated at clock speed 5000.
+[2026-04-02 15:07:40.741] I (8440) PWM_EVENT: PWM channel 0 initiated on GPIO1 with initial duty 8191 (inverted logic).
+[2026-04-02 15:07:40.746] I (8450) PWM_EVENT: PWM channel 1 initiated on GPIO4 with initial duty 8191 (inverted logic).
+[2026-04-02 15:07:40.751] I (8450) ESP32S3_MQTT_EVENT: Connected to MQTT server.
+[2026-04-02 15:07:40.756] I (8460) ESP32S3_STATUS_LED: LED mode changed to: 3
+[2026-04-02 15:07:40.764] I (8470) MQTT_MONITOR: [连接事件] #1 | 时间: 2026-04-02 15:07:39 [运行 00:00:08]
+[2026-04-02 15:07:40.771] I (8480) ESP32S3_MQTT_EVENT: 已订阅控制频道 'esp32_1/control' (msg_id=3862)
+[2026-04-02 15:07:40.780] I (8480) PWM_EVENT: PWM channel 2 initiated on GPIO6 with initial duty 8191 (inverted logic).
+[2026-04-02 15:07:40.788] I (8490) PWM_EVENT: PWM channel 3 initiated on GPIO8 with initial duty 8191 (inverted logic).
+[2026-04-02 15:07:40.794] I (8500) PCNT_EVENT: PCNT channel 0 has been initiated on pin 2.
+[2026-04-02 15:07:40.800] I (8500) PCNT_EVENT: PCNT channel 1 has been initiated on pin 5.
+[2026-04-02 15:07:40.804] I (8510) PCNT_EVENT: PCNT channel 2 has been initiated on pin 7.
+[2026-04-02 15:07:40.810] I (8520) PCNT_EVENT: PCNT channel 3 has been initiated on pin 9.
+[2026-04-02 15:07:40.816] I (8520) PCNT_EVENT: Motor 0 idle, PCNT=0
+[2026-04-02 15:07:40.819] I (8530) PWM_EVENT: PWM channel 0 duty set to 8191.
+[2026-04-02 15:07:40.821] I (8530) PID_EVENT: Index number is: 2
+[2026-04-02 15:07:40.822] 
+[2026-04-02 15:07:40.825] I (8530) PID_EVENT: Index number is: 0
+[2026-04-02 15:07:40.826] 
+[2026-04-02 15:07:40.830] I (8530) PID_EVENT: Index number is: 1
+[2026-04-02 15:07:40.831] 
+[2026-04-02 15:07:40.833] I (8530) PCNT_EVENT: Motor 3 idle, PCNT=0
+[2026-04-02 15:07:40.837] I (8530) PCNT_EVENT: Motor 1 idle, PCNT=0
+[2026-04-02 15:07:40.842] I (8550) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-04-02 15:07:40.845] I (8530) PID_EVENT: Index number is: 3
+[2026-04-02 15:07:40.846] 
+[2026-04-02 15:07:40.850] I (8530) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-04-02 15:07:40.855] I (8560) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-04-02 15:07:40.869] I (8530) MAX31850: [GPIO_DIAG] Configured GPIO14 as INPUT_OUTPUT_OD
+[2026-04-02 15:07:40.871] I (8580) MAX31850: [GPIO_DIAG] Internal pull-up/pull-down disabled, relying on external 4.7K pull-up
+[2026-04-02 15:07:40.879] I (8580) MAX31850: [BUS_LEVEL] After init release -> GPIO14 = 1
+[2026-04-02 15:07:40.881] I (8540) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-04-02 15:07:40.884] I (8590) MAX31850: [OW_RESET] Start reset on GPIO14
+[2026-04-02 15:07:40.935] 
+[2026-04-02 15:07:40.937] abort() was called at PC 0x4037689f on core 0
+[2026-04-02 15:07:40.938] 
+[2026-04-02 15:07:40.940] 
+[2026-04-02 15:07:40.944] Backtrace: 0x4037d169:0x3fca9280 0x4037d131:0x3fca92a0 0x40385811:0x3fca92c0 0x4037689f:0x3fca9330 0x403769b5:0x3fca9360 0x40376a7f:0x3fca9380 0x4209b7b3:0x3fca93b0 0x4208fda5:0x3fca96d0 0x4038474f:0x3fca9700 0x4200db59:0x3fca9760 0x4200dbb1:0x3fca9790 0x4200e38a:0x3fca97c0 0x4200c2f1:0x3fca9840 0x420ac550:0x3fca9870 0x4037de19:0x3fca98a0
+[2026-04-02 15:07:40.945] 
+[2026-04-02 15:07:40.946] 
+[2026-04-02 15:07:40.948] 
+[2026-04-02 15:07:40.950] 
+[2026-04-02 15:07:40.952] ELF file SHA256: f16d81ea4
+[2026-04-02 15:07:40.953] 
+[2026-04-02 15:07:40.954] Rebooting...
+[2026-04-02 15:07:40.956] ESP-ROM:esp32s3-20210327
+[2026-04-02 15:07:40.958] Build:Mar 27 2021
+[2026-04-02 15:07:40.960] rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+[2026-04-02 15:07:40.961] Saved PC:0x4037d2b8
+[2026-04-02 15:07:40.963] SPIWP:0xee
+[2026-04-02 15:07:40.964] mode:DIO, clock div:1
+[2026-04-02 15:07:40.966] load:0x3fce2820,len:0x158c
+[2026-04-02 15:07:40.968] load:0x403c8700,len:0xd24
+[2026-04-02 15:07:40.970] load:0x403cb700,len:0x2f34
+[2026-04-02 15:07:40.971] entry 0x403c8924
+[2026-04-02 15:07:40.973] I (24) boot: ESP-IDF v5.5.2 2nd stage bootloader
+[2026-04-02 15:07:40.974] I (24) boot: compile time Apr  2 2026 15:02:24
+[2026-04-02 15:07:40.976] I (24) boot: Multicore bootloader
+[2026-04-02 15:07:40.977] I (24) boot: chip revision: v0.1
+[2026-04-02 15:07:40.978] I (27) boot: efuse block revision: v1.2
+[2026-04-02 15:07:40.980] I (31) boot.esp32s3: Boot SPI Speed : 80MHz
+[2026-04-02 15:07:40.981] I (34) boot.esp32s3: SPI Mode       : DIO
+[2026-04-02 15:07:40.983] I (38) boot.esp32s3: SPI Flash Size : 2MB
+[2026-04-02 15:07:40.984] I (42) boot: Enabling RNG early entropy source...
+[2026-04-02 15:07:40.986] I (46) boot: Partition Table:
+[2026-04-02 15:07:40.990] I (49) boot: ## Label            Usage          Type ST Offset   Length
+[2026-04-02 15:07:40.997] I (55) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+[2026-04-02 15:07:41.003] I (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+[2026-04-02 15:07:41.010] I (68) boot:  2 factory          factory app      00 00 00010000 00100000
+[2026-04-02 15:07:41.013] I (75) boot: End of partition table
+[2026-04-02 15:07:41.020] I (78) esp_image: segment 0: paddr=00010020 vaddr=3c0b0020 size=23908h (145672) map
+[2026-04-02 15:07:41.047] I (111) esp_image: segment 1: paddr=00033930 vaddr=3fc9be00 size=04da8h ( 19880) load
+[2026-04-02 15:07:41.050] I (116) esp_image: segment 2: paddr=000386e0 vaddr=40374000 size=07938h ( 31032) load
+[2026-04-02 15:07:41.058] I (123) esp_image: segment 3: paddr=00040020 vaddr=42000020 size=ad3dch (709596) map
+[2026-04-02 15:07:41.183] I (248) esp_image: segment 4: paddr=000ed404 vaddr=4037b938 size=104ach ( 66732) load
+[2026-04-02 15:07:41.198] I (263) esp_image: segment 5: paddr=000fd8b8 vaddr=50000000 size=00020h (    32) load
+[2026-04-02 15:07:41.207] I (273) boot: Loaded app from partition at offset 0x10000
+[2026-04-02 15:07:41.209] I (273) boot: Disabling RNG early entropy source...
+[2026-04-02 15:07:41.218] I (283) cpu_start: Multicore app
+[2026-04-02 15:07:41.226] I (292) cpu_start: GPIO 44 and 43 are used as console UART I/O pins
+[2026-04-02 15:07:41.228] I (293) cpu_start: Pro cpu start user code
+[2026-04-02 15:07:41.230] I (293) cpu_start: cpu freq: 160000000 Hz
+[2026-04-02 15:07:41.232] I (294) app_init: Application information:
+[2026-04-02 15:07:41.236] I (298) app_init: Project name:     test
+[2026-04-02 15:07:41.239] I (302) app_init: App version:      393e349
+[2026-04-02 15:07:41.245] I (305) app_init: Compile time:     Apr  2 2026 15:02:11
+[2026-04-02 15:07:41.249] I (311) app_init: ELF file SHA256:  f16d81ea4...
+[2026-04-02 15:07:41.252] I (315) app_init: ESP-IDF:          v5.5.2
+[2026-04-02 15:07:41.257] I (319) efuse_init: Min chip rev:     v0.0
+[2026-04-02 15:07:41.260] I (322) efuse_init: Max chip rev:     v0.99
+[2026-04-02 15:07:41.264] I (326) efuse_init: Chip rev:         v0.1
+[2026-04-02 15:07:41.271] I (330) heap_init: Initializing. RAM available for dynamic allocation:
+[2026-04-02 15:07:41.277] I (337) heap_init: At 3FCA5D60 len 000439B0 (270 KiB): RAM
+[2026-04-02 15:07:41.281] I (342) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM
+[2026-04-02 15:07:41.286] I (347) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM
+[2026-04-02 15:07:41.292] I (352) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM
+[2026-04-02 15:07:41.295] I (359) spi_flash: detected chip: generic
+[2026-04-02 15:07:41.298] I (361) spi_flash: flash io: dio
+[2026-04-02 15:07:41.311] W (364) spi_flash: Detected size(8192k) larger than the size in the binary image header(2048k). Using the size in the binary image header.
+[2026-04-02 15:07:41.317] I (377) sleep_gpio: Configure to isolate all GPIO pins in sleep state
+[2026-04-02 15:07:41.323] I (383) sleep_gpio: Enable automatic switching of GPIO sleep configuration
+[2026-04-02 15:07:41.326] I (390) main_task: Started on CPU0
+[2026-04-02 15:07:41.334] I (400) main_task: Calling app_main()
+[2026-04-02 15:07:41.336] I (400) ESP32S3_STATUS_LED: WS2812 RGB LED initialized on GPIO 48
+[2026-04-02 15:07:41.355] I (420) pp: pp rom version: e7ae62f
+[2026-04-02 15:07:41.356] I (420) net80211: net80211 rom version: e7ae62f
+[2026-04-02 15:07:41.359] I (430) wifi:wifi driver task: 3fceea04, prio:23, stack:6656, core=0
+[2026-04-02 15:07:41.370] I (440) wifi:wifi firmware version: ee91c8c
+[2026-04-02 15:07:41.371] I (440) wifi:wifi certification version: v7.0
+[2026-04-02 15:07:41.373] I (440) wifi:config NVS flash: enabled
+[2026-04-02 15:07:41.374] I (440) wifi:config nano formatting: disabled
+[2026-04-02 15:07:41.379] I (440) wifi:Init data frame dynamic rx buffer num: 32
+[2026-04-02 15:07:41.384] I (450) wifi:Init static rx mgmt buffer num: 5
+[2026-04-02 15:07:41.388] I (450) wifi:Init management short buffer num: 32
+[2026-04-02 15:07:41.392] I (450) wifi:Init dynamic tx buffer num: 32
+[2026-04-02 15:07:41.395] I (460) wifi:Init static tx FG buffer num: 2
+[2026-04-02 15:07:41.400] I (460) wifi:Init static rx buffer size: 1600
+[2026-04-02 15:07:41.403] I (470) wifi:Init static rx buffer num: 10
+[2026-04-02 15:07:41.407] I (470) wifi:Init dynamic rx buffer num: 32
+[2026-04-02 15:07:41.410] I (470) wifi_init: rx ba win: 6
+[2026-04-02 15:07:41.413] I (480) wifi_init: accept mbox: 6
+[2026-04-02 15:07:41.416] I (480) wifi_init: tcpip mbox: 32
+[2026-04-02 15:07:41.419] I (480) wifi_init: udp mbox: 6
+[2026-04-02 15:07:41.422] I (490) wifi_init: tcp mbox: 6
+[2026-04-02 15:07:41.425] I (490) wifi_init: tcp tx win: 5760
+[2026-04-02 15:07:41.428] I (490) wifi_init: tcp rx win: 5760
+[2026-04-02 15:07:41.431] I (490) wifi_init: tcp mss: 1440
+[2026-04-02 15:07:41.435] I (500) wifi_init: WiFi IRAM OP enabled
+[2026-04-02 15:07:41.438] I (500) wifi_init: WiFi RX IRAM OP enabled
+[2026-04-02 15:07:41.448] W (510) wifi:Password length matches WPA2 standards, authmode threshold changes from OPEN to WPA2
+[2026-04-02 15:07:41.453] I (510) phy_init: phy_version 711,97bcf0a2,Aug 25 2025,19:04:10
+[2026-04-02 15:07:41.498] I (560) phy_init: Saving new calibration data due to checksum failure or outdated calibration data, mode(0)
+[2026-04-02 15:07:41.520] I (580) wifi:mode : sta (7c:df:a1:f2:5a:78)
+[2026-04-02 15:07:41.521] I (590) wifi:enable tsf
+[2026-04-02 15:07:41.523] I (590) ESP32S3_WIFI_EVENT: Begin to connect the AP
+[2026-04-02 15:07:41.525] I (590) ESP32S3_STATUS_LED: LED mode changed to: 1
+[2026-04-02 15:07:41.527] I (590) wifi:Set ps type: 0, coexist: 0
+[2026-04-02 15:07:41.528] 
+[2026-04-02 15:07:41.535] I (600) wifi:new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1, snd_ch_cfg:0x0
+[2026-04-02 15:07:41.538] I (600) wifi:state: init -> auth (0xb0)
+[2026-04-02 15:07:41.552] I (620) wifi:state: auth -> assoc (0x0)
+[2026-04-02 15:07:41.609] I (670) wifi:state: assoc -> run (0x10)
+[2026-04-02 15:07:41.712] I (780) wifi:connected with WeShare-6148, aid = 13, channel 1, BW20, bssid = c4:70:ab:d9:a0:e2
+[2026-04-02 15:07:41.714] I (780) wifi:security: WPA2-PSK, phy: bgn, rssi: -69
+[2026-04-02 15:07:41.716] I (780) wifi:pm start, type: 0
+[2026-04-02 15:07:41.717] 
+[2026-04-02 15:07:41.724] I (780) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us
+[2026-04-02 15:07:41.732] I (790) wifi:set rx beacon pti, rx_bcn_pti: 0, bcn_timeout: 25000, mt_pti: 0, mt_time: 10000
+[2026-04-02 15:07:42.520] I (880) wifi:AP's beacon interval = 102400 us, DTIM period = 1
+[2026-04-02 15:07:42.522] W (1590) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (1/60)
+[2026-04-02 15:07:42.739] I (1810) ESP32S3_WIFI_EVENT: Got ip:192.168.110.199
+[2026-04-02 15:07:42.741] I (1810) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-04-02 15:07:42.743] I (1810) MQTT_MONITOR: ==============================================
+[2026-04-02 15:07:42.748] I (1810) MQTT_MONITOR: 正在启动 SNTP 时间同步...
+[2026-04-02 15:07:42.761] I (1820) MQTT_MONITOR: NTP服务器1: cn.pool.ntp.org (国内)
+[2026-04-02 15:07:42.763] I (1820) MQTT_MONITOR: NTP服务器2: ntp.aliyun.com (阿里云)
+[2026-04-02 15:07:42.766] I (1830) MQTT_MONITOR: NTP服务器3: ntp.tencent.com (腾讯云)
+[2026-04-02 15:07:42.771] I (1830) MQTT_MONITOR: 当前系统时间: 1448 ms
+[2026-04-02 15:07:42.777] I (1840) MQTT_MONITOR: 时区设置: CST-8 (UTC+8, 中国标准时间)
+[2026-04-02 15:07:42.783] I (1840) MQTT_MONITOR: SNTP 初始化完成，等待时间同步...
+[2026-04-02 15:07:42.790] I (1850) MQTT_MONITOR: ==============================================
+[2026-04-02 15:07:42.797] I (1860) esp_netif_handlers: sta ip: 192.168.110.199, mask: 255.255.255.0, gw: 192.168.110.1
+[2026-04-02 15:07:42.801] I (1860) ESP32S3_WIFI_EVENT: Connected to ap!
+[2026-04-02 15:07:42.806] I (1870) ESP32S3_WIFI_EVENT: Waiting for NTP time sync...
+[2026-04-02 15:07:44.267] I (3330) MQTT_MONITOR: ==============================================
+[2026-04-02 15:07:44.269] I (3330) MQTT_MONITOR: NTP时间同步回调被触发！
+[2026-04-02 15:07:44.271] I (3330) MQTT_MONITOR: 已发送同步完成信号
+[2026-04-02 15:07:44.278] I (3330) MQTT_MONITOR: ==============================================
+[2026-04-02 15:07:44.282] I (3340) MQTT_MONITOR: 时间同步完成！
+[2026-04-02 15:07:44.288] I (3350) MQTT_MONITOR: 当前实际时间: 2026-04-02 15:07:42 [运行 00:00:02]
+[2026-04-02 15:07:44.293] I (3360) MQTT_MONITOR: 开机时间戳: 1448 ms
+[2026-04-02 15:07:44.299] I (3360) MQTT_MONITOR: 实际开机时间: Thu Apr  2 15:07:40 2026
+[2026-04-02 15:07:44.301] 
+[2026-04-02 15:07:44.305] I (3370) MQTT_MONITOR: NTP轮询间隔已恢复为1小时
+[2026-04-02 15:07:44.311] I (3370) MQTT_MONITOR: ==============================================
+[2026-04-02 15:07:44.314] I (3380) MQTT_MONITOR: 时间同步成功！
+[2026-04-02 15:07:44.320] I (3380) MQTT_MONITOR: 当前时间: 2026-04-02 15:07:42
+[2026-04-02 15:07:44.323] I (3390) MQTT_MONITOR: 开机时间戳: 1448 ms
+[2026-04-02 15:07:44.330] I (3390) MQTT_MONITOR: 实际开机时间: Thu Apr  2 15:07:40 2026
+[2026-04-02 15:07:44.331] 
+[2026-04-02 15:07:44.337] I (3400) MQTT_MONITOR: ==============================================
+[2026-04-02 15:07:44.341] I (3400) ESP32S3_WIFI_EVENT: NTP time sync completed successfully
+[2026-04-02 15:07:49.340] I (8410) MQTT_MONITOR: MQTT连接监控模块已初始化
+[2026-04-02 15:07:49.342] I (8410) MQTT_MONITOR: 统计报告间隔: 0 小时
+[2026-04-02 15:07:49.345] I (8410) MQTT_MONITOR: =================================================
+[2026-04-02 15:07:49.351] I (8410) MQTT_MONITOR:       MQTT连接监控统计系统已启动
+[2026-04-02 15:07:49.358] I (8420) MQTT_MONITOR: =================================================
+[2026-04-02 15:07:49.363] I (8420) MQTT_MONITOR: 提示: 时间将在WiFi连接后通过NTP同步
+[2026-04-02 15:07:49.368] I (8430) MQTT_MONITOR: 等待 SNTP 时间同步完成...
+[2026-04-02 15:07:49.374] I (8430) MQTT_MONITOR: 时间同步已完成，开始监控任务
+[2026-04-02 15:07:49.379] I (8440) ESP32S3_MQTT_EVENT: MQTT客户端已启动
+[2026-04-02 15:07:49.384] I (8450) ESP32S3_MQTT_EVENT: MQTT心跳任务已启动
+[2026-04-02 15:07:49.390] I (8450) ESP32S3_MQTT_EVENT: MQTT连接健康检查任务已启动
+[2026-04-02 15:07:49.403] I (8450) PWM_EVENT: PWM timer 0 initiated at clock speed 5000.
+[2026-04-02 15:07:49.405] I (8460) PWM_EVENT: PWM channel 0 initiated on GPIO1 with initial duty 8191 (inverted logic).
+[2026-04-02 15:07:49.413] I (8470) PWM_EVENT: PWM channel 1 initiated on GPIO4 with initial duty 8191 (inverted logic).
+[2026-04-02 15:07:49.416] I (8480) ESP32S3_MQTT_EVENT: Connected to MQTT server.
+[2026-04-02 15:07:49.421] I (8480) ESP32S3_STATUS_LED: LED mode changed to: 3
+[2026-04-02 15:07:49.429] I (8490) MQTT_MONITOR: [连接事件] #1 | 时间: 2026-04-02 15:07:48 [运行 00:00:08]
+[2026-04-02 15:07:49.437] I (8500) PWM_EVENT: PWM channel 2 initiated on GPIO6 with initial duty 8191 (inverted logic).
+[2026-04-02 15:07:49.445] I (8500) ESP32S3_MQTT_EVENT: 已订阅控制频道 'esp32_1/control' (msg_id=59510)
+[2026-04-02 15:07:49.452] I (8520) PWM_EVENT: PWM channel 3 initiated on GPIO8 with initial duty 8191 (inverted logic).
+[2026-04-02 15:07:49.459] I (8520) PCNT_EVENT: PCNT channel 0 has been initiated on pin 2.
+[2026-04-02 15:07:49.464] I (8520) PCNT_EVENT: PCNT channel 1 has been initiated on pin 5.
+[2026-04-02 15:07:49.471] I (8530) PCNT_EVENT: PCNT channel 2 has been initiated on pin 7.
+[2026-04-02 15:07:49.475] I (8540) PCNT_EVENT: PCNT channel 3 has been initiated on pin 9.
+[2026-04-02 15:07:49.479] I (8540) PCNT_EVENT: Motor 0 idle, PCNT=0
+[2026-04-02 15:07:49.484] I (8550) PWM_EVENT: PWM channel 0 duty set to 8191.
+[2026-04-02 15:07:49.487] I (8550) PID_EVENT: Index number is: 0
+[2026-04-02 15:07:49.488] 
+[2026-04-02 15:07:49.491] I (8550) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-04-02 15:07:49.496] I (8560) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-04-02 15:07:49.499] I (8550) PCNT_EVENT: Motor 1 idle, PCNT=0
+[2026-04-02 15:07:49.503] I (8550) PID_EVENT: Index number is: 2
+[2026-04-02 15:07:49.505] 
+[2026-04-02 15:07:49.507] I (8550) PID_EVENT: Index number is: 3
+[2026-04-02 15:07:49.509] 
+[2026-04-02 15:07:49.512] I (8550) MAX31850: [GPIO_DIAG] Configured GPIO14 as INPUT_OUTPUT_OD
+[2026-04-02 15:07:49.522] I (8580) MAX31850: [GPIO_DIAG] Internal pull-up/pull-down disabled, relying on external 4.7K pull-up
+[2026-04-02 15:07:49.525] I (8550) PID_EVENT: Index number is: 1
+[2026-04-02 15:07:49.526] 
+[2026-04-02 15:07:49.531] I (8570) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-04-02 15:07:49.533] I (8550) PCNT_EVENT: Motor 3 idle, PCNT=0
+[2026-04-02 15:07:49.539] I (8600) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-04-02 15:07:49.548] I (8590) MAX31850: [BUS_LEVEL] After init release -> GPIO14 = 1
+[2026-04-02 15:07:49.550] I (8610) MAX31850: [OW_RESET] Start reset on GPIO14
+[2026-04-02 15:07:49.599] 
+[2026-04-02 15:07:49.601] abort() was called at PC 0x4037689f on core 0
+[2026-04-02 15:07:49.603] 
+[2026-04-02 15:07:49.604] 
+[2026-04-02 15:07:49.608] Backtrace: 0x4037d169:0x3fca9280 0x4037d131:0x3fca92a0 0x40385811:0x3fca92c0 0x4037689f:0x3fca9330 0x403769b5:0x3fca9360 0x40376a7f:0x3fca9380 0x4209b7b3:0x3fca93b0 0x4208fda5:0x3fca96d0 0x4038474f:0x3fca9700 0x4200db59:0x3fca9760 0x4200dbb1:0x3fca9790 0x4200e38a:0x3fca97c0 0x4200c2f1:0x3fca9840 0x420ac550:0x3fca9870 0x4037de19:0x3fca98a0
+[2026-04-02 15:07:49.610] 
+[2026-04-02 15:07:49.611] 
+[2026-04-02 15:07:49.613] 
+[2026-04-02 15:07:49.614] 
+[2026-04-02 15:07:49.616] ELF file SHA256: f16d81ea4
+[2026-04-02 15:07:49.617] 
+[2026-04-02 15:07:49.619] Rebooting...
+[2026-04-02 15:07:49.620] ESP-ROM:esp32s3-20210327
+[2026-04-02 15:07:49.622] Build:Mar 27 2021
+[2026-04-02 15:07:49.623] rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+[2026-04-02 15:07:49.625] Saved PC:0x4037d2b8
+[2026-04-02 15:07:49.626] SPIWP:0xee
+[2026-04-02 15:07:49.628] mode:DIO, clock div:1
+[2026-04-02 15:07:49.630] load:0x3fce2820,len:0x158c
+[2026-04-02 15:07:49.631] load:0x403c8700,len:0xd24
+[2026-04-02 15:07:49.633] load:0x403cb700,len:0x2f34
+[2026-04-02 15:07:49.634] entry 0x403c8924
+[2026-04-02 15:07:49.636] I (24) boot: ESP-IDF v5.5.2 2nd stage bootloader
+[2026-04-02 15:07:49.637] I (24) boot: compile time Apr  2 2026 15:02:24
+[2026-04-02 15:07:49.639] I (24) boot: Multicore bootloader
+[2026-04-02 15:07:49.640] I (24) boot: chip revision: v0.1
+[2026-04-02 15:07:49.642] I (27) boot: efuse block revision: v1.2
+[2026-04-02 15:07:49.644] I (31) boot.esp32s3: Boot SPI Speed : 80MHz
+[2026-04-02 15:07:49.646] I (34) boot.esp32s3: SPI Mode       : DIO
+[2026-04-02 15:07:49.647] I (38) boot.esp32s3: SPI Flash Size : 2MB
+[2026-04-02 15:07:49.649] I (42) boot: Enabling RNG early entropy source...
+[2026-04-02 15:07:49.651] I (46) boot: Partition Table:
+[2026-04-02 15:07:49.654] I (49) boot: ## Label            Usage          Type ST Offset   Length
+[2026-04-02 15:07:49.661] I (55) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+[2026-04-02 15:07:49.668] I (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+[2026-04-02 15:07:49.674] I (68) boot:  2 factory          factory app      00 00 00010000 00100000
+[2026-04-02 15:07:49.676] I (75) boot: End of partition table
+[2026-04-02 15:07:49.684] I (78) esp_image: segment 0: paddr=00010020 vaddr=3c0b0020 size=23908h (145672) map
+[2026-04-02 15:07:49.710] I (111) esp_image: segment 1: paddr=00033930 vaddr=3fc9be00 size=04da8h ( 19880) load
+[2026-04-02 15:07:49.716] I (116) esp_image: segment 2: paddr=000386e0 vaddr=40374000 size=07938h ( 31032) load
+[2026-04-02 15:07:49.723] I (123) esp_image: segment 3: paddr=00040020 vaddr=42000020 size=ad3dch (709596) map
+[2026-04-02 15:07:49.847] I (249) esp_image: segment 4: paddr=000ed404 vaddr=4037b938 size=104ach ( 66732) load
+[2026-04-02 15:07:49.862] I (263) esp_image: segment 5: paddr=000fd8b8 vaddr=50000000 size=00020h (    32) load
+[2026-04-02 15:07:49.873] I (273) boot: Loaded app from partition at offset 0x10000
+[2026-04-02 15:07:49.875] I (273) boot: Disabling RNG early entropy source...
+[2026-04-02 15:07:49.883] I (283) cpu_start: Multicore app
+[2026-04-02 15:07:49.890] I (292) cpu_start: GPIO 44 and 43 are used as console UART I/O pins
+[2026-04-02 15:07:49.892] I (293) cpu_start: Pro cpu start user code
+[2026-04-02 15:07:49.894] I (293) cpu_start: cpu freq: 160000000 Hz
+[2026-04-02 15:07:49.897] I (294) app_init: Application information:
+[2026-04-02 15:07:49.900] I (298) app_init: Project name:     test
+[2026-04-02 15:07:49.904] I (302) app_init: App version:      393e349
+[2026-04-02 15:07:49.910] I (306) app_init: Compile time:     Apr  2 2026 15:02:11
+[2026-04-02 15:07:49.914] I (311) app_init: ELF file SHA256:  f16d81ea4...
+[2026-04-02 15:07:49.917] I (315) app_init: ESP-IDF:          v5.5.2
+[2026-04-02 15:07:49.922] I (319) efuse_init: Min chip rev:     v0.0
+[2026-04-02 15:07:49.925] I (323) efuse_init: Max chip rev:     v0.99
+[2026-04-02 15:07:49.930] I (327) efuse_init: Chip rev:         v0.1
+[2026-04-02 15:07:49.935] I (331) heap_init: Initializing. RAM available for dynamic allocation:
+[2026-04-02 15:07:49.940] I (337) heap_init: At 3FCA5D60 len 000439B0 (270 KiB): RAM
+[2026-04-02 15:07:49.946] I (342) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM
+[2026-04-02 15:07:49.952] I (347) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM
+[2026-04-02 15:07:49.957] I (352) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM
+[2026-04-02 15:07:49.960] I (359) spi_flash: detected chip: generic
+[2026-04-02 15:07:49.963] I (361) spi_flash: flash io: dio
+[2026-04-02 15:07:49.976] W (364) spi_flash: Detected size(8192k) larger than the size in the binary image header(2048k). Using the size in the binary image header.
+[2026-04-02 15:07:49.981] I (377) sleep_gpio: Configure to isolate all GPIO pins in sleep state
+[2026-04-02 15:07:49.988] I (383) sleep_gpio: Enable automatic switching of GPIO sleep configuration
+[2026-04-02 15:07:49.991] I (390) main_task: Started on CPU0
+[2026-04-02 15:07:49.999] I (400) main_task: Calling app_main()
+[2026-04-02 15:07:50.001] I (400) ESP32S3_STATUS_LED: WS2812 RGB LED initialized on GPIO 48
+[2026-04-02 15:07:50.019] I (420) pp: pp rom version: e7ae62f
+[2026-04-02 15:07:50.020] I (420) net80211: net80211 rom version: e7ae62f
+[2026-04-02 15:07:50.024] I (430) wifi:wifi driver task: 3fceea04, prio:23, stack:6656, core=0
+[2026-04-02 15:07:50.035] I (440) wifi:wifi firmware version: ee91c8c
+[2026-04-02 15:07:50.036] I (440) wifi:wifi certification version: v7.0
+[2026-04-02 15:07:50.038] I (440) wifi:config NVS flash: enabled
+[2026-04-02 15:07:50.040] I (440) wifi:config nano formatting: disabled
+[2026-04-02 15:07:50.045] I (440) wifi:Init data frame dynamic rx buffer num: 32
+[2026-04-02 15:07:50.048] I (450) wifi:Init static rx mgmt buffer num: 5
+[2026-04-02 15:07:50.053] I (450) wifi:Init management short buffer num: 32
+[2026-04-02 15:07:50.056] I (450) wifi:Init dynamic tx buffer num: 32
+[2026-04-02 15:07:50.061] I (460) wifi:Init static tx FG buffer num: 2
+[2026-04-02 15:07:50.064] I (460) wifi:Init static rx buffer size: 1600
+[2026-04-02 15:07:50.069] I (470) wifi:Init static rx buffer num: 10
+[2026-04-02 15:07:50.072] I (470) wifi:Init dynamic rx buffer num: 32
+[2026-04-02 15:07:50.074] I (470) wifi_init: rx ba win: 6
+[2026-04-02 15:07:50.077] I (480) wifi_init: accept mbox: 6
+[2026-04-02 15:07:50.082] I (480) wifi_init: tcpip mbox: 32
+[2026-04-02 15:07:50.084] I (480) wifi_init: udp mbox: 6
+[2026-04-02 15:07:50.087] I (490) wifi_init: tcp mbox: 6
+[2026-04-02 15:07:50.090] I (490) wifi_init: tcp tx win: 5760
+[2026-04-02 15:07:50.093] I (490) wifi_init: tcp rx win: 5760
+[2026-04-02 15:07:50.096] I (490) wifi_init: tcp mss: 1440
+[2026-04-02 15:07:50.099] I (500) wifi_init: WiFi IRAM OP enabled
+[2026-04-02 15:07:50.104] I (500) wifi_init: WiFi RX IRAM OP enabled
+[2026-04-02 15:07:50.114] W (510) wifi:Password length matches WPA2 standards, authmode threshold changes from OPEN to WPA2
+[2026-04-02 15:07:50.117] I (510) phy_init: phy_version 711,97bcf0a2,Aug 25 2025,19:04:10
+[2026-04-02 15:07:50.165] I (570) wifi:mode : sta (7c:df:a1:f2:5a:78)
+[2026-04-02 15:07:50.167] I (570) wifi:enable tsf
+[2026-04-02 15:07:50.169] I (570) ESP32S3_WIFI_EVENT: Begin to connect the AP
+[2026-04-02 15:07:50.170] I (570) ESP32S3_STATUS_LED: LED mode changed to: 1
+[2026-04-02 15:07:50.173] I (570) wifi:Set ps type: 0, coexist: 0
+[2026-04-02 15:07:50.174] 
+[2026-04-02 15:07:50.181] I (580) wifi:new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1, snd_ch_cfg:0x0
+[2026-04-02 15:07:50.183] I (580) wifi:state: init -> auth (0xb0)
+[2026-04-02 15:07:50.197] I (600) wifi:state: auth -> assoc (0x0)
+[2026-04-02 15:07:50.253] I (650) wifi:state: assoc -> run (0x10)
+[2026-04-02 15:07:50.356] I (760) wifi:connected with WeShare-6148, aid = 13, channel 1, BW20, bssid = c4:70:ab:d9:a0:e2
+[2026-04-02 15:07:50.358] I (760) wifi:security: WPA2-PSK, phy: bgn, rssi: -71
+[2026-04-02 15:07:50.361] I (760) wifi:pm start, type: 0
+[2026-04-02 15:07:50.362] 
+[2026-04-02 15:07:50.369] I (760) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us
+[2026-04-02 15:07:50.377] I (770) wifi:set rx beacon pti, rx_bcn_pti: 0, bcn_timeout: 25000, mt_pti: 0, mt_time: 10000
+[2026-04-02 15:07:51.164] I (820) wifi:AP's beacon interval = 102400 us, DTIM period = 1
+[2026-04-02 15:07:51.167] W (1570) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (1/60)
+
+
+============================================================
+日志记录结束
+结束时间: 2026-04-02 15:07:51
+总运行时间: 0.41 分钟
+总行数: 578
+============================================================
+连接统计:
+  - MQTT连接次数: 3
+  - MQTT断开次数: 0
+  - 连接保持率: 300.00%
+
+错误统计:
+  - 无错误记录
+============================================================

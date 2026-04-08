@@ -1,0 +1,262 @@
+============================================================
+ESP32-S3 串口日志记录
+开始时间: 2026-04-02 22:39:09
+串口: COM10, 波特率: 115200
+============================================================
+
+[2026-04-02 22:39:09.551] I (781) wifi:connected with WeShare-6148, aid = 13, channel 1, BW (1581) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (1/60)
+[2026-04-02 22:39:09.830] I (1861) ESP32S3_WIFI_EVENT: Got ip:192.168.110.199
+[2026-04-02 22:39:09.832] I (1861) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-04-02 22:39:09.834] I (1861) MQTT_MONITOR: ==============================================
+[2026-04-02 22:39:09.840] I (1861) MQTT_MONITOR: 正在启动 SNTP 时间同步...
+[2026-04-02 22:39:09.851] I (1871) MQTT_MONITOR: NTP服务器1: cn.pool.ntp.org (国内)
+[2026-04-02 22:39:09.853] I (1871) MQTT_MONITOR: NTP服务器2: ntp.aliyun.com (阿里云)
+[2026-04-02 22:39:09.856] I (1881) MQTT_MONITOR: NTP服务器3: ntp.tencent.com (腾讯云)
+[2026-04-02 22:39:09.861] I (1881) MQTT_MONITOR: 当前系统时间: 1498 ms
+[2026-04-02 22:39:09.867] I (1891) MQTT_MONITOR: 时区设置: CST-8 (UTC+8, 中国标准时间)
+[2026-04-02 22:39:09.873] I (1891) MQTT_MONITOR: SNTP 初始化完成，等待时间同步...
+[2026-04-02 22:39:09.879] I (1901) MQTT_MONITOR: ==============================================
+[2026-04-02 22:39:09.889] I (1911) esp_netif_handlers: sta ip: 192.168.110.199, mask: 255.255.255.0, gw: 192.168.110.1
+[2026-04-02 22:39:09.893] I (1911) ESP32S3_WIFI_EVENT: Connected to ap!
+[2026-04-02 22:39:09.898] I (1921) ESP32S3_WIFI_EVENT: Waiting for NTP time sync...
+[2026-04-02 22:39:10.817] I (2841) MQTT_MONITOR: ==============================================
+[2026-04-02 22:39:10.819] I (2841) MQTT_MONITOR: NTP时间同步回调被触发！
+[2026-04-02 22:39:10.821] I (2841) MQTT_MONITOR: 已发送同步完成信号
+[2026-04-02 22:39:10.826] I (2841) MQTT_MONITOR: ==============================================
+[2026-04-02 22:39:10.830] I (2851) MQTT_MONITOR: 时间同步完成！
+[2026-04-02 22:39:10.837] I (2861) MQTT_MONITOR: 当前实际时间: 2026-04-02 22:39:10 [运行 00:00:02]
+[2026-04-02 22:39:10.841] I (2861) MQTT_MONITOR: 开机时间戳: 1498 ms
+[2026-04-02 22:39:10.846] I (2871) MQTT_MONITOR: 实际开机时间: Thu Apr  2 22:39:08 2026
+[2026-04-02 22:39:10.847] 
+[2026-04-02 22:39:10.852] I (2871) MQTT_MONITOR: NTP轮询间隔已恢复为1小时
+[2026-04-02 22:39:10.859] I (2881) MQTT_MONITOR: ==============================================
+[2026-04-02 22:39:10.862] I (2881) MQTT_MONITOR: 时间同步成功！
+[2026-04-02 22:39:10.868] I (2891) MQTT_MONITOR: 当前时间: 2026-04-02 22:39:10
+[2026-04-02 22:39:10.871] I (2891) MQTT_MONITOR: 开机时间戳: 1498 ms
+[2026-04-02 22:39:10.878] I (2901) MQTT_MONITOR: 实际开机时间: Thu Apr  2 22:39:08 2026
+[2026-04-02 22:39:10.880] 
+[2026-04-02 22:39:10.885] I (2901) MQTT_MONITOR: ==============================================
+[2026-04-02 22:39:10.891] I (2911) ESP32S3_WIFI_EVENT: NTP time sync completed successfully
+[2026-04-02 22:39:15.890] I (7921) MQTT_MONITOR: MQTT连接监控模块已初始化
+[2026-04-02 22:39:15.892] I (7921) MQTT_MONITOR: 统计报告间隔: 0 小时
+[2026-04-02 22:39:15.895] I (7921) MQTT_MONITOR: =================================================
+[2026-04-02 22:39:15.900] I (7921) MQTT_MONITOR:       MQTT连接监控统计系统已启动
+[2026-04-02 22:39:15.908] I (7931) MQTT_MONITOR: =================================================
+[2026-04-02 22:39:15.913] I (7931) MQTT_MONITOR: 提示: 时间将在WiFi连接后通过NTP同步
+[2026-04-02 22:39:15.918] I (7941) MQTT_MONITOR: 等待 SNTP 时间同步完成...
+[2026-04-02 22:39:15.924] I (7941) MQTT_MONITOR: 时间同步已完成，开始监控任务
+[2026-04-02 22:39:15.929] I (7951) ESP32S3_MQTT_EVENT: MQTT客户端已启动
+[2026-04-02 22:39:15.934] I (7961) ESP32S3_MQTT_EVENT: MQTT心跳任务已启动
+[2026-04-02 22:39:15.940] I (7961) ESP32S3_MQTT_EVENT: MQTT连接健康检查任务已启动
+[2026-04-02 22:39:15.954] I (7961) PWM_EVENT: PWM timer 0 initiated at clock speed 5000.
+[2026-04-02 22:39:15.956] I (7971) PWM_EVENT: PWM channel 0 initiated on GPIO1 with initial duty 8191 (inverted logic).
+[2026-04-02 22:39:15.962] I (7981) PWM_EVENT: PWM channel 1 initiated on GPIO4 with initial duty 8191 (inverted logic).
+[2026-04-02 22:39:15.972] I (7991) PWM_EVENT: PWM channel 2 initiated on GPIO6 with initial duty 8191 (inverted logic).
+[2026-04-02 22:39:15.978] I (8001) PWM_EVENT: PWM channel 3 initiated on GPIO8 with initial duty 8191 (inverted logic).
+[2026-04-02 22:39:15.985] I (8001) PCNT_EVENT: PCNT channel 0 has been initiated on pin 2.
+[2026-04-02 22:39:15.989] I (8011) PCNT_EVENT: PCNT channel 1 has been initiated on pin 5.
+[2026-04-02 22:39:15.995] I (8021) PCNT_EVENT: PCNT channel 2 has been initiated on pin 7.
+[2026-04-02 22:39:16.001] I (8021) PCNT_EVENT: PCNT channel 3 has been initiated on pin 9.
+[2026-04-02 22:39:16.005] I (8031) PID_EVENT: Index number is: 0
+[2026-04-02 22:39:16.006] 
+[2026-04-02 22:39:16.008] I (8031) PID_EVENT: Index number is: 1
+[2026-04-02 22:39:16.010] 
+[2026-04-02 22:39:16.012] I (8031) PID_EVENT: Index number is: 2
+[2026-04-02 22:39:16.013] 
+[2026-04-02 22:39:16.015] I (8031) PID_EVENT: Index number is: 3
+[2026-04-02 22:39:16.017] 
+[2026-04-02 22:39:16.021] I (8031) MAX31850: === MAX31850 Driver Initialization ===
+[2026-04-02 22:39:16.027] I (8051) MAX31850: Configuring GPIO14 as open-drain with pull-up
+[2026-04-02 22:39:16.034] E (8051) gpio: gpio_get_drive_capability(722): GPIO drive capability pointer error
+[2026-04-02 22:39:16.037] I (8061) MAX31850: === GPIO14 Diagnostic ===
+[2026-04-02 22:39:16.043] I (8061) MAX31850:   Mode: INPUT_OUTPUT_OD (Open-Drain)
+[2026-04-02 22:39:16.050] I (8071) MAX31850:   Pull-up: ENABLED (4.7K external recommended)
+[2026-04-02 22:39:16.052] I (8071) MAX31850:   Pull-down: DISABLED
+[2026-04-02 22:39:16.056] I (8081) MAX31850:   Current Level: 1
+[2026-04-02 22:39:16.061] I (8081) MAX31850:   Expected idle level: 1 (pulled high)
+[2026-04-02 22:39:16.065] I (8091) MAX31850:   Bus state: OK (high)
+[2026-04-02 22:39:16.070] I (8091) MAX31850: === Testing Open-Drain Mode on GPIO14 ===
+[2026-04-02 22:39:16.075] I (8091) ESP32S3_MQTT_EVENT: Connected to MQTT server.
+[2026-04-02 22:39:16.079] I (8101) ESP32S3_STATUS_LED: LED mode changed to: 3
+[2026-04-02 22:39:16.087] I (8111) MQTT_MONITOR: [连接事件] #1 | 时间: 2026-04-02 22:39:15 [运行 00:00:07]
+[2026-04-02 22:39:16.095] I (8121) ESP32S3_MQTT_EVENT: 已订阅控制频道 'esp32_1/control' (msg_id=26248)
+[2026-04-02 22:39:16.098] I (8121) MAX31850:   Drive LOW: 0 (expected 0)
+[2026-04-02 22:39:16.103] I (8121) MAX31850:   Release (pull-up): 0 (expected 1)
+[2026-04-02 22:39:16.107] I (8121) PCNT_EVENT: Motor 1 idle, PCNT=0
+[2026-04-02 22:39:16.111] I (8131) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-04-02 22:39:16.114] I (8121) PCNT_EVENT: Motor 0 idle, PCNT=0
+[2026-04-02 22:39:16.118] I (8131) PCNT_EVENT: Motor 3 idle, PCNT=0
+[2026-04-02 22:39:16.123] I (8141) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-04-02 22:39:16.128] I (8131) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-04-02 22:39:16.132] I (8141) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-04-02 22:39:16.137] I (8141) PWM_EVENT: PWM channel 0 duty set to 8191.
+[2026-04-02 22:39:16.142] I (8131) MAX31850:   Open-drain test: FAIL
+[2026-04-02 22:39:16.145] E (8171) MAX31850: GPIO open-drain test FAILED!
+[2026-04-02 22:39:16.148] I (8171) MAX31850: Checking bus level...
+[2026-04-02 22:39:16.153] I (8171) MAX31850: Bus idle level: 1 (expected 1)
+[2026-04-02 22:39:16.159] I (8181) MAX31850: Waiting for bus stabilization (10ms)...
+[2026-04-02 22:39:16.162] I (8191) MAX31850: Starting device discovery...
+[2026-04-02 22:39:16.168] I (8191) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-02 22:39:16.179] I (8191) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-02 22:39:16.181] I (8201) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-02 22:39:16.184] I (8211) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-02 22:39:16.190] I (8211) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-02 22:39:16.195] I (8221) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-02 22:39:16.198] I (8221) MAX31850:   Presence detected: YES
+[2026-04-02 22:39:16.203] I (8231) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-02 22:39:16.211] I (8231) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-02 22:39:16.213] I (8241) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-02 22:39:16.216] I (8241) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-02 22:39:16.220] I (8241) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-02 22:39:16.225] I (8251) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-02 22:39:16.229] I (8251) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-02 22:39:16.234] I (8261) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-02 22:39:16.237] I (8261) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-02 22:39:16.242] I (8261) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-02 22:39:16.249] I (8271) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-02 22:39:16.254] I (8271) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-02 22:39:16.257] I (8281) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-02 22:39:16.262] I (8281) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-02 22:39:16.266] I (8291) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-02 22:39:16.271] I (8291) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-02 22:39:16.276] I (8301) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-02 22:39:16.279] I (8301) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-02 22:39:16.284] I (8311) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-02 22:39:16.288] I (8311) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-02 22:39:16.293] I (8311) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-02 22:39:16.297] I (8321) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-02 22:39:16.302] I (8321) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-02 22:39:16.307] I (8331) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-02 22:39:16.310] I (8331) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-02 22:39:16.315] I (8341) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-02 22:39:16.319] I (8341) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-02 22:39:16.324] I (8351) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-02 22:39:16.328] I (8351) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-02 22:39:16.333] I (8351) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-02 22:39:16.337] I (8361) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-02 22:39:16.342] I (8361) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-02 22:39:16.346] I (8371) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-02 22:39:16.350] I (8371) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-02 22:39:16.354] I (8381) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-02 22:39:16.360] I (8381) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-02 22:39:16.364] I (8391) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-02 22:39:16.368] I (8391) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-02 22:39:16.373] I (8391) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-02 22:39:16.377] I (8401) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-02 22:39:16.382] I (8401) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-02 22:39:16.386] I (8411) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-02 22:39:16.390] I (8411) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-02 22:39:16.395] I (8421) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-02 22:39:16.400] I (8421) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-02 22:39:16.404] I (8431) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-02 22:39:16.407] I (8431) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-02 22:39:16.413] I (8431) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-02 22:39:16.417] I (8441) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-02 22:39:16.421] I (8441) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-02 22:39:16.426] I (8451) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-02 22:39:16.430] I (8451) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-02 22:39:16.440] I (8461) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-02 22:39:16.441] I (8471) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-02 22:39:16.444] I (8471) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-02 22:39:16.448] I (8471) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-02 22:39:16.452] I (8471) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-02 22:39:16.457] I (8481) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-02 22:39:16.461] I (8481) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-02 22:39:16.466] I (8491) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-02 22:39:16.470] I (8491) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-02 22:39:16.475] I (8501) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-02 22:39:16.480] I (8501) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-02 22:39:16.484] I (8501) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-02 22:39:16.492] I (8511) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-02 22:39:16.495] I (8521) MAX31850:   Next discrepancy: 12
+[2026-04-02 22:39:16.499] I (8521) MAX31850:   CRC check: FAIL
+[2026-04-02 22:39:16.505] I (8521) MAX31850: MAX31850 Init: Found 0 sensors on GPIO14
+[2026-04-02 22:39:16.508] W (8531) MAX31850: No MAX31850 sensors found!
+[2026-04-02 22:39:16.513] I (8531) MAX31850: === Initialization Complete ===
+[2026-04-02 22:39:16.519] I (8541) MAX31850: ========== MAX31850 Sensor Info ==========
+[2026-04-02 22:39:16.522] I (8541) MAX31850: Polling task started
+[2026-04-02 22:39:16.525] I (8541) MAX31850: Total sensors found: 0
+[2026-04-02 22:39:16.530] I (8551) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-02 22:39:16.531] I (8551) MAX31850: GPIO: 14
+[2026-04-02 22:39:16.538] I (8561) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-02 22:39:16.541] I (8561) MAX31850: Sensor [0]:
+[2026-04-02 22:39:16.546] I (8561) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-02 22:39:16.549] I (8571) MAX31850:   Present: NO
+[2026-04-02 22:39:16.555] I (8571) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-02 22:39:16.560] I (8581) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-02 22:39:16.563] I (8571) MAX31850: Sensor [1]:
+[2026-04-02 22:39:16.566] I (8591) MAX31850:   Presence detected: YES
+[2026-04-02 22:39:16.569] I (8591) MAX31850:   Present: NO
+[2026-04-02 22:39:16.572] I (8591) MAX31850: Sensor [2]:
+[2026-04-02 22:39:16.575] I (8601) MAX31850:   Present: NO
+[2026-04-02 22:39:16.578] I (8601) MAX31850: Sensor [3]:
+[2026-04-02 22:39:16.581] I (8601) MAX31850:   Present: NO
+[2026-04-02 22:39:16.587] I (8611) MAX31850: ==========================================
+[2026-04-02 22:39:17.560] I (9591) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-02 22:39:17.563] I (9591) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-02 22:39:17.565] I (9591) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-02 22:39:17.570] I (9591) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-02 22:39:17.575] I (9601) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-02 22:39:17.578] I (9601) MAX31850:   Presence detected: YES
+[2026-04-02 22:39:18.580] I (10611) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-02 22:39:18.582] I (10611) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-02 22:39:18.584] I (10611) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-02 22:39:18.590] I (10611) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-02 22:39:18.595] I (10621) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-02 22:39:18.599] I (10621) MAX31850:   Presence detected: YES
+[2026-04-02 22:39:19.121] I (11151) PCNT_EVENT: Motor 3 startup protection ended, normal PCNT monitoring active
+[2026-04-02 22:39:19.130] I (11161) PCNT_EVENT: Motor 1 startup protection ended, normal PCNT monitoring active
+[2026-04-02 22:39:19.134] I (11161) PCNT_EVENT: Motor 2 startup protection ended, normal PCNT monitoring active
+[2026-04-02 22:39:19.141] I (11161) PCNT_EVENT: Motor 0 startup protection ended, normal PCNT monitoring active
+[2026-04-02 22:39:19.600] I (11631) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-02 22:39:19.602] I (11631) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-02 22:39:19.604] I (11631) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-02 22:39:19.610] I (11631) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-02 22:39:19.615] I (11641) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-02 22:39:19.620] I (11641) MAX31850:   Presence detected: YES
+[2026-04-02 22:39:20.620] I (12651) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-02 22:39:20.622] I (12651) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-02 22:39:20.624] I (12651) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-02 22:39:20.630] I (12651) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-02 22:39:20.635] I (12661) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-02 22:39:20.638] I (12661) MAX31850:   Presence detected: YES
+[2026-04-02 22:39:21.640] I (13671) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-02 22:39:21.643] I (13671) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-02 22:39:21.644] I (13671) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-02 22:39:21.650] I (13671) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-02 22:39:21.655] I (13681) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-02 22:39:21.659] I (13681) MAX31850:   Presence detected: YES
+[2026-04-02 22:39:22.660] I (14691) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-02 22:39:22.662] I (14691) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-02 22:39:22.664] I (14691) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-02 22:39:22.671] I (14691) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-02 22:39:22.675] I (14701) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-02 22:39:22.678] I (14701) MAX31850:   Presence detected: YES
+[2026-04-02 22:39:23.680] I (15711) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-02 22:39:23.682] I (15711) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-02 22:39:23.684] I (15711) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-02 22:39:23.691] I (15711) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-02 22:39:23.694] I (15721) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-02 22:39:23.699] I (15721) MAX31850:   Presence detected: YES
+[2026-04-02 22:39:24.699] I (16731) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-02 22:39:24.701] I (16731) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-02 22:39:24.703] I (16731) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-02 22:39:24.709] I (16731) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-02 22:39:24.714] I (16741) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-02 22:39:24.719] I (16741) MAX31850:   Presence detected: YES
+
+
+============================================================
+日志记录结束
+结束时间: 2026-04-02 22:39:25
+总运行时间: 0.27 分钟
+总行数: 240
+============================================================
+连接统计:
+  - MQTT连接次数: 1
+  - MQTT断开次数: 0
+  - 连接保持率: 100.00%
+
+错误统计:
+  - 无错误记录
+============================================================

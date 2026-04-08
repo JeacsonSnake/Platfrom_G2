@@ -1,0 +1,114 @@
+============================================================
+ESP32-S3 串口日志记录
+开始时间: 2026-04-02 15:38:59
+串口: COM10, 波特率: 115200
+============================================================
+
+[2026-04-02 15:39:00.003] I (783) wifi:connected with WeShare-6148, aid = 13, channel 1, BW20, bssid = c4:70:ab:d9:a0:e2
+[2026-04-02 15:39:00.005] I (783) wifi:security: WPA2-PSK, phy: bgn, rssi: -73
+[2026-04-02 15:39:00.007] I (793) wifi:pm start, type: 0
+[2026-04-02 15:39:00.008] 
+[2026-04-02 15:39:00.015] I (793) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us
+[2026-04-02 15:39:00.023] I (803) wifi:set rx beacon pti, rx_bcn_pti: 0, bcn_timeout: 25000, mt_pti: 0, mt_time: 10000
+[2026-04-02 15:39:00.796] I (873) wifi:AP's beacon interval = 102400 us, DTIM period = 1
+[2026-04-02 15:39:00.798] W (1583) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (1/60)
+[2026-04-02 15:39:01.056] I (1843) ESP32S3_WIFI_EVENT: Got ip:192.168.110.199
+[2026-04-02 15:39:01.058] I (1843) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-04-02 15:39:01.060] I (1843) MQTT_MONITOR: ==============================================
+[2026-04-02 15:39:01.065] I (1843) MQTT_MONITOR: 正在启动 SNTP 时间同步...
+[2026-04-02 15:39:01.076] I (1853) MQTT_MONITOR: NTP服务器1: cn.pool.ntp.org (国内)
+[2026-04-02 15:39:01.078] I (1853) MQTT_MONITOR: NTP服务器2: ntp.aliyun.com (阿里云)
+[2026-04-02 15:39:01.082] I (1863) MQTT_MONITOR: NTP服务器3: ntp.tencent.com (腾讯云)
+[2026-04-02 15:39:01.086] I (1863) MQTT_MONITOR: 当前系统时间: 1478 ms
+[2026-04-02 15:39:01.092] I (1873) MQTT_MONITOR: 时区设置: CST-8 (UTC+8, 中国标准时间)
+[2026-04-02 15:39:01.099] I (1873) MQTT_MONITOR: SNTP 初始化完成，等待时间同步...
+[2026-04-02 15:39:01.106] I (1883) MQTT_MONITOR: ==============================================
+[2026-04-02 15:39:01.114] I (1893) esp_netif_handlers: sta ip: 192.168.110.199, mask: 255.255.255.0, gw: 192.168.110.1
+[2026-04-02 15:39:01.118] I (1893) ESP32S3_WIFI_EVENT: Connected to ap!
+[2026-04-02 15:39:01.122] I (1903) ESP32S3_WIFI_EVENT: Waiting for NTP time sync...
+[2026-04-02 15:39:05.562] I (6343) MQTT_MONITOR: ==============================================
+[2026-04-02 15:39:05.564] I (6343) MQTT_MONITOR: NTP时间同步回调被触发！
+[2026-04-02 15:39:05.565] I (6343) MQTT_MONITOR: 已发送同步完成信号
+[2026-04-02 15:39:05.572] I (6343) MQTT_MONITOR: ==============================================
+[2026-04-02 15:39:05.575] I (6353) MQTT_MONITOR: 时间同步完成！
+[2026-04-02 15:39:05.583] I (6363) MQTT_MONITOR: 当前实际时间: 2026-04-02 15:39:04 [运行 00:00:05]
+[2026-04-02 15:39:05.586] I (6363) MQTT_MONITOR: 开机时间戳: 1478 ms
+[2026-04-02 15:39:05.593] I (6373) MQTT_MONITOR: 实际开机时间: Thu Apr  2 15:38:59 2026
+[2026-04-02 15:39:05.594] 
+[2026-04-02 15:39:05.598] I (6373) MQTT_MONITOR: NTP轮询间隔已恢复为1小时
+[2026-04-02 15:39:05.604] I (6383) MQTT_MONITOR: ==============================================
+[2026-04-02 15:39:05.609] I (6383) MQTT_MONITOR: 时间同步成功！
+[2026-04-02 15:39:05.613] I (6393) MQTT_MONITOR: 当前时间: 2026-04-02 15:39:04
+[2026-04-02 15:39:05.618] I (6393) MQTT_MONITOR: 开机时间戳: 1478 ms
+[2026-04-02 15:39:05.624] I (6403) MQTT_MONITOR: 实际开机时间: Thu Apr  2 15:38:59 2026
+[2026-04-02 15:39:05.625] 
+[2026-04-02 15:39:05.630] I (6403) MQTT_MONITOR: ==============================================
+[2026-04-02 15:39:05.637] I (6413) ESP32S3_WIFI_EVENT: NTP time sync completed successfully
+[2026-04-02 15:39:10.636] I (11423) MQTT_MONITOR: MQTT连接监控模块已初始化
+[2026-04-02 15:39:10.638] I (11423) MQTT_MONITOR: 统计报告间隔: 0 小时
+[2026-04-02 15:39:10.641] I (11423) MQTT_MONITOR: =================================================
+[2026-04-02 15:39:10.648] I (11423) MQTT_MONITOR:       MQTT连接监控统计系统已启动
+[2026-04-02 15:39:10.654] I (11433) MQTT_MONITOR: =================================================
+[2026-04-02 15:39:10.660] I (11433) MQTT_MONITOR: 提示: 时间将在WiFi连接后通过NTP同步
+[2026-04-02 15:39:10.665] I (11443) MQTT_MONITOR: 等待 SNTP 时间同步完成...
+[2026-04-02 15:39:10.672] I (11443) MQTT_MONITOR: 时间同步已完成，开始监控任务
+[2026-04-02 15:39:10.676] I (11463) ESP32S3_MQTT_EVENT: MQTT客户端已启动
+[2026-04-02 15:39:10.681] I (11463) ESP32S3_MQTT_EVENT: MQTT心跳任务已启动
+[2026-04-02 15:39:10.686] I (11463) ESP32S3_MQTT_EVENT: MQTT连接健康检查任务已启动
+[2026-04-02 15:39:10.692] I (11463) PWM_EVENT: PWM timer 0 initiated at clock speed 5000.
+[2026-04-02 15:39:10.702] I (11473) PWM_EVENT: PWM channel 0 initiated on GPIO1 with initial duty 8191 (inverted logic).
+[2026-04-02 15:39:10.709] I (11483) PWM_EVENT: PWM channel 1 initiated on GPIO4 with initial duty 8191 (inverted logic).
+[2026-04-02 15:39:10.718] I (11493) PWM_EVENT: PWM channel 2 initiated on GPIO6 with initial duty 8191 (inverted logic).
+[2026-04-02 15:39:10.726] I (11503) PWM_EVENT: PWM channel 3 initiated on GPIO8 with initial duty 8191 (inverted logic).
+[2026-04-02 15:39:10.732] I (11513) PCNT_EVENT: PCNT channel 0 has been initiated on pin 2.
+[2026-04-02 15:39:10.738] I (11513) PCNT_EVENT: PCNT channel 1 has been initiated on pin 5.
+[2026-04-02 15:39:10.743] I (11523) ESP32S3_MQTT_EVENT: Connected to MQTT server.
+[2026-04-02 15:39:10.746] I (11523) ESP32S3_STATUS_LED: LED mode changed to: 3
+[2026-04-02 15:39:10.754] I (11533) MQTT_MONITOR: [连接事件] #1 | 时间: 2026-04-02 15:39:09 [运行 00:00:11]
+[2026-04-02 15:39:10.763] I (11543) ESP32S3_MQTT_EVENT: 已订阅控制频道 'esp32_1/control' (msg_id=63308)
+[2026-04-02 15:39:10.770] I (11543) PCNT_EVENT: PCNT channel 2 has been initiated on pin 7.
+[2026-04-02 15:39:10.774] I (11553) PCNT_EVENT: PCNT channel 3 has been initiated on pin 9.
+[2026-04-02 15:39:10.777] I (11563) PCNT_EVENT: Motor 0 idle, PCNT=0
+[2026-04-02 15:39:10.783] I (11563) PWM_EVENT: PWM channel 0 duty set to 8191.
+[2026-04-02 15:39:10.786] I (11563) PCNT_EVENT: Motor 1 idle, PCNT=0
+[2026-04-02 15:39:10.790] I (11563) PID_EVENT: Index number is: 0
+[2026-04-02 15:39:10.791] 
+[2026-04-02 15:39:10.793] I (11563) PID_EVENT: Index number is: 1
+[2026-04-02 15:39:10.794] 
+[2026-04-02 15:39:10.796] I (11563) PID_EVENT: Index number is: 2
+[2026-04-02 15:39:10.798] 
+[2026-04-02 15:39:10.802] I (11563) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-04-02 15:39:10.807] I (11563) MAX31850: [GPIO_DIAG] Configured GPIO14 as INPUT_OUTPUT_OD
+[2026-04-02 15:39:10.811] I (11563) PID_EVENT: Index number is: 3
+[2026-04-02 15:39:10.812] 
+[2026-04-02 15:39:10.814] I (11563) PCNT_EVENT: Motor 3 idle, PCNT=0
+[2026-04-02 15:39:10.819] I (11573) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-04-02 15:39:10.825] I (11583) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-04-02 15:39:10.833] I (11593) MAX31850: [GPIO_DIAG] Internal pull-up/pull-down disabled, relying on external 4.7K pull-up
+[2026-04-02 15:39:10.838] I (11593) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-04-02 15:39:10.854] I (11613) MAX31850: [BUS_LEVEL] After init release -> GPIO14 = 1
+[2026-04-02 15:39:10.856] I (11633) MAX31850: [OW_RESET] Start reset on GPIO14
+[2026-04-02 15:39:10.857] I (11643) MAX31850: [OW_RESET] After 70us level = 1
+[2026-04-02 15:39:10.859] I (11643) MAX31850: [OW_RESET] After 480us level = 1 (presence=0)
+[2026-04-02 15:39:10.864] E (11643) MAX31850: No device detected on GPIO14
+[2026-04-02 15:39:13.786] I (14573) PCNT_EVENT: Motor 0 startup protection ended, normal PCNT monitoring active
+[2026-04-02 15:39:13.815] I (14603) PCNT_EVENT: Motor 1 startup protection ended, normal PCNT monitoring active
+[2026-04-02 15:39:13.827] I (14613) PCNT_EVENT: Motor 2 startup protection ended, normal PCNT monitoring active
+[2026-04-02 15:39:13.836] I (14623) PCNT_EVENT: Motor 3 startup protection ended, normal PCNT monitoring active
+[2026-04-02 15:39:45.680] I (46463) ESP32S3_MQTT_EVENT: 心跳已发送 (msg_id=62068, elapsed=0ms)
+
+
+============================================================
+日志记录结束
+结束时间: 2026-04-02 15:39:46
+总运行时间: 0.77 分钟
+总行数: 92
+============================================================
+连接统计:
+  - MQTT连接次数: 1
+  - MQTT断开次数: 0
+  - 连接保持率: 100.00%
+
+错误统计:
+  - 无错误记录
+============================================================

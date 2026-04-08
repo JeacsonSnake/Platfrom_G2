@@ -36,7 +36,7 @@
     "--compile-commands-dir=e:\\Platform_G2\\esp32_idf\\build"
   ],
   "idf.currentSetup": "e:\\esp\\v5.5.2\\esp-idf",
-  "idf.portWin": "COM10",
+  "idf.portWin": "COM9",
   "idf.monitorPort": "COM9",
   "idf.flashType": "UART"
 }
