@@ -32,10 +32,16 @@
 #define ONE_WIRE_WRITE0_HIGH        10      // 写0恢复时间
 #define ONE_WIRE_WRITE1_LOW         6       // 写1低电平时间 (1-15us)
 #define ONE_WIRE_WRITE1_HIGH        64      // 写1恢复时间
-#define ONE_WIRE_READ_LOW           6       // 读时隙低电平时间
-#define ONE_WIRE_READ_SAMPLE        10      // 读采样延迟 (在读低后10us采样)
-#define ONE_WIRE_READ_HIGH          55      // 读时隙恢复时间
+
+// 读时序参数优化 (针对弱上拉电阻情况)
+// 问题：4.7KΩ上拉电阻导致信号上升沿慢，在标准采样点(10us)时电平不稳定，
+//       导致读取数据位反转（如家族码0x3B被读成0xDC）
+// 解决：提前采样点，在信号还稳定时读取
+#define ONE_WIRE_READ_LOW           3       // 读时隙低电平时间 (缩短到3us，尽快释放总线让从设备驱动)
+#define ONE_WIRE_READ_SAMPLE        4       // 读采样延迟 (提前到4us采样，避免弱上拉导致的电平不稳定)
+#define ONE_WIRE_READ_HIGH          58      // 读时隙恢复时间 (增加到58us，保证总时隙>60us)
 #define ONE_WIRE_SLOT_MIN           60      // 最小时隙
+// 读时隙总时间：3 + 4 + 58 = 65us (>60us，符合1-Wire标准)
 
 /** @brief MAX31850家族码 */
 #define MAX31850_FAMILY_CODE        0x3B
