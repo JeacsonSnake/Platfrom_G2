@@ -33,19 +33,19 @@
 #define ONE_WIRE_WRITE1_LOW         6       // 写1低电平时间 (1-15us)
 #define ONE_WIRE_WRITE1_HIGH        64      // 写1恢复时间
 
-// 读时序参数优化 - 方案B (极端参数)
+// 读时序参数优化 - 方案2+5us恢复时间 (诊断测试)
 // 问题：4.7KΩ上拉电阻导致信号上升沿慢，读取数据位反转（如家族码0x3B被读成0xDC）
-// 解决：使用极端参数，尽可能延后采样点，给从设备最多时间驱动总线
+// 解决：在释放总线后增加5us额外恢复时间，验证问题是否由上升沿过慢导致
 // 验证：
-//   - tINIT = 1us >= 1us (数据手册要求) [PASS，临界]
-//   - 采样点 = 1 + 12 = 13us < 15us (数据有效窗口) [PASS，余量2us]
-//   - 总时隙 = 65us (60-120us范围内) [PASS]
-//   - 安全余量 = 2us (距离15us上限) [PASS，偏紧但合规]
-#define ONE_WIRE_READ_LOW           1       // 读时隙低电平时间 (最小值1us，尽快释放总线)
-#define ONE_WIRE_READ_SAMPLE        12      // 读采样延迟 (激进延后到12us)
-#define ONE_WIRE_READ_HIGH          52      // 读时隙恢复时间 (52us，保证总时隙>60us)
+//   - tINIT = 1us >= 1us (数据手册要求) [PASS]
+//   - 额外恢复时间 = 5us (给上拉电阻建立信号)
+//   - 采样点 = 1 + 5 + 12 = 18us (>15us) [超出数据手册要求]
+//   - 注意：这是诊断性修改，用于验证问题根源
+#define ONE_WIRE_READ_LOW           1       // 读时隙低电平时间 (最小值1us)
+#define ONE_WIRE_READ_SAMPLE        12      // 读采样延迟 (12us)
+#define ONE_WIRE_READ_HIGH          52      // 读时隙恢复时间 (52us)
 #define ONE_WIRE_SLOT_MIN           60      // 最小时隙
-// 读时隙总时间：1 + 12 + 52 = 65us (>60us，符合1-Wire标准)
+// 实际采样点：1 + 5(extra) + 12 = 18us (超出15us上限，诊断用途)
 
 /** @brief MAX31850家族码 */
 #define MAX31850_FAMILY_CODE        0x3B
@@ -470,6 +470,11 @@ static uint8_t one_wire_read_bit(void)
     
     // 释放总线
     gpio_set_level_fast(g_driver.gpio_num, 1);
+    
+    // 额外恢复时间 - 给弱上拉(4.7KΩ)更多时间建立信号
+    // 测试目的: 验证位反转问题是否由信号上升沿过慢导致
+    esp_rom_delay_us(5);
+    
     esp_rom_delay_us(ONE_WIRE_READ_SAMPLE);
     
     // 采样
