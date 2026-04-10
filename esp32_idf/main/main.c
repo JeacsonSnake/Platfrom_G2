@@ -1,6 +1,62 @@
 #include "main.h"
 
 //////////////////////////////////////////////////////////////
+//////////////////////// LOGIC ANALYZER INIT /////////////////
+//////////////////////////////////////////////////////////////
+
+/**
+ * @brief 初始化逻辑分析仪用于1-Wire协议调试
+ * 
+ * 使用SUMP协议通过USB-Serial与PulseView通信
+ * 采样GPIO14（1-Wire总线）的波形用于时序分析
+ * 
+ * 配置说明：
+ * - 通过 menuconfig 配置逻辑分析仪参数
+ * - Component config -> Logic Analyzer
+ * - 默认采样 GPIO14（在 menuconfig 中配置通道0为GPIO14）
+ * - 使用 SUMP 协议与 PulseView 通信
+ */
+void logic_analyzer_init(void)
+{
+#if LOGIC_ANALYZER_ENABLED
+    ESP_LOGI("LOGIC_ANALYZER", "========================================");
+    ESP_LOGI("LOGIC_ANALYZER", "Initializing Logic Analyzer...");
+    ESP_LOGI("LOGIC_ANALYZER", "========================================");
+    
+    // 配置信息提示
+    ESP_LOGI("LOGIC_ANALYZER", "Configuration:");
+    ESP_LOGI("LOGIC_ANALYZER", "  Target: ESP32-S3");
+    ESP_LOGI("LOGIC_ANALYZER", "  Protocol: SUMP (Openbench Logic Sniffer)");
+    ESP_LOGI("LOGIC_ANALYZER", "  Interface: USB-Serial/JTAG (UART0)");
+    ESP_LOGI("LOGIC_ANALYZER", "  Baud Rate: 921600");
+    ESP_LOGI("LOGIC_ANALYZER", "  Target GPIO: GPIO14 (1-Wire bus)");
+    
+    // 启动SUMP协议服务器
+    // 注意：配置通过 menuconfig 进行
+    // Component config -> Logic Analyzer
+    ESP_LOGI("LOGIC_ANALYZER", "");
+    ESP_LOGI("LOGIC_ANALYZER", "PulseView Connection Guide:");
+    ESP_LOGI("LOGIC_ANALYZER", "  1. Open PulseView");
+    ESP_LOGI("LOGIC_ANALYZER", "  2. Click 'Connect to a Device'");
+    ESP_LOGI("LOGIC_ANALYZER", "  3. Driver: Openbench Logic Sniffer & SUMP Compatibles");
+    ESP_LOGI("LOGIC_ANALYZER", "  4. Serial Port: Select ESP32-S3 COM port");
+    ESP_LOGI("LOGIC_ANALYZER", "  5. Baud Rate: 921600");
+    ESP_LOGI("LOGIC_ANALYZER", "  6. Click 'Scan for Devices'");
+    ESP_LOGI("LOGIC_ANALYZER", "  7. Select 'ESP32 with 8/16 channels'");
+    ESP_LOGI("LOGIC_ANALYZER", "");
+    ESP_LOGI("LOGIC_ANALYZER", "Starting SUMP protocol server...");
+    
+    // 启动SUMP协议任务（阻塞函数，内部创建任务）
+    logic_analyzer_sump();
+    
+    ESP_LOGI("LOGIC_ANALYZER", "Logic Analyzer initialized successfully");
+    ESP_LOGI("LOGIC_ANALYZER", "========================================");
+#else
+    ESP_LOGI("LOGIC_ANALYZER", "Logic Analyzer disabled (LOGIC_ANALYZER_ENABLED=0)");
+#endif
+}
+
+//////////////////////////////////////////////////////////////
 //////////////////////// Data Init ///////////////////////////
 //////////////////////////////////////////////////////////////
 // MQTT 客户端初始化
@@ -65,6 +121,11 @@ void app_main(void){
     } else {
         ESP_LOGE("MAIN", "MAX31850 initialization failed: %s", esp_err_to_name(ret));
     }
+
+    // 初始化逻辑分析仪（用于调试1-Wire协议波形）
+    // 使用SUMP协议通过USB-Serial与PulseView通信
+    // 注意：此函数会创建后台任务，不会阻塞
+    logic_analyzer_init();
 
     // 防止主线程结束
     while(1)

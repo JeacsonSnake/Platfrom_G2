@@ -1,0 +1,34 @@
+menu "Project Configuration"
+
+    config LOGIC_ANALYZER_ENABLED
+        bool "Enable Logic Analyzer for 1-Wire Debugging"
+        default y
+        help
+            Enable ESP32-S3 Logic Analyzer component for debugging 1-Wire protocol.
+            Uses SUMP protocol to communicate with PulseView via USB-Serial.
+    
+    config LOGIC_ANALYZER_PCLK_GPIO
+        int "PCLK GPIO (unused pin for ESP32-S3)"
+        default 15
+        range 0 48
+        help
+            ESP32-S3 requires one unused GPIO pin for PCLK (sample clock) signal.
+            This pin should not be connected to anything.
+    
+    config LOGIC_ANALYZER_SAMPLE_RATE
+        int "Default Sample Rate (Hz)"
+        default 1000000
+        range 1000 80000000
+        help
+            Default sampling rate for logic analyzer.
+            1MHz is sufficient for 1-Wire protocol (max 16.3Kbps).
+    
+    config LOGIC_ANALYZER_MAX_SAMPLES
+        int "Maximum Sample Count"
+        default 140000
+        range 1000 8000000
+        help
+            Maximum number of samples to capture.
+            ESP32-S3 can store up to ~140K samples in RAM.
+
+endmenu
