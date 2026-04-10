@@ -1,3 +1,0 @@
-[submodule "esp32_idf/components/logic_analyzer"]
-	path = esp32_idf/components/logic_analyzer
-	url = https://github.com/ok-home/logic_analyzer.git

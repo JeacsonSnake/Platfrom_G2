@@ -1,127 +1,6 @@
 #include "main.h"
 
 //////////////////////////////////////////////////////////////
-//////////////////////// LOGIC ANALYZER INIT /////////////////
-//////////////////////////////////////////////////////////////
-
-/**
- * @brief 初始化逻辑分析仪用于1-Wire协议调试
- * 
- * 支持多种模式（通过 menuconfig 配置）：
- * 
- * 【推荐】CLI 模式 (ANALYZER_USE_CLI):
- *   - USB 连接，Python 脚本采集
- *   - 单线连接，无需额外硬件
- *   - 完全兼容 ESP-IDF v5.5.2
- *   - 使用: python logic_analyzer_cli.py
- * 
- * SUMP 模式 (ANALYZER_USE_SUMP):
- *   - USB + UART 连接 PulseView
- *   - 实时分析
- *   - 需要 USB-TTL 转换器
- * 
- * Web 模式 (ANALYZER_USE_WS):
- *   - WiFi 无线连接
- *   - 浏览器访问 http://<ip>/la
- *   - ⚠️ ESP-IDF v5.5.2 存在兼容性问题
- * 
- * 默认配置：
- * - 采样 GPIO14（1-Wire 总线）
- * - PCLK 使用 GPIO15（悬空引脚）
- * 
- * 使用指南详见:
- * 2026_04_08_12_heat_test/04_10/20260410-logic-analyzer-cli-mode-guide.md
- */
-void logic_analyzer_init(void)
-{
-#if LOGIC_ANALYZER_ENABLED
-    ESP_LOGI("LOGIC_ANALYZER", "========================================");
-    ESP_LOGI("LOGIC_ANALYZER", "Initializing Logic Analyzer...");
-    ESP_LOGI("LOGIC_ANALYZER", "========================================");
-    
-    // 配置信息提示
-    ESP_LOGI("LOGIC_ANALYZER", "Configuration:");
-    ESP_LOGI("LOGIC_ANALYZER", "  Target: ESP32-S3");
-    ESP_LOGI("LOGIC_ANALYZER", "  PCLK GPIO: 15 (internal use)");
-    ESP_LOGI("LOGIC_ANALYZER", "  Channel 0: GPIO14 (1-Wire bus)");
-    
-    // 模式检测提示
-#if defined(CONFIG_ANALYZER_USE_WS)
-    ESP_LOGI("LOGIC_ANALYZER", "  Mode: WebSocket (HTTP)");
-    ESP_LOGI("LOGIC_ANALYZER", "  Interface: WiFi");
-    ESP_LOGI("LOGIC_ANALYZER", "  Access: http://<esp32-ip>/la");
-    ESP_LOGI("LOGIC_ANALYZER", "");
-    ESP_LOGI("LOGIC_ANALYZER", "NOTE: Web mode has ESP-IDF v5.5.2 compatibility issues");
-    ESP_LOGI("LOGIC_ANALYZER", "Recommended to use CLI mode instead.");
-#elif defined(CONFIG_ANALYZER_USE_CLI)
-    ESP_LOGI("LOGIC_ANALYZER", "  Mode: CLI (Command Line Interface)");
-    ESP_LOGI("LOGIC_ANALYZER", "  Interface: USB-Serial/JTAG");
-    ESP_LOGI("LOGIC_ANALYZER", "");
-    ESP_LOGI("LOGIC_ANALYZER", "CLI Usage:");
-    ESP_LOGI("LOGIC_ANALYZER", "  1. pip install pyserial");
-    ESP_LOGI("LOGIC_ANALYZER", "  2. cd components/logic_analyzer/logic_analyzer_cli");
-    ESP_LOGI("LOGIC_ANALYZER", "  3. Edit la_cfg.json: port=COMx, gpio=14");
-    ESP_LOGI("LOGIC_ANALYZER", "  4. python logic_analyzer_cli.py");
-    ESP_LOGI("LOGIC_ANALYZER", "  5. Import RowBin.bin to PulseView");
-#elif defined(CONFIG_ANALYZER_USE_SUMP)
-    ESP_LOGI("LOGIC_ANALYZER", "  Mode: SUMP Protocol");
-    ESP_LOGI("LOGIC_ANALYZER", "  Interface: UART");
-    ESP_LOGI("LOGIC_ANALYZER", "  Baud Rate: 921600");
-    ESP_LOGI("LOGIC_ANALYZER", "");
-    ESP_LOGI("LOGIC_ANALYZER", "PulseView Connection Guide:");
-    ESP_LOGI("LOGIC_ANALYZER", "  1. Open PulseView");
-    ESP_LOGI("LOGIC_ANALYZER", "  2. Driver: Openbench Logic Sniffer & SUMP");
-    ESP_LOGI("LOGIC_ANALYZER", "  3. Serial Port: ESP32 UART port");
-    ESP_LOGI("LOGIC_ANALYZER", "  4. Baud Rate: 921600");
-    ESP_LOGI("LOGIC_ANALYZER", "  5. Click 'Scan for Devices'");
-#elif defined(CONFIG_ANALYZER_USE_CLI)
-    ESP_LOGI("LOGIC_ANALYZER", "  Mode: CLI (Command Line Interface)");
-    ESP_LOGI("LOGIC_ANALYZER", "  Interface: USB-Serial/JTAG");
-    ESP_LOGI("LOGIC_ANALYZER", "");
-    ESP_LOGI("LOGIC_ANALYZER", "CLI Usage:");
-    ESP_LOGI("LOGIC_ANALYZER", "  python logic_analyzer_cli.py");
-    ESP_LOGI("LOGIC_ANALYZER", "  Import RowBin.bin to PulseView");
-#else
-    ESP_LOGW("LOGIC_ANALYZER", "  Mode: No output mode selected!");
-    ESP_LOGW("LOGIC_ANALYZER", "  Please enable one mode in menuconfig:");
-    ESP_LOGW("LOGIC_ANALYZER", "    - WebSocket (ANALYZER_USE_WS)");
-    ESP_LOGW("LOGIC_ANALYZER", "    - SUMP (ANALYZER_USE_SUMP)");
-    ESP_LOGW("LOGIC_ANALYZER", "    - CLI (ANALYZER_USE_CLI)");
-#endif
-    
-    ESP_LOGI("LOGIC_ANALYZER", "");
-    ESP_LOGI("LOGIC_ANALYZER", "1-Wire Debug Info:");
-    ESP_LOGI("LOGIC_ANALYZER", "  Target: MAX31850 on GPIO14");
-    ESP_LOGI("LOGIC_ANALYZER", "  Sample Rate: 1MHz recommended");
-    ESP_LOGI("LOGIC_ANALYZER", "  Trigger: Falling edge");
-    ESP_LOGI("LOGIC_ANALYZER", "");
-    
-    // 模式自动初始化
-    // 根据 menuconfig 自动选择对应模式
-#if defined(CONFIG_ANALYZER_USE_SUMP)
-    ESP_LOGI("LOGIC_ANALYZER", "Starting SUMP protocol server...");
-    logic_analyzer_sump();
-    ESP_LOGI("LOGIC_ANALYZER", "SUMP server started");
-#elif defined(CONFIG_ANALYZER_USE_CLI)
-    ESP_LOGI("LOGIC_ANALYZER", "CLI mode selected.");
-    ESP_LOGI("LOGIC_ANALYZER", "Connect USB and run logic_analyzer_cli.py");
-    // CLI 模式无需额外初始化，组件自动处理
-#elif defined(CONFIG_ANALYZER_USE_WS)
-    ESP_LOGI("LOGIC_ANALYZER", "WebSocket mode selected.");
-    ESP_LOGI("LOGIC_ANALYZER", "WARNING: May have compatibility issues with ESP-IDF v5.5.2");
-    ESP_LOGI("LOGIC_ANALYZER", "Web server will start after WiFi connection.");
-    // Web 服务器由 logic_analyzer 组件自动启动
-#endif
-    
-    ESP_LOGI("LOGIC_ANALYZER", "");
-    ESP_LOGI("LOGIC_ANALYZER", "Logic Analyzer initialized");
-    ESP_LOGI("LOGIC_ANALYZER", "========================================");
-#else
-    ESP_LOGI("LOGIC_ANALYZER", "Logic Analyzer disabled (LOGIC_ANALYZER_ENABLED=0)");
-#endif
-}
-
-//////////////////////////////////////////////////////////////
 //////////////////////// Data Init ///////////////////////////
 //////////////////////////////////////////////////////////////
 // MQTT 客户端初始化
@@ -186,11 +65,6 @@ void app_main(void){
     } else {
         ESP_LOGE("MAIN", "MAX31850 initialization failed: %s", esp_err_to_name(ret));
     }
-
-    // 初始化逻辑分析仪（用于调试1-Wire协议波形）
-    // 支持多种模式：Web、SUMP、CLI（通过menuconfig配置）
-    // 注意：此函数不会阻塞，根据配置自动初始化对应模式
-    logic_analyzer_init();
 
     // 防止主线程结束
     while(1)

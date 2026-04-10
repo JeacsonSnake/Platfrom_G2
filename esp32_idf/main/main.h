@@ -25,21 +25,6 @@
 #include "monitor.h"
 #include "heating_detect.h"
 
-//////////////////////////////////////////////////////////////
-//////////////////////// LOGIC ANALYZER //////////////////////
-//////////////////////////////////////////////////////////////
-// ESP32-S3 Logic Analyzer for 1-Wire Protocol Debugging
-// Uses SUMP protocol to connect with PulseView
-#include "logic_analyzer_sump.h"
-#include "logic_analyzer_hal.h"
-
-// Logic Analyzer Configuration
-// 通过 menuconfig 配置详细参数: Component config -> Logic Analyzer
-#define LOGIC_ANALYZER_ENABLED          1           // 启用逻辑分析仪
-
-// Logic Analyzer Initialization
-void logic_analyzer_init(void);
-
 
 //////////////////////////////////////////////////////////////
 //////////////////////// STATUS LED //////////////////////////
