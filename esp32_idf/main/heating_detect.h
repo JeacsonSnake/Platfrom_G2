@@ -62,7 +62,16 @@
 #define CONVERSION_TIME_MS      100
 
 /** @brief 轮询间隔（毫秒） */
-#define POLLING_INTERVAL_MS     1000
+#define POLLING_INTERVAL_MS             1000
+
+/** @brief 离线传感器重试间隔（毫秒），比正常轮询间隔更长以减少总线占用 */
+#define OFFLINE_RETRY_INTERVAL_MS       5000
+
+/** @brief 离线判定阈值，连续失败多少次后标记为离线 */
+#define OFFLINE_THRESHOLD               3
+
+/** @brief 离线传感器最大重试间隔（毫秒），指数退避上限 */
+#define OFFLINE_RETRY_MAX_MS            30000
 
 /** @brief 任务栈大小 */
 #define HEATING_TASK_STACK_SIZE 4096
@@ -146,6 +155,9 @@ typedef struct {
     uint32_t last_update_tick;      // 最后更新时间戳
     uint32_t crc_error_count;       // CRC错误计数
     uint32_t fault_count;           // 故障计数
+    uint8_t  consecutive_failures;  // 连续失败计数
+    bool     offline;               // 离线状态标志
+    uint32_t offline_retry_interval_ms;  // 当前离线重试间隔（动态调整）
 } max31850_sensor_t;
 
 /**

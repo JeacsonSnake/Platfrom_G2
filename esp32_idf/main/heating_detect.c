@@ -944,90 +944,202 @@ static uint8_t max31850_get_hw_addr_from_scratch(const max31850_scratchpad_t *sc
 //////////////////////////////////////////////////////////////
 
 /**
+ * @brief 检查传感器是否需要轮询
+ * 
+ * 根据传感器状态决定是否需要读取：
+ * - 正常传感器：每次轮询都读取
+ * - 离线传感器：按离线重试间隔读取
+ * 
+ * @param sensor 传感器状态指针
+ * @param current_tick 当前tick
+ * @return true 需要轮询
+ */
+static bool sensor_needs_polling(max31850_sensor_t *sensor, TickType_t current_tick)
+{
+    if (!sensor->present) {
+        return false;
+    }
+    
+    // 正常传感器每次都需要轮询
+    if (!sensor->offline) {
+        return true;
+    }
+    
+    // 离线传感器按重试间隔轮询
+    uint32_t elapsed_ms = (current_tick - sensor->last_update_tick) * portTICK_PERIOD_MS;
+    return (elapsed_ms >= sensor->offline_retry_interval_ms);
+}
+
+/**
+ * @brief 更新传感器离线状态
+ * 
+ * 根据读取结果更新传感器的连续失败计数和离线状态
+ * 
+ * @param sensor 传感器状态指针
+ * @param read_success 读取是否成功
+ * @param hw_addr 硬件地址（用于日志）
+ */
+static void update_sensor_offline_status(max31850_sensor_t *sensor, bool read_success, uint8_t hw_addr)
+{
+    if (read_success) {
+        // 读取成功
+        if (sensor->offline) {
+            // 从离线状态恢复
+            ESP_LOGI(TAG, "Sensor [HW_ADDR=%02d] Recovered from offline state", hw_addr);
+            sensor->offline = false;
+            sensor->offline_retry_interval_ms = OFFLINE_RETRY_INTERVAL_MS;
+        }
+        sensor->consecutive_failures = 0;
+    } else {
+        // 读取失败
+        sensor->consecutive_failures++;
+        
+        if (!sensor->offline && sensor->consecutive_failures >= OFFLINE_THRESHOLD) {
+            // 标记为离线
+            sensor->offline = true;
+            sensor->offline_retry_interval_ms = OFFLINE_RETRY_INTERVAL_MS;
+            ESP_LOGW(TAG, "Sensor [HW_ADDR=%02d] Marked as OFFLINE after %d consecutive failures",
+                     hw_addr, sensor->consecutive_failures);
+        } else if (sensor->offline) {
+            // 已经离线，指数退避增加重试间隔
+            sensor->offline_retry_interval_ms *= 2;
+            if (sensor->offline_retry_interval_ms > OFFLINE_RETRY_MAX_MS) {
+                sensor->offline_retry_interval_ms = OFFLINE_RETRY_MAX_MS;
+            }
+            ESP_LOGD(TAG, "Sensor [HW_ADDR=%02d] Offline retry interval adjusted to %lu ms",
+                     hw_addr, sensor->offline_retry_interval_ms);
+        }
+    }
+}
+
+/**
  * @brief 温度轮询任务
  * 
  * 后台任务，定期轮询所有传感器
+ * 实现离线传感器重试机制，减少对网络连接的影响：
+ * 1. 分级轮询：正常传感器高频轮询，离线传感器低频重试
+ * 2. 任务让步：在1-Wire操作之间短暂延时，允许网络任务运行
+ * 3. 指数退避：离线传感器重试间隔动态调整
  */
 static void max31850_polling_task(void *pvParameters)
 {
     (void)pvParameters;
     
-    ESP_LOGI(TAG, "Polling task started");
+    ESP_LOGI(TAG, "Polling task started (offline retry enabled)");
     
     while (1) {
-        // 触发所有传感器转换（广播模式）
-        max31850_trigger_all_conversion();
+        TickType_t current_tick = xTaskGetTickCount();
+        bool any_sensor_polled = false;
         
-        // 等待转换完成
-        vTaskDelay(pdMS_TO_TICKS(CONVERSION_TIME_MS));
-        
-        // 读取所有传感器数据
+        // 首先检查是否有任何传感器需要轮询（避免不必要的1-Wire操作）
+        bool needs_conversion = false;
         for (int i = 0; i < MAX31850_SENSOR_COUNT; i++) {
-            if (!g_driver.sensors[i].present) {
-                continue;
+            if (sensor_needs_polling(&g_driver.sensors[i], current_tick)) {
+                needs_conversion = true;
+                break;
             }
-            
-            max31850_scratchpad_t scratch;
-            
-            if (xSemaphoreTake(g_driver.mutex, pdMS_TO_TICKS(100)) != pdTRUE) {
-                continue;
-            }
-            
-            bool read_ok = max31850_read_scratchpad(&g_driver.sensors[i].rom_id, &scratch);
-            
-            if (!read_ok) {
-                ESP_LOGW(TAG, "Sensor [HW_ADDR=%02d] CRC Error: CRC verification failed", i);
-                g_driver.sensors[i].crc_error_count++;
-                xSemaphoreGive(g_driver.mutex);
-                continue;
-            }
-            
-            // 检查故障
-            max31850_fault_t fault = max31850_get_fault(&scratch);
-            g_driver.sensors[i].fault = fault;
-            
-            if (fault != MAX31850_FAULT_NONE) {
-                g_driver.sensors[i].fault_count++;
-                
-                if (fault & MAX31850_FAULT_OC) {
-                    ESP_LOGW(TAG, "Sensor [HW_ADDR=%02d] FAULT: Thermocouple Open Circuit", i);
-                }
-                if (fault & MAX31850_FAULT_SCG) {
-                    ESP_LOGW(TAG, "Sensor [HW_ADDR=%02d] FAULT: Thermocouple Short to GND", i);
-                }
-                if (fault & MAX31850_FAULT_SCV) {
-                    ESP_LOGW(TAG, "Sensor [HW_ADDR=%02d] FAULT: Thermocouple Short to VCC", i);
-                }
-            }
-            
-            // 解析温度
-            float temp, cj_temp;
-            if (max31850_parse_temperature(&scratch, &temp)) {
-                g_driver.sensors[i].thermocouple_temp = temp;
-            }
-            
-            if (max31850_parse_cold_junction(&scratch, &cj_temp)) {
-                g_driver.sensors[i].cold_junction_temp = cj_temp;
-            }
-            
-            g_driver.sensors[i].last_update_tick = xTaskGetTickCount();
-            
-            // 验证硬件地址
-            uint8_t hw_from_config = max31850_get_hw_addr_from_scratch(&scratch);
-            if (hw_from_config != g_driver.sensors[i].hw_addr) {
-                ESP_LOGW(TAG, "Sensor [HW_ADDR=%02d] Address mismatch: Config=0x%02X, Expected=%d",
-                         i, scratch.config, g_driver.sensors[i].hw_addr);
-            }
-            
-            ESP_LOGI(TAG, "Sensor [HW_ADDR=%02d]: Temp=%.2fC, CJ=%.2fC",
-                     i, g_driver.sensors[i].thermocouple_temp,
-                     g_driver.sensors[i].cold_junction_temp);
-            
-            xSemaphoreGive(g_driver.mutex);
         }
         
-        // 等待下一次轮询
-        vTaskDelay(pdMS_TO_TICKS(POLLING_INTERVAL_MS - CONVERSION_TIME_MS));
+        // 如果有传感器需要轮询，触发温度转换
+        if (needs_conversion) {
+            // 触发所有传感器转换（广播模式）
+            max31850_trigger_all_conversion();
+            
+            // 等待转换完成 - 在此期间网络任务可以正常运行
+            vTaskDelay(pdMS_TO_TICKS(CONVERSION_TIME_MS));
+            
+            // 逐个读取传感器数据
+            for (int i = 0; i < MAX31850_SENSOR_COUNT; i++) {
+                // 检查是否需要轮询此传感器
+                if (!sensor_needs_polling(&g_driver.sensors[i], xTaskGetTickCount())) {
+                    continue;
+                }
+                
+                any_sensor_polled = true;
+                max31850_scratchpad_t scratch;
+                bool read_ok = false;
+                
+                // 短暂的任务让步，允许网络任务处理数据
+                // 这可以减少1-Wire操作对MQTT的影响
+                if (i > 0) {
+                    vTaskDelay(pdMS_TO_TICKS(5));
+                }
+                
+                if (xSemaphoreTake(g_driver.mutex, pdMS_TO_TICKS(100)) != pdTRUE) {
+                    ESP_LOGW(TAG, "Sensor [HW_ADDR=%02d] Mutex timeout", i);
+                    continue;
+                }
+                
+                read_ok = max31850_read_scratchpad(&g_driver.sensors[i].rom_id, &scratch);
+                
+                if (!read_ok) {
+                    g_driver.sensors[i].crc_error_count++;
+                    ESP_LOGW(TAG, "Sensor [HW_ADDR=%02d] CRC Error (failure %d/%d)", 
+                             i, g_driver.sensors[i].consecutive_failures + 1, OFFLINE_THRESHOLD);
+                } else {
+                    // 检查故障
+                    max31850_fault_t fault = max31850_get_fault(&scratch);
+                    g_driver.sensors[i].fault = fault;
+                    
+                    if (fault != MAX31850_FAULT_NONE) {
+                        g_driver.sensors[i].fault_count++;
+                        
+                        if (fault & MAX31850_FAULT_OC) {
+                            ESP_LOGW(TAG, "Sensor [HW_ADDR=%02d] FAULT: Thermocouple Open Circuit", i);
+                        }
+                        if (fault & MAX31850_FAULT_SCG) {
+                            ESP_LOGW(TAG, "Sensor [HW_ADDR=%02d] FAULT: Thermocouple Short to GND", i);
+                        }
+                        if (fault & MAX31850_FAULT_SCV) {
+                            ESP_LOGW(TAG, "Sensor [HW_ADDR=%02d] FAULT: Thermocouple Short to VCC", i);
+                        }
+                    }
+                    
+                    // 解析温度
+                    float temp, cj_temp;
+                    if (max31850_parse_temperature(&scratch, &temp)) {
+                        g_driver.sensors[i].thermocouple_temp = temp;
+                    }
+                    
+                    if (max31850_parse_cold_junction(&scratch, &cj_temp)) {
+                        g_driver.sensors[i].cold_junction_temp = cj_temp;
+                    }
+                    
+                    // 验证硬件地址
+                    uint8_t hw_from_config = max31850_get_hw_addr_from_scratch(&scratch);
+                    if (hw_from_config != g_driver.sensors[i].hw_addr) {
+                        ESP_LOGW(TAG, "Sensor [HW_ADDR=%02d] Address mismatch: Config=0x%02X, Expected=%d",
+                                 i, scratch.config, g_driver.sensors[i].hw_addr);
+                    }
+                    
+                    ESP_LOGI(TAG, "Sensor [HW_ADDR=%02d]: Temp=%.2fC, CJ=%.2fC%s",
+                             i, g_driver.sensors[i].thermocouple_temp,
+                             g_driver.sensors[i].cold_junction_temp,
+                             g_driver.sensors[i].offline ? " [RECOVERED]" : "");
+                }
+                
+                // 更新离线状态
+                update_sensor_offline_status(&g_driver.sensors[i], read_ok, i);
+                
+                if (read_ok) {
+                    g_driver.sensors[i].last_update_tick = xTaskGetTickCount();
+                }
+                
+                xSemaphoreGive(g_driver.mutex);
+            }
+        }
+        
+        // 计算下一次轮询的延时
+        // 如果有传感器被轮询，使用标准间隔；否则短暂延时后再次检查
+        uint32_t delay_ms;
+        if (any_sensor_polled) {
+            delay_ms = POLLING_INTERVAL_MS - CONVERSION_TIME_MS;
+        } else {
+            // 没有传感器需要轮询（可能都离线且未到重试时间），短暂休眠
+            delay_ms = 100;  // 100ms后再次检查
+        }
+        
+        vTaskDelay(pdMS_TO_TICKS(delay_ms));
     }
 }
 
@@ -1100,6 +1212,9 @@ esp_err_t max31850_init(gpio_num_t gpio_num)
     for (int i = 0; i < MAX31850_SENSOR_COUNT; i++) {
         g_driver.sensors[i].present = false;
         g_driver.sensors[i].hw_addr = i;
+        g_driver.sensors[i].offline = false;
+        g_driver.sensors[i].consecutive_failures = 0;
+        g_driver.sensors[i].offline_retry_interval_ms = OFFLINE_RETRY_INTERVAL_MS;
     }
     
     // 等待总线稳定（DataSheet: 上电后等待10ms）
@@ -1338,6 +1453,8 @@ void max31850_print_sensor_info(void)
     ESP_LOGI(TAG, "========== MAX31850 Sensor Info ==========");
     ESP_LOGI(TAG, "Total sensors found: %d", g_driver.sensor_count);
     ESP_LOGI(TAG, "GPIO: %d", g_driver.gpio_num);
+    ESP_LOGI(TAG, "Offline threshold: %d, Retry interval: %d ms", 
+             OFFLINE_THRESHOLD, OFFLINE_RETRY_INTERVAL_MS);
     
     for (int i = 0; i < MAX31850_SENSOR_COUNT; i++) {
         max31850_sensor_t *sensor = &g_driver.sensors[i];
@@ -1352,6 +1469,11 @@ void max31850_print_sensor_info(void)
                      sensor->rom_id.bytes[2], sensor->rom_id.bytes[3],
                      sensor->rom_id.bytes[4], sensor->rom_id.bytes[5],
                      sensor->rom_id.bytes[6], sensor->rom_id.bytes[7]);
+            ESP_LOGI(TAG, "  Status: %s", sensor->offline ? "OFFLINE" : "ONLINE");
+            if (sensor->offline) {
+                ESP_LOGI(TAG, "  Retry Interval: %lu ms", sensor->offline_retry_interval_ms);
+            }
+            ESP_LOGI(TAG, "  Consecutive Failures: %d", sensor->consecutive_failures);
             ESP_LOGI(TAG, "  Temperature: %.2f C", sensor->thermocouple_temp);
             ESP_LOGI(TAG, "  Cold Junction: %.2f C", sensor->cold_junction_temp);
             ESP_LOGI(TAG, "  Fault: 0x%02X (%s)", sensor->fault,
