@@ -73,6 +73,15 @@
 /** @brief 离线传感器最大重试间隔（毫秒），指数退避上限 */
 #define OFFLINE_RETRY_MAX_MS            30000
 
+/** @brief ROM搜索重试间隔（毫秒），用于定期重新搜索未发现的设备 */
+#define ROM_SEARCH_RETRY_INTERVAL_MS    10000
+
+/** @brief 已知传感器总数（硬件固定4个） */
+#define EXPECTED_SENSOR_COUNT           4
+
+/** @brief 允许CRC失败的设备（在已知硬件配置下使用Family Code验证） */
+#define ALLOW_CRC_FAILURE_DEVICES       1
+
 /** @brief 任务栈大小 */
 #define HEATING_TASK_STACK_SIZE 4096
 
@@ -158,6 +167,7 @@ typedef struct {
     uint8_t  consecutive_failures;  // 连续失败计数
     bool     offline;               // 离线状态标志
     uint32_t offline_retry_interval_ms;  // 当前离线重试间隔（动态调整）
+    bool     crc_valid;             // ROM CRC是否有效
 } max31850_sensor_t;
 
 /**

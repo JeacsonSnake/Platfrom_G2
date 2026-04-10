@@ -545,9 +545,10 @@ static void max31850_skip_rom(void)
  * 
  * @param rom 输出ROM ID
  * @param last_discrepancy 上次分歧位置
- * @return true 找到设备
+ * @param crc_ok 输出参数，指示ROM CRC是否有效（可为NULL）
+ * @return true 找到设备（Family Code正确即视为有效设备）
  */
-static bool one_wire_search_rom(max31850_rom_id_t *rom, int *last_discrepancy)
+static bool one_wire_search_rom(max31850_rom_id_t *rom, int *last_discrepancy, bool *crc_ok)
 {
     int id_bit_number = 1;
     int last_zero = 0;
@@ -649,12 +650,51 @@ static bool one_wire_search_rom(max31850_rom_id_t *rom, int *last_discrepancy)
 #endif
     
     // 验证ROM CRC
-    bool crc_ok = verify_rom_crc(rom);
+    bool crc_valid = verify_rom_crc(rom);
 #if MAX31850_DEBUG_ROM_SEARCH
-    ESP_LOGI(TAG, "  CRC check: %s", crc_ok ? "PASS" : "FAIL");
+    ESP_LOGI(TAG, "  CRC check: %s", crc_valid ? "PASS" : "FAIL");
 #endif
     
-    return crc_ok;
+    // 验证Family Code
+    bool family_ok = (rom->family_code == MAX31850_FAMILY_CODE);
+    if (!family_ok) {
+        ESP_LOGW(TAG, "  Family Code mismatch: 0x%02X (expected 0x%02X)", 
+                 rom->family_code, MAX31850_FAMILY_CODE);
+        return false;
+    }
+    
+    // 输出CRC状态
+    if (crc_ok != NULL) {
+        *crc_ok = crc_valid;
+    }
+    
+    // 在已知硬件配置下，允许CRC失败的设备
+    // 只要Family Code正确就视为有效设备
+#if ALLOW_CRC_FAILURE_DEVICES
+    if (!crc_valid) {
+        ESP_LOGW(TAG, "  CRC failed but Family Code valid (0x%02X), accepting device", 
+                 rom->family_code);
+    }
+    return true;
+#else
+    return crc_valid;
+#endif
+}
+
+/**
+ * @brief 根据ROM ID获取硬件地址（使用CRC作为区分）
+ * 
+ * 在已知4传感器硬件配置下，使用ROM CRC的低2位作为硬件地址
+ * 这是一种简化方案，假设每个传感器有唯一的CRC值
+ * 
+ * @param rom ROM ID
+ * @return 硬件地址 (0-3)
+ */
+static uint8_t get_hw_addr_from_rom(const max31850_rom_id_t *rom)
+{
+    // 使用序列号的低几位来确定地址
+    // 假设4个传感器的序列号不同，可以使用serial[0] & 0x03
+    return (rom->serial[0] & 0x03) % MAX31850_SENSOR_COUNT;
 }
 
 /**
@@ -669,35 +709,40 @@ static uint8_t max31850_search_all(void)
     uint8_t found_count = 0;
     bool last_device = false;
     
-    // 临时存储发现的ROM ID
+    // 临时存储发现的ROM ID和CRC状态
     max31850_rom_id_t found_roms[MAX31850_SENSOR_COUNT];
+    bool found_crc_ok[MAX31850_SENSOR_COUNT];
+    
+    ESP_LOGI(TAG, "=== ROM Search All (expecting %d sensors) ===", EXPECTED_SENSOR_COUNT);
     
     while (!last_device && found_count < MAX31850_SENSOR_COUNT) {
         memset(&rom, 0, sizeof(rom));
+        bool crc_valid = false;
         
-        if (!one_wire_search_rom(&rom, &last_discrepancy)) {
+        if (!one_wire_search_rom(&rom, &last_discrepancy, &crc_valid)) {
             break;
         }
         
-        // 检查家族码
-        if (rom.family_code != MAX31850_FAMILY_CODE) {
-            ESP_LOGW(TAG, "Unknown family code: 0x%02X", rom.family_code);
-            continue;
-        }
-        
-        // 保存ROM ID
+        // 保存ROM ID和CRC状态
         found_roms[found_count] = rom;
+        found_crc_ok[found_count] = crc_valid;
         found_count++;
+        
+        ESP_LOGI(TAG, "  Found device %d: Family=0x%02X, CRC=%s", 
+                 found_count, rom.family_code, crc_valid ? "OK" : "FAIL");
         
         // 检查是否是最后一个设备
         last_device = (last_discrepancy == 0);
     }
     
-    // 现在读取每个设备的scratchpad，获取硬件地址，建立映射
+    ESP_LOGI(TAG, "  Total devices found: %d (expected: %d)", found_count, EXPECTED_SENSOR_COUNT);
+    
+    // 建立ROM到硬件地址的映射
     for (int i = 0; i < found_count; i++) {
         max31850_scratchpad_t scratch;
+        uint8_t hw_addr = 0xFF;
         
-        // 选择设备并读取scratchpad
+        // 尝试读取scratchpad获取硬件地址
         max31850_match_rom(&found_roms[i]);
         one_wire_write_byte(MAX31850_CMD_READ_SCRATCH);
         
@@ -705,47 +750,75 @@ static uint8_t max31850_search_all(void)
             scratch.bytes[j] = one_wire_read_byte();
         }
         
-        // 验证CRC
-        if (!verify_scratchpad_crc(&scratch)) {
-            ESP_LOGW(TAG, "CRC error during address mapping");
-            continue;
-        }
-        
-        // 从Config寄存器获取硬件地址 (Byte 4的低4位)
-        // MAX31850KATB+: AD0/AD1引脚决定硬件地址
-        // AD0=GND,AD1=GND -> 0xF0 -> 位置0
-        // AD0=3.3V,AD1=GND -> 0xF1 -> 位置1
-        // AD0=GND,AD1=3.3V -> 0xF2 -> 位置2
-        // AD0=3.3V,AD1=3.3V -> 0xF3 -> 位置3
-        uint8_t hw_addr = scratch.config & 0x0F;
-        
-        // 映射到数组索引 (0xF0-0xF3 -> 0-3)
-        if (hw_addr <= 0x03) {
-            // 有些版本使用0x00-0x03，直接作为索引
-            // 不做转换
-        } else if (hw_addr >= 0xF0 && hw_addr <= 0xF3) {
-            // 转换为0-3
-            hw_addr -= 0xF0;
+        // 尝试从Config寄存器获取硬件地址
+        if (verify_scratchpad_crc(&scratch)) {
+            uint8_t config_addr = scratch.config & 0x0F;
+            if (config_addr >= 0xF0 && config_addr <= 0xF3) {
+                hw_addr = config_addr - 0xF0;
+            } else if (config_addr <= 0x03) {
+                hw_addr = config_addr;
+            }
+            ESP_LOGI(TAG, "  Device %d: HW addr from scratchpad = %d", i, hw_addr);
         } else {
-            ESP_LOGW(TAG, "Invalid HW address: 0x%02X, using index %d", hw_addr, i);
-            hw_addr = i;
+            // 如果scratchpad CRC失败，使用ROM-based地址分配
+            hw_addr = get_hw_addr_from_rom(&found_roms[i]);
+            ESP_LOGW(TAG, "  Device %d: Scratchpad CRC fail, using ROM-based addr = %d", i, hw_addr);
         }
         
+        // 确保地址不冲突
         if (hw_addr < MAX31850_SENSOR_COUNT) {
+            // 检查是否已有设备使用此地址
+            if (g_driver.sensors[hw_addr].present) {
+                // 寻找下一个可用地址
+                for (int j = 0; j < MAX31850_SENSOR_COUNT; j++) {
+                    if (!g_driver.sensors[j].present) {
+                        hw_addr = j;
+                        break;
+                    }
+                }
+            }
+            
             g_driver.sensors[hw_addr].rom_id = found_roms[i];
             g_driver.sensors[hw_addr].hw_addr = hw_addr;
             g_driver.sensors[hw_addr].present = true;
-            ESP_LOGI(TAG, "Sensor [%d]: ROM=0x%02X%02X%02X%02X%02X%02X%02X%02X, HW_ADDR=%d, Location confirmed",
+            g_driver.sensors[hw_addr].crc_valid = found_crc_ok[i];
+            
+            ESP_LOGI(TAG, "Sensor [%d]: ROM=0x%02X%02X%02X%02X%02X%02X%02X%02X, HW_ADDR=%d, CRC_VALID=%d",
                      hw_addr,
                      found_roms[i].bytes[0], found_roms[i].bytes[1],
                      found_roms[i].bytes[2], found_roms[i].bytes[3],
                      found_roms[i].bytes[4], found_roms[i].bytes[5],
                      found_roms[i].bytes[6], found_roms[i].bytes[7],
-                     hw_addr);
+                     hw_addr, found_crc_ok[i]);
         }
     }
     
     return found_count;
+}
+
+/**
+ * @brief 检查是否需要重新搜索ROM
+ * 
+ * 在已知4传感器硬件配置下，如果发现的设备少于4个，定期重新搜索
+ * 
+ * @return true 需要重新搜索
+ */
+static bool needs_rom_res_search(void)
+{
+    if (g_driver.sensor_count >= EXPECTED_SENSOR_COUNT) {
+        return false;
+    }
+    
+    static TickType_t last_search_tick = 0;
+    TickType_t current_tick = xTaskGetTickCount();
+    
+    if (last_search_tick == 0 || 
+        (current_tick - last_search_tick) * portTICK_PERIOD_MS >= ROM_SEARCH_RETRY_INTERVAL_MS) {
+        last_search_tick = current_tick;
+        return true;
+    }
+    
+    return false;
 }
 
 //////////////////////////////////////////////////////////////
@@ -1129,6 +1202,19 @@ static void max31850_polling_task(void *pvParameters)
             }
         }
         
+        // 检查是否需要重新搜索ROM（在设备未完全发现时）
+        if (needs_rom_res_search()) {
+            ESP_LOGI(TAG, "ROM res search triggered (found %d/%d sensors)", 
+                     g_driver.sensor_count, EXPECTED_SENSOR_COUNT);
+            
+            uint8_t new_count = max31850_search_all();
+            if (new_count > g_driver.sensor_count) {
+                ESP_LOGI(TAG, "ROM res search found new devices: %d -> %d", 
+                         g_driver.sensor_count, new_count);
+                g_driver.sensor_count = new_count;
+            }
+        }
+        
         // 计算下一次轮询的延时
         // 如果有传感器被轮询，使用标准间隔；否则短暂延时后再次检查
         uint32_t delay_ms;
@@ -1215,6 +1301,7 @@ esp_err_t max31850_init(gpio_num_t gpio_num)
         g_driver.sensors[i].offline = false;
         g_driver.sensors[i].consecutive_failures = 0;
         g_driver.sensors[i].offline_retry_interval_ms = OFFLINE_RETRY_INTERVAL_MS;
+        g_driver.sensors[i].crc_valid = false;
     }
     
     // 等待总线稳定（DataSheet: 上电后等待10ms）
@@ -1451,10 +1538,12 @@ void max31850_print_sensor_info(void)
     }
     
     ESP_LOGI(TAG, "========== MAX31850 Sensor Info ==========");
-    ESP_LOGI(TAG, "Total sensors found: %d", g_driver.sensor_count);
+    ESP_LOGI(TAG, "Total sensors found: %d (expected: %d)", g_driver.sensor_count, EXPECTED_SENSOR_COUNT);
     ESP_LOGI(TAG, "GPIO: %d", g_driver.gpio_num);
     ESP_LOGI(TAG, "Offline threshold: %d, Retry interval: %d ms", 
              OFFLINE_THRESHOLD, OFFLINE_RETRY_INTERVAL_MS);
+    ESP_LOGI(TAG, "ROM res search interval: %d ms", ROM_SEARCH_RETRY_INTERVAL_MS);
+    ESP_LOGI(TAG, "Allow CRC failure devices: %s", ALLOW_CRC_FAILURE_DEVICES ? "YES" : "NO");
     
     for (int i = 0; i < MAX31850_SENSOR_COUNT; i++) {
         max31850_sensor_t *sensor = &g_driver.sensors[i];
@@ -1469,6 +1558,7 @@ void max31850_print_sensor_info(void)
                      sensor->rom_id.bytes[2], sensor->rom_id.bytes[3],
                      sensor->rom_id.bytes[4], sensor->rom_id.bytes[5],
                      sensor->rom_id.bytes[6], sensor->rom_id.bytes[7]);
+            ESP_LOGI(TAG, "  ROM CRC Valid: %s", sensor->crc_valid ? "YES" : "NO (Family Code verified)");
             ESP_LOGI(TAG, "  Status: %s", sensor->offline ? "OFFLINE" : "ONLINE");
             if (sensor->offline) {
                 ESP_LOGI(TAG, "  Retry Interval: %lu ms", sensor->offline_retry_interval_ms);
