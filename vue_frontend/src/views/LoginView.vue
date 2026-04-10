@@ -18,11 +18,7 @@
             </div>
         </div>
         <div class="field">
-<<<<<<< HEAD
-            <label>Passwrod</label>
-=======
             <label>Password</label>
->>>>>>> s-codeRunTesting
             <div class="control">
                 <input class="input" name="password" :type="this.show_password ? 'text' : 'password'" v-model="this.data.password">
             </div>

@@ -8,6 +8,7 @@ import MyAccountView from '../views/MyAccount.vue'
 import ChangePasswordView from '../views/ChangePassword.vue'
 import SpinningView from '../views/Dashboard/Spinning.vue'
 import WebsocketView from '../views/Dashboard/Websocket.vue'
+import RecipeDemoView from '../views/Dashboard/RecipeDemo.vue'
 
 import store from '../store'
 
@@ -20,11 +21,7 @@ const router = createRouter({
       component: HomeView,
     },
     {
-<<<<<<< HEAD
-      path: '/test/',
-=======
       path: '/test',
->>>>>>> s-codeRunTesting
       name: 'test',
       component: TestView,
       meta: {
@@ -80,20 +77,18 @@ const router = createRouter({
       meta:{
         requireLogin: true
       }
+    },
+    {
+      path: '/dashboard/material-demo',
+      name: 'material-demo',
+      component: RecipeDemoView,
+      meta:{
+        requireLogin: true
+      }
     }
   ]
 })
 
-<<<<<<< HEAD
-router.beforeEach((to, from, next) => {
-  if(to.matched.some(record => record.meta.requireLogin) && !store.state.is_auth){
-    next('/login')
-  }
-  else{
-    next()
-  }
-})
-=======
 // router.beforeEach((to, from, next) => {
 //   if(to.matched.some(record => record.meta.requireLogin) && !store.state.is_auth){
 //     next('/login')
@@ -102,6 +97,5 @@ router.beforeEach((to, from, next) => {
 //     next()
 //   }
 // })
->>>>>>> s-codeRunTesting
 
 export default router

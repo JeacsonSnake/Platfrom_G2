@@ -1,15 +1,16 @@
 from rest_framework import status
-<<<<<<< HEAD
-from rest_framework.decorators import api_view
-=======
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
->>>>>>> s-codeRunTesting
 from rest_framework.response import Response
+from django.db import transaction
 
-from .models import Task, MotorControl, User, Motor, Spinning
+from .models import (
+    Task, MotorControl, User, Motor, Spinning, ExperimentProcess,
+    MaterialType, MaterialRecipe, RecipeStep, BatchJob, BatchStepExecution, CommandOutbox
+)
 from .serializer import TaskSerializer, MotorControlSerializer, UserSerializer, LoginRecordSerializer, \
-    SpinningSerializer
+    SpinningSerializer, ExperimentProcessSerializer, MaterialTypeSerializer, MaterialRecipeSerializer, \
+    RecipeStepSerializer, BatchJobSerializer, BatchStepExecutionSerializer, CommandOutboxSerializer
 from django.contrib.auth.hashers import make_password, check_password
 from django.http import JsonResponse
 from datetime import datetime
@@ -17,10 +18,11 @@ from django.utils import timezone
 
 from .token import create_token, check_token, token_auth
 
-from .mqtt import client as mqtt_client
+from .mqtt import publish_device_command, mqtt_client_available
 
 import requests
 import base64
+from decimal import Decimal
 
 
 @api_view(['GET', 'POST'])
@@ -185,12 +187,6 @@ def mqtt_msg(request):
 @api_view(['GET'])
 def device_list(request):
     # 限制只接受一页，并且每页上限50个设备
-<<<<<<< HEAD
-    url = "http://localhost:18083/api/v5/clients?page=1&limit=50&node=emqx%40127.0.0.1"
-    # EMQX 的密钥信息
-    api_key = "14d39e44d739b1d9"
-    secret_key = "DrXETy29CGKJnUHWMTQauKnOYzBN9A65z5Yw4FiUMpt9BC"
-=======
     # url = "http://localhost:18083/api/v5/clients?page=1&limit=50&node=emqx%40127.0.0.1"
     url = "http://192.168.233.100:18083/api/v5/clients?page=1&limit=50&node=emqx%40127.0.0.1"
     # EMQX 的密钥信息
@@ -199,7 +195,6 @@ def device_list(request):
     
     # api_key = "d339f651ca2aafd5"
     # secret_key = "yqsTFKpr49BQcAHfZMzZFCunR1UnmmFw7EnXDS5DmsBF"
->>>>>>> s-codeRunTesting
 
     # 使用Base64方式加密密钥对
     credentials = f"{api_key}:{secret_key}"
@@ -219,3 +214,366 @@ def device_list(request):
         return JsonResponse(connections, safe=False)
     except requests.exceptions.RequestException as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@api_view(['GET', 'POST'])
+def experiment_process_list(request):
+    if request.method == 'GET':
+        records = ExperimentProcess.objects.all().order_by('-created_at')
+        serializer = ExperimentProcessSerializer(records, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    serializer = ExperimentProcessSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
+def experiment_process_detail(request, experiment_id):
+    try:
+        record = ExperimentProcess.objects.get(experiment_id=experiment_id)
+    except ExperimentProcess.DoesNotExist:
+        return Response({'detail': 'Experiment not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = ExperimentProcessSerializer(record)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    if request.method == 'DELETE':
+        record.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    partial = request.method == 'PATCH'
+    serializer = ExperimentProcessSerializer(record, data=request.data, partial=partial)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'POST'])
+def material_type_list(request):
+    if request.method == 'GET':
+        records = MaterialType.objects.all().order_by('name')
+        serializer = MaterialTypeSerializer(records, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    serializer = MaterialTypeSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'POST'])
+def material_recipe_list(request):
+    if request.method == 'GET':
+        records = MaterialRecipe.objects.all().order_by('-updated_at')
+        serializer = MaterialRecipeSerializer(records, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    serializer = MaterialRecipeSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def material_recipe_detail(request, recipe_id):
+    try:
+        record = MaterialRecipe.objects.get(id=recipe_id)
+    except MaterialRecipe.DoesNotExist:
+        return Response({'detail': 'Recipe not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = MaterialRecipeSerializer(record)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET', 'POST'])
+def recipe_step_list_create(request, recipe_id):
+    try:
+        recipe = MaterialRecipe.objects.get(id=recipe_id)
+    except MaterialRecipe.DoesNotExist:
+        return Response({'detail': 'Recipe not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        steps = RecipeStep.objects.filter(recipe=recipe).order_by('step_no', 'id')
+        serializer = RecipeStepSerializer(steps, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    data = request.data.copy()
+    data['recipe'] = recipe.id
+    serializer = RecipeStepSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def _build_planned_parameters(recipe, overrides):
+    def _jsonable(value):
+        if isinstance(value, Decimal):
+            return float(value)
+        return value
+
+    planned = {
+        'dmac_dosage_ml': _jsonable(recipe.dmac_dosage_ml),
+        'water_dosage_ml': _jsonable(recipe.water_dosage_ml),
+        'solvent_ph': _jsonable(recipe.solvent_ph),
+        'reaction_temperature_c': _jsonable(recipe.reaction_temperature_c),
+        'stirring_speed_rpm': _jsonable(recipe.stirring_speed_rpm),
+        'stirring_duration_min': _jsonable(recipe.stirring_duration_min),
+    }
+    for key, value in (overrides or {}).items():
+        if key in planned:
+            planned[key] = _jsonable(value)
+    return planned
+
+
+def _build_step_command_payload(recipe_step, planned_parameters):
+    payload = {
+        'step_no': recipe_step.step_no,
+        'step_type': recipe_step.step_type,
+        'name': recipe_step.name or f'Step {recipe_step.step_no}',
+        'parameters': recipe_step.parameters or {},
+        'planned_parameters': planned_parameters,
+    }
+    return payload
+
+
+def _coerce_positive_int(value, default=None):
+    if value is None or value == '':
+        return default
+    return max(int(float(value)), 0)
+
+
+def _resolve_motor_command(step_execution):
+    payload = step_execution.command_payload or {}
+    parameters = payload.get('parameters') or {}
+    planned = payload.get('planned_parameters') or {}
+
+    motor = parameters.get('motor')
+    if motor is None:
+        motor = parameters.get('motor_index', 0)
+
+    speed = parameters.get('speed')
+    if speed is None and parameters.get('speed_key'):
+        speed = planned.get(parameters.get('speed_key'))
+    if speed is None:
+        speed = planned.get('stirring_speed_rpm')
+
+    duration = parameters.get('duration_sec')
+    if duration is None and parameters.get('duration_key'):
+        duration = planned.get(parameters.get('duration_key'))
+    if duration is None:
+        duration_min = planned.get('stirring_duration_min')
+        if duration_min is not None:
+            duration = float(duration_min) * 60
+
+    motor = _coerce_positive_int(motor, 0)
+    speed = _coerce_positive_int(speed)
+    duration = _coerce_positive_int(duration)
+    if speed is None or duration is None:
+        raise ValueError('Motor step is missing speed or duration.')
+
+    topic = parameters.get('topic', 'esp32_1/control')
+    raw_payload = f'cmd_{motor}_{speed}_{duration}'
+
+    return {
+        'topic': topic,
+        'payload': raw_payload,
+        'transport': 'mqtt',
+        'device': parameters.get('device', 'esp32'),
+        'command_type': 'motor_cmd'
+    }
+
+
+def _resolve_generic_command(step_execution):
+    payload = step_execution.command_payload or {}
+    parameters = payload.get('parameters') or {}
+    topic = parameters.get('topic')
+    if not topic:
+        raise ValueError('Step parameters must define a topic for generic dispatch.')
+
+    generic_payload = {
+        'job_id': step_execution.job_id,
+        'step_execution_id': step_execution.id,
+        'step_no': payload.get('step_no'),
+        'step_type': payload.get('step_type'),
+        'name': payload.get('name'),
+        'parameters': parameters,
+        'planned_parameters': payload.get('planned_parameters') or {}
+    }
+    return {
+        'topic': topic,
+        'payload': generic_payload,
+        'transport': 'mqtt',
+        'device': parameters.get('device', 'generic'),
+        'command_type': 'generic_json'
+    }
+
+
+def _resolve_dispatch_command(step_execution):
+    step_type = step_execution.command_payload.get('step_type')
+    if step_type in ['STIR', 'DISPENSE']:
+        return _resolve_motor_command(step_execution)
+    return _resolve_generic_command(step_execution)
+
+
+@api_view(['POST'])
+def batch_job_create(request):
+    recipe_id = request.data.get('recipe_id')
+    if not recipe_id:
+        return Response({'recipe_id': ['This field is required.']}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        recipe = MaterialRecipe.objects.get(id=recipe_id)
+    except MaterialRecipe.DoesNotExist:
+        return Response({'detail': 'Recipe not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    overrides = request.data.get('overrides') or {}
+    if not isinstance(overrides, dict):
+        return Response({'overrides': ['Must be a JSON object.']}, status=status.HTTP_400_BAD_REQUEST)
+
+    operator = request.data.get('operator')
+    planned_parameters = _build_planned_parameters(recipe, overrides)
+    recipe_steps = list(RecipeStep.objects.filter(recipe=recipe).order_by('step_no', 'id'))
+    if not recipe_steps:
+        return Response({'detail': 'Recipe has no steps configured.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    with transaction.atomic():
+        job = BatchJob.objects.create(
+            recipe=recipe,
+            status='PENDING',
+            operator=operator,
+            planned_parameters=planned_parameters,
+            overrides=overrides,
+        )
+
+        execution_records = []
+        for step in recipe_steps:
+            payload = _build_step_command_payload(step, planned_parameters)
+            execution_records.append(
+                BatchStepExecution(
+                    job=job,
+                    recipe_step=step,
+                    status='PENDING',
+                    command_payload=payload,
+                )
+            )
+        BatchStepExecution.objects.bulk_create(execution_records)
+
+    serializer = BatchJobSerializer(job)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+def batch_job_start(request, job_id):
+    try:
+        job = BatchJob.objects.get(id=job_id)
+    except BatchJob.DoesNotExist:
+        return Response({'detail': 'Job not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    if job.status not in ['PENDING', 'PAUSED']:
+        return Response({'detail': f'Job cannot be started from status {job.status}.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    dispatched_messages = []
+    failed_steps = []
+
+    with transaction.atomic():
+        now = timezone.now()
+        if not job.started_at:
+            job.started_at = now
+        job.status = 'RUNNING'
+        job.error_message = None
+        job.save(update_fields=['status', 'error_message', 'started_at', 'updated_at'])
+
+        pending_steps = BatchStepExecution.objects.filter(job=job, status='PENDING').order_by('id')
+        for step_execution in pending_steps:
+            try:
+                dispatch = _resolve_dispatch_command(step_execution)
+                outbox = CommandOutbox.objects.create(
+                    job=job,
+                    step_execution=step_execution,
+                    topic=dispatch['topic'],
+                    payload={
+                        'transport': dispatch['transport'],
+                        'device': dispatch['device'],
+                        'command_type': dispatch['command_type'],
+                        'body': dispatch['payload'],
+                    },
+                    status='QUEUED',
+                )
+                publish_device_command(dispatch['topic'], dispatch['payload'])
+                outbox.status = 'SENT'
+                outbox.sent_at = timezone.now()
+                outbox.save(update_fields=['status', 'sent_at', 'updated_at'])
+
+                step_execution.status = 'RUNNING'
+                step_execution.started_at = timezone.now()
+                step_execution.telemetry = {
+                    **(step_execution.telemetry or {}),
+                    'dispatch_topic': dispatch['topic'],
+                    'dispatch_payload': dispatch['payload'],
+                    'dispatch_transport': dispatch['transport'],
+                }
+                step_execution.save(update_fields=['status', 'started_at', 'telemetry', 'updated_at'])
+                dispatched_messages.append(outbox)
+            except Exception as exc:
+                step_execution.status = 'FAILED'
+                step_execution.error_message = str(exc)
+                step_execution.save(update_fields=['status', 'error_message', 'updated_at'])
+                failed_steps.append({
+                    'step_execution_id': step_execution.id,
+                    'step_no': step_execution.command_payload.get('step_no'),
+                    'error': str(exc),
+                })
+
+        if failed_steps and not dispatched_messages:
+            job.status = 'FAILED'
+            job.error_message = 'Unable to dispatch any device commands.'
+            job.finished_at = timezone.now()
+            job.save(update_fields=['status', 'error_message', 'finished_at', 'updated_at'])
+
+    return Response({
+        'job_id': job.id,
+        'status': job.status,
+        'mqtt_available': mqtt_client_available(),
+        'dispatched_messages': CommandOutboxSerializer(dispatched_messages, many=True).data,
+        'failed_steps': failed_steps,
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def batch_job_status(request, job_id):
+    try:
+        job = BatchJob.objects.get(id=job_id)
+    except BatchJob.DoesNotExist:
+        return Response({'detail': 'Job not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    step_qs = BatchStepExecution.objects.filter(job=job)
+    step_status_counts = {
+        'pending': step_qs.filter(status='PENDING').count(),
+        'queued': step_qs.filter(status='QUEUED').count(),
+        'running': step_qs.filter(status='RUNNING').count(),
+        'done': step_qs.filter(status='DONE').count(),
+        'failed': step_qs.filter(status='FAILED').count(),
+        'skipped': step_qs.filter(status='SKIPPED').count(),
+    }
+    next_step = step_qs.filter(status__in=['PENDING', 'QUEUED', 'RUNNING']).order_by('id').first()
+    next_step_data = None
+    if next_step:
+        next_step_data = BatchStepExecutionSerializer(next_step).data
+
+    outbox_messages = CommandOutbox.objects.filter(job=job).order_by('-created_at')
+
+    return Response({
+        'job': BatchJobSerializer(job).data,
+        'step_status_counts': step_status_counts,
+        'next_step': next_step_data,
+        'step_executions': BatchStepExecutionSerializer(step_qs, many=True).data,
+        'outbox_messages': CommandOutboxSerializer(outbox_messages, many=True).data,
+    }, status=status.HTTP_200_OK)

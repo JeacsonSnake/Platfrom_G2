@@ -7,4 +7,5 @@ class MyAppConfig(AppConfig):
     def ready(self):
         if os.environ.get('RUN_MAIN'):
             from . import mqtt
-            mqtt.client.loop_start()
+            if mqtt.client is not None:
+                mqtt.client.loop_start()
