@@ -1,0 +1,1997 @@
+============================================================
+ESP32-S3 串口日志记录
+开始时间: 2026-04-10 12:06:39
+串口: COM9, 波特率: 115200
+============================================================
+
+[2026-04-10 12:06:39.425] I (113) esp_image: segment 1: paddr=00034860 vaddr=3fc9be00 sizeW (1676) ESP32S3_WIFI_EVENT: Waiting for WiFi connection... (1/60)
+[2026-04-10 12:06:39.734] I (1986) ESP32S3_WIFI_EVENT: Got ip:192.168.110.180
+[2026-04-10 12:06:39.736] I (1986) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-04-10 12:06:39.739] I (1986) MQTT_MONITOR: ==============================================
+[2026-04-10 12:06:39.744] I (1986) MQTT_MONITOR: 正在启动 SNTP 时间同步...
+[2026-04-10 12:06:39.755] I (1996) MQTT_MONITOR: NTP服务器1: cn.pool.ntp.org (国内)
+[2026-04-10 12:06:39.757] I (1996) MQTT_MONITOR: NTP服务器2: ntp.aliyun.com (阿里云)
+[2026-04-10 12:06:39.761] I (2006) MQTT_MONITOR: NTP服务器3: ntp.tencent.com (腾讯云)
+[2026-04-10 12:06:39.765] I (2006) MQTT_MONITOR: 当前系统时间: 1618 ms
+[2026-04-10 12:06:39.772] I (2016) MQTT_MONITOR: 时区设置: CST-8 (UTC+8, 中国标准时间)
+[2026-04-10 12:06:39.777] I (2016) MQTT_MONITOR: SNTP 初始化完成，等待时间同步...
+[2026-04-10 12:06:39.784] I (2026) MQTT_MONITOR: ==============================================
+[2026-04-10 12:06:39.791] I (2036) esp_netif_handlers: sta ip: 192.168.110.180, mask: 255.255.255.0, gw: 192.168.110.1
+[2026-04-10 12:06:39.796] I (2036) ESP32S3_WIFI_EVENT: Connected to ap!
+[2026-04-10 12:06:39.801] I (2046) ESP32S3_WIFI_EVENT: Waiting for NTP time sync...
+[2026-04-10 12:06:42.215] I (4466) MQTT_MONITOR: ==============================================
+[2026-04-10 12:06:42.217] I (4466) MQTT_MONITOR: NTP时间同步回调被触发！
+[2026-04-10 12:06:42.220] I (4466) MQTT_MONITOR: 已发送同步完成信号
+[2026-04-10 12:06:42.226] I (4466) MQTT_MONITOR: ==============================================
+[2026-04-10 12:06:42.229] I (4466) MQTT_MONITOR: 时间同步完成！
+[2026-04-10 12:06:42.237] I (4476) MQTT_MONITOR: 当前实际时间: 2026-04-10 12:06:41 [运行 00:00:04]
+[2026-04-10 12:06:42.241] I (4486) MQTT_MONITOR: 开机时间戳: 1618 ms
+[2026-04-10 12:06:42.247] I (4486) MQTT_MONITOR: 实际开机时间: Fri Apr 10 12:06:37 2026
+[2026-04-10 12:06:42.248] 
+[2026-04-10 12:06:42.252] I (4496) MQTT_MONITOR: NTP轮询间隔已恢复为1小时
+[2026-04-10 12:06:42.259] I (4496) MQTT_MONITOR: ==============================================
+[2026-04-10 12:06:42.262] I (4506) MQTT_MONITOR: 时间同步成功！
+[2026-04-10 12:06:42.267] I (4506) MQTT_MONITOR: 当前时间: 2026-04-10 12:06:41
+[2026-04-10 12:06:42.272] I (4516) MQTT_MONITOR: 开机时间戳: 1618 ms
+[2026-04-10 12:06:42.278] I (4516) MQTT_MONITOR: 实际开机时间: Fri Apr 10 12:06:37 2026
+[2026-04-10 12:06:42.280] 
+[2026-04-10 12:06:42.283] I (4526) MQTT_MONITOR: ==============================================
+[2026-04-10 12:06:42.290] I (4536) ESP32S3_WIFI_EVENT: NTP time sync completed successfully
+[2026-04-10 12:06:47.284] I (9536) MQTT_MONITOR: MQTT连接监控模块已初始化
+[2026-04-10 12:06:47.286] I (9536) MQTT_MONITOR: 统计报告间隔: 0 小时
+[2026-04-10 12:06:47.289] I (9536) MQTT_MONITOR: =================================================
+[2026-04-10 12:06:47.295] I (9536) MQTT_MONITOR:       MQTT连接监控统计系统已启动
+[2026-04-10 12:06:47.302] I (9546) MQTT_MONITOR: =================================================
+[2026-04-10 12:06:47.308] I (9546) MQTT_MONITOR: 提示: 时间将在WiFi连接后通过NTP同步
+[2026-04-10 12:06:47.313] I (9556) MQTT_MONITOR: 等待 SNTP 时间同步完成...
+[2026-04-10 12:06:47.318] I (9556) MQTT_MONITOR: 时间同步已完成，开始监控任务
+[2026-04-10 12:06:47.323] I (9566) ESP32S3_MQTT_EVENT: MQTT客户端已启动
+[2026-04-10 12:06:47.328] I (9576) ESP32S3_MQTT_EVENT: MQTT心跳任务已启动
+[2026-04-10 12:06:47.334] I (9576) ESP32S3_MQTT_EVENT: MQTT连接健康检查任务已启动
+[2026-04-10 12:06:47.348] I (9576) PWM_EVENT: PWM timer 0 initiated at clock speed 5000.
+[2026-04-10 12:06:47.350] I (9586) PWM_EVENT: PWM channel 0 initiated on GPIO1 with initial duty 8191 (inverted logic).
+[2026-04-10 12:06:47.356] I (9596) PWM_EVENT: PWM channel 1 initiated on GPIO4 with initial duty 8191 (inverted logic).
+[2026-04-10 12:06:47.365] I (9606) PWM_EVENT: PWM channel 2 initiated on GPIO6 with initial duty 8191 (inverted logic).
+[2026-04-10 12:06:47.373] I (9616) PWM_EVENT: PWM channel 3 initiated on GPIO8 with initial duty 8191 (inverted logic).
+[2026-04-10 12:06:47.378] I (9616) PCNT_EVENT: PCNT channel 0 has been initiated on pin 2.
+[2026-04-10 12:06:47.383] I (9626) PCNT_EVENT: PCNT channel 1 has been initiated on pin 5.
+[2026-04-10 12:06:47.390] I (9636) PCNT_EVENT: PCNT channel 2 has been initiated on pin 7.
+[2026-04-10 12:06:47.395] I (9636) PCNT_EVENT: PCNT channel 3 has been initiated on pin 9.
+[2026-04-10 12:06:47.398] I (9646) PID_EVENT: Index number is: 0
+[2026-04-10 12:06:47.399] 
+[2026-04-10 12:06:47.403] I (9646) PID_EVENT: Index number is: 1
+[2026-04-10 12:06:47.404] 
+[2026-04-10 12:06:47.406] I (9646) PID_EVENT: Index number is: 2
+[2026-04-10 12:06:47.407] 
+[2026-04-10 12:06:47.411] I (9646) MAX31850: === MAX31850 Driver Initialization ===
+[2026-04-10 12:06:47.414] I (9646) PID_EVENT: Index number is: 3
+[2026-04-10 12:06:47.416] 
+[2026-04-10 12:06:47.421] I (9656) MAX31850: Configuring GPIO14 as open-drain with pull-up
+[2026-04-10 12:06:47.424] I (9666) MAX31850: === GPIO14 Diagnostic ===
+[2026-04-10 12:06:47.430] I (9676) MAX31850:   Mode: INPUT_OUTPUT_OD (Open-Drain)
+[2026-04-10 12:06:47.435] I (9676) MAX31850:   Pull-up: ENABLED (4.7K external recommended)
+[2026-04-10 12:06:47.438] I (9686) MAX31850:   Pull-down: DISABLED
+[2026-04-10 12:06:47.442] I (9686) MAX31850:   Current Level: 1
+[2026-04-10 12:06:47.448] I (9686) MAX31850:   Expected idle level: 1 (pulled high)
+[2026-04-10 12:06:47.451] I (9696) MAX31850:   Bus state: OK (high)
+[2026-04-10 12:06:47.457] I (9696) MAX31850: === Testing Open-Drain Mode on GPIO14 ===
+[2026-04-10 12:06:47.460] I (9706) MAX31850:   Drive LOW: 0 (expected 0)
+[2026-04-10 12:06:47.467] I (9706) MAX31850:   Release (pull-up): HIGH (7/10 samples high)
+[2026-04-10 12:06:47.473] I (9716) MAX31850:   Pull-up time: 500us (weak pull-up may need more time)
+[2026-04-10 12:06:47.477] I (9716) MAX31850:   Open-drain test: PASS
+[2026-04-10 12:06:47.481] I (9726) MAX31850: Checking bus level...
+[2026-04-10 12:06:47.485] I (9726) MAX31850: Bus idle level: 1 (expected 1)
+[2026-04-10 12:06:47.490] I (9736) MAX31850: Waiting for bus stabilization (10ms)...
+[2026-04-10 12:06:47.496] I (9746) MAX31850: ========================================
+[2026-04-10 12:06:47.499] I (9746) MAX31850:     MAX31850 Timing Diagnostic
+[2026-04-10 12:06:47.506] I (9746) MAX31850: ========================================
+[2026-04-10 12:06:47.509] I (9756) MAX31850: === GPIO14 Diagnostic ===
+[2026-04-10 12:06:47.515] I (9756) MAX31850:   Mode: INPUT_OUTPUT_OD (Open-Drain)
+[2026-04-10 12:06:47.520] I (9766) MAX31850:   Pull-up: ENABLED (4.7K external recommended)
+[2026-04-10 12:06:47.523] I (9766) MAX31850:   Pull-down: DISABLED
+[2026-04-10 12:06:47.526] I (9776) MAX31850:   Current Level: 1
+[2026-04-10 12:06:47.533] I (9776) MAX31850:   Expected idle level: 1 (pulled high)
+[2026-04-10 12:06:47.536] I (9776) MAX31850:   Bus state: OK (high)
+[2026-04-10 12:06:47.541] I (9786) MAX31850: === Testing Open-Drain Mode on GPIO14 ===
+[2026-04-10 12:06:47.546] I (9786) MAX31850:   Drive LOW: 0 (expected 0)
+[2026-04-10 12:06:47.551] I (9796) MAX31850:   Release (pull-up): HIGH (7/10 samples high)
+[2026-04-10 12:06:47.557] I (9796) MAX31850:   Pull-up time: 500us (weak pull-up may need more time)
+[2026-04-10 12:06:47.562] I (9806) MAX31850:   Open-drain test: PASS
+[2026-04-10 12:06:47.566] I (9806) MAX31850: === Data Window Scan ===
+[2026-04-10 12:06:47.570] I (9816) MAX31850: Testing different sample points...
+[2026-04-10 12:06:47.575] I (9816) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:47.581] I (9826) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:47.586] I (9826) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:47.592] I (9836) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:47.596] I (9836) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:47.601] I (9846) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:47.604] I (9846) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:47.610] I (9856) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:47.615] I (9856) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:47.621] I (9866) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:47.626] I (9866) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:47.630] I (9876) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:47.635] I (9876) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:47.640] I (9886) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:47.646] I (9886) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:47.651] I (9896) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:47.656] I (9896) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:47.660] I (9906) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:47.664] I (9906) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:47.671] I (9916) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:47.676] I (9916) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:47.682] I (9926) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:47.687] I (9926) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:47.690] I (9936) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:47.695] I (9936) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:47.700] I (9946) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:47.705] I (9946) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:47.711] I (9956) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:47.716] I (9956) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:47.719] I (9966) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:47.725] I (9966) MAX31850:   Sample point  5μs: 0/5 correct [FAIL]
+[2026-04-10 12:06:47.729] I (9976) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:47.736] I (9976) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:47.740] I (9986) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:47.746] I (9986) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:47.750] I (9996) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:47.755] I (9996) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:47.759] I (10006) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:47.766] I (10006) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:47.770] I (10016) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:47.776] I (10016) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:47.781] I (10026) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:47.786] I (10026) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:47.790] I (10036) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:47.797] I (10036) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:47.800] I (10046) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:47.806] I (10046) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:47.811] I (10056) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:47.816] I (10056) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:47.819] I (10066) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:47.826] I (10066) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:47.831] I (10076) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:47.836] I (10076) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:47.841] I (10086) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:47.846] I (10086) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:47.851] I (10096) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:47.857] I (10096) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:47.862] I (10106) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:47.867] I (10106) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:47.872] I (10116) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:47.876] I (10116) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:47.881] I (10126) MAX31850:   Sample point  7μs: 5/5 correct [OK]
+[2026-04-10 12:06:47.886] I (10126) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:47.892] I (10136) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:47.897] I (10136) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:47.903] I (10146) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:47.908] I (10146) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:47.912] I (10156) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:47.916] I (10156) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:47.923] I (10166) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:47.928] I (10166) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:47.933] I (10176) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:47.938] I (10176) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:47.942] I (10186) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:47.947] I (10186) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:47.954] I (10196) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:47.958] I (10206) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:47.964] I (10206) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:47.968] I (10216) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:47.973] I (10216) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:47.976] I (10226) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:47.984] I (10226) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:47.989] I (10236) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:47.995] I (10236) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:47.999] I (10246) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.002] I (10246) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.007] I (10256) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.013] I (10256) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.018] I (10266) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.024] I (10266) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.029] I (10276) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.034] I (10276) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.038] I (10286) MAX31850:   Sample point  9μs: 5/5 correct [OK]
+[2026-04-10 12:06:48.043] I (10286) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.050] I (10286) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.055] I (10296) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.060] I (10306) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.065] I (10306) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.069] I (10316) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.073] I (10316) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.080] I (10316) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.085] I (10326) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.090] I (10336) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.095] I (10336) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.099] I (10346) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.104] I (10346) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.111] I (10356) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.115] I (10356) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.120] I (10366) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.125] I (10366) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.130] I (10376) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.134] I (10376) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.141] I (10386) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.146] I (10386) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.151] I (10396) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.156] I (10396) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.160] I (10406) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.164] I (10406) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.171] I (10416) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.175] I (10416) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.181] I (10426) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.186] I (10426) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.191] I (10436) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.196] I (10436) MAX31850:   Sample point 11μs: 5/5 correct [OK]
+[2026-04-10 12:06:48.200] I (10446) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.207] I (10446) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.212] I (10456) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.218] I (10456) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.223] I (10466) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.226] I (10466) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.230] I (10476) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.237] I (10476) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.242] I (10486) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.248] I (10486) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.252] I (10496) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.257] I (10496) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.261] I (10506) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.267] I (10506) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.272] I (10516) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.278] I (10516) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.282] I (10526) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.287] I (10526) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.291] I (10536) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.298] I (10536) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.303] I (10546) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.309] I (10546) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.314] I (10556) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.317] I (10556) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.322] I (10566) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.328] I (10566) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.333] I (10576) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.339] I (10576) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.343] I (10586) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.348] I (10596) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.353] I (10596) MAX31850:   Sample point 13μs: 5/5 correct [OK]
+[2026-04-10 12:06:48.357] I (10596) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.364] I (10606) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.369] I (10616) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.374] I (10616) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.379] I (10626) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.383] I (10626) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.388] I (10636) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.393] I (10636) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.398] I (10646) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.404] I (10646) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.409] I (10656) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.414] I (10656) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.419] I (10666) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.424] I (10666) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.429] I (10676) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.435] I (10676) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.440] I (10686) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.443] I (10686) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.448] I (10696) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.455] I (10696) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.459] I (10706) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.465] I (10706) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.470] I (10716) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.474] I (10716) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.479] I (10726) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.485] I (10726) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.490] I (10736) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.496] I (10736) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.501] I (10746) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.505] I (10746) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.510] I (10756) MAX31850:   Sample point 15μs: 5/5 correct [OK]
+[2026-04-10 12:06:48.515] I (10756) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.521] I (10766) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.525] I (10766) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.532] I (10776) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.536] I (10776) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.541] I (10786) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.544] I (10786) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.550] I (10796) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.555] I (10796) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.561] I (10806) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.566] I (10806) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.571] I (10816) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.575] I (10816) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.582] I (10826) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.587] I (10826) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.592] I (10836) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.597] I (10836) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.602] I (10846) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.605] I (10846) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.612] I (10856) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.616] I (10856) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.623] I (10866) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.627] I (10866) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.631] I (10876) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.635] I (10876) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.642] I (10886) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.646] I (10886) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.653] I (10896) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.658] I (10896) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.661] I (10906) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.668] I (10906) MAX31850:   Sample point 17μs: 5/5 correct [OK]
+[2026-04-10 12:06:48.671] I (10916) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.678] I (10916) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.683] I (10926) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.689] I (10926) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.694] I (10936) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.697] I (10936) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.702] I (10946) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.708] I (10946) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.713] I (10956) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.719] I (10956) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.724] I (10966) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.728] I (10976) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.732] I (10976) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.738] I (10976) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.743] I (10986) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.749] I (10986) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.754] I (10996) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.758] I (11006) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.763] I (11006) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.769] I (11006) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.774] I (11016) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.779] I (11026) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.784] I (11026) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.789] I (11036) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.793] I (11036) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.800] I (11036) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.805] I (11046) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.809] I (11056) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.814] I (11056) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.819] I (11066) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.824] I (11066) MAX31850:   Sample point 19μs: 5/5 correct [OK]
+[2026-04-10 12:06:48.828] I (11076) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.835] I (11076) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.839] I (11086) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.845] I (11086) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.850] I (11096) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.855] I (11096) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.859] I (11106) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.866] I (11106) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.871] I (11116) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.877] I (11116) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.880] I (11126) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.885] I (11126) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.890] I (11136) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.895] I (11136) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.900] I (11146) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.906] I (11146) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.911] I (11156) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.916] I (11156) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.919] I (11166) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.926] I (11166) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.931] I (11176) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.937] I (11176) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.942] I (11186) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.946] I (11186) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.950] I (11196) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.957] I (11196) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.962] I (11206) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:48.967] I (11206) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:48.973] I (11216) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:48.976] I (11216) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:48.981] I (11226) MAX31850:   Sample point 21μs: 5/5 correct [OK]
+[2026-04-10 12:06:48.986] I (11226) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:48.992] I (11236) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:48.996] I (11236) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:49.003] I (11246) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:49.008] I (11246) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:49.011] I (11256) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:49.016] I (11256) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:49.023] I (11266) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:49.027] I (11266) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:49.033] I (11276) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:49.038] I (11276) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:49.042] I (11286) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:49.046] I (11286) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:49.052] I (11296) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:49.058] I (11296) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:49.063] I (11306) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:49.068] I (11316) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:49.072] I (11316) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:49.077] I (11326) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:49.083] I (11326) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:49.088] I (11336) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:49.094] I (11336) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:49.099] I (11346) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:49.102] I (11346) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:49.107] I (11356) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:49.113] I (11356) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:49.118] I (11366) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:49.125] I (11366) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:49.130] I (11376) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:49.133] I (11376) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:49.139] I (11386) MAX31850:   Sample point 23μs: 5/5 correct [OK]
+[2026-04-10 12:06:49.142] I (11386) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:49.149] I (11386) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:49.153] I (11396) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:49.159] I (11406) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:49.164] I (11406) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:49.169] I (11416) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:49.173] I (11416) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:49.179] I (11416) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:49.184] I (11426) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:49.190] I (11436) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:49.195] I (11436) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:49.200] I (11446) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:49.203] I (11446) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:49.209] I (11456) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:49.215] I (11456) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:49.220] I (11466) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:49.226] I (11466) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:49.229] I (11476) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:49.234] I (11476) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:49.241] I (11486) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:49.244] I (11486) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:49.250] I (11496) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:49.255] I (11496) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:49.259] I (11506) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:49.264] I (11506) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:49.270] I (11516) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:49.275] I (11516) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:49.282] I (11526) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:49.287] I (11526) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:49.290] I (11536) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:49.296] I (11536) MAX31850:   Sample point 25μs: 5/5 correct [OK]
+[2026-04-10 12:06:49.299] I (11546) MAX31850: Data window: 7μs to 25μs
+[2026-04-10 12:06:49.304] I (11546) MAX31850: Recommended sample point: 16μs
+[2026-04-10 12:06:49.310] I (11556) MAX31850: Note: Keep margin of at least 2μs from window edges
+[2026-04-10 12:06:49.312] I (11556) MAX31850:
+[2026-04-10 12:06:49.315] === ROM Search Test ===
+[2026-04-10 12:06:49.320] I (11566) MAX31850: === ROM Search with Retry (max=3) ===
+[2026-04-10 12:06:49.326] I (11566) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:06:49.330] I (11576) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:49.336] I (11576) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:49.341] I (11586) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:49.348] I (11586) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:49.352] I (11596) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:49.355] I (11596) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:49.361] I (11606) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:06:49.366] I (11606) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:06:49.369] I (11616) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:06:49.374] I (11616) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:06:49.379] I (11626) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:06:49.383] I (11626) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:06:49.388] I (11636) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:06:49.393] I (11636) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:06:49.397] I (11636) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:06:49.402] I (11646) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:06:49.407] I (11646) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:49.411] I (11656) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:49.416] I (11656) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:06:49.421] I (11666) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:06:49.426] I (11666) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:06:49.431] I (11676) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:06:49.435] I (11676) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:06:49.439] I (11686) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:06:49.443] I (11686) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:06:49.448] I (11696) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:06:49.453] I (11696) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:06:49.458] I (11696) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:06:49.461] I (11706) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:06:49.466] I (11706) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:06:49.471] I (11716) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:06:49.475] I (11716) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:06:49.479] I (11726) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:06:49.484] I (11726) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:06:49.488] I (11736) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:06:49.494] I (11736) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:06:49.497] I (11746) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:06:49.502] I (11746) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:06:49.507] I (11746) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:06:49.511] I (11756) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:06:49.515] I (11756) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:06:49.520] I (11766) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:06:49.525] I (11766) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:06:49.529] I (11776) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:06:49.534] I (11776) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:06:49.539] I (11786) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:06:49.544] I (11786) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:06:49.548] I (11786) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:06:49.551] I (11796) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:06:49.557] I (11796) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:06:49.561] I (11806) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:06:49.566] I (11806) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:06:49.571] I (11816) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:06:49.574] I (11816) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:06:49.579] I (11826) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:06:49.584] I (11826) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:06:49.588] I (11836) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:06:49.593] I (11836) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:06:49.597] I (11836) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:06:49.601] I (11846) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:06:49.606] I (11846) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:06:49.610] I (11856) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:06:49.616] I (11856) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-10 12:06:49.619] I (11866) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-10 12:06:49.624] I (11866) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-10 12:06:49.629] I (11876) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-10 12:06:49.633] I (11876) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-10 12:06:49.638] I (11886) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-10 12:06:49.643] I (11886) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-10 12:06:49.646] I (11886) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-10 12:06:49.655] I (11896) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-10 12:06:49.659] I (11906) MAX31850:   Next discrepancy: 12
+[2026-04-10 12:06:49.662] I (11906) MAX31850:   CRC check: FAIL
+[2026-04-10 12:06:49.669] W (11906) MAX31850: Search failed on attempt 1, will retry...
+[2026-04-10 12:06:49.672] I (11916) MAX31850: Retry attempt 1/3...
+[2026-04-10 12:06:49.678] I (11926) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:06:49.682] I (11926) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:49.688] I (11926) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:49.693] I (11936) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:49.700] I (11936) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:49.703] I (11946) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:49.708] I (11956) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:49.712] I (11956) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:06:49.716] I (11956) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:06:49.721] I (11966) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:06:49.726] I (11966) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:06:49.730] I (11976) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:06:49.735] I (11976) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:06:49.740] I (11986) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:06:49.743] I (11986) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:06:49.748] I (11996) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:06:49.753] I (11996) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:06:49.759] I (11996) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:49.764] I (12006) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:49.769] I (12016) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:06:49.773] I (12016) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:06:49.777] I (12016) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:06:49.782] I (12026) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:06:49.786] I (12026) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:06:49.791] I (12036) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:06:49.795] I (12036) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:06:49.800] I (12046) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:06:49.805] I (12046) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:06:49.808] I (12056) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:06:49.813] I (12056) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:06:49.818] I (12066) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:06:49.822] I (12066) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:06:49.827] I (12066) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:06:49.831] I (12076) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:06:49.836] I (12076) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:06:49.841] I (12086) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:06:49.845] I (12086) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:06:49.850] I (12096) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:06:49.854] I (12096) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:06:49.859] I (12106) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:06:49.862] I (12106) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:06:49.867] I (12106) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:06:49.872] I (12116) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:06:49.877] I (12116) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:06:49.881] I (12126) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:06:49.886] I (12126) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:06:49.890] I (12136) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:06:49.895] I (12136) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:06:49.899] I (12146) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:06:49.904] I (12146) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:06:49.909] I (12156) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:06:49.913] I (12156) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:06:49.918] I (12156) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:06:49.922] I (12166) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:06:49.926] I (12166) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:06:49.931] I (12176) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:06:49.935] I (12176) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:06:49.940] I (12186) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:06:49.945] I (12186) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:06:49.948] I (12196) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:06:49.953] I (12196) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:06:49.957] I (12206) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:06:49.962] I (12206) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:06:49.967] I (12206) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-10 12:06:49.971] I (12216) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-10 12:06:49.976] I (12216) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-10 12:06:49.981] I (12226) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-10 12:06:49.984] I (12226) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-10 12:06:49.990] I (12236) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-10 12:06:49.994] I (12236) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-10 12:06:49.999] I (12246) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-10 12:06:50.007] I (12246) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-10 12:06:50.011] I (12256) MAX31850:   Next discrepancy: 12
+[2026-04-10 12:06:50.014] I (12256) MAX31850:   CRC check: FAIL
+[2026-04-10 12:06:50.021] W (12266) MAX31850: Search failed on attempt 2, will retry...
+[2026-04-10 12:06:50.024] I (12266) MAX31850: Retry attempt 2/3...
+[2026-04-10 12:06:50.034] I (12286) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:06:50.036] I (12286) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:50.041] I (12286) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:50.044] I (12286) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:50.050] I (12296) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:50.055] I (12296) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:50.060] I (12306) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:50.065] I (12306) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:06:50.068] I (12316) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:06:50.073] I (12316) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:06:50.078] I (12326) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:06:50.082] I (12326) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:06:50.087] I (12326) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:06:50.091] I (12336) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:06:50.096] I (12336) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:06:50.101] I (12346) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:06:50.104] I (12346) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:06:50.110] I (12356) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:50.116] I (12356) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:50.120] I (12366) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:06:50.125] I (12366) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:06:50.129] I (12376) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:06:50.134] I (12376) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:06:50.139] I (12386) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:06:50.143] I (12386) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:06:50.147] I (12386) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:06:50.152] I (12396) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:06:50.156] I (12396) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:06:50.161] I (12406) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:06:50.165] I (12406) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:06:50.170] I (12416) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:06:50.175] I (12416) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:06:50.178] I (12426) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:06:50.183] I (12426) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:06:50.188] I (12436) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:06:50.193] I (12436) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:06:50.197] I (12436) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:06:50.202] I (12446) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:06:50.207] I (12446) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:06:50.210] I (12456) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:06:50.214] I (12456) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:06:50.219] I (12466) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:06:50.224] I (12466) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:06:50.229] I (12476) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:06:50.233] I (12476) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:06:50.238] I (12476) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:06:50.243] I (12486) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:06:50.246] I (12486) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:06:50.251] I (12496) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:06:50.255] I (12496) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:06:50.260] I (12506) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:06:50.265] I (12506) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:06:50.270] I (12516) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:06:50.273] I (12516) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:06:50.279] I (12526) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:06:50.283] I (12526) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:06:50.287] I (12526) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:06:50.292] I (12536) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:06:50.297] I (12536) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:06:50.301] I (12546) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:06:50.305] I (12546) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:06:50.310] I (12556) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:06:50.315] I (12556) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:06:50.318] I (12566) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-10 12:06:50.323] I (12566) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-10 12:06:50.327] I (12576) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-10 12:06:50.332] I (12576) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-10 12:06:50.337] I (12576) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-10 12:06:50.341] I (12586) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-10 12:06:50.346] I (12586) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-10 12:06:50.350] I (12596) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-10 12:06:50.360] I (12596) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-10 12:06:50.363] I (12606) MAX31850:   Next discrepancy: 12
+[2026-04-10 12:06:50.366] I (12606) MAX31850:   CRC check: FAIL
+[2026-04-10 12:06:50.371] W (12616) MAX31850: Search failed on attempt 3, will retry...
+[2026-04-10 12:06:50.376] I (12616) MAX31850: Retry attempt 3/3...
+[2026-04-10 12:06:50.405] I (12656) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:06:50.406] I (12656) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:50.409] I (12656) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:50.415] I (12656) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:50.420] I (12666) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:50.425] I (12666) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:50.430] I (12676) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:50.434] I (12676) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:06:50.437] I (12686) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:06:50.442] I (12686) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:06:50.447] I (12686) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:06:50.451] I (12696) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:06:50.456] I (12696) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:06:50.460] I (12706) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:06:50.465] I (12706) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:06:50.469] I (12716) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:06:50.474] I (12716) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:06:50.479] I (12726) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:50.485] I (12726) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:50.490] I (12736) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:06:50.494] I (12736) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:06:50.499] I (12746) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:06:50.503] I (12746) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:06:50.508] I (12746) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:06:50.511] I (12756) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:06:50.516] I (12756) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:06:50.521] I (12766) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:06:50.526] I (12766) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:06:50.530] I (12776) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:06:50.535] I (12776) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:06:50.540] I (12786) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:06:50.543] I (12786) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:06:50.548] I (12796) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:06:50.553] I (12796) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:06:50.557] I (12796) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:06:50.562] I (12806) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:06:50.566] I (12806) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:06:50.571] I (12816) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:06:50.576] I (12816) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:06:50.579] I (12826) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:06:50.584] I (12826) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:06:50.589] I (12836) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:06:50.593] I (12836) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:06:50.598] I (12846) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:06:50.603] I (12846) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:06:50.607] I (12846) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:06:50.612] I (12856) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:06:50.616] I (12856) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:06:50.620] I (12866) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:06:50.625] I (12866) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:06:50.630] I (12876) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:06:50.634] I (12876) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:06:50.639] I (12886) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:06:50.643] I (12886) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:06:50.648] I (12886) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:06:50.653] I (12896) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:06:50.656] I (12896) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:06:50.660] I (12906) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:06:50.665] I (12906) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:06:50.670] I (12916) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:06:50.674] I (12916) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:06:50.679] I (12926) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:06:50.683] I (12926) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:06:50.688] I (12936) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-10 12:06:50.693] I (12936) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-10 12:06:50.697] I (12936) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-10 12:06:50.701] I (12946) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-10 12:06:50.706] I (12946) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-10 12:06:50.710] I (12956) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-10 12:06:50.715] I (12956) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-10 12:06:50.720] I (12966) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-10 12:06:50.728] I (12966) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-10 12:06:50.732] I (12976) MAX31850:   Next discrepancy: 12
+[2026-04-10 12:06:50.736] I (12976) MAX31850:   CRC check: FAIL
+[2026-04-10 12:06:50.740] E (12986) MAX31850: Search failed after 4 attempts
+[2026-04-10 12:06:50.743] I (12986) MAX31850: Found 0 sensor(s)
+[2026-04-10 12:06:50.748] I (12986) MAX31850: ========================================
+[2026-04-10 12:06:50.751] I (12996) MAX31850: Diagnostic complete
+[2026-04-10 12:06:50.758] I (12996) MAX31850: Recommendation: Use sample point 16μs
+[2026-04-10 12:06:50.763] I (13006) MAX31850: ========================================
+[2026-04-10 12:06:50.768] I (13006) MAX31850: Starting device discovery...
+[2026-04-10 12:06:50.772] I (13016) MAX31850: === ROM Search with Retry (max=3) ===
+[2026-04-10 12:06:50.778] I (13016) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:06:50.783] I (13026) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:50.789] I (13026) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:50.794] I (13036) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:50.800] I (13046) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:50.805] I (13046) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:50.809] I (13056) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:50.813] I (13056) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:06:50.818] I (13066) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:06:50.821] I (13066) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:06:50.826] I (13066) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:06:50.832] I (13076) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:06:50.835] I (13076) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:06:50.840] I (13086) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:06:50.845] I (13086) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:06:50.849] I (13096) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:06:50.854] I (13096) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:06:50.859] I (13106) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:50.865] I (13106) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:50.868] I (13116) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:06:50.873] I (13116) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:06:50.878] I (13126) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:06:50.882] I (13126) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:06:50.887] I (13126) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:06:50.892] I (13136) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:06:50.897] I (13136) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:06:50.901] I (13146) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:06:50.904] I (13146) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:06:50.910] I (13156) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:06:50.915] I (13156) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:06:50.919] I (13166) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:06:50.924] I (13166) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:06:50.927] I (13166) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:06:50.932] I (13176) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:06:50.937] I (13176) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:06:50.941] I (13186) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:06:50.946] I (13186) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:06:50.950] I (13196) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:06:50.955] I (13196) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:06:50.960] I (13206) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:06:50.963] I (13206) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:06:50.968] I (13216) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:06:50.973] I (13216) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:06:50.977] I (13216) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:06:50.981] I (13226) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:06:50.986] I (13226) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:06:50.991] I (13236) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:06:50.995] I (13236) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:06:51.000] I (13246) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:06:51.004] I (13246) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:06:51.008] I (13256) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:06:51.014] I (13256) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:06:51.017] I (13266) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:06:51.022] I (13266) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:06:51.027] I (13266) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:06:51.032] I (13276) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:06:51.036] I (13276) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:06:51.040] I (13286) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:06:51.046] I (13286) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:06:51.049] I (13296) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:06:51.054] I (13296) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:06:51.059] I (13306) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:06:51.063] I (13306) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:06:51.067] I (13306) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-10 12:06:51.072] I (13316) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-10 12:06:51.077] I (13316) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-10 12:06:51.081] I (13326) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-10 12:06:51.086] I (13326) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-10 12:06:51.090] I (13336) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-10 12:06:51.095] I (13336) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-10 12:06:51.099] I (13346) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-10 12:06:51.107] I (13346) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-10 12:06:51.111] I (13356) MAX31850:   Next discrepancy: 12
+[2026-04-10 12:06:51.114] I (13356) MAX31850:   CRC check: FAIL
+[2026-04-10 12:06:51.121] W (13366) MAX31850: Search failed on attempt 1, will retry...
+[2026-04-10 12:06:51.124] I (13366) MAX31850: Retry attempt 1/3...
+[2026-04-10 12:06:51.134] I (13386) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:06:51.136] I (13386) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:51.141] I (13386) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:51.146] I (13386) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:51.152] I (13396) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:51.156] I (13396) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:51.161] I (13406) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:51.166] I (13406) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:06:51.169] I (13416) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:06:51.173] I (13416) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:06:51.178] I (13426) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:06:51.182] I (13426) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:06:51.187] I (13426) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:06:51.192] I (13436) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:06:51.197] I (13436) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:06:51.201] I (13446) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:06:51.206] I (13446) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:06:51.211] I (13456) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:51.216] I (13456) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:51.221] I (13466) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:06:51.225] I (13466) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:06:51.230] I (13476) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:06:51.235] I (13476) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:06:51.240] I (13486) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:06:51.243] I (13486) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:06:51.248] I (13496) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:06:51.253] I (13496) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:06:51.257] I (13496) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:06:51.262] I (13506) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:06:51.266] I (13506) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:06:51.271] I (13516) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:06:51.275] I (13516) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:06:51.280] I (13526) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:06:51.285] I (13526) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:06:51.288] I (13536) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:06:51.293] I (13536) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:06:51.298] I (13536) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:06:51.303] I (13546) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:06:51.307] I (13546) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:06:51.312] I (13556) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:06:51.316] I (13556) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:06:51.320] I (13566) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:06:51.325] I (13566) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:06:51.330] I (13576) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:06:51.333] I (13576) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:06:51.338] I (13586) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:06:51.343] I (13586) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:06:51.347] I (13586) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:06:51.351] I (13596) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:06:51.356] I (13596) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:06:51.361] I (13606) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:06:51.366] I (13606) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:06:51.370] I (13616) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:06:51.374] I (13616) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:06:51.379] I (13626) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:06:51.383] I (13626) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:06:51.388] I (13636) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:06:51.393] I (13636) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:06:51.396] I (13636) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:06:51.401] I (13646) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:06:51.406] I (13646) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:06:51.410] I (13656) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:06:51.415] I (13656) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:06:51.420] I (13666) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-10 12:06:51.425] I (13666) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-10 12:06:51.428] I (13676) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-10 12:06:51.432] I (13676) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-10 12:06:51.437] I (13676) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-10 12:06:51.442] I (13686) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-10 12:06:51.446] I (13686) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-10 12:06:51.451] I (13696) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-10 12:06:51.461] I (13696) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-10 12:06:51.464] I (13706) MAX31850:   Next discrepancy: 12
+[2026-04-10 12:06:51.467] I (13706) MAX31850:   CRC check: FAIL
+[2026-04-10 12:06:51.472] W (13716) MAX31850: Search failed on attempt 2, will retry...
+[2026-04-10 12:06:51.476] I (13716) MAX31850: Retry attempt 2/3...
+[2026-04-10 12:06:51.494] I (13746) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:06:51.496] I (13746) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:51.499] I (13746) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:51.504] I (13746) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:51.510] I (13756) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:51.516] I (13756) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:51.519] I (13766) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:51.524] I (13766) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:06:51.528] I (13776) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:06:51.532] I (13776) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:06:51.536] I (13776) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:06:51.541] I (13786) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:06:51.546] I (13786) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:06:51.550] I (13796) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:06:51.555] I (13796) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:06:51.560] I (13806) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:06:51.564] I (13806) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:06:51.569] I (13816) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:51.575] I (13816) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:51.579] I (13826) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:06:51.584] I (13826) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:06:51.589] I (13836) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:06:51.594] I (13836) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:06:51.597] I (13836) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:06:51.601] I (13846) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:06:51.606] I (13846) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:06:51.611] I (13856) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:06:51.616] I (13856) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:06:51.621] I (13866) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:06:51.625] I (13866) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:06:51.629] I (13876) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:06:51.633] I (13876) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:06:51.638] I (13886) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:06:51.642] I (13886) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:06:51.647] I (13886) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:06:51.652] I (13896) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:06:51.657] I (13896) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:06:51.660] I (13906) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:06:51.665] I (13906) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:06:51.670] I (13916) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:06:51.674] I (13916) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:06:51.679] I (13926) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:06:51.682] I (13926) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:06:51.688] I (13926) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:06:51.691] I (13936) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:06:51.697] I (13936) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:06:51.701] I (13946) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:06:51.706] I (13946) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:06:51.711] I (13956) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:06:51.714] I (13956) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:06:51.719] I (13966) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:06:51.723] I (13966) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:06:51.728] I (13976) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:06:51.732] I (13976) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:06:51.737] I (13976) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:06:51.742] I (13986) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:06:51.746] I (13986) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:06:51.751] I (13996) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:06:51.756] I (13996) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:06:51.760] I (14006) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:06:51.764] I (14006) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:06:51.769] I (14016) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:06:51.773] I (14016) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:06:51.778] I (14026) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-10 12:06:51.783] I (14026) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-10 12:06:51.787] I (14026) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-10 12:06:51.792] I (14036) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-10 12:06:51.796] I (14036) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-10 12:06:51.801] I (14046) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-10 12:06:51.805] I (14046) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-10 12:06:51.810] I (14056) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-10 12:06:51.818] I (14056) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-10 12:06:51.821] I (14066) MAX31850:   Next discrepancy: 12
+[2026-04-10 12:06:51.825] I (14066) MAX31850:   CRC check: FAIL
+[2026-04-10 12:06:51.830] W (14076) MAX31850: Search failed on attempt 3, will retry...
+[2026-04-10 12:06:51.835] I (14076) MAX31850: Retry attempt 3/3...
+[2026-04-10 12:06:51.863] I (14116) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:06:51.865] I (14116) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:51.868] I (14116) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:51.875] I (14116) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:51.880] I (14126) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:51.885] I (14126) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:51.888] I (14136) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:51.893] I (14136) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:06:51.899] I (14146) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:06:51.902] I (14146) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:06:51.907] I (14146) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:06:51.912] I (14156) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:06:51.915] I (14156) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:06:51.920] I (14166) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:06:51.925] I (14166) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:06:51.929] I (14176) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:06:51.934] I (14176) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:06:51.940] I (14186) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:51.945] I (14186) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:51.950] I (14196) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:06:51.953] I (14196) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:06:51.958] I (14206) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:06:51.963] I (14206) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:06:51.967] I (14206) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:06:51.972] I (14216) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:06:51.976] I (14216) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:06:51.982] I (14226) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:06:51.985] I (14226) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:06:51.990] I (14236) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:06:51.994] I (14236) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:06:51.999] I (14246) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:06:52.003] I (14246) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:06:52.008] I (14256) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:06:52.012] I (14256) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:06:52.017] I (14256) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:06:52.022] I (14266) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:06:52.026] I (14266) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:06:52.031] I (14276) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:06:52.036] I (14276) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:06:52.039] I (14286) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:06:52.044] I (14286) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:06:52.049] I (14296) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:06:52.053] I (14296) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:06:52.058] I (14296) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:06:52.062] I (14306) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:06:52.067] I (14306) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:06:52.071] I (14316) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:06:52.076] I (14316) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:06:52.081] I (14326) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:06:52.085] I (14326) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:06:52.089] I (14336) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:06:52.093] I (14336) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:06:52.098] I (14346) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:06:52.102] I (14346) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:06:52.107] I (14346) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:06:52.111] I (14356) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:06:52.116] I (14356) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:06:52.121] I (14366) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:06:52.125] I (14366) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:06:52.129] I (14376) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:06:52.134] I (14376) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:06:52.139] I (14386) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:06:52.144] I (14386) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:06:52.148] W (14396) MAX31850:   Bit 57: NO RESPONSE (id=1, cmp=1)
+[2026-04-10 12:06:52.153] E (14396) MAX31850: Search failed after 4 attempts
+[2026-04-10 12:06:52.158] I (14396) MAX31850: MAX31850 Init: Found 0 sensors on GPIO14
+[2026-04-10 12:06:52.165] W (14406) MAX31850: No MAX31850 sensors found! Will retry in background task
+[2026-04-10 12:06:52.170] I (14416) MAX31850: === Initialization Complete ===
+[2026-04-10 12:06:52.173] I (14416) MAX31850: Polling task started
+[2026-04-10 12:06:52.185] I (14416) MAX31850: ========== MAX31850 Sensor Info ==========
+[2026-04-10 12:06:52.187] I (14426) MAX31850: Polling task: Re-searching for sensors...
+[2026-04-10 12:06:52.188] I (14426) MAX31850: Total sensors found: 0
+[2026-04-10 12:06:52.193] I (14436) MAX31850: === ROM Search with Retry (max=1) ===
+[2026-04-10 12:06:52.195] I (14436) MAX31850: GPIO: 14
+[2026-04-10 12:06:52.201] I (14436) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:06:52.205] I (14446) MAX31850: Sensor [0]:
+[2026-04-10 12:06:52.210] I (14446) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:52.212] I (14456) MAX31850:   Present: NO
+[2026-04-10 12:06:52.218] I (14456) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:52.221] I (14456) MAX31850: Sensor [1]:
+[2026-04-10 12:06:52.226] I (14466) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:52.229] I (14466) MAX31850:   Present: NO
+[2026-04-10 12:06:52.235] I (14476) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:52.237] I (14476) MAX31850: Sensor [2]:
+[2026-04-10 12:06:52.243] I (14486) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:52.246] I (14486) MAX31850:   Present: NO
+[2026-04-10 12:06:52.250] I (14486) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:52.254] I (14496) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:06:52.259] I (14506) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:06:52.264] I (14506) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:06:52.268] I (14516) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:06:52.272] I (14516) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:06:52.277] I (14516) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:06:52.282] I (14526) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:06:52.286] I (14526) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:06:52.291] I (14536) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:06:52.295] I (14536) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:06:52.301] I (14546) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:52.305] I (14546) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:52.310] I (14556) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:06:52.315] I (14556) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:06:52.319] I (14566) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:06:52.324] I (14566) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:06:52.329] I (14576) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:06:52.333] I (14576) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:06:52.337] I (14576) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:06:52.342] I (14586) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:06:52.345] I (14496) MAX31850: Sensor [3]:
+[2026-04-10 12:06:52.347] I (14596) MAX31850:   Present: NO
+[2026-04-10 12:06:52.352] I (14596) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:06:52.362] I (14596) MAX31850: ==========================================
+[2026-04-10 12:06:52.364] I (14596) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:06:52.367] I (14606) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:06:52.372] I (14616) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:06:52.376] I (14616) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:06:52.381] I (14626) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:06:52.385] I (14626) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:06:52.389] I (14636) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:06:52.394] I (14636) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:06:52.399] I (14646) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:06:52.404] I (14646) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:06:52.407] I (14646) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:06:52.412] I (14656) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:06:52.417] I (14656) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:06:52.421] I (14666) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:06:52.426] I (14666) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:06:52.430] I (14676) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:06:52.435] I (14676) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:06:52.439] I (14686) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:06:52.444] I (14686) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:06:52.449] I (14696) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:06:52.453] I (14696) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:06:52.456] I (14696) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:06:52.461] I (14706) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:06:52.466] I (14706) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:06:52.471] I (14716) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:06:52.476] I (14716) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:06:52.480] I (14726) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:06:52.484] I (14726) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:06:52.489] I (14736) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:06:52.494] I (14736) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:06:52.497] I (14746) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:06:52.502] I (14746) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:06:52.507] I (14746) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:06:52.512] I (14756) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:06:52.515] I (14756) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:06:52.520] I (14766) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-10 12:06:52.524] I (14766) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-10 12:06:52.529] I (14776) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-10 12:06:52.534] I (14776) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-10 12:06:52.539] I (14786) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-10 12:06:52.543] I (14786) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-10 12:06:52.548] I (14786) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-10 12:06:52.552] I (14796) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-10 12:06:52.561] I (14796) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-10 12:06:52.564] I (14806) MAX31850:   Next discrepancy: 12
+[2026-04-10 12:06:52.568] I (14816) MAX31850:   CRC check: FAIL
+[2026-04-10 12:06:52.573] W (14816) MAX31850: Search failed on attempt 1, will retry...
+[2026-04-10 12:06:52.577] I (14816) MAX31850: Retry attempt 1/1...
+[2026-04-10 12:06:52.584] I (14836) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:06:52.587] I (14836) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:52.593] I (14836) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:52.598] I (14846) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:52.604] I (14846) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:52.609] I (14856) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:52.613] I (14856) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:52.618] I (14866) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:06:52.622] I (14866) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:06:52.627] I (14866) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:06:52.631] I (14876) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:06:52.636] I (14876) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:06:52.641] I (14886) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:06:52.644] I (14886) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:06:52.649] I (14896) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:06:52.654] I (14896) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:06:52.658] I (14906) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:06:52.664] I (14906) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:52.669] I (14916) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:52.674] I (14916) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:06:52.679] I (14926) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:06:52.682] I (14926) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:06:52.687] I (14926) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:06:52.691] I (14936) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:06:52.696] I (14936) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:06:52.701] I (14946) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:06:52.706] I (14946) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:06:52.709] I (14956) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:06:52.715] I (14956) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:06:52.719] I (14966) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:06:52.723] I (14966) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:06:52.728] I (14966) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:06:52.733] I (14976) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:06:52.736] I (14976) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:06:52.742] I (14986) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:06:52.745] I (14986) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:06:52.750] I (14996) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:06:52.755] I (14996) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:06:52.759] I (15006) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:06:52.764] I (15006) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:06:52.769] I (15016) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:06:52.773] I (15016) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:06:52.778] I (15016) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:06:52.782] I (15026) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:06:52.786] I (15026) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:06:52.791] I (15036) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:06:52.795] I (15036) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:06:52.800] I (15046) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:06:52.805] I (15046) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:06:52.810] I (15056) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:06:52.814] I (15056) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:06:52.817] I (15066) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:06:52.822] I (15066) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:06:52.827] I (15066) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:06:52.831] I (15076) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:06:52.836] I (15076) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:06:52.841] I (15086) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:06:52.844] I (15086) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:06:52.850] I (15096) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:06:52.855] I (15096) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:06:52.859] I (15106) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:06:52.863] I (15106) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:06:52.868] I (15106) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:06:52.873] I (15116) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-10 12:06:52.877] I (15116) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-10 12:06:52.880] I (15126) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-10 12:06:52.885] I (15126) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-10 12:06:52.890] I (15136) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-10 12:06:52.894] I (15136) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-10 12:06:52.899] I (15146) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-10 12:06:52.904] I (15146) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-10 12:06:52.912] I (15156) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-10 12:06:52.915] I (15156) MAX31850:   Next discrepancy: 12
+[2026-04-10 12:06:52.920] I (15166) MAX31850:   CRC check: FAIL
+[2026-04-10 12:06:52.923] E (15166) MAX31850: Search failed after 2 attempts
+[2026-04-10 12:06:53.525] I (15776) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:53.528] I (15776) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:53.530] I (15776) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:53.534] I (15776) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:53.539] I (15786) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:53.542] I (15786) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:54.545] I (16796) MAX31850: Polling task: Re-searching for sensors...
+[2026-04-10 12:06:54.546] I (16796) MAX31850: === ROM Search with Retry (max=1) ===
+[2026-04-10 12:06:54.549] I (16796) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:06:54.554] I (16796) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:54.560] I (16806) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:54.565] I (16806) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:54.571] I (16816) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:54.576] I (16816) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:54.580] I (16826) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:54.584] I (16826) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:06:54.588] I (16836) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:06:54.593] I (16836) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:06:54.598] I (16846) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:06:54.603] I (16846) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:06:54.607] I (16846) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:06:54.612] I (16856) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:06:54.616] I (16856) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:06:54.620] I (16866) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:06:54.625] I (16866) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:06:54.631] I (16876) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:54.636] I (16876) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:54.640] I (16886) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:06:54.645] I (16886) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:06:54.649] I (16896) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:06:54.654] I (16896) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:06:54.658] I (16906) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:06:54.663] I (16906) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:06:54.667] I (16906) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:06:54.671] I (16916) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:06:54.676] I (16916) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:06:54.681] I (16926) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:06:54.685] I (16926) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:06:54.690] I (16936) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:06:54.695] I (16936) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:06:54.699] I (16946) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:06:54.704] I (16946) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:06:54.708] I (16956) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:06:54.713] I (16956) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:06:54.717] I (16956) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:06:54.721] I (16966) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:06:54.725] I (16966) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:06:54.730] I (16976) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:06:54.735] I (16976) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:06:54.740] I (16986) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:06:54.745] I (16986) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:06:54.748] I (16996) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:06:54.753] I (16996) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:06:54.758] I (16996) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:06:54.762] I (17006) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:06:54.767] I (17006) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:06:54.771] I (17016) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:06:54.776] I (17016) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:06:54.780] I (17026) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:06:54.785] I (17026) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:06:54.790] I (17036) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:06:54.793] I (17036) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:06:54.798] I (17046) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:06:54.803] I (17046) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:06:54.807] I (17046) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:06:54.812] I (17056) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:06:54.816] I (17056) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:06:54.821] I (17066) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:06:54.826] I (17066) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:06:54.829] I (17076) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:06:54.834] I (17076) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:06:54.839] I (17086) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-10 12:06:54.844] I (17086) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-10 12:06:54.849] I (17096) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-10 12:06:54.853] I (17096) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-10 12:06:54.856] I (17096) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-10 12:06:54.861] I (17106) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-10 12:06:54.866] I (17106) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-10 12:06:54.870] I (17116) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-10 12:06:54.880] I (17116) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-10 12:06:54.882] I (17126) MAX31850:   Next discrepancy: 12
+[2026-04-10 12:06:54.885] I (17126) MAX31850:   CRC check: FAIL
+[2026-04-10 12:06:54.892] W (17136) MAX31850: Search failed on attempt 1, will retry...
+[2026-04-10 12:06:54.895] I (17136) MAX31850: Retry attempt 1/1...
+[2026-04-10 12:06:54.904] I (17156) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:06:54.905] I (17156) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:54.911] I (17156) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:54.916] I (17156) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:54.922] I (17166) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:54.927] I (17166) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:54.932] I (17176) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:54.936] I (17176) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:06:54.941] I (17186) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:06:54.946] I (17186) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:06:54.949] I (17196) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:06:54.954] I (17196) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:06:54.958] I (17206) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:06:54.963] I (17206) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:06:54.968] I (17206) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:06:54.972] I (17216) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:06:54.977] I (17216) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:06:54.982] I (17226) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:54.987] I (17226) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:54.992] I (17236) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:06:54.997] I (17236) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:06:55.001] I (17246) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:06:55.006] I (17246) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:06:55.011] I (17256) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:06:55.015] I (17256) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:06:55.020] I (17266) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:06:55.024] I (17266) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:06:55.029] I (17276) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:06:55.032] I (17276) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:06:55.037] I (17276) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:06:55.041] I (17286) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:06:55.046] I (17286) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:06:55.051] I (17296) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:06:55.055] I (17296) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:06:55.060] I (17306) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:06:55.065] I (17306) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:06:55.068] I (17316) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:06:55.073] I (17316) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:06:55.077] I (17316) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:06:55.082] I (17326) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:06:55.086] I (17326) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:06:55.091] I (17336) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:06:55.095] I (17336) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:06:55.100] I (17346) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:06:55.105] I (17346) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:06:55.109] I (17356) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:06:55.114] I (17356) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:06:55.119] I (17366) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:06:55.124] I (17366) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:06:55.127] I (17366) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:06:55.132] I (17376) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:06:55.137] I (17376) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:06:55.140] I (17386) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:06:55.145] I (17386) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:06:55.149] I (17396) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:06:55.154] I (17396) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:06:55.159] I (17406) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:06:55.163] I (17406) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:06:55.168] I (17416) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:06:55.173] I (17416) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:06:55.177] I (17416) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:06:55.182] I (17426) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:06:55.187] I (17426) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:06:55.190] I (17436) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-10 12:06:55.195] I (17436) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-10 12:06:55.199] I (17446) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-10 12:06:55.204] I (17446) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-10 12:06:55.209] I (17456) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-10 12:06:55.214] I (17456) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-10 12:06:55.217] I (17456) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-10 12:06:55.222] I (17466) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-10 12:06:55.231] I (17466) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-10 12:06:55.234] I (17476) MAX31850:   Next discrepancy: 12
+[2026-04-10 12:06:55.237] I (17486) MAX31850:   CRC check: FAIL
+[2026-04-10 12:06:55.242] E (17486) MAX31850: Search failed after 2 attempts
+[2026-04-10 12:06:56.333] I (18586) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:56.335] I (18586) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:56.339] I (18586) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:56.344] I (18586) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:56.349] I (18596) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:56.354] I (18596) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:57.355] E (19606) mqtt_client: esp_mqtt_connect: mqtt_message_receive() returned 0
+[2026-04-10 12:06:57.357] E (19606) mqtt_client: MQTT connect failed
+[2026-04-10 12:06:57.359] I (19606) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-04-10 12:06:57.365] I (19606) MAX31850: Polling task: Re-searching for sensors...
+[2026-04-10 12:06:57.371] W (19606) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=1, 总计=1
+[2026-04-10 12:06:57.376] I (19616) MAX31850: === ROM Search with Retry (max=1) ===
+[2026-04-10 12:06:57.381] I (19616) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-04-10 12:06:57.387] I (19626) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:06:57.397] W (19626) ESP32S3_MQTT_EVENT: 断开原因: PING_OR_UNKNOWN_ERROR (type=0, tls_err=0, stack_err=0, ret_code=0)
+[2026-04-10 12:06:57.400] I (19636) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:57.412] W (19646) MQTT_MONITOR: [断开事件] #1 | 时间: 2026-04-10 12:06:56 [运行 00:00:19] | 原因: PING_OR_UNKNOWN_ERROR
+[2026-04-10 12:06:57.417] I (19646) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:57.421] I (19656) PCNT_EVENT: Motor 0 idle, PCNT=0
+[2026-04-10 12:06:57.426] I (19666) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:57.433] I (19676) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:57.436] I (19656) PCNT_EVENT: Motor 2 idle, PCNT=0
+[2026-04-10 12:06:57.441] I (19676) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:57.445] I (19686) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:57.450] I (19676) PWM_EVENT: PWM channel 0 duty set to 8191.
+[2026-04-10 12:06:57.454] I (19696) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:06:57.459] I (19656) PCNT_EVENT: Motor 1 idle, PCNT=0
+[2026-04-10 12:06:57.462] I (19706) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:06:57.467] I (19656) PCNT_EVENT: Motor 3 idle, PCNT=0
+[2026-04-10 12:06:57.472] I (19706) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:06:57.475] I (19686) PWM_EVENT: PWM channel 2 duty set to 8191.
+[2026-04-10 12:06:57.480] I (19716) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:06:57.485] I (19706) PWM_EVENT: PWM channel 1 duty set to 8191.
+[2026-04-10 12:06:57.489] I (19726) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:06:57.494] I (19716) PWM_EVENT: PWM channel 3 duty set to 8191.
+[2026-04-10 12:06:57.498] I (19736) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:06:57.503] I (19746) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:06:57.507] I (19746) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:06:57.512] I (19756) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:06:57.517] I (19756) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:06:57.522] I (19766) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:57.527] I (19766) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:57.532] I (19776) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:06:57.537] I (19776) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:06:57.541] I (19786) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:06:57.546] I (19786) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:06:57.549] I (19796) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:06:57.554] I (19796) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:06:57.559] I (19806) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:06:57.563] I (19806) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:06:57.567] I (19816) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:06:57.572] I (19816) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:06:57.577] I (19816) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:06:57.581] I (19826) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:06:57.585] I (19826) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:06:57.590] I (19836) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:06:57.595] I (19836) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:06:57.600] I (19846) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:06:57.603] I (19846) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:06:57.608] I (19856) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:06:57.613] I (19856) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:06:57.618] I (19856) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:06:57.622] I (19866) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:06:57.627] I (19866) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:06:57.631] I (19876) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:06:57.636] I (19876) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:06:57.641] I (19886) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:06:57.644] I (19886) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:06:57.650] I (19896) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:06:57.654] I (19896) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:06:57.662] I (19906) PCNT_EVENT: Motor 0 startup protection ended, normal PCNT monitoring active
+[2026-04-10 12:06:57.666] I (19906) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:06:57.671] I (19916) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:06:57.674] I (19916) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:06:57.682] I (19926) PCNT_EVENT: Motor 2 startup protection ended, normal PCNT monitoring active
+[2026-04-10 12:06:57.686] I (19926) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:06:57.695] I (19936) PCNT_EVENT: Motor 1 startup protection ended, normal PCNT monitoring active
+[2026-04-10 12:06:57.698] I (19936) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:06:57.703] I (19946) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:06:57.708] I (19956) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:06:57.713] I (19956) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:06:57.721] I (19956) PCNT_EVENT: Motor 3 startup protection ended, normal PCNT monitoring active
+[2026-04-10 12:06:57.724] I (19956) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:06:57.728] I (19976) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:06:57.733] I (19976) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:06:57.737] I (19986) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:06:57.742] I (19986) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:06:57.747] I (19986) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:06:57.752] I (19996) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:06:57.756] I (19996) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:06:57.761] I (20006) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-10 12:06:57.764] I (20006) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-10 12:06:57.770] I (20016) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-10 12:06:57.773] I (20016) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-10 12:06:57.778] I (20026) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-10 12:06:57.783] I (20026) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-10 12:06:57.787] I (20026) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-10 12:06:57.792] I (20036) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-10 12:06:57.801] I (20036) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-10 12:06:57.804] I (20046) MAX31850:   Next discrepancy: 12
+[2026-04-10 12:06:57.808] I (20056) MAX31850:   CRC check: FAIL
+[2026-04-10 12:06:57.814] W (20056) MAX31850: Search failed on attempt 1, will retry...
+[2026-04-10 12:06:57.817] I (20056) MAX31850: Retry attempt 1/1...
+[2026-04-10 12:06:57.823] I (20076) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:06:57.827] I (20076) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:57.833] I (20076) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:57.838] I (20086) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:57.845] I (20086) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:57.850] I (20096) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:57.853] I (20096) MAX31850:   Presence detected: YES
+[2026-04-10 12:06:57.858] I (20106) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:06:57.862] I (20106) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:06:57.867] I (20106) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:06:57.872] I (20116) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:06:57.875] I (20116) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:06:57.880] I (20126) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:06:57.885] I (20126) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:06:57.889] I (20136) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:06:57.894] I (20136) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:06:57.902] I (20146) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:06:57.905] I (20146) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:57.909] I (20156) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:06:57.914] I (20156) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:06:57.919] I (20166) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:06:57.922] I (20166) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:06:57.927] I (20166) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:06:57.932] I (20176) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:06:57.936] I (20176) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:06:57.941] I (20186) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:06:57.945] I (20186) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:06:57.950] I (20196) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:06:57.954] I (20196) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:06:57.959] I (20206) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:06:57.963] I (20206) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:06:57.968] I (20216) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:06:57.973] I (20216) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:06:57.977] I (20216) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:06:57.982] I (20226) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:06:57.987] I (20226) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:06:57.991] I (20236) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:06:57.995] I (20236) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:06:57.999] I (20246) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:06:58.004] I (20246) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:06:58.009] I (20256) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:06:58.014] I (20256) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:06:58.018] I (20256) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:06:58.022] I (20266) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:06:58.027] I (20266) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:06:58.032] I (20276) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:06:58.036] I (20276) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:06:58.041] I (20286) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:06:58.044] I (20286) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:06:58.049] I (20296) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:06:58.054] I (20296) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:06:58.059] I (20306) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:06:58.063] I (20306) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:06:58.068] I (20306) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:06:58.071] I (20316) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:06:58.076] I (20316) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:06:58.081] I (20326) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:06:58.086] I (20326) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:06:58.090] I (20336) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:06:58.095] I (20336) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:06:58.098] I (20346) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:06:58.103] I (20346) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:06:58.108] I (20356) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:06:58.112] I (20356) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-10 12:06:58.117] I (20356) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-10 12:06:58.121] I (20366) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-10 12:06:58.126] I (20366) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-10 12:06:58.131] I (20376) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-10 12:06:58.135] I (20376) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-10 12:06:58.140] I (20386) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-10 12:06:58.143] I (20386) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-10 12:06:58.152] I (20396) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-10 12:06:58.157] I (20396) MAX31850:   Next discrepancy: 12
+[2026-04-10 12:06:58.160] I (20406) MAX31850:   CRC check: FAIL
+[2026-04-10 12:06:58.163] E (20406) MAX31850: Search failed after 2 attempts
+[2026-04-10 12:06:59.765] I (22016) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:06:59.767] I (22016) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:06:59.769] I (22016) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:06:59.775] I (22016) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:06:59.780] I (22026) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:06:59.783] I (22026) MAX31850:   Presence detected: YES
+[2026-04-10 12:07:00.785] I (23036) MAX31850: Polling task: Re-searching for sensors...
+[2026-04-10 12:07:00.787] I (23036) MAX31850: === ROM Search with Retry (max=0) ===
+[2026-04-10 12:07:00.789] I (23036) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:07:00.794] I (23036) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:07:00.801] I (23046) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:07:00.805] I (23046) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:07:00.812] I (23056) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:07:00.817] I (23056) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:07:00.820] I (23066) MAX31850:   Presence detected: YES
+[2026-04-10 12:07:00.825] I (23066) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:07:00.830] I (23076) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:07:00.833] I (23076) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:07:00.837] I (23086) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:07:00.842] I (23086) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:07:00.847] I (23086) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:07:00.852] I (23096) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:07:00.856] I (23096) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:07:00.861] I (23106) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:07:00.865] I (23106) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:07:00.871] I (23116) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:07:00.876] I (23116) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:07:00.880] I (23126) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:07:00.885] I (23126) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:07:00.890] I (23136) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:07:00.894] I (23136) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:07:00.899] I (23146) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:07:00.902] I (23146) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:07:00.907] I (23146) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:07:00.912] I (23156) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:07:00.916] I (23156) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:07:00.921] I (23166) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:07:00.926] I (23166) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:07:00.931] I (23176) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:07:00.935] I (23176) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:07:00.938] I (23186) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:07:00.943] I (23186) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:07:00.948] I (23196) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:07:00.952] I (23196) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:07:00.957] I (23196) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:07:00.961] I (23206) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:07:00.966] I (23206) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:07:00.971] I (23216) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:07:00.976] I (23216) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:07:00.979] I (23226) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:07:00.984] I (23226) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:07:00.988] I (23236) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:07:00.993] I (23236) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:07:00.998] I (23236) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:07:01.002] I (23246) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:07:01.006] I (23246) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:07:01.011] I (23256) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:07:01.016] I (23256) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:07:01.020] I (23266) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:07:01.025] I (23266) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:07:01.030] I (23276) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:07:01.033] I (23276) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:07:01.039] I (23286) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:07:01.042] I (23286) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:07:01.047] I (23286) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:07:01.052] I (23296) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:07:01.056] I (23296) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:07:01.061] I (23306) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:07:01.065] I (23306) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:07:01.070] I (23316) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:07:01.075] I (23316) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:07:01.079] I (23326) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-10 12:07:01.084] I (23326) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-10 12:07:01.088] I (23336) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-10 12:07:01.093] I (23336) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-10 12:07:01.098] I (23336) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-10 12:07:01.102] I (23346) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-10 12:07:01.106] I (23346) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-10 12:07:01.110] I (23356) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-10 12:07:01.120] I (23356) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-10 12:07:01.122] I (23366) MAX31850:   Next discrepancy: 12
+[2026-04-10 12:07:01.126] I (23366) MAX31850:   CRC check: FAIL
+[2026-04-10 12:07:01.131] E (23376) MAX31850: Search failed after 1 attempts
+[2026-04-10 12:07:03.224] I (25476) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:07:03.226] I (25476) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:07:03.228] I (25476) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:07:03.235] I (25476) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:07:03.240] I (25486) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:07:03.243] I (25486) MAX31850:   Presence detected: YES
+[2026-04-10 12:07:04.244] I (26496) MAX31850: Polling task: Re-searching for sensors...
+[2026-04-10 12:07:04.246] I (26496) MAX31850: === ROM Search with Retry (max=0) ===
+[2026-04-10 12:07:04.251] I (26496) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:07:04.254] I (26496) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:07:04.261] I (26506) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:07:04.265] I (26506) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:07:04.272] I (26516) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:07:04.276] I (26516) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:07:04.281] I (26526) MAX31850:   Presence detected: YES
+[2026-04-10 12:07:04.285] I (26526) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:07:04.288] I (26536) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:07:04.294] I (26536) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:07:04.298] I (26546) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:07:04.303] I (26546) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:07:04.307] I (26546) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:07:04.312] I (26556) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:07:04.316] I (26556) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:07:04.320] I (26566) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:07:04.325] I (26566) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:07:04.331] I (26576) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:07:04.336] I (26576) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:07:04.340] I (26586) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:07:04.345] I (26586) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:07:04.350] I (26596) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:07:04.354] I (26596) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:07:04.359] I (26606) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:07:04.363] I (26606) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:07:04.368] I (26606) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:07:04.372] I (26616) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:07:04.376] I (26616) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:07:04.381] I (26626) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:07:04.386] I (26626) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:07:04.390] I (26636) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:07:04.395] I (26636) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:07:04.400] I (26646) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:07:04.405] I (26646) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:07:04.408] I (26656) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:07:04.413] I (26656) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:07:04.417] I (26656) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:07:04.422] I (26666) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:07:04.426] I (26666) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:07:04.431] I (26676) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:07:04.435] I (26676) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:07:04.440] I (26686) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:07:04.444] I (26686) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:07:04.448] I (26696) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:07:04.453] I (26696) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:07:04.457] I (26696) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:07:04.462] I (26706) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:07:04.467] I (26706) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:07:04.471] I (26716) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:07:04.476] I (26716) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:07:04.480] I (26726) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:07:04.484] I (26726) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:07:04.489] I (26736) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:07:04.493] I (26736) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:07:04.498] I (26746) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:07:04.503] I (26746) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:07:04.508] I (26746) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:07:04.512] I (26756) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:07:04.517] I (26756) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:07:04.520] I (26766) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:07:04.526] I (26766) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:07:04.531] I (26776) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:07:04.534] I (26776) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:07:04.539] I (26786) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-10 12:07:04.543] I (26786) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-10 12:07:04.547] I (26796) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-10 12:07:04.552] I (26796) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-10 12:07:04.557] I (26796) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-10 12:07:04.562] I (26806) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-10 12:07:04.567] I (26806) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-10 12:07:04.571] I (26816) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-10 12:07:04.579] I (26816) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-10 12:07:04.583] I (26826) MAX31850:   Next discrepancy: 12
+[2026-04-10 12:07:04.586] I (26826) MAX31850:   CRC check: FAIL
+[2026-04-10 12:07:04.590] E (26836) MAX31850: Search failed after 1 attempts
+[2026-04-10 12:07:07.185] I (29436) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:07:07.187] I (29436) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:07:07.189] I (29436) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:07:07.195] I (29436) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:07:07.200] I (29446) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:07:07.203] I (29446) MAX31850:   Presence detected: YES
+[2026-04-10 12:07:07.335] W (29586) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=1/3, 会话重连=1, 总计=1)
+[2026-04-10 12:07:08.205] I (30456) MAX31850: Polling task: Re-searching for sensors...
+[2026-04-10 12:07:08.207] I (30456) MAX31850: === ROM Search with Retry (max=0) ===
+[2026-04-10 12:07:08.210] I (30456) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:07:08.214] I (30456) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:07:08.220] I (30466) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:07:08.225] I (30466) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:07:08.231] I (30476) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:07:08.236] I (30476) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:07:08.240] I (30486) MAX31850:   Presence detected: YES
+[2026-04-10 12:07:08.245] I (30486) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:07:08.250] I (30496) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:07:08.253] I (30496) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:07:08.258] I (30506) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:07:08.262] I (30506) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:07:08.267] I (30506) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:07:08.272] I (30516) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:07:08.276] I (30516) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:07:08.281] I (30526) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:07:08.286] I (30526) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:07:08.290] I (30536) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:07:08.297] I (30536) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:07:08.300] I (30546) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:07:08.305] I (30546) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:07:08.309] I (30556) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:07:08.314] I (30556) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:07:08.318] I (30566) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:07:08.323] I (30566) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:07:08.328] I (30566) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:07:08.332] I (30576) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:07:08.336] I (30576) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:07:08.341] I (30586) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:07:08.345] I (30586) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:07:08.349] I (30596) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:07:08.355] I (30596) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:07:08.360] I (30606) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:07:08.364] I (30606) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:07:08.368] I (30616) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:07:08.373] I (30616) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:07:08.378] I (30616) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:07:08.383] I (30626) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:07:08.386] I (30626) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:07:08.391] I (30636) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:07:08.395] I (30636) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:07:08.400] I (30646) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:07:08.405] I (30646) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:07:08.410] I (30656) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:07:08.413] I (30656) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:07:08.418] I (30656) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:07:08.423] I (30666) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:07:08.428] I (30666) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:07:08.431] I (30676) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:07:08.435] I (30676) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:07:08.440] I (30686) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:07:08.445] I (30686) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:07:08.450] I (30696) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:07:08.454] I (30696) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:07:08.459] I (30706) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:07:08.464] I (30706) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:07:08.467] I (30706) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:07:08.472] I (30716) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:07:08.476] I (30716) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:07:08.480] I (30726) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:07:08.485] I (30726) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:07:08.490] I (30736) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:07:08.495] I (30736) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:07:08.500] I (30746) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-10 12:07:08.504] I (30746) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-10 12:07:08.509] I (30756) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-10 12:07:08.512] I (30756) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-10 12:07:08.517] I (30756) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-10 12:07:08.522] I (30766) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-10 12:07:08.526] I (30766) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-10 12:07:08.531] I (30776) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-10 12:07:08.539] I (30776) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-10 12:07:08.543] I (30786) MAX31850:   Next discrepancy: 12
+[2026-04-10 12:07:08.547] I (30786) MAX31850:   CRC check: FAIL
+[2026-04-10 12:07:08.552] E (30796) MAX31850: Search failed after 1 attempts
+[2026-04-10 12:07:10.426] E (32676) mqtt_client: esp_mqtt_connect: mqtt_message_receive() returned 0
+[2026-04-10 12:07:10.428] E (32676) mqtt_client: MQTT connect failed
+[2026-04-10 12:07:10.430] I (32676) ESP32S3_MQTT_EVENT: Disconnected from MQTT server.
+[2026-04-10 12:07:10.437] W (32676) ESP32S3_MQTT_EVENT: MQTT断开次数: 当前会话=2, 总计=2
+[2026-04-10 12:07:10.440] I (32686) ESP32S3_STATUS_LED: LED mode changed to: 2
+[2026-04-10 12:07:10.450] W (32686) ESP32S3_MQTT_EVENT: 断开原因: PING_OR_UNKNOWN_ERROR (type=0, tls_err=0, stack_err=0, ret_code=0)
+[2026-04-10 12:07:10.461] W (32696) MQTT_MONITOR: [断开事件] #2 | 时间: 2026-04-10 12:07:09 [运行 00:00:32] | 原因: PING_OR_UNKNOWN_ERROR
+[2026-04-10 12:07:11.144] I (33396) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:07:11.146] I (33396) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:07:11.150] I (33396) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:07:11.154] I (33396) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:07:11.159] I (33406) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:07:11.163] I (33406) MAX31850:   Presence detected: YES
+[2026-04-10 12:07:12.165] I (34416) MAX31850: Polling task: Re-searching for sensors...
+[2026-04-10 12:07:12.167] I (34416) MAX31850: === ROM Search with Retry (max=0) ===
+[2026-04-10 12:07:12.170] I (34416) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:07:12.173] I (34416) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:07:12.181] I (34426) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:07:12.185] I (34426) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:07:12.191] I (34436) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:07:12.196] I (34436) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:07:12.200] I (34446) MAX31850:   Presence detected: YES
+[2026-04-10 12:07:12.205] I (34446) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:07:12.210] I (34456) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:07:12.213] I (34456) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:07:12.218] I (34466) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:07:12.223] I (34466) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:07:12.227] I (34466) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:07:12.232] I (34476) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:07:12.236] I (34476) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:07:12.241] I (34486) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:07:12.245] I (34486) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:07:12.251] I (34496) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:07:12.256] I (34496) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:07:12.261] I (34506) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:07:12.265] I (34506) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:07:12.270] I (34516) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:07:12.275] I (34516) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:07:12.279] I (34526) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:07:12.282] I (34526) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:07:12.287] I (34526) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:07:12.292] I (34536) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:07:12.297] I (34536) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:07:12.301] I (34546) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:07:12.306] I (34546) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:07:12.310] I (34556) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:07:12.315] I (34556) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:07:12.320] I (34566) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:07:12.323] I (34566) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:07:12.328] I (34576) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:07:12.333] I (34576) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:07:12.337] I (34576) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:07:12.342] I (34586) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:07:12.347] I (34586) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:07:12.351] I (34596) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:07:12.356] I (34596) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:07:12.361] I (34606) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:07:12.365] I (34606) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:07:12.369] I (34616) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:07:12.373] I (34616) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:07:12.378] I (34616) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:07:12.383] I (34626) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:07:12.387] I (34626) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:07:12.392] I (34636) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:07:12.396] I (34636) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:07:12.401] I (34646) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:07:12.405] I (34646) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:07:12.410] I (34656) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:07:12.415] I (34656) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:07:12.418] I (34666) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:07:12.423] I (34666) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:07:12.428] I (34666) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:07:12.432] I (34676) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:07:12.437] I (34676) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:07:12.440] I (34686) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:07:12.445] I (34686) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:07:12.450] I (34696) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:07:12.454] I (34696) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:07:12.459] I (34706) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-10 12:07:12.464] I (34706) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-10 12:07:12.469] I (34716) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-10 12:07:12.474] I (34716) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-10 12:07:12.477] I (34716) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-10 12:07:12.482] I (34726) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-10 12:07:12.487] I (34726) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-10 12:07:12.491] I (34736) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-10 12:07:12.499] I (34736) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-10 12:07:12.503] I (34746) MAX31850:   Next discrepancy: 12
+[2026-04-10 12:07:12.506] I (34746) MAX31850:   CRC check: FAIL
+[2026-04-10 12:07:12.511] E (34756) MAX31850: Search failed after 1 attempts
+[2026-04-10 12:07:15.104] I (37356) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:07:15.106] I (37356) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:07:15.109] I (37356) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:07:15.115] I (37356) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:07:15.119] I (37366) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:07:15.124] I (37366) MAX31850:   Presence detected: YES
+[2026-04-10 12:07:16.124] I (38376) MAX31850: Polling task: Re-searching for sensors...
+[2026-04-10 12:07:16.126] I (38376) MAX31850: === ROM Search with Retry (max=0) ===
+[2026-04-10 12:07:16.131] I (38376) MAX31850: === ROM Search Started (last_discrepancy=0) ===
+[2026-04-10 12:07:16.134] I (38376) MAX31850: === 1-Wire Reset Waveform ===
+[2026-04-10 12:07:16.141] I (38386) MAX31850:   Timing: reset=480us, wait=70us, presence=240us
+[2026-04-10 12:07:16.146] I (38386) MAX31850:   Level before reset: 1 (expected 1)
+[2026-04-10 12:07:16.152] I (38396) MAX31850:   Level during presence window: 0 (0=detected)
+[2026-04-10 12:07:16.156] I (38396) MAX31850:   Level after reset: 1 (expected 1)
+[2026-04-10 12:07:16.161] I (38406) MAX31850:   Presence detected: YES
+[2026-04-10 12:07:16.164] I (38406) MAX31850:   Bit  1: CONSISTENT (value=1)
+[2026-04-10 12:07:16.169] I (38416) MAX31850:   Bit  2: CONSISTENT (value=1)
+[2026-04-10 12:07:16.174] I (38416) MAX31850:   Bit  3: CONSISTENT (value=0)
+[2026-04-10 12:07:16.179] I (38426) MAX31850:   Bit  4: CONSISTENT (value=1)
+[2026-04-10 12:07:16.182] I (38426) MAX31850:   Bit  5: CONSISTENT (value=1)
+[2026-04-10 12:07:16.187] I (38426) MAX31850:   Bit  6: CONSISTENT (value=1)
+[2026-04-10 12:07:16.191] I (38436) MAX31850:   Bit  7: CONSISTENT (value=0)
+[2026-04-10 12:07:16.197] I (38436) MAX31850:   Bit  8: CONSISTENT (value=0)
+[2026-04-10 12:07:16.202] I (38446) MAX31850:   Bit  9: CONSISTENT (value=0)
+[2026-04-10 12:07:16.205] I (38446) MAX31850:   Bit 10: CONSISTENT (value=0)
+[2026-04-10 12:07:16.212] I (38456) MAX31850:   Bit 11: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:07:16.216] I (38456) MAX31850:   Bit 12: CONFLICT (0 and 1), choosing 0
+[2026-04-10 12:07:16.220] I (38466) MAX31850:   Bit 13: CONSISTENT (value=0)
+[2026-04-10 12:07:16.225] I (38466) MAX31850:   Bit 14: CONSISTENT (value=0)
+[2026-04-10 12:07:16.230] I (38476) MAX31850:   Bit 15: CONSISTENT (value=0)
+[2026-04-10 12:07:16.234] I (38476) MAX31850:   Bit 16: CONSISTENT (value=0)
+[2026-04-10 12:07:16.238] I (38486) MAX31850:   Bit 17: CONSISTENT (value=0)
+[2026-04-10 12:07:16.243] I (38486) MAX31850:   Bit 18: CONSISTENT (value=0)
+[2026-04-10 12:07:16.248] I (38486) MAX31850:   Bit 19: CONSISTENT (value=0)
+[2026-04-10 12:07:16.253] I (38496) MAX31850:   Bit 20: CONSISTENT (value=0)
+[2026-04-10 12:07:16.257] I (38496) MAX31850:   Bit 21: CONSISTENT (value=0)
+[2026-04-10 12:07:16.261] I (38506) MAX31850:   Bit 22: CONSISTENT (value=0)
+[2026-04-10 12:07:16.266] I (38506) MAX31850:   Bit 23: CONSISTENT (value=0)
+[2026-04-10 12:07:16.271] I (38516) MAX31850:   Bit 24: CONSISTENT (value=0)
+[2026-04-10 12:07:16.275] I (38516) MAX31850:   Bit 25: CONSISTENT (value=1)
+[2026-04-10 12:07:16.279] I (38526) MAX31850:   Bit 26: CONSISTENT (value=1)
+[2026-04-10 12:07:16.283] I (38526) MAX31850:   Bit 27: CONSISTENT (value=1)
+[2026-04-10 12:07:16.288] I (38536) MAX31850:   Bit 28: CONSISTENT (value=1)
+[2026-04-10 12:07:16.293] I (38536) MAX31850:   Bit 29: CONSISTENT (value=0)
+[2026-04-10 12:07:16.297] I (38536) MAX31850:   Bit 30: CONSISTENT (value=0)
+[2026-04-10 12:07:16.302] I (38546) MAX31850:   Bit 31: CONSISTENT (value=0)
+[2026-04-10 12:07:16.307] I (38546) MAX31850:   Bit 32: CONSISTENT (value=0)
+[2026-04-10 12:07:16.312] I (38556) MAX31850:   Bit 33: CONSISTENT (value=1)
+[2026-04-10 12:07:16.315] I (38556) MAX31850:   Bit 34: CONSISTENT (value=0)
+[2026-04-10 12:07:16.320] I (38566) MAX31850:   Bit 35: CONSISTENT (value=0)
+[2026-04-10 12:07:16.324] I (38566) MAX31850:   Bit 36: CONSISTENT (value=0)
+[2026-04-10 12:07:16.329] I (38576) MAX31850:   Bit 37: CONSISTENT (value=0)
+[2026-04-10 12:07:16.334] I (38576) MAX31850:   Bit 38: CONSISTENT (value=1)
+[2026-04-10 12:07:16.339] I (38576) MAX31850:   Bit 39: CONSISTENT (value=1)
+[2026-04-10 12:07:16.342] I (38586) MAX31850:   Bit 40: CONSISTENT (value=1)
+[2026-04-10 12:07:16.346] I (38586) MAX31850:   Bit 41: CONSISTENT (value=1)
+[2026-04-10 12:07:16.353] I (38596) MAX31850:   Bit 42: CONSISTENT (value=0)
+[2026-04-10 12:07:16.356] I (38596) MAX31850:   Bit 43: CONSISTENT (value=1)
+[2026-04-10 12:07:16.360] I (38606) MAX31850:   Bit 44: CONSISTENT (value=0)
+[2026-04-10 12:07:16.365] I (38606) MAX31850:   Bit 45: CONSISTENT (value=0)
+[2026-04-10 12:07:16.369] I (38616) MAX31850:   Bit 46: CONSISTENT (value=0)
+[2026-04-10 12:07:16.374] I (38616) MAX31850:   Bit 47: CONSISTENT (value=1)
+[2026-04-10 12:07:16.379] I (38626) MAX31850:   Bit 48: CONSISTENT (value=1)
+[2026-04-10 12:07:16.384] I (38626) MAX31850:   Bit 49: CONSISTENT (value=0)
+[2026-04-10 12:07:16.388] I (38626) MAX31850:   Bit 50: CONSISTENT (value=0)
+[2026-04-10 12:07:16.393] I (38636) MAX31850:   Bit 51: CONSISTENT (value=0)
+[2026-04-10 12:07:16.397] I (38636) MAX31850:   Bit 52: CONSISTENT (value=1)
+[2026-04-10 12:07:16.402] I (38646) MAX31850:   Bit 53: CONSISTENT (value=0)
+[2026-04-10 12:07:16.406] I (38646) MAX31850:   Bit 54: CONSISTENT (value=1)
+[2026-04-10 12:07:16.410] I (38656) MAX31850:   Bit 55: CONSISTENT (value=0)
+[2026-04-10 12:07:16.415] I (38656) MAX31850:   Bit 56: CONSISTENT (value=1)
+[2026-04-10 12:07:16.421] I (38666) MAX31850:   Bit 57: CONSISTENT (value=0)
+[2026-04-10 12:07:16.423] I (38666) MAX31850:   Bit 58: CONSISTENT (value=1)
+[2026-04-10 12:07:16.428] I (38676) MAX31850:   Bit 59: CONSISTENT (value=0)
+[2026-04-10 12:07:16.432] I (38676) MAX31850:   Bit 60: CONSISTENT (value=0)
+[2026-04-10 12:07:16.437] I (38676) MAX31850:   Bit 61: CONSISTENT (value=1)
+[2026-04-10 12:07:16.442] I (38686) MAX31850:   Bit 62: CONSISTENT (value=1)
+[2026-04-10 12:07:16.446] I (38686) MAX31850:   Bit 63: CONSISTENT (value=1)
+[2026-04-10 12:07:16.451] I (38696) MAX31850:   Bit 64: CONSISTENT (value=0)
+[2026-04-10 12:07:16.460] I (38696) MAX31850:   ROM bits: 1101110000000000000000001111000010000111101000110001010101001110
+[2026-04-10 12:07:16.464] I (38706) MAX31850:   Next discrepancy: 12
+[2026-04-10 12:07:16.468] I (38706) MAX31850:   CRC check: FAIL
+[2026-04-10 12:07:16.470] E (38716) MAX31850: Search failed after 1 attempts
+[2026-04-10 12:07:17.336] W (39586) ESP32S3_MQTT_EVENT: MQTT连接检查: 未连接 (计数=2/3, 会话重连=2, 总计=2)
+
+
+============================================================
+日志记录结束
+结束时间: 2026-04-10 12:07:18
+总运行时间: 0.66 分钟
+总行数: 1975
+============================================================
+连接统计:
+  - MQTT连接次数: 0
+  - MQTT断开次数: 2
+  - 连接保持率: 0.00%
+
+错误统计:
+  - PING_OR_UNKNOWN_ERROR: 4
+============================================================
