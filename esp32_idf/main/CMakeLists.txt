@@ -12,7 +12,6 @@ idf_component_register(
         "heating_detect.c"
     INCLUDE_DIRS 
         "."
-    PRIV_REQUIRES 
-        logic_analyzer_hal
-        logic_analyzer_sump
+    REQUIRES 
+        logic_analyzer
 )
