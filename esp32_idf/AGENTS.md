@@ -4,12 +4,13 @@
 
 ## Project Overview
 
-This is an ESP32-S3 based motor control system with IoT capabilities, built using ESP-IDF 5.5.2. The project implements a closed-loop motor control system with PID algorithm, featuring WiFi connectivity and MQTT communication for remote monitoring and control.
+This is an ESP32-S3 based motor control system with IoT capabilities, built using ESP-IDF 5.5.2. The project implements a closed-loop motor control system with PID algorithm, featuring WiFi connectivity, MQTT communication, and MAX31850KATB+ temperature sensors for remote monitoring and control.
 
 **Key Features:**
 - 4-channel motor control with PWM output (GPIO 1, 4, 6, 8)
 - PID closed-loop speed control with anti-windup protection
 - Encoder feedback via PCNT (Pulse Counter) on GPIO 2, 5, 7, 9
+- 4-channel MAX31850KATB+ temperature sensor monitoring (GPIO 14, 1-Wire protocol)
 - WiFi station mode connectivity
 - MQTT protocol for remote control and data transmission
 - RGB LED status indication (WS2812 @ GPIO48)
@@ -23,6 +24,7 @@ This is an ESP32-S3 based motor control system with IoT capabilities, built usin
 - USB: USB-Serial/JTAG
 - MAC Address: `7c:df:a1:e6:d3:cc` (used in MQTT client ID)
 - Motor Driver: CHB-BLDC2418 (inverted PWM logic: High=OFF, Low=ON)
+- Temperature Sensor: MAX31850KATB+ (4 sensors on 1-Wire bus)
 
 ## Technology Stack
 
@@ -35,6 +37,7 @@ This is an ESP32-S3 based motor control system with IoT capabilities, built usin
 | RTOS | FreeRTOS |
 | MQTT Broker | EMQX (VMware NAT: 192.168.110.31:1883) |
 | NTP Servers | cn.pool.ntp.org, ntp.aliyun.com, ntp.tencent.com |
+| Temperature Sensor | MAX31850KATB+ (1-Wire protocol, K-type thermocouple) |
 
 ## Project Structure
 
@@ -51,6 +54,8 @@ esp32_idf/
 │   ├── led.c                      # RGB status LED (WS2812)
 │   ├── monitor.c                  # MQTT connection monitoring with NTP sync
 │   ├── monitor.h                  # Monitor module header
+│   ├── heating_detect.c           # MAX31850 temperature sensor driver (1-Wire)
+│   ├── heating_detect.h           # MAX31850 driver header
 │   ├── led_strip_encoder.c        # RMT encoder for WS2812
 │   ├── led_strip_encoder.h        # Encoder header
 │   └── CMakeLists.txt             # Component build configuration
@@ -73,6 +78,7 @@ esp32_idf/
 - Application entry point (`app_main`)
 - Task creation and initialization order
 - Main loop with delay
+- Initializes all subsystems: WiFi, MQTT, PWM, PCNT, PID, MAX31850
 
 ### wifi.c
 - WiFi station mode initialization
@@ -81,6 +87,7 @@ esp32_idf/
 - 60-second connection timeout with retry
 - NTP time sync trigger after connection
 - WiFi power save disabled (`WIFI_PS_NONE`) for stable MQTT
+- Waits for NTP sync after connection before continuing
 
 ### mqtt.c
 - MQTT client configuration and connection
@@ -94,6 +101,7 @@ esp32_idf/
 - Exponential backoff reconnection strategy
 - Keepalive: 60s, Session persistence enabled
 - Comprehensive error type tracking and reporting
+- Mutex-protected connection and subscription flags
 
 ### pwm.c
 - LEDC PWM configuration (Timer 0, 13-bit, 5KHz)
@@ -102,23 +110,24 @@ esp32_idf/
 - Auto-notifies MQTT on duty change
 
 ### pcnt.c
-- PCNT unit initialization for 4 channels
+- PCNT unit initialization for 4 channels using ESP-IDF PCNT driver
 - GPIO: 2, 5, 7, 9 (encoder inputs)
 - 200ms sampling interval (converted to per-second rate)
 - Count range: -10000 to 10000
 - Idle detection for motor stop state
 - Startup protection (3-second noise filtering)
-- Abnormal value detection and filtering
-- Per-motor diagnostic statistics
+- Abnormal value detection and filtering (>150 counts/200ms considered abnormal)
+- Per-motor diagnostic statistics (zero rate tracking)
 
 ### pid.c
-- PID algorithm implementation with anti-windup
+- PID algorithm implementation with anti-windup protection
 - Default parameters: Kp=8, Ki=0.02, Kd=0.01
 - 4 independent PID controllers (one per motor)
 - Control period: 10ms when data updated
-- Inverted PWM output (8191 - calculated_duty)
-- Soft-start protection (limits initial PWM for 2 seconds)
-- Command execution task creation
+- Inverted PWM output (8191 - calculated_duty) for CHB-BLDC2418
+- Soft-start protection (limits initial PWM to 3000 for 2 seconds)
+- Command execution task creation (`control_cmd`)
+- Integral windup prevention with saturation detection
 
 ### led.c
 - WS2812 RGB LED control via RMT peripheral
@@ -130,13 +139,32 @@ esp32_idf/
   - ON (Green): All connected
 
 ### monitor.c / monitor.h
-- MQTT connection statistics tracking
-- SNTP time synchronization (China timezone UTC+8)
-- Disconnect event logging (up to 100 events)
+- MQTT connection statistics tracking with thread-safe mutex protection
+- SNTP time synchronization (China timezone UTC+8, CST-8)
+- Disconnect event logging (up to 100 events in circular buffer)
 - Connection keepalive rate calculation
 - Statistical reports every 8 minutes
-- Thread-safe with mutex protection
 - Time sync timeout: 30 seconds, 3 retries
+- Exponential backoff for reconnection attempts
+
+### heating_detect.c / heating_detect.h
+- MAX31850KATB+ temperature sensor driver with 1-Wire protocol
+- Supports 4 sensors on single 1-Wire bus (GPIO 14)
+- Bit-bang 1-Wire implementation with precise timing
+- Search ROM algorithm for device discovery
+- CRC8 verification (CRC8-MAXIM/Dallas, polynomial 0x31)
+- Scratchpad reading with fault detection
+- Temperature parsing (14-bit thermocouple, 12-bit cold junction)
+- Fault detection: Open Circuit, Short to GND, Short to VCC
+- Background polling task (1-second interval, 100ms conversion time)
+- Mutex-protected sensor data access
+- Debug features: GPIO diagnostics, waveform logging, ROM search debugging
+
+### led_strip_encoder.c / led_strip_encoder.h
+- RMT encoder for WS2812 LED strip
+- 10MHz resolution, 800KHz data rate
+- T0H=0.4us, T0L=0.85us, T1H=0.8us, T1L=0.45us timing
+- MSB-first bit order (GRB format)
 
 ## Build Commands
 
@@ -197,7 +225,7 @@ python esp_analysis.py
 
 ### Comments
 - Use **Chinese** comments for functional descriptions
-- Use **English** for technical terms (MQTT, PWM, PCNT, PID, NTP, SNTP)
+- Use **English** for technical terms (MQTT, PWM, PCNT, PID, NTP, SNTP, MAX31850, 1-Wire)
 - Section headers use block comment style:
 ```c
 //////////////////////////////////////////////////////////////
@@ -210,20 +238,21 @@ python esp_analysis.py
 - Macro definitions grouped by module
 - Function declarations in header, definitions in source
 - Global variables declared extern in header, defined in main.c
-- Thread-safe access to shared variables using mutex
+- Thread-safe access to shared variables using mutex/semaphore
 
 ## Hardware Pinout
 
 | Function | GPIO | Description |
 |----------|------|-------------|
-| PWM_CH0 | 1 | Motor 0 PWM output |
-| PWM_CH1 | 4 | Motor 1 PWM output |
-| PWM_CH2 | 6 | Motor 2 PWM output |
-| PWM_CH3 | 8 | Motor 3 PWM output |
-| PCNT_CH0 | 2 | Encoder 0 input |
-| PCNT_CH1 | 5 | Encoder 1 input |
-| PCNT_CH2 | 7 | Encoder 2 input |
-| PCNT_CH3 | 9 | Encoder 3 input |
+| PWM_CH0 | 1 | Motor 0 PWM output (CHB-BLDC2418) |
+| PWM_CH1 | 4 | Motor 1 PWM output (CHB-BLDC2418) |
+| PWM_CH2 | 6 | Motor 2 PWM output (CHB-BLDC2418) |
+| PWM_CH3 | 8 | Motor 3 PWM output (CHB-BLDC2418) |
+| PCNT_CH0 | 2 | Encoder 0 input (FG signal) |
+| PCNT_CH1 | 5 | Encoder 1 input (FG signal) |
+| PCNT_CH2 | 7 | Encoder 2 input (FG signal) |
+| PCNT_CH3 | 9 | Encoder 3 input (FG signal) |
+| 1-Wire Bus | 14 | MAX31850 temperature sensors (4 sensors, open-drain) |
 | RGB LED | 48 | WS2812 status LED |
 
 ### CHB-BLDC2418 Motor Driver Notes
@@ -246,6 +275,41 @@ python esp_analysis.py
 | FG Signal | 6 pulses/rotation | Tachometer output (450 pulses/sec at max speed) |
 | PWM Logic | Inverted | Duty 8191=OFF (stop), 0=ON (full speed) |
 | PWM Frequency | 15K~25KHz | Recommended for noise reduction |
+
+### MAX31850KATB+ Temperature Sensor Notes
+
+- **Protocol**: 1-Wire (Dallas Semiconductor/Maxim Integrated)
+- **GPIO**: 14 (open-drain with internal pull-up, external 4.7KΩ recommended)
+- **Sensor Count**: Up to 4 sensors on single bus
+- **Family Code**: 0x3B (MAX31850 specific)
+- **Hardware Address**: AD0/AD1 pins determine address (0-3)
+- **Temperature Resolution**: 14-bit signed (-270°C to +1372°C, 0.25°C resolution)
+- **Cold Junction**: 12-bit signed (-55°C to +125°C, 0.0625°C resolution)
+- **Conversion Time**: 100ms maximum
+- **CRC**: CRC8-MAXIM/Dallas (polynomial 0x31)
+
+#### 1-Wire Timing Parameters
+
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| Reset Pulse | 480μs | Master reset low time |
+| Presence Wait | 70μs | Wait for slave response |
+| Write 0 Low | 60μs | Write 0 low time |
+| Write 1 Low | 6μs | Write 1 low time (1-15μs) |
+| Read Low | 1μs | Read slot initialization |
+| Read Sample | 12μs | Sample delay from falling edge |
+
+#### MAX31850 Scratchpad Layout
+
+| Byte | Content | Description |
+|------|---------|-------------|
+| 0 | Temp LSB | Bit7-2: Temperature Bit5-0, Bit0: Fault flag |
+| 1 | Temp MSB | Bit7-0: Temperature Bit13-6 |
+| 2 | CJ LSB | Bit7-4: Cold junction Bit3-0, Bit2-0: Fault bits |
+| 3 | CJ MSB | Bit7-0: Cold junction Bit11-4 |
+| 4 | Config | Hardware address (AD3-AD0) |
+| 5-7 | Reserved | 0xFF |
+| 8 | CRC | Scratchpad CRC |
 
 ## Network Configuration
 
@@ -301,6 +365,7 @@ python esp_analysis.py
 | PID_TASK x4 | 1 | 4096 | PID control loops |
 | PCNT_TASK x4 | 1 | 4096 | Encoder monitoring |
 | CMD_TASK | 1 | 4096 | Command execution (dynamic) |
+| max31850_poll | 1 | 4096 | Temperature polling task (1s interval) |
 
 ## Testing Instructions
 
@@ -338,6 +403,11 @@ python esp_analysis.py
    - Verify time sync: `时间同步成功！`
    - Check connection events: `[连接事件]` / `[断开事件]`
 
+4. **Temperature Sensor Test:**
+   - Check MAX31850 initialization log: `MAX31850 Init: Found X sensors`
+   - Verify temperature readings in log: `Sensor [HW_ADDR=X]: Temp=XX.XXC`
+   - Check fault detection: Look for `FAULT: Thermocouple` messages
+
 ### Debug Output
 Monitor serial output at 115200 baud:
 ```powershell
@@ -351,6 +421,7 @@ idf.py -p COM9 monitor
 - Flash Encryption: Disabled
 - MQTT credentials in plaintext
 - No TLS/SSL for MQTT
+- 1-Wire bus not encrypted
 
 For production deployment, enable security features via `menuconfig` and use encrypted communication.
 
@@ -378,6 +449,14 @@ For production deployment, enable security features via `menuconfig` and use enc
 
 11. **PCNT Sampling**: PCNT samples every 200ms but converts to per-second rate for PID comparison and MQTT reporting. This provides faster response while maintaining consistent units.
 
+12. **1-Wire Timing Critical**: MAX31850 driver uses critical sections (`portENTER_CRITICAL`) for precise 1-Wire timing. Disable interrupts during bit operations.
+
+13. **MAX31850 Pull-up**: External 4.7KΩ pull-up resistor recommended on GPIO14 for reliable 1-Wire communication. Internal pull-up may be too weak for multiple sensors.
+
+14. **CRC Verification**: Always verify ROM CRC and Scratchpad CRC when reading MAX31850 data. Failed CRC indicates bus noise or timing issues.
+
+15. **Fault Detection**: MAX31850 detects thermocouple faults (open circuit, short to GND/VCC). Check fault bits in scratchpad byte 2 (Bit0-2).
+
 ## Common Issues
 
 | Issue | Solution |
@@ -392,6 +471,9 @@ For production deployment, enable security features via `menuconfig` and use enc
 | Motor not responding | Verify PWM wiring; check inverted logic (duty 8191=OFF, 0=ON) |
 | PID oscillation | Adjust Kp/Ki/Kd parameters; check PCNT signal quality |
 | Motor overshoot | Soft-start should handle this; verify startup_phase logic |
+| MAX31850 not detected | Check GPIO14 wiring; verify 4.7KΩ pull-up; check CRC errors |
+| Temperature reading invalid | Check thermocouple connection; look for fault flags (OC/SCG/SCV) |
+| 1-Wire CRC errors | Check bus capacitance; reduce wire length; verify pull-up resistor |
 
 ## Reference Documentation
 
@@ -404,3 +486,5 @@ For production deployment, enable security features via `menuconfig` and use enc
 - [FreeRTOS Documentation](https://www.freertos.org/Documentation/RTOS_book.html)
 - [ESP-IDF MQTT Client](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/protocols/mqtt.html)
 - [ESP-IDF SNTP Time Sync](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/system_time.html#sntp-time-synchronization)
+- [MAX31850 Datasheet](https://www.analog.com/media/en/technical-documentation/data-sheets/MAX31850-MAX31851.pdf) - MAX31850KATB+温度传感器数据手册
+- [1-Wire Protocol](https://www.analog.com/en/technical-articles/1wire-communication-through-software.html) - 1-Wire软件协议实现指南
