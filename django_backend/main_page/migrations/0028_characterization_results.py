@@ -27,9 +27,9 @@ class Migration(migrations.Migration):
             options={
                 'db_table': 'characterization_results',
                 'constraints': [
-                    models.CheckConstraint(condition=models.Q(('transmittance_365nm__gte', 0), ('transmittance_365nm__lte', 100)), name='characterization_results_365nm_range'),
-                    models.CheckConstraint(condition=models.Q(('transmittance_760nm__gte', 0), ('transmittance_760nm__lte', 100)), name='characterization_results_760nm_range'),
-                    models.CheckConstraint(condition=models.Q(('transmittance_970nm__gte', 0), ('transmittance_970nm__lte', 100)), name='characterization_results_970nm_range'),
+                    models.CheckConstraint(check=models.Q(('transmittance_365nm__gte', 0), ('transmittance_365nm__lte', 100)), name='characterization_results_365nm_range'),
+                    models.CheckConstraint(check=models.Q(('transmittance_760nm__gte', 0), ('transmittance_760nm__lte', 100)), name='characterization_results_760nm_range'),
+                    models.CheckConstraint(check=models.Q(('transmittance_970nm__gte', 0), ('transmittance_970nm__lte', 100)), name='characterization_results_970nm_range'),
                 ],
             },
         ),
