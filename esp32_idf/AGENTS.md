@@ -19,8 +19,8 @@ This is an ESP32-S3 based motor control system with IoT capabilities, built usin
 - Soft-start protection for motors
 
 **Target Hardware:** ESP32-S3-DevKitC-1
-- Flash: 8MB (detected), 1MB (configured in partitions.csv)
-- PSRAM: 2MB
+- Flash: 8MB (detected hardware), 2MB (configured in sdkconfig)
+- PSRAM: 2MB (hardware), not enabled in sdkconfig
 - USB: USB-Serial/JTAG
 - MAC Address: `7c:df:a1:e6:d3:cc` (used in MQTT client ID)
 - Motor Driver: CHB-BLDC2418 (inverted PWM logic: High=OFF, Low=ON)
@@ -33,7 +33,7 @@ This is an ESP32-S3 based motor control system with IoT capabilities, built usin
 | Framework | ESP-IDF 5.5.2 |
 | Build System | CMake 3.16+ |
 | Language | C (C11) |
-| Target Chip | ESP32-S3 (Xtensa dual-core, 240MHz) |
+| Target Chip | ESP32-S3 (Xtensa dual-core, 160MHz configured, 240MHz capable) |
 | RTOS | FreeRTOS |
 | MQTT Broker | EMQX (VMware NAT: 192.168.110.31:1883) |
 | NTP Servers | cn.pool.ntp.org, ntp.aliyun.com, ntp.tencent.com |
@@ -43,9 +43,9 @@ This is an ESP32-S3 based motor control system with IoT capabilities, built usin
 
 ```
 esp32_idf/
-├── main/                          # Application source code
-│   ├── main.c                     # Application entry point
-│   ├── main.h                     # Global definitions and declarations
+├── main/                          # Application source code (single component)
+│   ├── main.c                     # Application entry point and global vars
+│   ├── main.h                     # Global definitions, externs, structs, macros
 │   ├── wifi.c                     # WiFi connection management
 │   ├── mqtt.c                     # MQTT client implementation
 │   ├── pwm.c                      # PWM motor control (LEDC)
@@ -61,33 +61,39 @@ esp32_idf/
 │   └── CMakeLists.txt             # Component build configuration
 ├── CMakeLists.txt                 # Project build configuration
 ├── sdkconfig                      # ESP-IDF project configuration
-├── partitions.csv                 # Flash partition table
+├── partitions.csv                 # Flash partition table (present but unused by default)
 ├── .vscode/                       # VS Code configuration
 │   ├── settings.json              # VS Code settings (IDF path, clangd)
 │   └── c_cpp_properties.json      # C/C++ IntelliSense config
 ├── .clangd                        # Clangd LSP configuration
-├── esp_analysis.py                # ESP32 analysis script (esptool wrapper)
 ├── analyze.md                     # Hardware analysis report
 ├── Developer_Notes.md             # Developer notes
+├── components/                    # Empty (no custom components)
 └── build/                         # Build output directory
 ```
+
+**Note:** There is no `pyproject.toml`, `package.json`, `Cargo.toml`, or similar package manifest. This is a pure ESP-IDF C project.
 
 ## Module Descriptions
 
 ### main.c
 - Application entry point (`app_main`)
-- Task creation and initialization order
-- Main loop with delay
-- Initializes all subsystems: WiFi, MQTT, PWM, PCNT, PID, MAX31850
+- Defines all global variables: `mqtt_client`, `motor_speed_list[4]`, `pwm_gpios[4]`, `pwm_channels[4]`, `pcnt_gpios[4]`, `pcnt_unit_list[4]`, `pcnt_count_list[4]`, `pcnt_updated_list[4]`
+- Task creation and initialization in strict order (see Initialization Order below)
+- Main loop with 5-second delay
+
+### main.h
+- Central header included by all modules
+- All macro definitions, extern declarations, and struct definitions
+- Includes ESP-IDF headers and project module headers
 
 ### wifi.c
 - WiFi station mode initialization
 - Event-driven connection handling
 - SSID: "WeShare-6148", Password: "1234567890"
 - 60-second connection timeout with retry
-- NTP time sync trigger after connection
+- NTP time sync trigger after connection (`monitor_wait_time_sync(30000)`)
 - WiFi power save disabled (`WIFI_PS_NONE`) for stable MQTT
-- Waits for NTP sync after connection before continuing
 
 ### mqtt.c
 - MQTT client configuration and connection
@@ -99,66 +105,76 @@ esp32_idf/
 - Command format: `cmd_<index>_<speed>_<duration>`
 - Connection health check and error statistics tasks
 - Exponential backoff reconnection strategy
-- Keepalive: 60s, Session persistence enabled
-- Comprehensive error type tracking and reporting
-- Mutex-protected connection and subscription flags
+- Keepalive: 60s, Session persistence enabled (`disable_clean_session = false`)
+- Reconnect timeout: 3000ms, Network timeout: 10000ms
+- Buffer size: 4096 bytes (in + out)
+- Internal MQTT task: priority 5, stack 8192
+- Mutex-protected `connect_flag` and `subscribe_flag`
+- Tracks error types: transport timeout, ping timeout, connection reset, write timeout, connect failed
 
 ### pwm.c
-- LEDC PWM configuration (Timer 0, 13-bit, 5KHz)
+- LEDC PWM configuration (Timer 0, Low Speed Mode, 13-bit, 5KHz)
 - 4 PWM channels on GPIO 1, 4, 6, 8
-- Duty range: 0-8191 (inverted logic for CHB-BLDC2418)
-- Auto-notifies MQTT on duty change
+- Duty range: 0-8191 (inverted logic for CHB-BLDC2418: 8191=OFF, 0=ON)
+- Auto-notifies MQTT on duty change (`pwm_set_<channel>_<data>` to `MQTT_DATA_CHANNEL` with QoS 2)
 
 ### pcnt.c
 - PCNT unit initialization for 4 channels using ESP-IDF PCNT driver
 - GPIO: 2, 5, 7, 9 (encoder inputs)
-- 200ms sampling interval (converted to per-second rate)
-- Count range: -10000 to 10000
+- 200ms sampling interval (converted to per-second rate by multiplying by 5)
+- Count range: -10000 to +10000
 - Idle detection for motor stop state
-- Startup protection (3-second noise filtering)
-- Abnormal value detection and filtering (>150 counts/200ms considered abnormal)
-- Per-motor diagnostic statistics (zero rate tracking)
+- Startup protection: 3-second noise filtering after boot
+- Abnormal value detection: >150 counts/200ms is reset to 0
+- Idle noise threshold: 50 counts/200ms when `motor_speed_list[index] == 0`
+- Per-motor diagnostic statistics: zero-rate percentage logged every 50 samples (~10s) if >80%
 
 ### pid.c
 - PID algorithm implementation with anti-windup protection
 - Default parameters: Kp=8, Ki=0.02, Kd=0.01
 - 4 independent PID controllers (one per motor)
-- Control period: 10ms when data updated
-- Inverted PWM output (8191 - calculated_duty) for CHB-BLDC2418
-- Soft-start protection (limits initial PWM to 3000 for 2 seconds)
+- Control period: ~10ms when PCNT data updated (`pcnt_updated_list` flag)
+- Inverted PWM output (`8191 - (int)new_input`) for CHB-BLDC2418
+- Soft-start protection: limits max PWM to 3000 for first 10 samples (~2 seconds), linearly ramping to 8191
 - Command execution task creation (`control_cmd`)
-- Integral windup prevention with saturation detection
+- Integral windup prevention: conditionally rolls back integral if output saturates and error pushes same direction
 
 ### led.c
 - WS2812 RGB LED control via RMT peripheral
 - GPIO48 (ESP32-S3-DevKitC-1 onboard RGB LED)
 - Status modes:
-  - OFF: System not started
-  - Fast blink (Yellow): WiFi connecting (100ms)
-  - Slow blink (Blue): MQTT connecting (500ms)
-  - ON (Green): All connected
+  - `LED_OFF` (0): System not started / idle
+  - `LED_BLINK_FAST` (1): WiFi connecting (100ms yellow toggle)
+  - `LED_BLINK_SLOW` (2): MQTT connecting (500ms blue toggle)
+  - `LED_ON` (3): All connected (solid green)
 
 ### monitor.c / monitor.h
 - MQTT connection statistics tracking with thread-safe mutex protection
-- SNTP time synchronization (China timezone UTC+8, CST-8)
+- SNTP time synchronization (China timezone `CST-8`, UTC+8)
 - Disconnect event logging (up to 100 events in circular buffer)
 - Connection keepalive rate calculation
-- Statistical reports every 8 minutes
-- Time sync timeout: 30 seconds, 3 retries
+- Statistical reports every 8 minutes (`MONITOR_REPORT_INTERVAL_MS`)
+- Time sync timeout: 30 seconds, 3 retries (`TIME_SYNC_TIMEOUT_MS`, `TIME_SYNC_RETRY_MAX`)
 - Exponential backoff for reconnection attempts
 
 ### heating_detect.c / heating_detect.h
-- MAX31850KATB+ temperature sensor driver with 1-Wire protocol
-- Supports 4 sensors on single 1-Wire bus (GPIO 14)
-- Bit-bang 1-Wire implementation with precise timing
+- MAX31850KATB+ temperature sensor driver with bit-bang 1-Wire protocol
+- Supports up to 4 sensors on single 1-Wire bus (GPIO 14)
 - Search ROM algorithm for device discovery
 - CRC8 verification (CRC8-MAXIM/Dallas, polynomial 0x31)
-- Scratchpad reading with fault detection
-- Temperature parsing (14-bit thermocouple, 12-bit cold junction)
-- Fault detection: Open Circuit, Short to GND, Short to VCC
-- Background polling task (1-second interval, 100ms conversion time)
+- Scratchpad reading with fault detection (Open Circuit, Short to GND, Short to VCC)
+- Temperature parsing: 14-bit thermocouple (-270°C to +1372°C, 0.25°C resolution), 12-bit cold junction
+- Conversion time: 100ms, Polling interval: 1000ms
+- Background polling task (`max31850_poll`, priority 1, stack 4096)
 - Mutex-protected sensor data access
-- Debug features: GPIO diagnostics, waveform logging, ROM search debugging
+- Offline handling: sensors failing 3 consecutive reads are marked offline and retried with exponentially increasing intervals (up to 30s)
+- Debug features (compile-time configurable in `heating_detect.h`):
+  - `MAX31850_DEBUG_GPIO` - GPIO diagnostic print + open-drain test
+  - `MAX31850_DEBUG_WAVEFORM` - 1-Wire reset waveform logging
+  - `MAX31850_DEBUG_ROM_SEARCH` - Bit-level ROM search logging
+  - `MAX31850_DEBUG_SCRATCHPAD` - Full scratchpad byte dump with CRC
+  - `MAX31850_DEBUG_BUS_LEVEL` - Idle bus level verification
+  - `ALLOW_CRC_FAILURE_DEVICES = 1` - Accept ROM CRC failures if family code (0x3B) matches
 
 ### led_strip_encoder.c / led_strip_encoder.h
 - RMT encoder for WS2812 LED strip
@@ -172,6 +188,7 @@ esp32_idf/
 - ESP-IDF 5.5.2 installed and configured
 - Python 3.x with esptool
 - CMake 3.16+
+- ESP-IDF path on this machine: `e:\esp\v5.5.2\esp-idf`
 
 ### Build
 ```powershell
@@ -204,10 +221,31 @@ python -m esptool --port COM9 --chip esp32s3 write_flash 0x0 build/test.bin
 
 # Read flash
 python -m esptool --port COM9 --chip esp32s3 read_flash 0x0 0x800000 firmware_dump.bin
-
-# Hardware analysis
-python esp_analysis.py
 ```
+
+## sdkconfig Key Values
+
+| Parameter | Value | Notes |
+|-----------|-------|-------|
+| Target | `esp32s3` | Confirmed |
+| CPU Frequency | 160 MHz | `CONFIG_ESP32S3_DEFAULT_CPU_FREQ_MHZ=160` |
+| Flash size | 2MB | `CONFIG_ESPTOOLPY_FLASHSIZE_2MB=y` |
+| Partition table | Single app default | `CONFIG_PARTITION_TABLE_SINGLE_APP=y` |
+| Custom partitions.csv | Present but unused | `CONFIG_PARTITION_TABLE_CUSTOM` is NOT set |
+| Main task stack | 3584 bytes | |
+| System event task stack | 2304 bytes | |
+| FreeRTOS tick | 100 Hz | |
+| Cores | 2 | |
+| Stack overflow check | Canary | |
+| Task WDT | 5s timeout | |
+| Log level | INFO | `CONFIG_LOG_DEFAULT_LEVEL_INFO=y` |
+| Compiler optimization | DEBUG | `CONFIG_COMPILER_OPTIMIZATION_DEBUG=y` |
+| Secure Boot | Disabled | |
+| Flash Encryption | Disabled | |
+| SPIRAM (PSRAM) | Disabled | `CONFIG_SPIRAM` not set |
+| Bluetooth | Disabled | `CONFIG_BT_ENABLED` not set |
+
+**Note:** Hardware has 8MB Flash and 2MB PSRAM, but sdkconfig currently underutilizes both. The custom `partitions.csv` in the repo root includes a `storage` partition, but the default build uses `partitions_singleapp.csv`.
 
 ## Code Style Guidelines
 
@@ -219,7 +257,7 @@ python esp_analysis.py
 - **Local variables**: `snake_case`
 - **Functions**: `snake_case`
   - Example: `wifi_init()`, `pid_process_init()`, `monitor_record_connect()`
-- **Structs**: `PascalCase` (struct) + `snake_case` (typedef)
+- **Structs**: `PascalCase` (struct tag) + `snake_case` (typedef)
   - Example: `struct PID_params`, `mqtt_connection_stats_t`
 - **Files**: `snake_case.c`
 
@@ -237,7 +275,7 @@ python esp_analysis.py
 - Header includes at top of file
 - Macro definitions grouped by module
 - Function declarations in header, definitions in source
-- Global variables declared extern in header, defined in main.c
+- Global variables declared `extern` in `main.h`, defined in `main.c`
 - Thread-safe access to shared variables using mutex/semaphore
 
 ## Hardware Pinout
@@ -329,9 +367,9 @@ python esp_analysis.py
 - Keepalive: 60 seconds
 - Clean session: Disabled (session persistence enabled)
 - Reconnect timeout: 3000ms
-- Buffer size: 4096 bytes
-- Task priority: 5
-- Task stack size: 8192 bytes
+- Network timeout: 10000ms
+- Buffer size: 4096 bytes (in + out)
+- Internal task priority: 5, stack: 8192 bytes
 
 ### NTP Time Sync
 - Primary: `cn.pool.ntp.org`
@@ -344,6 +382,8 @@ python esp_analysis.py
 - Retry: 3 times
 
 ## Flash Partition Table
+
+The following is from the custom `partitions.csv` in the repo root. **Note:** This file is present but the current `sdkconfig` uses the default `partitions_singleapp.csv` instead (`CONFIG_PARTITION_TABLE_CUSTOM` is not set).
 
 | Name | Type | SubType | Offset | Size | Purpose |
 |------|------|---------|--------|------|---------|
@@ -364,10 +404,41 @@ python esp_analysis.py
 | MQTT_ERR | 1 | 4096 | MQTT error statistics report (5min interval) |
 | PID_TASK x4 | 1 | 4096 | PID control loops |
 | PCNT_TASK x4 | 1 | 4096 | Encoder monitoring |
-| CMD_TASK | 1 | 4096 | Command execution (dynamic) |
+| CMD_TASK | 1 | 4096 | Command execution (dynamic, one per command) |
 | max31850_poll | 1 | 4096 | Temperature polling task (1s interval) |
 
-## Testing Instructions
+**Note:** MQTT internal task runs at priority 5 with stack 8192 (configured in `mqtt_init()`).
+
+## Initialization Order
+
+In `app_main()`, subsystems are initialized in this strict order:
+
+1. `status_led_task` created
+2. `wifi_init()` — blocks until WiFi connected or 60s timeout
+3. `vTaskDelay(5000ms)`
+4. `monitor_task` created
+5. `mqtt_init` task created (self-deleting)
+6. `mqtt_heartbeat_task` created
+7. `mqtt_health_check_task` created
+8. `mqtt_error_report_task` created
+9. `pwm_init()` called
+10. `pcnt_func_init()` called
+11. `pcnt_monitor_init()` called (creates 4 PCNT tasks)
+12. `pid_process_init()` called (creates 4 PID tasks)
+13. `max31850_init(GPIO_NUM_14)` called
+14. If OK: `max31850_start_polling()` + `max31850_print_sensor_info()`
+15. Main loop: infinite `vTaskDelay(5000ms)`
+
+## Testing Strategy
+
+**No formal automated tests exist.** The project has no unit tests, integration tests, CI/CD pipelines, or test frameworks.
+
+Testing is performed manually via:
+- Serial monitor observation at 115200 baud
+- MQTT client tools (`mosquitto_pub`, `mosquitto_sub`)
+- Python test scripts found in `2026_02_to_04_develop_detail/` (historical development records)
+- LED status visual verification
+- `motor_test_client.py` — a Python MQTT client using `paho-mqtt` for motor integration testing
 
 ### Flash the Device
 1. Enter download mode:
@@ -385,14 +456,14 @@ python esp_analysis.py
 1. **LED Status Check:**
    - OFF: System startup/idle
    - Yellow fast blink (100ms): WiFi connecting
-   - Blue slow blink (500ms): MQTT connecting  
+   - Blue slow blink (500ms): MQTT connecting
    - Green solid: Fully connected
 
 2. **MQTT Test:**
    ```bash
    # Subscribe to data channel
    mosquitto_sub -h 192.168.110.31 -t "esp32_1/data"
-   
+
    # Send control command
    mosquitto_pub -h 192.168.110.31 -t "esp32_1/control" -m "cmd_0_100_5"
    # Format: cmd_<motor_index>_<speed>_<duration_seconds>
@@ -429,13 +500,13 @@ For production deployment, enable security features via `menuconfig` and use enc
 
 1. **NVS Usage**: `nvs_flash_init()` is called in `wifi_init()` for WiFi configuration storage.
 
-2. **HTTP Removal**: HTTP client feature was removed as per `Developer_Notes.md` - MQTT is the sole communication protocol.
+2. **HTTP Removal**: HTTP client feature was removed per `Developer_Notes.md` — MQTT is the sole communication protocol. However, `main.h` still includes `esp_http_client.h` and `cJSON.h` (unused but present).
 
-3. **PWM Inversion**: Note that duty value is inverted in PID calculation (`8191 - new_input`) - this matches CHB-BLDC2418 motor driver requirements (High=OFF, Low=ON).
+3. **PWM Inversion**: Note that duty value is inverted in PID calculation (`8191 - new_input`) — this matches CHB-BLDC2418 motor driver requirements (High=OFF, Low=ON).
 
-4. **PCNT Function Name**: Do NOT use `pcnt_init()` as function name - it's reserved by ESP-IDF internal functions. Use `pcnt_func_init()` instead.
+4. **PCNT Function Name**: Do NOT use `pcnt_init()` as function name — it's reserved by ESP-IDF internal functions. Use `pcnt_func_init()` instead.
 
-5. **Command Parameters**: The `cmd_params` struct is passed to `control_cmd()` task. Be careful with stack vs heap allocation when creating dynamic tasks.
+5. **Command Parameters**: The `cmd_params` struct is passed to `control_cmd()` task. Be careful with stack vs heap allocation when creating dynamic tasks. The project currently heap-allocates `cmd_params` before passing to the task.
 
 6. **Time Sync**: SNTP time sync is started automatically after WiFi connection. Monitor logs for `时间同步成功！` message.
 
@@ -445,7 +516,7 @@ For production deployment, enable security features via `menuconfig` and use enc
 
 9. **GPIO Pin Changes**: The PWM and PCNT GPIO pins have been updated from earlier versions. Current configuration uses GPIO 1,4,6,8 for PWM and GPIO 2,5,7,9 for PCNT.
 
-10. **Soft-start Protection**: PID controller implements soft-start to prevent motor overshoot. Initial PWM is limited to 3000 for the first 2 seconds after motor start.
+10. **Soft-start Protection**: PID controller implements soft-start to prevent motor overshoot. Initial PWM is limited to 3000 for the first 2 seconds (10 PID iterations) after motor start.
 
 11. **PCNT Sampling**: PCNT samples every 200ms but converts to per-second rate for PID comparison and MQTT reporting. This provides faster response while maintaining consistent units.
 
@@ -456,6 +527,8 @@ For production deployment, enable security features via `menuconfig` and use enc
 14. **CRC Verification**: Always verify ROM CRC and Scratchpad CRC when reading MAX31850 data. Failed CRC indicates bus noise or timing issues.
 
 15. **Fault Detection**: MAX31850 detects thermocouple faults (open circuit, short to GND/VCC). Check fault bits in scratchpad byte 2 (Bit0-2).
+
+16. **Partition Table Mismatch**: The custom `partitions.csv` exists in the repo root but is **not active** in the default build. To use it, run `idf.py menuconfig` → Partition Table → Custom partition table, then select `partitions.csv`.
 
 ## Common Issues
 
@@ -479,6 +552,8 @@ For production deployment, enable security features via `menuconfig` and use enc
 
 ### Project Documents
 - [CHB-BLDC2418-Motor-Configuration.md](hardware_info/CHB-BLDC2418-Motor-Configuration.md) - CHB-BLDC2418电机完整配置文档（规格参数、GPIO定义、PID设置）
+- [analyze.md](analyze.md) - ESP32-S3硬件分析报告（Flash 8MB, PSRAM 2MB, Secure Boot禁用等）
+- [Developer_Notes.md](Developer_Notes.md) - 开发者笔记（HTTP功能移除记录）
 
 ### External Documentation
 - [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/v5.5.2/esp32s3/index.html)
@@ -486,5 +561,5 @@ For production deployment, enable security features via `menuconfig` and use enc
 - [FreeRTOS Documentation](https://www.freertos.org/Documentation/RTOS_book.html)
 - [ESP-IDF MQTT Client](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/protocols/mqtt.html)
 - [ESP-IDF SNTP Time Sync](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/system_time.html#sntp-time-synchronization)
-- [MAX31850 Datasheet](https://www.analog.com/media/en/technical-documentation/data-sheets/MAX31850-MAX31851.pdf) - MAX31850KATB+温度传感器数据手册
+- [MAX31850 Datasheet](hardware_info/max31850-max31851.pdf) - MAX31850KATB+温度传感器数据手册
 - [1-Wire Protocol](https://www.analog.com/en/technical-articles/1wire-communication-through-software.html) - 1-Wire软件协议实现指南
