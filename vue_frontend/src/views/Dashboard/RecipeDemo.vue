@@ -719,7 +719,7 @@ export default {
     padding: 1.25rem;
     min-height: calc(100vh - 4rem);
     background:
-        linear-gradient(180deg, #101925 0%, #152132 20%, #eef3f8 20%, #eef3f8 100%);
+        linear-gradient(180deg, #101925 4%, #152132 15%, #eef3f8 30%, #eef3f8 100%);
 }
 
 .console-header {
