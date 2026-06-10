@@ -352,3 +352,91 @@ idf.py -p COM9 monitor
 - **ESP32 串口日志乱码**：`esp32_serial_logger.py` 已内置 `utf-8` / `gbk` / `latin-1` 降级解码。
 - **任务调度器未启动**：`task_manager.py` 不会随 Django 自动启动，忘记运行它会导致 `Spinning` 定时任务失效。
 - **外设脚本 Broker IP 不一致**：`motor_driver.py` 连接 `192.168.31.74`，`task_manager.py` 连接 `192.168.31.18`，ESP32 连接 `192.168.110.31`，注意区分不同网段或历史配置残留。
+
+
+---
+
+## 10. 近期架构变更记录（2026-06-10）
+
+> 以下变更对应**方案 A：最小修复**的实施结果，同时为**方案 B：完整优化**预留了扩展接口。完整优化方案详见项目根目录 `PLATFORM_G2_FULL_OPTIMIZATION_PLAN.md`。
+
+### 10.1 新增 `Device` 设备注册表模型
+
+文件：`django_backend/main_page/models.py`
+
+- 新增 `Device` 模型，字段包括 `device_id`（逻辑标识）、`client_id`、`mac_address`（预留）、`label`、`is_registered`、`is_online`、`last_heartbeat`、`task_status`、`current_task`（JSON 任务快照）、`telemetry`（JSON 遥测快照）。
+- 新增 `EmergencyStopLog` 模型，用于审计急停操作。
+- 用途：支持"已注册但离线"设备的展示，为未来多 ESP32-S3 统一管理做准备。
+
+### 10.2 MQTT 客户端重构
+
+文件：`django_backend/main_page/mqtt.py`
+
+- **Topic 订阅**：由 `esp32_1/+` 改为 `esp32_+/+`（通配符），预留多设备能力。
+- **消息标准化**：所有 Legacy 文本协议消息统一包装为结构化字典，包含 `topic`、`device_id`、`timestamp`、`payload`。
+- **设备状态追踪**：内存中维护 `_device_states`，实时追踪每台设备的在线状态、任务状态、最新遥测；后台线程每 15 秒扫描一次，超时 90 秒未心跳则标记离线。
+- **WebSocket 广播**：增加 `heartbeat`、`telemetry`、`task_status`、`device_status`、`device_reply` 等 topic 的标准化广播。
+- **急停接口**：新增 `emergency_stop()` / `resume_devices()` / `dispatch_motor_task()`，当前实现为**软急停**（向所有电机发送 `cmd_X_0_0`），并标记设备为 `estopped` 以阻止后续任务下发。
+- **paho-mqtt 2.x 兼容**：`mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION1)`。
+
+### 10.3 WebSocket Consumer 升级
+
+文件：`django_backend/django_backend/consumers.py`
+
+- `connect()` 时向前端发送当前设备状态快照。
+- `receive()` 支持接收前端指令：`emergency_stop`、`resume_device`、`dispatch_task`、`get_snapshot`。
+- 通过 `sync_to_async` 调用同步的 MQTT 操作函数。
+
+### 10.4 新增 REST API
+
+文件：`django_backend/main_page/views.py`、`urls.py`
+
+| 路由 | 方法 | 说明 |
+|---|---|---|
+| `/api/device_list/` | GET | 返回合并后的设备列表（注册表 + EMQX 在线状态 + 内存实时状态） |
+| `/api/devices/` | GET/POST | 设备注册表列表/创建 |
+| `/api/devices/<device_id>/` | GET/PUT/PATCH/DELETE | 单设备详情/更新/删除 |
+| `/api/devices/emergency_stop/` | POST | 急停（`device_ids` + `scope`） |
+| `/api/devices/resume/` | POST | 恢复设备 |
+| `/api/devices/dispatch_task/` | POST | 向单设备下发电机任务 |
+| `/api/devices/dispatch_batch/` | POST | 批量任务下发 |
+| `/api/devices/emergency_stop_log/` | GET | 急停历史 |
+
+同时修复了 `/api/mqtt_msg/` 中 `mqtt_client` 未定义导致的 `NameError`。
+
+### 10.5 前端 WebSocket 服务封装
+
+文件：`vue_frontend/src/services/websocket.js`
+
+- 单例模式，支持自动重连（指数退避）。
+- 按 `topic` 订阅/分发消息。
+- 连接状态监听。
+- 向后端发送 `get_snapshot` 作为心跳/保活。
+
+### 10.6 Dashboard.vue 重构
+
+文件：`vue_frontend/src/views/Dashboard.vue`
+
+- 顶部增加 WebSocket 连接状态条。
+- 设备表格增加复选框（支持多选）、展开按钮（显示 4 路电机 PWM/PCNT、任务进度条、温度预留字段）。
+- 摘要栏增加 Busy / E-Stopped 统计。
+- 右侧操作面板增加：
+  - **Stop Selected / Stop All**：急停按钮（带二次确认）
+  - **Resume Selected**：恢复按钮
+- 底部增加实时事件流面板，显示心跳、遥测、任务状态、急停等事件。
+- 任务剩余时间由前端根据 `started_at + duration_sec` 自动倒计时（混合方案，后续固件增加真实进度上报后可无缝替换）。
+
+### 10.7 task_manager.py 配置统一
+
+文件：`django_backend/task_manager.py`
+
+- 从 `django_backend/settings.py` 读取 MQTT 配置，避免 Broker IP 与主进程不一致。
+- 将控制 Topic 从 `control` 统一为 `esp32_1/control`。
+- paho-mqtt 2.x 兼容。
+
+### 10.8 当前已知限制
+
+- **多设备区分**：ESP32 固件当前将所有 Topic 硬编码为 `esp32_1/...`，因此若多台设备同时在线，后端无法通过 Topic 区分它们。当前 `device_id` 从 Topic 名提取，单设备阶段工作正常；多设备阶段需要后续固件更新（在 Payload 中携带 MAC 地址或按 `esp32_N/...` 发布）。
+- **急停为软急停**：ESP32 固件没有急停逻辑，当前通过发送 `cmd_X_0_0` 停止电机，并在后端/前端锁定任务下发。真实急停确认（`estop_ack` / `resume` JSON 协议）需要后续固件配合。
+- **温度数据**：MAX31850 当前硬件不稳定，Dashboard UI 已预留位置，显示为 `N/A`。
+- **Channel Layer**：当前仍使用 `InMemoryChannelLayer`，仅支持单进程 Daphne；多 Worker 方案已在 `PLATFORM_G2_FULL_OPTIMIZATION_PLAN.md` 中规划。
