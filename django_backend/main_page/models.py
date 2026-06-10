@@ -313,3 +313,51 @@ class TelemetryIngest(models.Model):
     topic = models.CharField(max_length=128, null=False)
     payload = models.JSONField(default=dict, blank=True)
     received_at = models.DateTimeField(auto_now_add=True, null=False)
+
+
+DEVICE_STATUS_CHOICES = (
+    ('idle', 'Idle'),
+    ('busy', 'Busy'),
+    ('estopped', 'E-Stopped'),
+    ('offline', 'Offline'),
+)
+
+
+class Device(models.Model):
+    """设备注册表：支持多 ESP32-S3 的发现、状态追踪与急停管理。"""
+    device_id = models.CharField(max_length=32, unique=True, null=False, help_text='逻辑标识，如 esp32_1')
+    client_id = models.CharField(max_length=64, blank=True, help_text='MQTT Client ID，如 ESP32S3_xxx')
+    mac_address = models.CharField(max_length=17, blank=True, help_text='硬件 MAC 地址，后续多设备区分用')
+    label = models.CharField(max_length=64, blank=True, help_text='用户自定义别名，如 "反应釜 A"')
+    is_registered = models.BooleanField(default=True)
+    is_online = models.BooleanField(default=False)
+    last_heartbeat = models.DateTimeField(null=True, blank=True)
+    task_status = models.CharField(max_length=16, choices=DEVICE_STATUS_CHOICES, default='idle')
+    # 当前任务快照：{motor, speed, duration_sec, started_at, expected_finished_at}
+    current_task = models.JSONField(default=dict, blank=True)
+    # 最新遥测快照：{motor_0: {pwm, pcnt}, motor_1: {...}, temperature: null}
+    telemetry = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
+    updated_at = models.DateTimeField(auto_now=True, null=False)
+
+    class Meta:
+        db_table = 'main_page_device'
+        ordering = ['device_id']
+
+    def __str__(self):
+        return f'{self.label or self.device_id} ({self.device_id})'
+
+
+class EmergencyStopLog(models.Model):
+    """急停操作审计日志。"""
+    device = models.ForeignKey(Device, on_delete=models.CASCADE, related_name='estop_logs')
+    triggered_at = models.DateTimeField(auto_now_add=True, null=False)
+    triggered_by = models.CharField(max_length=64, blank=True)
+    scope = models.CharField(max_length=16, blank=True, help_text='single / multi / broadcast')
+    reason = models.TextField(blank=True)
+    acknowledged_at = models.DateTimeField(null=True, blank=True)
+    acknowledged_by = models.CharField(max_length=64, blank=True)
+
+    class Meta:
+        db_table = 'main_page_emergency_stop_log'
+        ordering = ['-triggered_at']

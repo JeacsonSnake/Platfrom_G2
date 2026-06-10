@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from .models import (
     Task, MotorControl, User, LoginRecord, Motor, Spinning, MotorEvent, MotorData, ExperimentProcess,
-    MaterialType, MaterialRecipe, RecipeStep, BatchJob, BatchStepExecution, CommandOutbox, TelemetryIngest
+    MaterialType, MaterialRecipe, RecipeStep, BatchJob, BatchStepExecution, CommandOutbox, TelemetryIngest,
+    Device, EmergencyStopLog
 )
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -93,6 +94,23 @@ class TelemetryIngestSerializer(serializers.ModelSerializer):
     class Meta:
         model = TelemetryIngest
         fields = '__all__'
+
+
+class DeviceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Device
+        fields = '__all__'
+        read_only_fields = ('created_at', 'updated_at')
+
+
+class EmergencyStopLogSerializer(serializers.ModelSerializer):
+    device_label = serializers.CharField(source='device.label', read_only=True)
+    device_id = serializers.CharField(source='device.device_id', read_only=True)
+
+    class Meta:
+        model = EmergencyStopLog
+        fields = '__all__'
+        read_only_fields = ('triggered_at',)
 
 
 class TopicPublishRequestSerializer(serializers.Serializer):

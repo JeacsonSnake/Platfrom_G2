@@ -2,6 +2,27 @@ import sqlite3, time, threading
 from datetime import datetime, timedelta
 from paho.mqtt import client as mqtt
 
+# 让独立进程能够读取 Django settings.py 中的 MQTT 配置
+import os
+import sys
+import django
+
+# 将 django_backend 目录加入路径，以便导入 settings
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, BASE_DIR)
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_backend.settings')
+try:
+    django.setup()
+    from django.conf import settings
+    MQTT_SERVER = getattr(settings, 'MQTT_SERVER', '127.0.0.1')
+    MQTT_PORT = getattr(settings, 'MQTT_PORT', 1883)
+    MQTT_KEEPALIVE = getattr(settings, 'MQTT_KEEPALIVE', 60)
+except Exception as exc:
+    print(f'Warning: unable to load Django settings ({exc}), falling back to defaults.')
+    MQTT_SERVER = '127.0.0.1'
+    MQTT_PORT = 1883
+    MQTT_KEEPALIVE = 60
+
 task_finished = False
 
 
@@ -118,18 +139,19 @@ class Task_Manager():
                     self.mqtt_client.publish('task_manager', timer_trigger)
                     self.task_triggered = True
                     cmd = 'cmd_' + str(self.first_task[3]) + '_' + str(self.first_task[4]) + '_0'
-                    self.mqtt_client.publish('control', cmd)
+                    # 统一使用 esp32_1/control（与 Django 主进程一致）
+                    self.mqtt_client.publish('esp32_1/control', cmd)
 
     # MQTT 初始化方法
     def mqtt_init(self):
-        self.mqtt_client = mqtt.Client()
+        self.mqtt_client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION1)
         self.mqtt_client.on_connect = mqtt_on_connect
         self.mqtt_client.on_message = mqtt_on_message
         self.mqtt_client.username_pw_set('Task_Manager_py', '123456')
         self.mqtt_client.connect(
-            host='192.168.31.18',
-            port=1883,
-            keepalive=60
+            host=MQTT_SERVER,
+            port=MQTT_PORT,
+            keepalive=MQTT_KEEPALIVE
         )
 
     # MQTT心跳，告知客户端连接状态
@@ -137,6 +159,7 @@ class Task_Manager():
         self.mqtt_client.loop_start()
         while not self.terminate:
             self.mqtt_client.publish('heartbeat/task_manager', 'Status: Alive')
+            time.sleep(10)
         self.mqtt_client.loop_stop()
 
     # 用户操作界面

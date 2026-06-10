@@ -5,12 +5,14 @@ from django.db import transaction
 
 from .models import (
     Task, MotorControl, User, Motor, Spinning, ExperimentProcess,
-    MaterialType, MaterialRecipe, RecipeStep, BatchJob, BatchStepExecution, CommandOutbox
+    MaterialType, MaterialRecipe, RecipeStep, BatchJob, BatchStepExecution, CommandOutbox,
+    Device, EmergencyStopLog
 )
 from .serializer import TaskSerializer, MotorControlSerializer, UserSerializer, LoginRecordSerializer, \
     SpinningSerializer, ExperimentProcessSerializer, MaterialTypeSerializer, MaterialRecipeSerializer, \
     RecipeStepSerializer, BatchJobSerializer, BatchStepExecutionSerializer, CommandOutboxSerializer, \
-    TopicPublishRequestSerializer, ServiceCallRequestSerializer, ActionGoalRequestSerializer
+    TopicPublishRequestSerializer, ServiceCallRequestSerializer, ActionGoalRequestSerializer, \
+    DeviceSerializer, EmergencyStopLogSerializer
 from django.contrib.auth.hashers import make_password, check_password
 from django.http import JsonResponse
 from datetime import datetime
@@ -18,7 +20,10 @@ from django.utils import timezone
 
 from .token import create_token, check_token, token_auth
 
-from .mqtt import publish_device_command, mqtt_client_available
+from .mqtt import (
+    publish_device_command, mqtt_client_available,
+    emergency_stop, resume_devices, dispatch_motor_task, get_device_states
+)
 
 import requests
 import base64
@@ -169,47 +174,218 @@ def test(request):
 @api_view(['GET', 'POST'])
 def mqtt_msg(request):
     if request.method == 'POST':
-        if (request.data['topic']):
-            topic = request.data['topic']
-            msg = request.data['msg'] * 6
-            msg = 'pwm_' + str(msg)
-            # return Response(status=status.HTTP_200_OK)
-            rc, mid = mqtt_client.publish(topic, msg)
-            return JsonResponse({'code': rc})
-        else:
-            return Response({'request fail': 'Deined'}, status=status.HTTP_403_FORBIDDEN)
+        topic = request.data.get('topic')
+        if not topic:
+            return Response({'request fail': 'Denied'}, status=status.HTTP_403_FORBIDDEN)
+        msg = request.data.get('msg', '')
+        msg = 'pwm_' + str(msg)
+        if not mqtt_client_available():
+            return Response({'error': 'MQTT client unavailable'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        try:
+            rc, mid = publish_device_command(topic, msg)
+            return JsonResponse({'code': rc, 'mid': mid})
+        except Exception as exc:
+            return Response({'error': str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     if request.method == 'GET':
-        motor_speed = MotorControl.objects.values().last()['motor_speed']
+        last = MotorControl.objects.values().last()
+        motor_speed = last['motor_speed'] if last else 0
         return Response({'speed': motor_speed}, status=status.HTTP_200_OK)
 
 
 # Device List
 @api_view(['GET'])
 def device_list(request):
-    # 限制只接受一页，并且每页上限50个设备
-    url = "http://localhost:18083/api/v5/clients?page=1&limit=50&node=emqx%40127.0.0.1"
-    # EMQX 的密钥信息
-    api_key = "14d39e44d739b1d9"
-    secret_key = "DrXETy29CGKJnUHWMTQauKnOYzBN9A65z5Yw4FiUMpt9BC"
+    """
+    返回合并后的设备列表：Django 注册表 + EMQX 在线客户端 + 内存实时状态。
+    """
+    # 1. 读取 Django 注册表
+    registered_devices = {d.device_id: d for d in Device.objects.all()}
 
-    # 使用Base64方式加密密钥对
-    credentials = f"{api_key}:{secret_key}"
-    encoded_credentials = base64.b64encode(credentials.encode()).decode()
+    # 2. 读取内存中的实时状态
+    live_states = get_device_states()
 
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Basic ' + encoded_credentials
-    }
-
+    # 3. 尝试从 EMQX 获取在线客户端列表（用于补充 client_id / ip_address）
+    emqx_clients = []
     try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()  # 如果响应码不是200，会抛出异常
+        url = "http://localhost:18083/api/v5/clients?page=1&limit=50&node=emqx%40127.0.0.1"
+        api_key = "14d39e44d739b1d9"
+        secret_key = "DrXETy29CGKJnUHWMTQauKnOYzBN9A65z5Yw4FiUMpt9BC"
+        credentials = f"{api_key}:{secret_key}"
+        encoded_credentials = base64.b64encode(credentials.encode()).decode()
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic ' + encoded_credentials
+        }
+        response = requests.get(url, headers=headers, timeout=3)
+        if response.status_code == 200:
+            data = response.json()
+            emqx_clients = data.get('data', []) if isinstance(data, dict) else []
+    except Exception as exc:
+        print(f'EMQX API query failed: {exc}')
 
-        # 获取连接信息
-        connections = response.json()
-        return JsonResponse(connections, safe=False)
-    except requests.exceptions.RequestException as e:
-        return JsonResponse({'error': str(e)}, status=500)
+    # 4. 构建统一输出
+    merged = []
+    # 先输出所有注册设备
+    all_device_ids = set(registered_devices.keys()) | set(live_states.keys())
+    for device_id in sorted(all_device_ids):
+        reg = registered_devices.get(device_id)
+        state = live_states.get(device_id, {})
+
+        # 尝试从 EMQX 列表匹配 client_id（简单前缀匹配）
+        emqx_match = None
+        for cli in emqx_clients:
+            cid = cli.get('clientid', '')
+            if cid and (device_id in cid or cid in (reg.client_id if reg else '')):
+                emqx_match = cli
+                break
+
+        entry = {
+            'id': device_id,
+            'device_id': device_id,
+            'label': reg.label if reg else device_id,
+            'client_id': reg.client_id if reg and reg.client_id else (emqx_match.get('clientid') if emqx_match else ''),
+            'ip_address': (emqx_match.get('ip_address') if emqx_match else ''),
+            'connected_at': (emqx_match.get('connected_at') if emqx_match else ''),
+            'is_registered': reg.is_registered if reg else False,
+            'is_online': state.get('is_online', False) if state else (reg.is_online if reg else False),
+            'last_heartbeat': (state.get('last_heartbeat').isoformat() if state and state.get('last_heartbeat') else
+                              (reg.last_heartbeat.isoformat() if reg and reg.last_heartbeat else None)),
+            'task_status': state.get('task_status', 'idle') if state else (reg.task_status if reg else 'idle'),
+            'current_task': state.get('current_task', {}) if state else (reg.current_task if reg else {}),
+            'telemetry': state.get('telemetry', {}) if state else (reg.telemetry if reg else {}),
+            'mac_address': reg.mac_address if reg else '',
+        }
+        merged.append(entry)
+
+    return Response({'data': merged, 'mqtt_available': mqtt_client_available()})
+
+
+@api_view(['GET', 'POST'])
+def device_register_list(request):
+    """设备注册表 CRUD（列表与创建）。"""
+    if request.method == 'GET':
+        devices = Device.objects.all().order_by('device_id')
+        serializer = DeviceSerializer(devices, many=True)
+        return Response(serializer.data)
+
+    if request.method == 'POST':
+        serializer = DeviceSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
+def device_register_detail(request, device_id):
+    """单设备注册表详情/更新/删除。"""
+    try:
+        device = Device.objects.get(device_id=device_id)
+    except Device.DoesNotExist:
+        return Response({'detail': 'Device not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = DeviceSerializer(device)
+        return Response(serializer.data)
+
+    if request.method == 'DELETE':
+        device.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    partial = request.method == 'PATCH'
+    serializer = DeviceSerializer(device, data=request.data, partial=partial)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def device_emergency_stop(request):
+    """急停接口：向指定设备或所有设备发送软急停。"""
+    device_ids = request.data.get('device_ids', [])
+    scope = request.data.get('scope', 'single')
+    reason = request.data.get('reason', '')
+    triggered_by = request.data.get('triggered_by', request.user.username if hasattr(request, 'user') else 'unknown')
+
+    if scope == 'broadcast':
+        device_ids = list(Device.objects.filter(is_registered=True).values_list('device_id', flat=True))
+        if not device_ids:
+            live = get_device_states()
+            device_ids = list(live.keys())
+
+    if not device_ids:
+        return Response({'detail': 'No target devices specified.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    results = emergency_stop(device_ids, triggered_by=triggered_by, reason=reason, scope=scope)
+    all_success = all(r.get('success') for r in results)
+    return Response({
+        'scope': scope,
+        'results': results,
+        'mqtt_available': mqtt_client_available(),
+    }, status=status.HTTP_200_OK if all_success else status.HTTP_207_MULTI_STATUS)
+
+
+@api_view(['POST'])
+def device_resume(request):
+    """恢复接口：解除设备的急停锁定。"""
+    device_ids = request.data.get('device_ids', [])
+    resumed_by = request.data.get('resumed_by', request.user.username if hasattr(request, 'user') else 'unknown')
+
+    if not device_ids:
+        return Response({'detail': 'No target devices specified.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    results = resume_devices(device_ids, resumed_by=resumed_by)
+    all_success = all(r.get('success') for r in results)
+    return Response({
+        'results': results,
+    }, status=status.HTTP_200_OK if all_success else status.HTTP_207_MULTI_STATUS)
+
+
+@api_view(['POST'])
+def device_dispatch_task(request):
+    """向指定设备下发电机任务。"""
+    device_id = request.data.get('device_id')
+    motor = int(request.data.get('motor', 0))
+    speed = int(request.data.get('speed', 0))
+    duration = int(request.data.get('duration', 0))
+
+    if not device_id:
+        return Response({'detail': 'device_id is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    result = dispatch_motor_task(device_id, motor, speed, duration)
+    if result.get('success'):
+        return Response(result, status=status.HTTP_200_OK)
+    return Response(result, status=status.HTTP_409_CONFLICT if 'estopped' in result.get('error', '').lower() else status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def device_dispatch_batch(request):
+    """批量任务：向多台设备下发相同参数的任务。"""
+    device_ids = request.data.get('device_ids', [])
+    motor = int(request.data.get('motor', 0))
+    speed = int(request.data.get('speed', 0))
+    duration = int(request.data.get('duration', 0))
+
+    if not device_ids:
+        return Response({'detail': 'device_ids is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    results = []
+    for device_id in device_ids:
+        results.append(dispatch_motor_task(device_id, motor, speed, duration))
+
+    all_success = all(r.get('success') for r in results)
+    return Response({
+        'results': results,
+    }, status=status.HTTP_200_OK if all_success else status.HTTP_207_MULTI_STATUS)
+
+
+@api_view(['GET'])
+def emergency_stop_log_list(request):
+    """急停历史记录。"""
+    logs = EmergencyStopLog.objects.all().order_by('-triggered_at')[:100]
+    serializer = EmergencyStopLogSerializer(logs, many=True)
+    return Response(serializer.data)
 
 
 @api_view(['GET', 'POST'])
