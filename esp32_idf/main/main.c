@@ -27,6 +27,9 @@ bool pcnt_updated_list[4] = PCNT_UPDATE;
 
 // 主函数
 void app_main(void){
+    // 从硬件读取 MAC 地址，生成 device_id 与 MQTT topic
+    device_identity_init();
+
     // 创建LED状态指示任务（优先级2，低于WiFi初始化，避免影响WiFi连接）
     xTaskCreate(status_led_task, "LED_TASK", 4096, NULL, 2, NULL);
     

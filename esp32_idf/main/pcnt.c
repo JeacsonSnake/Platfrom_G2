@@ -119,7 +119,7 @@ void pcnt_monitor(void* params)
             // 如果空闲，发送PCNT转速信息并停止
             char buff[64];
             sprintf(buff, "pcnt_count_%d_%d", index, pcnt_count_list[index]);
-            esp_mqtt_client_publish(mqtt_client, MQTT_DATA_CHANNEL, buff, strlen(buff), 2, 0);
+            esp_mqtt_client_publish(mqtt_client, mqtt_telemetry_topic, buff, strlen(buff), 2, 0);
             ESP_LOGI(TAG, "Motor %d idle, PCNT=%d", index, pcnt_count_list[index]);
             // CHB-BLDC2418: Duty 8191 = Motor OFF (inverted logic)
             pwm_set_duty(8191, index);
@@ -143,7 +143,7 @@ void pcnt_monitor(void* params)
             char buff[64];
             // MQTT发布每秒值（0-450范围），与1秒采样时格式一致
             sprintf(buff, "pcnt_count_%d_%d", index, actual_per_sec);
-            esp_mqtt_client_publish(mqtt_client, MQTT_DATA_CHANNEL, buff, strlen(buff), 2, 0);
+            esp_mqtt_client_publish(mqtt_client, mqtt_telemetry_topic, buff, strlen(buff), 2, 0);
             
             ESP_LOGI(TAG, "Motor %d running, PCNT=%d/s (raw=%d/200ms), target=%d/s", 
                      index, actual_per_sec, pcnt_count_list[index], target_per_sec);

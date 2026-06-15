@@ -145,7 +145,7 @@ void message_compare(char *msg)
     {
         char buff[64];
         sprintf(buff, "Hello to you too");
-        esp_mqtt_client_publish(mqtt_client, MQTT_CONTROL_CHANNEL, buff, strlen(buff), 2, 0);
+        esp_mqtt_client_publish(mqtt_client, mqtt_control_topic, buff, strlen(buff), 2, 0);
     }
     else if(strncmp(msg, "cmd_", 4) == 0)
     {
@@ -188,9 +188,9 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
             monitor_record_connect();
             // 订阅MQTT 控制频道来接收指令（仅在未订阅时订阅）
             if (!get_subscribe_flag()) {
-                int msg_id = esp_mqtt_client_subscribe(mqtt_client, MQTT_CONTROL_CHANNEL, 1);
+                int msg_id = esp_mqtt_client_subscribe(mqtt_client, mqtt_control_topic, 1);
                 if (msg_id >= 0) {
-                    ESP_LOGI(TAG, "已订阅控制频道 '%s' (msg_id=%d)", MQTT_CONTROL_CHANNEL, msg_id);
+                    ESP_LOGI(TAG, "已订阅控制频道 '%s' (msg_id=%d)", mqtt_control_topic, msg_id);
                     set_subscribe_flag(true);
                 } else {
                     ESP_LOGE(TAG, "订阅控制频道失败");
@@ -295,7 +295,7 @@ void mqtt_heartbeat_task(void *pvParameters)
         // 使用安全的方式获取连接状态
         if (get_connect_flag() == true)
         {
-            char buff[64] = "ESP32_1 is online";
+            char buff[64] = "online";
             
             // 记录发送前tick和系统信息，用于检测阻塞
             TickType_t publish_start = xTaskGetTickCount();
@@ -304,7 +304,7 @@ void mqtt_heartbeat_task(void *pvParameters)
             
             // 向mqtt服务器发布主题为heartbeat，payload为buff的数据
             // 使用QoS=1确保心跳可靠传输，retain=0
-            int msg_id = esp_mqtt_client_publish(mqtt_client, MQTT_HEARTBEAT_CHANNEL, buff, strlen(buff), 1, 0);
+            int msg_id = esp_mqtt_client_publish(mqtt_client, mqtt_heartbeat_topic, buff, strlen(buff), 1, 0);
             
             TickType_t publish_elapsed = xTaskGetTickCount() - publish_start;
             uint32_t elapsed_ms = publish_elapsed * portTICK_PERIOD_MS;
@@ -473,7 +473,7 @@ void mqtt_init()
             
         },
         .credentials = {
-            .client_id = "ESP32S3_7cdfa1e6d3cc",  // 固定唯一ClientID（使用MAC地址后6位）
+            .client_id = mqtt_client_id,  // 根据 MAC 地址动态生成
             .username = "ESP32_1",
             
         },

@@ -24,6 +24,7 @@
 #include "esp_sntp.h"
 #include "monitor.h"
 #include "heating_detect.h"
+#include "device_identity.h"
 
 
 //////////////////////////////////////////////////////////////
@@ -121,12 +122,12 @@ void pcnt_monitor(void* params);
 // MQTT Client 客户端
 #define MQTT_CLIENT_INIT        (NULL)
 // MQTT 通信信道
-// CONTROL_CHANNEL 监听指令、返回控制任务接收、执行情况
-#define MQTT_CONTROL_CHANNEL    "esp32_1/control"
-// HEARTBEAT_CHANNEL 输出心跳
-#define MQTT_HEARTBEAT_CHANNEL  "esp32_1/heartbeat"
-// DATA_CHANNEL 返回PCNT转速信息、PWM更新信息
-#define MQTT_DATA_CHANNEL       "esp32_1/data"
+// 旧版本使用硬编码的 esp32_1/...，现在由 device_identity_init() 根据 MAC 地址动态生成。
+// 全局 topic 字符串定义在 device_identity.h 中：
+//   mqtt_control_topic   -> esp32/<mac>/control
+//   mqtt_heartbeat_topic -> esp32/<mac>/heartbeat
+//   mqtt_telemetry_topic -> esp32/<mac>/telemetry
+//   mqtt_task_topic      -> esp32/<mac>/task
 
 extern esp_mqtt_client_handle_t mqtt_client;
 
