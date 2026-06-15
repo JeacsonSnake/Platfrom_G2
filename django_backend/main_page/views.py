@@ -20,9 +20,11 @@ from django.utils import timezone
 
 from .token import create_token, check_token, token_auth
 
+from django.conf import settings
 from .mqtt import (
     publish_device_command, mqtt_client_available,
-    emergency_stop, resume_devices, dispatch_motor_task, get_device_states
+    emergency_stop, resume_devices, dispatch_motor_task, get_device_states,
+    _device_control_topic,
 )
 
 import requests
@@ -554,7 +556,8 @@ def _resolve_motor_command(step_execution):
     if speed is None or duration is None:
         raise ValueError('Motor step is missing speed or duration.')
 
-    topic = parameters.get('topic', 'esp32_1/control')
+    default_topic = _device_control_topic(getattr(settings, 'MQTT_DEFAULT_DEVICE_ID', 'esp32_1'))
+    topic = parameters.get('topic', default_topic)
     raw_payload = f'cmd_{motor}_{speed}_{duration}'
 
     return {
@@ -602,7 +605,8 @@ def _resolve_step_interface(step_type, parameters):
         return explicit_interface, route_name
 
     if step_type in ['STIR', 'DISPENSE']:
-        return 'topic', parameters.get('topic', 'esp32_1/control')
+        default_topic = _device_control_topic(getattr(settings, 'MQTT_DEFAULT_DEVICE_ID', 'esp32_1'))
+        return 'topic', parameters.get('topic', default_topic)
     if step_type in ['MOVE_ARM', 'HEAT', 'CLEAN']:
         return 'action', parameters.get('action_name') or parameters.get('topic')
     if step_type in ['WAIT', 'SAMPLE']:

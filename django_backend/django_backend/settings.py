@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -152,6 +153,10 @@ MQTT_KEEPALIVE = 60
 
 MQTT_USER = 'Django'
 MQTT_PASSWORD = '123456'
+
+# 默认目标设备（用于 task_manager 与未指定设备的 recipe step）
+# 请改成实际 ESP32 的 device_id，例如 esp32_7cdfa1e6d3cc
+MQTT_DEFAULT_DEVICE_ID = os.environ.get('MQTT_DEFAULT_DEVICE_ID', 'esp32_1')
 
 # Channels 相关配置
 CHANNEL_LAYERS = {

@@ -2,6 +2,13 @@ import sqlite3, time, threading
 from datetime import datetime, timedelta
 from paho.mqtt import client as mqtt
 
+
+def _device_control_topic(device_id):
+    """根据 device_id 生成对应的 MQTT 控制 topic。"""
+    if device_id.startswith('esp32_') and len(device_id) == 6 + 12:
+        return f"esp32/{device_id[6:]}/control"
+    return f"{device_id}/control"
+
 # 让独立进程能够读取 Django settings.py 中的 MQTT 配置
 import os
 import sys
@@ -139,8 +146,9 @@ class Task_Manager():
                     self.mqtt_client.publish('task_manager', timer_trigger)
                     self.task_triggered = True
                     cmd = 'cmd_' + str(self.first_task[3]) + '_' + str(self.first_task[4]) + '_0'
-                    # 统一使用 esp32_1/control（与 Django 主进程一致）
-                    self.mqtt_client.publish('esp32_1/control', cmd)
+                    # 统一使用 esp32/<mac>/control（与 Django 主进程一致）
+                    default_device_id = getattr(settings, 'MQTT_DEFAULT_DEVICE_ID', 'esp32_1')
+                    self.mqtt_client.publish(_device_control_topic(default_device_id), cmd)
 
     # MQTT 初始化方法
     def mqtt_init(self):

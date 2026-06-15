@@ -10,6 +10,7 @@ import paho.mqtt.client as mqtt
 from django.conf import settings
 import os
 import socket
+import sys
 import json
 import threading
 import time
@@ -56,13 +57,40 @@ def _broadcast(event_type, payload):
 
 
 def _extract_device_id_from_topic(topic):
-    """从 Topic 名提取 device_id，例如 esp32_1/heartbeat -> esp32_1。"""
+    """从 Topic 名提取 device_id。
+
+    支持两种层级：
+      - 新层级: esp32/<mac>/heartbeat -> esp32_<mac>
+      - 旧层级: esp32_1/heartbeat     -> esp32_1 (兼容旧设备)
+    """
     if not topic:
         return None
     parts = topic.split('/')
+    # 新层级：esp32/<mac_suffix>/<type>
+    if len(parts) >= 2 and parts[0] == 'esp32' and len(parts[1]) == 12:
+        return f"esp32_{parts[1]}"
+    # 兼容旧层级：esp32_1/<type>
     if parts and parts[0].startswith('esp32_'):
         return parts[0]
     return None
+
+
+def _device_id_to_mac(device_id):
+    """根据 device_id（如 esp32_7cdfa1e6d3cc）反推出 MAC 地址（带冒号）。"""
+    if device_id and device_id.startswith('esp32_') and len(device_id) == 6 + 12:
+        hex_mac = device_id[6:]
+        return ':'.join(hex_mac[i:i + 2] for i in range(0, 12, 2))
+    return ''
+
+
+def _device_control_topic(device_id):
+    """根据 device_id 生成对应的 MQTT 控制 topic。"""
+    if not device_id:
+        return None
+    if device_id.startswith('esp32_') and len(device_id) == 6 + 12:
+        return f"esp32/{device_id[6:]}/control"
+    # 兼容旧 topic
+    return f"{device_id}/control"
 
 
 def _ensure_device_state(device_id):
@@ -84,7 +112,11 @@ def _ensure_device_state(device_id):
                 Device = apps.get_model('main_page', 'Device')
                 Device.objects.get_or_create(
                     device_id=device_id,
-                    defaults={'label': device_id, 'is_registered': True}
+                    defaults={
+                        'label': device_id,
+                        'is_registered': True,
+                        'mac_address': _device_id_to_mac(device_id),
+                    }
                 )
             except Exception as exc:
                 print(f'Auto-create Device failed for {device_id}: {exc}')
@@ -167,7 +199,10 @@ def on_connect(mqtt_client, userdata, flags, rc):
     if rc == 0:
         print("MQTT Connect Success!")
         # 使用通配符订阅所有 esp32_N 设备
-        mqtt_client.subscribe('esp32_+/+')
+        # 合法通配符：匹配所有 esp32/<mac>/... 设备
+        mqtt_client.subscribe('esp32/+/+')
+        # 兼容旧设备的硬编码 topic（单台旧 ESP32）
+        mqtt_client.subscribe('esp32_1/+')
     else:
         print("Bad Connection Code: ", rc)
 
@@ -581,7 +616,7 @@ def emergency_stop(device_ids, triggered_by='', reason='', scope='single'):
         # 向设备发送所有电机的停止指令
         stop_results = []
         if client is not None and client.is_connected():
-            topic = f'{device_id}/control'
+            topic = _device_control_topic(device_id)
             for motor in range(4):
                 cmd = f'cmd_{motor}_0_0'
                 try:
@@ -687,7 +722,7 @@ def dispatch_motor_task(device_id, motor, speed, duration):
     if client is None or not client.is_connected():
         return {'success': False, 'error': 'MQTT client unavailable'}
 
-    topic = f'{device_id}/control'
+    topic = _device_control_topic(device_id)
     cmd = f'cmd_{motor}_{speed}_{duration}'
     try:
         info = client.publish(topic, cmd)
@@ -719,7 +754,21 @@ def mqtt_client_available():
     return client is not None and client.is_connected()
 
 
-if os.environ.get('RUN_MAIN'):
+def _should_init_mqtt_client():
+    """判断当前进程是否应该创建 MQTT Client。
+
+    - runserver 自动重载子进程会设置 RUN_MAIN，在此处创建 Client。
+    - Daphne / uvicorn / gunicorn 等 ASGI 服务器没有 RUN_MAIN，也需要创建 Client。
+    - 管理命令（migrate/test/shell）不需要创建 Client。
+    """
+    if os.environ.get('RUN_MAIN'):
+        return True
+    if any('daphne' in arg or 'uvicorn' in arg or 'gunicorn' in arg for arg in sys.argv):
+        return True
+    return False
+
+
+if _should_init_mqtt_client():
     try:
         client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION1)
         client.on_connect = on_connect
