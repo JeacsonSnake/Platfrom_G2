@@ -1,13 +1,6 @@
 <template>
     <section class="operations-dashboard">
-        <!-- 连接状态条 -->
-        <div class="connection-bar" :class="wsStatusClass">
-            <span class="connection-dot"></span>
-            <span class="connection-label">{{ wsStatusLabel }}</span>
-            <span v-if="mqttAvailable !== null" class="connection-sublabel">
-                · MQTT {{ mqttAvailable ? '可用' : '不可用' }}
-            </span>
-        </div>
+        <ConnectionBar :status="wsStatus" :mqtt-available="mqttAvailable" />
 
         <header class="command-header">
             <div class="command-header__main">
@@ -28,42 +21,11 @@
             </div>
         </header>
 
-        <section class="summary-bar">
-            <article class="summary-metric">
-                <span class="summary-metric__label">Total Devices</span>
-                <span class="summary-metric__value">{{ summary.total }}</span>
-            </article>
-            <article class="summary-metric summary-metric--good">
-                <span class="summary-metric__label">Online</span>
-                <span class="summary-metric__value">{{ summary.online }}</span>
-            </article>
-            <article class="summary-metric summary-metric--busy">
-                <span class="summary-metric__label">Busy</span>
-                <span class="summary-metric__value">{{ summary.busy }}</span>
-            </article>
-            <article class="summary-metric summary-metric--alert">
-                <span class="summary-metric__label">E-Stopped</span>
-                <span class="summary-metric__value">{{ summary.estopped }}</span>
-            </article>
-            <article class="summary-metric summary-metric--idle">
-                <span class="summary-metric__label">Idle</span>
-                <span class="summary-metric__value">{{ summary.idle }}</span>
-            </article>
-            <article class="summary-metric summary-metric--offline">
-                <span class="summary-metric__label">Offline</span>
-                <span class="summary-metric__value">{{ summary.offline }}</span>
-            </article>
-        </section>
+        <FleetSummary :summary="summary" />
 
         <div class="console-grid">
             <section class="panel-card panel-card--status">
-                <div class="panel-header">
-                    <div>
-                        <p class="panel-kicker">Fleet Monitor</p>
-                        <h2 class="panel-title">Device Status Board</h2>
-                    </div>
-                    <span class="panel-badge">{{ loading ? 'Updating' : 'Live' }}</span>
-                </div>
+                <PanelHeader kicker="Fleet Monitor" title="Device Status Board" :badge="loading ? 'Updating' : 'Live'" />
 
                 <div class="status-toolbar">
                     <div class="toolbar-item">
@@ -86,105 +48,17 @@
                     {{ errorMessage }}
                 </div>
 
-                <div v-if="devices.length" class="device-table">
-                    <div class="device-table__head">
-                        <span class="head-cell head-cell--check">
-                            <input type="checkbox" :checked="isAllSelected" @change="toggleSelectAll">
-                        </span>
-                        <span>Device</span>
-                        <span>Status</span>
-                        <span>Task</span>
-                        <span>Connection</span>
-                        <span>Last Seen</span>
-                        <span></span>
-                    </div>
-                    <div class="device-table__body">
-                        <template v-for="device in devices" :key="device.id">
-                            <article class="device-row" :class="{'device-row--selected': isSelected(device.id), 'device-row--estopped': device.taskStatus === 'E-Stopped', 'device-row--offline': device.connectionStatus === 'Offline'}">
-                                <div class="device-cell device-cell--check">
-                                    <input type="checkbox" :checked="isSelected(device.id)" @change="toggleSelect(device.id)">
-                                </div>
-                                <div class="device-cell">
-                                    <span class="device-label">{{ device.label }}</span>
-                                    <span class="device-index">{{ device.deviceId }}</span>
-                                </div>
-                                <div class="device-cell">
-                                    <span class="status-pill" :class="statusClass(device.taskStatus)">
-                                        {{ device.taskStatus }}
-                                    </span>
-                                </div>
-                                <div class="device-cell">
-                                    <div v-if="device.currentTask && device.currentTask.motor !== undefined" class="task-mini">
-                                        <span class="task-mini__motor">M{{ device.currentTask.motor }}</span>
-                                        <span class="task-mini__speed">{{ device.currentTask.speed }} rpm</span>
-                                        <span v-if="device.currentTask.remainingSec > 0" class="task-mini__remaining">{{ device.currentTask.remainingSec }}s left</span>
-                                    </div>
-                                    <span v-else class="task-mini task-mini--empty">--</span>
-                                </div>
-                                <div class="device-cell">
-                                    <span class="status-pill" :class="connectionClass(device.connectionStatus)">
-                                        {{ device.connectionStatus }}
-                                    </span>
-                                </div>
-                                <div class="device-cell device-cell--time">{{ device.lastSeenText }}</div>
-                                <div class="device-cell device-cell--action">
-                                    <button class="expand-button" @click="toggleExpand(device.id)">
-                                        {{ isExpanded(device.id) ? 'Collapse' : 'Expand' }}
-                                    </button>
-                                </div>
-                            </article>
-                            <article v-if="isExpanded(device.id)" class="device-detail-row">
-                                <div class="device-detail">
-                                    <div class="detail-section">
-                                        <h4 class="detail-title">Telemetry</h4>
-                                        <div class="motor-grid">
-                                            <div class="motor-card" v-for="mIdx in 4" :key="mIdx">
-                                                <span class="motor-card__label">Motor {{ mIdx - 1 }}</span>
-                                                <div class="motor-card__values">
-                                                    <span>PWM: {{ getTelemetry(device, mIdx - 1, 'pwm') }}</span>
-                                                    <span>PCNT: {{ getTelemetry(device, mIdx - 1, 'pcnt') }}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="temperature-row">
-                                            <span class="detail-label">Temperature:</span>
-                                            <span class="detail-value detail-value--na">N/A (reserved for hardware update)</span>
-                                        </div>
-                                    </div>
-                                    <div class="detail-section" v-if="device.currentTask && device.currentTask.motor !== undefined">
-                                        <h4 class="detail-title">Current Task</h4>
-                                        <div class="task-detail">
-                                            <div class="task-detail__row">
-                                                <span class="detail-label">Motor:</span>
-                                                <span class="detail-value">{{ device.currentTask.motor }}</span>
-                                            </div>
-                                            <div class="task-detail__row">
-                                                <span class="detail-label">Speed:</span>
-                                                <span class="detail-value">{{ device.currentTask.speed }} rpm</span>
-                                            </div>
-                                            <div class="task-detail__row">
-                                                <span class="detail-label">Duration:</span>
-                                                <span class="detail-value">{{ device.currentTask.durationSec }} s</span>
-                                            </div>
-                                            <div class="task-detail__row">
-                                                <span class="detail-label">Remaining:</span>
-                                                <span class="detail-value">{{ device.currentTask.remainingSec }} s</span>
-                                            </div>
-                                            <div class="task-progress">
-                                                <div class="task-progress__bar">
-                                                    <div class="task-progress__fill" :style="{width: device.currentTask.progressPercent + '%'}"></div>
-                                                </div>
-                                                <span class="task-progress__text">{{ device.currentTask.progressPercent }}%</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
-                        </template>
-                    </div>
-                </div>
+                <DeviceStatusTable
+                    :devices="devices"
+                    :selected-ids="selectedDeviceIds"
+                    :expanded-ids="expandedDeviceIds"
+                    :loading="loading"
+                    @update:selected-ids="selectedDeviceIds = $event"
+                    @update:expanded-ids="expandedDeviceIds = $event"
+                    @refresh="getDeviceList"
+                />
 
-                <div v-else-if="!loading" class="empty-state">
+                <div v-if="!devices.length && !loading" class="empty-state">
                     <p class="empty-title">No active controller records</p>
                     <p class="empty-copy">
                         The operations console is available, but the fleet board will populate only when the broker reports active clients.
@@ -192,141 +66,37 @@
                 </div>
             </section>
 
-            <section class="operations-rail">
-                <div class="panel-header">
-                    <div>
-                        <p class="panel-kicker">Operator Rail</p>
-                        <h2 class="panel-title">Manual Control Tools</h2>
-                    </div>
-                    <span class="panel-badge">Authorized</span>
-                </div>
-
-                <div class="action-stack">
-                    <article class="action-card action-card--danger">
-                        <div>
-                            <p class="action-title">Emergency Stop</p>
-                            <p class="action-copy">
-                                Halt all motors on selected devices. Requires manual resume before further task dispatch.
-                            </p>
-                        </div>
-                        <div class="action-buttons">
-                            <button class="button estop-button" @click="emergencyStop('single')" :disabled="!selectedDeviceIds.length">
-                                Stop Selected
-                            </button>
-                            <button class="button estop-button estop-button--broadcast" @click="emergencyStop('broadcast')">
-                                Stop All
-                            </button>
-                        </div>
-                    </article>
-
-                    <article class="action-card">
-                        <div>
-                            <p class="action-title">Resume Devices</p>
-                            <p class="action-copy">
-                                Unlock task dispatch for selected E-Stopped devices after manual safety confirmation.
-                            </p>
-                        </div>
-                        <button class="button resume-button" @click="resumeDevices" :disabled="!selectedDeviceIds.length">
-                            Resume Selected
-                        </button>
-                    </article>
-
-
-                    <article class="action-card">
-                        <div>
-                            <p class="action-title">Material Orchestration</p>
-                            <p class="action-copy">
-                                Route material or recipe input into backend planning and device command generation.
-                            </p>
-                        </div>
-                        <router-link class="button action-button" to="/dashboard/material-demo">Launch</router-link>
-                    </article>
-
-                    <article class="action-card">
-                        <div>
-                            <p class="action-title">Motor Scheduling</p>
-                            <p class="action-copy">
-                                Register motor tasks, inspect actuator availability, and submit scheduled spin jobs.
-                            </p>
-                        </div>
-                        <router-link class="button action-button" to="/dashboard/spinning">Launch</router-link>
-                    </article>
-
-                    <article class="action-card">
-                        <div>
-                            <p class="action-title">Realtime Device Console</p>
-                            <p class="action-copy">
-                                Inspect websocket events, PWM activity, PCNT feedback, and command flow in real time.
-                            </p>
-                        </div>
-                        <router-link class="button action-button" to="/dashboard/websocket">Launch</router-link>
-                    </article>
-                </div>
-
-                <section class="rail-card">
-                    <p class="rail-title">Runbook</p>
-                    <div class="runbook-row">
-                        <span class="runbook-index">01</span>
-                        <span class="runbook-copy">Confirm the target controller is online before issuing any manual command.</span>
-                    </div>
-                    <div class="runbook-row">
-                        <span class="runbook-index">02</span>
-                        <span class="runbook-copy">Use Emergency Stop only when immediate halt is required. Always resume after safety check.</span>
-                    </div>
-                    <div class="runbook-row">
-                        <span class="runbook-index">03</span>
-                        <span class="runbook-copy">Prefer scheduled workflows over ad hoc commands for repeatable lab operation.</span>
-                    </div>
-                </section>
-
-                <section class="rail-card rail-card--compact">
-                    <p class="rail-title">Platform Context</p>
-                    <div class="context-row">
-                        <span class="context-label">Transport</span>
-                        <span class="context-value">MQTT / WebSocket</span>
-                    </div>
-                    <div class="context-row">
-                        <span class="context-label">Mode</span>
-                        <span class="context-value">Supervisory Control</span>
-                    </div>
-                    <div class="context-row">
-                        <span class="context-label">Operator</span>
-                        <span class="context-value">{{ $store.state.email || 'Authenticated User' }}</span>
-                    </div>
-                </section>
-            </section>
+            <OperatorRail
+                :selected-count="selectedDeviceIds.length"
+                @emergency-stop="emergencyStop"
+                @resume="resumeDevices"
+            />
         </div>
 
-        <!-- 实时事件流 -->
-        <section class="event-stream">
-            <div class="panel-header">
-                <div>
-                    <p class="panel-kicker">Realtime Feed</p>
-                    <h2 class="panel-title">Device Events</h2>
-                </div>
-                <button class="button clear-button" @click="clearEvents">Clear</button>
-            </div>
-            <div class="event-list">
-                <div v-for="evt in liveEvents" :key="evt.key" class="event-row" :class="'event-row--' + evt.kind">
-                    <span class="event-time">{{ evt.time }}</span>
-                    <span class="event-device">{{ evt.device }}</span>
-                    <span class="event-topic">{{ evt.topic }}</span>
-                    <span class="event-summary">{{ evt.summary }}</span>
-                </div>
-                <div v-if="!liveEvents.length" class="event-empty">
-                    Waiting for MQTT messages...
-                </div>
-            </div>
-        </section>
+        <LiveEventStream :events="liveEvents" @clear="clearEvents" />
     </section>
 </template>
 
 <script>
-import axios from 'axios'
 import WebSocketService from '@/services/websocket.js'
+import devicesApi from '@/services/api/devices.js'
+import ConnectionBar from '@/components/ui/ConnectionBar.vue'
+import FleetSummary from '@/components/dashboard/FleetSummary.vue'
+import PanelHeader from '@/components/ui/PanelHeader.vue'
+import DeviceStatusTable from '@/components/dashboard/DeviceStatusTable.vue'
+import OperatorRail from '@/components/dashboard/OperatorRail.vue'
+import LiveEventStream from '@/components/ui/LiveEventStream.vue'
 
 export default {
     name: 'DashboardView',
+    components: {
+        ConnectionBar,
+        FleetSummary,
+        PanelHeader,
+        DeviceStatusTable,
+        OperatorRail,
+        LiveEventStream
+    },
     created() {
         this.getDeviceList()
         this.initWebSocket()
@@ -368,41 +138,9 @@ export default {
             const offline = total - online
             return { total, online, busy, estopped, idle, offline }
         },
-        isAllSelected() {
-            if (!this.devices.length) return false
-            return this.devices.every(d => this.selectedDeviceIds.includes(d.id))
-        },
-        wsStatusLabel() {
-            const map = {
-                connected: 'WebSocket Connected',
-                connecting: 'WebSocket Connecting…',
-                disconnected: 'WebSocket Disconnected'
-            }
-            return map[this.wsStatus] || this.wsStatus
-        },
-        wsStatusClass() {
-            return {
-                'connection-bar--connected': this.wsStatus === 'connected',
-                'connection-bar--connecting': this.wsStatus === 'connecting',
-                'connection-bar--disconnected': this.wsStatus === 'disconnected'
-            }
-        }
+        
     },
     methods: {
-        statusClass(status) {
-            return {
-                'status-pill--online': status === 'Idle',
-                'status-pill--busy': status === 'Busy',
-                'status-pill--alert': status === 'E-Stopped',
-                'status-pill--offline': status === 'Offline'
-            }
-        },
-        connectionClass(status) {
-            return {
-                'status-pill--online': status === 'Online',
-                'status-pill--offline': status !== 'Online'
-            }
-        },
         normalizeDevice(raw) {
             return {
                 id: raw.device_id || raw.id,
@@ -474,16 +212,11 @@ export default {
             if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
             return `${Math.floor(diff / 3600)}h ago`
         },
-        getTelemetry(device, motorIdx, key) {
-            const motorKey = `motor_${motorIdx}`
-            const val = device.telemetry[motorKey] && device.telemetry[motorKey][key]
-            return val !== undefined ? val : 'N/A'
-        },
         async getDeviceList() {
             this.loading = true
             this.errorMessage = ''
             try {
-                const response = await axios.get('/api/device_list/')
+                const response = await devicesApi.getList()
                 const result = response.data || {}
                 this.mqttAvailable = result.mqtt_available
                 const list = result.data || []
@@ -708,35 +441,6 @@ export default {
         clearEvents() {
             this.liveEvents = []
         },
-        isSelected(deviceId) {
-            return this.selectedDeviceIds.includes(deviceId)
-        },
-        toggleSelect(deviceId) {
-            const idx = this.selectedDeviceIds.indexOf(deviceId)
-            if (idx === -1) {
-                this.selectedDeviceIds.push(deviceId)
-            } else {
-                this.selectedDeviceIds.splice(idx, 1)
-            }
-        },
-        toggleSelectAll() {
-            if (this.isAllSelected) {
-                this.selectedDeviceIds = []
-            } else {
-                this.selectedDeviceIds = this.devices.map(d => d.id)
-            }
-        },
-        isExpanded(deviceId) {
-            return this.expandedDeviceIds.includes(deviceId)
-        },
-        toggleExpand(deviceId) {
-            const idx = this.expandedDeviceIds.indexOf(deviceId)
-            if (idx === -1) {
-                this.expandedDeviceIds.push(deviceId)
-            } else {
-                this.expandedDeviceIds.splice(idx, 1)
-            }
-        },
         emergencyStop(scope) {
             if (scope !== 'broadcast' && !this.selectedDeviceIds.length) return
             const ok = confirm(scope === 'broadcast'
@@ -787,47 +491,6 @@ export default {
     min-height: calc(100vh - 4rem);
     background:
         linear-gradient(180deg, #0f1724 4%, #131d2c 15%, #eef3f8 30%, #eef3f8 100%);
-}
-
-/* 连接状态条 */
-.connection-bar {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    padding: 0.5rem 1rem;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    background: rgba(255, 255, 255, 0.92);
-    border: 1px solid rgba(15, 23, 36, 0.08);
-}
-
-.connection-bar--connected {
-    color: #166534;
-    background: #dcfce7;
-}
-
-.connection-bar--connecting {
-    color: #9a670f;
-    background: #fef3c7;
-}
-
-.connection-bar--disconnected {
-    color: #991b1b;
-    background: #fee2e2;
-}
-
-.connection-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: currentColor;
-}
-
-.connection-sublabel {
-    opacity: 0.8;
-    font-weight: 500;
 }
 
 .command-header {
@@ -904,58 +567,6 @@ export default {
     font-weight: 700;
 }
 
-.summary-bar {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 0.85rem;
-    margin-bottom: 1.5rem;
-}
-
-.summary-metric {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    padding: 0.9rem 1rem;
-    border-radius: 16px;
-    background: #ffffff;
-    border: 1px solid rgba(15, 23, 36, 0.08);
-    box-shadow: 0 10px 24px rgba(15, 23, 36, 0.08);
-}
-
-.summary-metric--good {
-    border-left: 4px solid #1c8c63;
-}
-
-.summary-metric--busy {
-    border-left: 4px solid #3b82f6;
-}
-
-.summary-metric--alert {
-    border-left: 4px solid #d4584f;
-}
-
-.summary-metric--idle {
-    border-left: 4px solid #c58a2a;
-}
-
-.summary-metric--offline {
-    border-left: 4px solid #64748b;
-}
-
-.summary-metric__label {
-    color: #64748b;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-weight: 700;
-}
-
-.summary-metric__value {
-    color: #111827;
-    font-size: 1.8rem;
-    font-weight: 700;
-}
-
 .console-grid {
     display: grid;
     grid-template-columns: minmax(0, 1.7fr) minmax(340px, 0.9fr);
@@ -972,51 +583,6 @@ export default {
 
 .panel-card--status {
     min-height: 520px;
-}
-
-.operations-rail {
-    display: grid;
-    gap: 1rem;
-    padding: 1.4rem;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.96);
-    border: 1px solid rgba(13, 22, 38, 0.08);
-    box-shadow: 0 14px 36px rgba(15, 23, 36, 0.08);
-}
-
-.panel-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-}
-
-.panel-kicker {
-    color: #9c5f16;
-    font-size: 0.74rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    margin-bottom: 0.25rem;
-    font-weight: 700;
-}
-
-.panel-title {
-    color: #111827;
-    font-size: 1.22rem;
-    font-weight: 700;
-}
-
-.panel-badge {
-    display: inline-flex;
-    align-items: center;
-    height: fit-content;
-    padding: 0.3rem 0.7rem;
-    border-radius: 999px;
-    background: #eef3fb;
-    color: #325891;
-    font-size: 0.76rem;
-    font-weight: 700;
 }
 
 .status-toolbar {
@@ -1069,549 +635,6 @@ export default {
     color: #9b6a12;
 }
 
-.device-table {
-    border-radius: 18px;
-    overflow: hidden;
-    border: 1px solid rgba(15, 23, 36, 0.08);
-}
-
-.device-table__head,
-.device-row {
-    display: grid;
-    grid-template-columns: 40px 1.3fr 0.9fr 1.1fr 0.9fr 1fr 80px;
-    gap: 0.6rem;
-    align-items: center;
-    padding: 0.85rem 0.9rem;
-}
-
-.device-table__head {
-    background: #ecf2f8;
-    color: #5f6d81;
-    font-size: 0.74rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-weight: 700;
-}
-
-.head-cell--check,
-.device-cell--check {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.device-row {
-    background: #ffffff;
-    border-top: 1px solid rgba(15, 23, 36, 0.06);
-    transition: background 0.15s ease;
-}
-
-.device-row:nth-child(even) {
-    background: #fafcfe;
-}
-
-.device-row--selected {
-    background: #eff6ff !important;
-}
-
-.device-row--estopped {
-    border-left: 4px solid #d4584f;
-}
-
-.device-row--offline {
-    opacity: 0.7;
-}
-
-.device-cell {
-    color: #1f2937;
-    font-size: 0.94rem;
-}
-
-.device-cell--mono {
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-    font-size: 0.86rem;
-}
-
-.device-cell--time {
-    color: #475569;
-    font-size: 0.88rem;
-}
-
-.device-cell--action {
-    text-align: right;
-}
-
-.device-label {
-    display: block;
-    font-weight: 700;
-    color: #111827;
-}
-
-.device-index {
-    display: block;
-    font-size: 0.82rem;
-    color: #64748b;
-}
-
-.expand-button {
-    padding: 0.35rem 0.6rem;
-    border-radius: 8px;
-    border: 1px solid rgba(15, 23, 36, 0.12);
-    background: #ffffff;
-    color: #325891;
-    font-size: 0.78rem;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.expand-button:hover {
-    background: #f4f7fb;
-}
-
-.status-pill {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 64px;
-    padding: 0.28rem 0.65rem;
-    border-radius: 999px;
-    font-size: 0.76rem;
-    font-weight: 700;
-}
-
-.status-pill--online {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.status-pill--busy {
-    background: #dbeafe;
-    color: #1e40af;
-}
-
-.status-pill--alert {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-.status-pill--offline {
-    background: #f1f5f9;
-    color: #475569;
-}
-
-/* 展开详情 */
-.device-detail-row {
-    background: #f8fafc;
-    border-top: 1px dashed rgba(15, 23, 36, 0.08);
-}
-
-.device-detail {
-    padding: 1rem 1.2rem;
-    display: grid;
-    gap: 1.2rem;
-}
-
-.detail-section {
-    background: #ffffff;
-    border-radius: 14px;
-    padding: 1rem;
-    border: 1px solid rgba(15, 23, 36, 0.06);
-}
-
-.detail-title {
-    font-size: 0.92rem;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 0.7rem;
-}
-
-.motor-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.6rem;
-}
-
-.motor-card {
-    background: #f4f7fb;
-    border-radius: 12px;
-    padding: 0.75rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-}
-
-.motor-card__label {
-    font-size: 0.75rem;
-    color: #64748b;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-.motor-card__values {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-    font-size: 0.9rem;
-    color: #0f172a;
-    font-weight: 600;
-}
-
-.temperature-row {
-    margin-top: 0.75rem;
-    display: flex;
-    gap: 0.5rem;
-    font-size: 0.88rem;
-}
-
-.detail-label {
-    color: #64748b;
-    font-weight: 600;
-}
-
-.detail-value {
-    color: #0f172a;
-    font-weight: 600;
-}
-
-.detail-value--na {
-    color: #94a3b8;
-    font-style: italic;
-}
-
-.task-mini {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem;
-    align-items: center;
-}
-
-.task-mini--empty {
-    color: #94a3b8;
-}
-
-.task-mini__motor {
-    background: #eff6ff;
-    color: #1e40af;
-    padding: 0.15rem 0.4rem;
-    border-radius: 6px;
-    font-size: 0.72rem;
-    font-weight: 700;
-}
-
-.task-mini__speed {
-    color: #1f2937;
-    font-weight: 600;
-}
-
-.task-mini__remaining {
-    color: #0f7a59;
-    font-size: 0.8rem;
-    font-weight: 700;
-}
-
-.task-detail__row {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.3rem 0;
-    border-bottom: 1px solid rgba(15, 23, 36, 0.04);
-}
-
-.task-progress {
-    margin-top: 0.6rem;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-}
-
-.task-progress__bar {
-    flex: 1;
-    height: 8px;
-    background: #e2e8f0;
-    border-radius: 999px;
-    overflow: hidden;
-}
-
-.task-progress__fill {
-    height: 100%;
-    background: #3b82f6;
-    transition: width 0.3s ease;
-}
-
-.task-progress__text {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: #325891;
-    min-width: 36px;
-    text-align: right;
-}
-
-/* 操作面板 */
-.action-stack {
-    display: grid;
-    gap: 1rem;
-}
-
-.action-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem 1rem 1rem 1.05rem;
-    border-radius: 18px;
-    background: #fbfcfe;
-    border: 1px solid rgba(15, 23, 36, 0.08);
-}
-
-.action-card--danger {
-    border: 1px solid rgba(212, 88, 79, 0.25);
-    background: #fffafa;
-}
-
-.action-title {
-    color: #111827;
-    font-size: 1rem;
-    font-weight: 700;
-    margin-bottom: 0.3rem;
-}
-
-.action-copy {
-    color: #526174;
-    font-size: 0.9rem;
-    line-height: 1.5;
-}
-
-.action-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.action-button {
-    background: #1e293b;
-    color: #ffffff;
-    border: none;
-    font-weight: 700;
-}
-
-.estop-button {
-    background: #d4584f;
-    color: #ffffff;
-    border: none;
-    font-weight: 700;
-}
-
-.estop-button:hover:not(:disabled) {
-    background: #b93e36;
-}
-
-.estop-button--broadcast {
-    background: #991b1b;
-}
-
-.estop-button:disabled {
-    background: #fca5a5;
-    cursor: not-allowed;
-}
-
-.resume-button {
-    background: #1c8c63;
-    color: #ffffff;
-    border: none;
-    font-weight: 700;
-}
-
-.resume-button:disabled {
-    background: #86efac;
-    cursor: not-allowed;
-}
-
-.dispatch-button {
-    background: #3b82f6;
-    color: #ffffff;
-    border: none;
-    font-weight: 700;
-    margin-top: 0.5rem;
-    width: 100%;
-}
-
-.dispatch-button:disabled {
-    background: #93c5fd;
-    cursor: not-allowed;
-}
-
-.dispatch-form {
-    display: grid;
-    gap: 0.5rem;
-    min-width: 140px;
-}
-
-.form-row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-}
-
-.form-label {
-    font-size: 0.75rem;
-    color: #64748b;
-    font-weight: 700;
-}
-
-.form-input,
-.form-select {
-    padding: 0.4rem 0.5rem;
-    border-radius: 8px;
-    border: 1px solid rgba(15, 23, 36, 0.12);
-    font-size: 0.9rem;
-    background: #ffffff;
-}
-
-.rail-card {
-    padding: 1rem;
-    border-radius: 18px;
-    background: #f4f7fb;
-    border: 1px solid rgba(15, 23, 36, 0.08);
-}
-
-.rail-card--compact {
-    background: #f8fafc;
-}
-
-.rail-title {
-    color: #111827;
-    font-size: 0.96rem;
-    font-weight: 700;
-    margin-bottom: 0.8rem;
-}
-
-.runbook-row,
-.context-row {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0.75rem;
-    align-items: start;
-}
-
-.runbook-row + .runbook-row,
-.context-row + .context-row {
-    margin-top: 0.7rem;
-}
-
-.runbook-index {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    background: #e5edf6;
-    color: #274c7d;
-    font-size: 0.8rem;
-    font-weight: 700;
-}
-
-.runbook-copy {
-    color: #475569;
-    line-height: 1.55;
-}
-
-.context-label {
-    color: #64748b;
-    font-size: 0.8rem;
-    font-weight: 700;
-}
-
-.context-value {
-    color: #0f172a;
-    font-weight: 600;
-}
-
-/* 实时事件流 */
-.event-stream {
-    margin-top: 1.5rem;
-    padding: 1.4rem;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.96);
-    border: 1px solid rgba(13, 22, 38, 0.08);
-    box-shadow: 0 14px 36px rgba(15, 23, 36, 0.08);
-}
-
-.clear-button {
-    background: transparent;
-    color: #64748b;
-    border: 1px solid rgba(15, 23, 36, 0.12);
-    font-weight: 600;
-    font-size: 0.85rem;
-}
-
-.event-list {
-    display: grid;
-    gap: 0.4rem;
-    max-height: 240px;
-    overflow-y: auto;
-}
-
-.event-row {
-    display: grid;
-    grid-template-columns: 90px 110px 110px 1fr;
-    gap: 0.75rem;
-    align-items: center;
-    padding: 0.55rem 0.75rem;
-    border-radius: 10px;
-    background: #f8fafc;
-    font-size: 0.88rem;
-}
-
-.event-row--estop {
-    background: #fee2e2;
-}
-
-.event-row--error {
-    background: #fff7ed;
-}
-
-.event-row--task {
-    background: #eff6ff;
-}
-
-.event-row--heartbeat {
-    background: #f0fdf4;
-}
-
-.event-time {
-    color: #64748b;
-    font-family: "SFMono-Regular", Consolas, monospace;
-    font-size: 0.8rem;
-}
-
-.event-device {
-    color: #111827;
-    font-weight: 700;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.event-topic {
-    color: #325891;
-    font-weight: 600;
-    font-size: 0.8rem;
-}
-
-.event-summary {
-    color: #475569;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.event-empty {
-    padding: 1.2rem;
-    text-align: center;
-    color: #94a3b8;
-    font-size: 0.9rem;
-}
-
 .empty-state {
     padding: 2.2rem 1.2rem;
     border-radius: 18px;
@@ -1631,35 +654,9 @@ export default {
     color: #64748b;
 }
 
-@media screen and (max-width: 1280px) {
-    .summary-bar {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-}
-
 @media screen and (max-width: 1180px) {
     .console-grid {
         grid-template-columns: 1fr;
-    }
-
-    .motor-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media screen and (max-width: 960px) {
-    .device-table__head,
-    .device-row {
-        grid-template-columns: 36px 1fr 1fr 80px;
-    }
-
-    .device-table__head > span:nth-child(4),
-    .device-table__head > span:nth-child(5),
-    .device-table__head > span:nth-child(6),
-    .device-row > .device-cell:nth-child(5),
-    .device-row > .device-cell:nth-child(6),
-    .device-row > .device-cell:nth-child(7) {
-        display: none;
     }
 }
 
@@ -1675,24 +672,6 @@ export default {
     .command-header__actions {
         width: 100%;
         justify-content: space-between;
-    }
-
-    .summary-bar {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .motor-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .action-card {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .event-row {
-        grid-template-columns: 1fr;
-        gap: 0.2rem;
     }
 }
 </style>
