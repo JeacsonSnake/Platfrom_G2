@@ -15,6 +15,7 @@ urlpatterns = [
     path('motors/', views.get_motors, name='motors'),
     path('spinning-jobs/', views.spinning, name='spinning_jobs'),
     path('mqtt/messages/', views.mqtt_msg, name='mqtt_messages'),
+    path('mqtt/reconnect/', views.mqtt_reconnect, name='mqtt_reconnect'),
     path('devices/', views.device_list, name='devices'),
     path('experiments/', views.experiment_process_list, name='experiments'),
     path('experiments/<str:experiment_id>/', views.experiment_process_detail, name='experiment_detail'),

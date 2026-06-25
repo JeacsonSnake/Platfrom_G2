@@ -22,7 +22,7 @@ from .token import create_token, check_token, token_auth
 
 from django.conf import settings
 from .mqtt import (
-    publish_device_command, mqtt_client_available,
+    publish_device_command, mqtt_client_available, reconnect_mqtt_client,
     emergency_stop, resume_devices, dispatch_motor_task, get_device_states,
     get_mqtt_connection_state, can_dispatch_to_device, acknowledge_device,
     _device_control_topic, _extract_device_id_from_topic,
@@ -193,6 +193,15 @@ def mqtt_msg(request):
         last = MotorControl.objects.values().last()
         motor_speed = last['motor_speed'] if last else 0
         return Response({'speed': motor_speed}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def mqtt_reconnect(request):
+    """手动触发后端 MQTT 客户端重连 Broker。"""
+    result = reconnect_mqtt_client()
+    if result.get('success'):
+        return Response(result, status=status.HTTP_200_OK)
+    return Response(result, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
 
 # Device List

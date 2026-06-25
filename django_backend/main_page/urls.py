@@ -16,6 +16,7 @@ urlpatterns = [
     re_path(r'^test/$', views.test, name='test'),
     re_path(r'^spinning/$', views.spinning, name='spinning'),
     re_path(r'^mqtt_msg/$', views.mqtt_msg, name='mqtt_msg'),
+    re_path(r'^mqtt/reconnect/$', views.mqtt_reconnect, name='mqtt_reconnect'),
 
     # 设备管理（Dashboard 核心）
     re_path(r'^device_list/$', views.device_list, name='device_list'),

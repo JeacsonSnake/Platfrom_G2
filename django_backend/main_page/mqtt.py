@@ -984,6 +984,35 @@ def mqtt_client_available():
     return client is not None and client.is_connected()
 
 
+def reconnect_mqtt_client():
+    """手动重连 MQTT Broker；供前端刷新按钮或管理接口调用。"""
+    global client
+    try:
+        if client is not None:
+            if client.is_connected():
+                return {'success': True, 'connected': True, 'message': 'Already connected'}
+            # 尝试复用现有 client 进行重连（loop_start 线程应仍在运行）
+            client.reconnect()
+            return {'success': True, 'connected': client.is_connected(), 'message': 'Reconnect requested'}
+
+        # client 为 None（如启动失败），重新初始化
+        client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION1)
+        client.on_connect = on_connect
+        client.on_disconnect = on_disconnect
+        client.on_message = on_message
+        client.username_pw_set(settings.MQTT_USER, settings.MQTT_PASSWORD)
+        client.connect(
+            host=settings.MQTT_SERVER,
+            port=settings.MQTT_PORT,
+            keepalive=settings.MQTT_KEEPALIVE
+        )
+        client.loop_start()
+        return {'success': True, 'connected': client.is_connected(), 'message': 'Client recreated'}
+    except Exception as exc:
+        print(f'MQTT reconnect failed: {exc}')
+        return {'success': False, 'connected': False, 'error': str(exc)}
+
+
 def _should_init_mqtt_client():
     """判断当前进程是否应该创建 MQTT Client。
 
