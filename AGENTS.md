@@ -478,7 +478,7 @@ idf.py -p COM9 monitor
   - MQTT 断开：红色错误消息，不自动关闭、无关闭按钮，右侧带 **刷新连接** 按钮，调用 `POST /api/mqtt/reconnect/` 手动触发后端重连。
   - MQTT 恢复：绿色成功消息，显示 5 秒后自动关闭，可手动关闭。
 - `Dashboard.vue` 删除原 `showMqttBanner` 内联横幅，改为调用 `mqttMessage` 服务。
-- `ConnectionBar` 组件新增 `mqttConnected` 显示。
+- `ConnectionBar` 组件新增 `mqttConnected` 显示，移除冗余的 `mqttAvailable` prop，统一使用 WebSocket 实时推送的 MQTT 连接状态。
 - 任务完成/异常时，`LiveEventStream` 显示对应事件，设备状态显示为 `Completed` / `Error`。
 - `OperatorRail` 新增 **Acknowledge Selected** 按钮，用于确认选中设备的完成/异常/急停状态。
 - 下发任务前前端先做在线/空闲拦截；下发失败时顶部显示 5 秒错误提示。
