@@ -2,8 +2,8 @@
     <div class="connection-bar" :class="statusClass">
         <span class="connection-dot"></span>
         <span class="connection-label">{{ statusLabel }}</span>
-        <span v-if="mqttAvailable !== null" class="connection-sublabel">
-            · MQTT {{ mqttAvailable ? '可用' : '不可用' }}
+        <span v-if="mqttAvailable !== null || mqttConnected !== null" class="connection-sublabel">
+            · {{ mqttLabel }}
         </span>
     </div>
 </template>
@@ -22,6 +22,10 @@ export default {
         mqttAvailable: {
             type: [Boolean, null],
             default: null
+        },
+        mqttConnected: {
+            type: [Boolean, null],
+            default: null
         }
     },
     computed: {
@@ -32,6 +36,13 @@ export default {
                 disconnected: 'WebSocket Disconnected'
             }
             return map[this.status] || this.status
+        },
+        mqttLabel() {
+            if (this.mqttConnected === true) return 'MQTT 已连接'
+            if (this.mqttConnected === false) return 'MQTT 已断开'
+            if (this.mqttAvailable === true) return 'MQTT 可用'
+            if (this.mqttAvailable === false) return 'MQTT 不可用'
+            return 'MQTT 未知'
         },
         statusClass() {
             return {

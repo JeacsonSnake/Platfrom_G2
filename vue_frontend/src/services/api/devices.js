@@ -28,5 +28,12 @@ export default {
       speed,
       duration
     })
+  },
+
+  acknowledge(deviceIds, acknowledgedBy) {
+    return client.post('/api/devices/acknowledge/', {
+      device_ids: deviceIds,
+      acknowledged_by: acknowledgedBy
+    })
   }
 }

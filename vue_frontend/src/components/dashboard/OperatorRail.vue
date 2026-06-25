@@ -34,6 +34,18 @@
 
             <article class="action-card">
                 <div>
+                    <p class="action-title">Acknowledge Devices</p>
+                    <p class="action-copy">
+                        Confirm error cleared or task completed for selected Error / Completed devices.
+                    </p>
+                </div>
+                <button class="button resume-button" @click="handleAcknowledge" :disabled="!selectedCount">
+                    Acknowledge Selected
+                </button>
+            </article>
+
+            <article class="action-card">
+                <div>
                     <p class="action-title">Material Orchestration</p>
                     <p class="action-copy">
                         Route material or recipe input into backend planning and device command generation.
@@ -109,7 +121,7 @@ export default {
             default: 0
         }
     },
-    emits: ['emergency-stop', 'resume'],
+    emits: ['emergency-stop', 'resume', 'acknowledge'],
     computed: {
         operatorName() {
             return this.$store.state.email || 'Authenticated User'
@@ -127,6 +139,10 @@ export default {
         handleResume() {
             if (!this.selectedCount) return
             this.$emit('resume')
+        },
+        handleAcknowledge() {
+            if (!this.selectedCount) return
+            this.$emit('acknowledge')
         }
     }
 }

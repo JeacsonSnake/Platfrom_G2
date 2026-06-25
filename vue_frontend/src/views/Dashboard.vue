@@ -1,6 +1,11 @@
 <template>
     <section class="operations-dashboard">
-        <ConnectionBar :status="wsStatus" :mqtt-available="mqttAvailable" />
+        <ConnectionBar :status="wsStatus" :mqtt-available="mqttAvailable" :mqtt-connected="backendMqttConnected" />
+
+        <div v-if="showMqttBanner" class="notification mqtt-banner" :class="mqttBannerType">
+            <button class="delete" @click="showMqttBanner = false"></button>
+            {{ mqttBannerText }}
+        </div>
 
         <header class="command-header">
             <div class="command-header__main">
@@ -70,6 +75,7 @@
                 :selected-count="selectedDeviceIds.length"
                 @emergency-stop="emergencyStop"
                 @resume="resumeDevices"
+                @acknowledge="acknowledgeDevices"
             />
         </div>
 
@@ -106,6 +112,9 @@ export default {
         if (this.countdownTimer) {
             clearInterval(this.countdownTimer)
         }
+        if (this.mqttBannerTimer) {
+            clearTimeout(this.mqttBannerTimer)
+        }
         // WebSocket 服务作为单例保留，不在这里断开
     },
     data() {
@@ -115,6 +124,11 @@ export default {
             errorMessage: '',
             wsStatus: 'disconnected',
             mqttAvailable: null,
+            backendMqttConnected: null,
+            showMqttBanner: false,
+            mqttBannerType: 'is-danger',
+            mqttBannerText: '',
+            mqttBannerTimer: null,
             selectedDeviceIds: [],
             expandedDeviceIds: [],
             liveEvents: [],
@@ -166,6 +180,8 @@ export default {
             if (s === 'busy') return 'Busy'
             if (s === 'estopped') return 'E-Stopped'
             if (s === 'offline') return 'Offline'
+            if (s === 'error') return 'Error'
+            if (s === 'completed') return 'Completed'
             return 'Idle'
         },
         normalizeTask(task) {
@@ -219,6 +235,8 @@ export default {
                 const response = await devicesApi.getList()
                 const result = response.data || {}
                 this.mqttAvailable = result.mqtt_available
+                this.backendMqttConnected = result.mqtt_connected
+                this.updateMqttBanner(result.mqtt_connected)
                 const list = result.data || []
                 // 保留当前设备的选中/展开状态
                 const selected = new Set(this.selectedDeviceIds)
@@ -263,6 +281,19 @@ export default {
             const unsubSnapshot = this.wsService.subscribe('device_snapshot', (payload) => {
                 this.handleSnapshot(payload)
             })
+            const unsubMqttStatus = this.wsService.subscribe('mqtt_connection_status', (payload) => {
+                this.handleMqttConnectionStatus(payload)
+            })
+            const unsubAcknowledgeResult = this.wsService.subscribe('acknowledge_result', (payload) => {
+                this.addEvent({
+                    kind: 'acknowledge',
+                    device: (payload.results || []).map(r => r.device_id).join(', '),
+                    topic: 'Acknowledge',
+                    summary: payload.success === false ? `Acknowledge failed: ${payload.error}` : 'Devices acknowledged',
+                    time: new Date().toLocaleTimeString()
+                })
+                this.getDeviceList()
+            })
             const unsubEstopResult = this.wsService.subscribe('estop_result', (payload) => {
                 this.addEvent({
                     kind: 'estop',
@@ -285,6 +316,9 @@ export default {
                 this.getDeviceList()
             })
             const unsubDispatchResult = this.wsService.subscribe('dispatch_result', (payload) => {
+                if (!payload.success && payload.error) {
+                    this.showErrorMessage(`下发失败: ${payload.error}`)
+                }
                 this.addEvent({
                     kind: payload.success ? 'dispatch' : 'error',
                     device: payload.topic || '',
@@ -296,7 +330,8 @@ export default {
 
             this.unsubscribeCallbacks = [
                 unsubStatus, unsubHeartbeat, unsubTelemetry, unsubTask,
-                unsubStatusEvent, unsubSnapshot, unsubEstopResult, unsubResumeResult, unsubDispatchResult
+                unsubStatusEvent, unsubSnapshot, unsubMqttStatus, unsubAcknowledgeResult,
+                unsubEstopResult, unsubResumeResult, unsubDispatchResult
             ]
         },
         handleHeartbeat(payload) {
@@ -373,6 +408,16 @@ export default {
                     summary: `Motor ${p.motor} finished`,
                     time: new Date().toLocaleTimeString()
                 })
+            } else if (p.event === 'task_completed_pending_ack') {
+                d.taskStatus = 'Completed'
+                d.currentTask = {}
+                this.addEvent({
+                    kind: 'task',
+                    device: deviceId,
+                    topic: 'Task Completed',
+                    summary: p.message || `Motor ${p.motor} finished. Waiting for acknowledgement.`,
+                    time: new Date().toLocaleTimeString()
+                })
             }
         },
         handleDeviceStatus(payload) {
@@ -396,12 +441,19 @@ export default {
                 d.currentTask = {}
             } else if (p.event === 'resumed') {
                 d.taskStatus = 'Idle'
+            } else if (p.event === 'aborted') {
+                d.connectionStatus = 'Offline'
+                d.taskStatus = 'Error'
+                d.currentTask = {}
+            } else if (p.event === 'acknowledged') {
+                d.taskStatus = 'Idle'
+                d.currentTask = {}
             }
             this.addEvent({
-                kind: p.event === 'estopped' ? 'estop' : (p.event === 'offline' ? 'offline' : 'status'),
+                kind: p.event === 'estopped' ? 'estop' : (p.event === 'offline' ? 'offline' : (p.event === 'aborted' ? 'error' : 'status')),
                 device: deviceId,
                 topic: 'Status',
-                summary: `Device ${p.event}`,
+                summary: `Device ${p.event}${p.reason ? ': ' + p.reason : ''}`,
                 time: new Date().toLocaleTimeString()
             })
         },
@@ -431,6 +483,31 @@ export default {
                 }
             })
         },
+        handleMqttConnectionStatus(payload) {
+            const connected = payload.payload && payload.payload.connected
+            this.backendMqttConnected = connected
+            this.updateMqttBanner(connected)
+        },
+        updateMqttBanner(connected) {
+            if (this.mqttBannerTimer) {
+                clearTimeout(this.mqttBannerTimer)
+                this.mqttBannerTimer = null
+            }
+            if (connected === true) {
+                this.mqttBannerType = 'is-success'
+                this.mqttBannerText = 'MQTT 已恢复连接'
+                this.showMqttBanner = true
+                this.mqttBannerTimer = setTimeout(() => {
+                    this.showMqttBanner = false
+                }, 3000)
+            } else if (connected === false) {
+                this.mqttBannerType = 'is-danger'
+                this.mqttBannerText = 'MQTT 已断开，命令将无法下发'
+                this.showMqttBanner = true
+            } else {
+                this.showMqttBanner = false
+            }
+        },
         addEvent(evt) {
             evt.key = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
             this.liveEvents.unshift(evt)
@@ -440,6 +517,25 @@ export default {
         },
         clearEvents() {
             this.liveEvents = []
+        },
+        showErrorMessage(message) {
+            this.errorMessage = message
+            setTimeout(() => {
+                this.errorMessage = ''
+            }, 5000)
+        },
+        acknowledgeDevices() {
+            if (!this.selectedDeviceIds.length) return
+            const ackable = this.devices.filter(d => this.selectedDeviceIds.includes(d.id) && ['E-Stopped', 'Error', 'Completed'].includes(d.taskStatus))
+            if (!ackable.length) {
+                alert('选中的设备没有需要确认的状态（急停/异常/完成）。')
+                return
+            }
+            this.wsService.send({
+                action: 'acknowledge_device',
+                device_ids: ackable.map(d => d.id),
+                acknowledged_by: this.$store.state.email || 'operator'
+            })
         },
         emergencyStop(scope) {
             if (scope !== 'broadcast' && !this.selectedDeviceIds.length) return
@@ -466,9 +562,9 @@ export default {
         },
         dispatchTaskToSelected() {
             if (!this.selectedDeviceIds.length) return
-            const blocked = this.devices.filter(d => this.selectedDeviceIds.includes(d.id) && d.taskStatus === 'E-Stopped')
-            if (blocked.length) {
-                alert(`以下设备处于急停状态，无法下发任务：${blocked.map(d => d.deviceId).join(', ')}`)
+            const notReady = this.devices.filter(d => this.selectedDeviceIds.includes(d.id) && (d.connectionStatus !== 'Online' || d.taskStatus !== 'Idle'))
+            if (notReady.length) {
+                alert(`以下设备不在线或不空闲，无法下发任务：${notReady.map(d => `${d.deviceId}(${d.connectionStatus}, ${d.taskStatus})`).join(', ')}`)
                 return
             }
             this.selectedDeviceIds.forEach(deviceId => {
@@ -633,6 +729,21 @@ export default {
     background: #fff6df;
     border: 1px solid #f0dfaa;
     color: #9b6a12;
+}
+
+.mqtt-banner {
+    margin-bottom: 1rem;
+    border-radius: 14px;
+}
+
+.mqtt-banner.is-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.mqtt-banner.is-danger {
+    background: #fee2e2;
+    color: #991b1b;
 }
 
 .empty-state {
