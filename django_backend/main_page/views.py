@@ -25,7 +25,7 @@ from .mqtt import (
     publish_device_command, mqtt_client_available, reconnect_mqtt_client,
     emergency_stop, resume_devices, dispatch_motor_task, get_device_states,
     get_mqtt_connection_state, can_dispatch_to_device, acknowledge_device,
-    _device_control_topic, _extract_device_id_from_topic,
+    _device_control_topic, _extract_device_id_from_topic, _broadcast,
 )
 
 import requests
@@ -197,11 +197,18 @@ def mqtt_msg(request):
 
 @api_view(['POST'])
 def mqtt_reconnect(request):
-    """手动触发后端 MQTT 客户端重连 Broker。"""
+    """手动触发后端 MQTT 客户端重连 Broker，并主动向所有 WebSocket 客户端广播当前状态。"""
     result = reconnect_mqtt_client()
-    if result.get('success'):
+    # 无论是否真正连上，都把最新状态推送给前端，避免前端状态 stale
+    try:
+        _broadcast('mqtt_connection_status', get_mqtt_connection_state())
+    except Exception as exc:
+        print(f'Broadcast mqtt_connection_status failed: {exc}')
+    if not result.get('success'):
+        return Response(result, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    if result.get('connected'):
         return Response(result, status=status.HTTP_200_OK)
-    return Response(result, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    return Response(result, status=status.HTTP_202_ACCEPTED)
 
 
 # Device List

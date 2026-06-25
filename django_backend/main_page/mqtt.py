@@ -988,26 +988,36 @@ def reconnect_mqtt_client():
     """手动重连 MQTT Broker；供前端刷新按钮或管理接口调用。"""
     global client
     try:
+        if client is not None and client.is_connected():
+            return {'success': True, 'connected': True, 'message': 'Already connected'}
+
         if client is not None:
-            if client.is_connected():
-                return {'success': True, 'connected': True, 'message': 'Already connected'}
             # 尝试复用现有 client 进行重连（loop_start 线程应仍在运行）
             client.reconnect()
-            return {'success': True, 'connected': client.is_connected(), 'message': 'Reconnect requested'}
+        else:
+            # client 为 None（如启动失败），重新初始化
+            client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION1)
+            client.on_connect = on_connect
+            client.on_disconnect = on_disconnect
+            client.on_message = on_message
+            client.username_pw_set(settings.MQTT_USER, settings.MQTT_PASSWORD)
+            client.connect(
+                host=settings.MQTT_SERVER,
+                port=settings.MQTT_PORT,
+                keepalive=settings.MQTT_KEEPALIVE
+            )
+            client.loop_start()
 
-        # client 为 None（如启动失败），重新初始化
-        client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION1)
-        client.on_connect = on_connect
-        client.on_disconnect = on_disconnect
-        client.on_message = on_message
-        client.username_pw_set(settings.MQTT_USER, settings.MQTT_PASSWORD)
-        client.connect(
-            host=settings.MQTT_SERVER,
-            port=settings.MQTT_PORT,
-            keepalive=settings.MQTT_KEEPALIVE
-        )
-        client.loop_start()
-        return {'success': True, 'connected': client.is_connected(), 'message': 'Client recreated'}
+        # 最多等待 3 秒让连接建立（paho loop 线程在后台完成握手）
+        deadline = time.time() + 3
+        while time.time() < deadline:
+            if client.is_connected():
+                break
+            time.sleep(0.1)
+
+        connected = client.is_connected()
+        message = 'MQTT connected' if connected else 'MQTT reconnection in progress, please wait'
+        return {'success': True, 'connected': connected, 'message': message}
     except Exception as exc:
         print(f'MQTT reconnect failed: {exc}')
         return {'success': False, 'connected': False, 'error': str(exc)}
