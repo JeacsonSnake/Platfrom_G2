@@ -496,3 +496,14 @@ idf.py -p COM9 monitor
 - `test_job_start_queues_all_pending_steps_and_outbox` / `test_job_status_returns_counts_and_next_step` 增加 `publish_device_command` 与 `mqtt_client_available` 的 Mock，并将断言修正为步骤 `RUNNING`、Outbox `SENT`。
 
 运行命令：`python manage.py test`（当前 17 项测试全部通过）。
+
+### 11.6 后端 MQTT 自动重连
+
+文件：`django_backend/main_page/mqtt.py`、`django_backend/django_backend/settings.py`
+
+- 在 `_mqtt_connection_watchdog` 中增加自动重连逻辑：当后端 MQTT 客户端与 Broker 断开时，按指数退避持续尝试恢复连接（最小间隔 2s，最大间隔 90s，倍数 2），连接成功后立即重置退避计数器。
+- 复用已有 `reconnect_mqtt_client()` 的重连逻辑，抽取内部 `_perform_reconnect()`；手动重连调用时先重置退避，保证用户触发后立即优先尝试。
+- 保留 paho-mqtt 内置自动重连作为第一层恢复（`reconnect_on_failure=True`），自定义自动重连作为补充，覆盖启动失败、长时间未恢复等场景。
+- 启动时即使初始连接失败也保留同一个 `mqtt.Client` 实例，由 `apps.py` 启动 `loop_start()`，避免重新创建 client 对象导致其它地方持有的引用失效。
+- 自动重连仅在 `_should_init_mqtt_client()` 为 `True` 的进程启用，避免测试、迁移等进程产生无意义网络请求。
+- `settings.py` 新增 `MQTT_AUTO_RECONNECT_MIN_DELAY`、`MQTT_AUTO_RECONNECT_MAX_DELAY`、`MQTT_AUTO_RECONNECT_MULTIPLIER` 配置项。
