@@ -1,10 +1,13 @@
 <template>
-    <div class="connection-bar" :class="statusClass">
-        <span class="connection-dot"></span>
-        <span class="connection-label">{{ statusLabel }}</span>
-        <span v-if="mqttConnected !== null" class="connection-sublabel">
-            · {{ mqttLabel }}
-        </span>
+    <div class="connection-bar">
+        <div class="connection-item" :class="wsItemClass">
+            <span class="connection-dot"></span>
+            <span class="connection-label">{{ wsLabel }}</span>
+        </div>
+        <div class="connection-item" :class="mqttItemClass">
+            <span class="connection-dot"></span>
+            <span class="connection-label">{{ mqttLabel }}</span>
+        </div>
     </div>
 </template>
 
@@ -22,28 +25,49 @@ export default {
         mqttConnected: {
             type: [Boolean, null],
             default: null
+        },
+        mqttStatus: {
+            type: String,
+            default: null,
+            validator(value) {
+                return value === null || ['connected', 'connecting', 'disconnected'].includes(value)
+            }
         }
     },
     computed: {
-        statusLabel() {
+        wsLabel() {
             const map = {
                 connected: 'WebSocket Connected',
                 connecting: 'WebSocket Connecting…',
                 disconnected: 'WebSocket Disconnected'
             }
-            return map[this.status] || this.status
+            return map[this.status] || 'WebSocket Disconnected'
+        },
+        mqttState() {
+            if (this.mqttStatus) {
+                return this.mqttStatus
+            }
+            if (this.mqttConnected === true) {
+                return 'connected'
+            }
+            if (this.mqttConnected === false) {
+                return 'disconnected'
+            }
+            return 'disconnected'
         },
         mqttLabel() {
-            if (this.mqttConnected === true) return 'MQTT Connected'
-            if (this.mqttConnected === false) return 'MQTT Disconnected'
-            return 'MQTT Unknown'
-        },
-        statusClass() {
-            return {
-                'connection-bar--connected': this.status === 'connected',
-                'connection-bar--connecting': this.status === 'connecting',
-                'connection-bar--disconnected': this.status === 'disconnected'
+            const map = {
+                connected: 'MQTT Connected',
+                connecting: 'MQTT Connecting…',
+                disconnected: 'MQTT Disconnected'
             }
+            return map[this.mqttState] || 'MQTT Disconnected'
+        },
+        wsItemClass() {
+            return `connection-item--${this.status}`
+        },
+        mqttItemClass() {
+            return `connection-item--${this.mqttState}`
         }
     }
 }
@@ -53,29 +77,38 @@ export default {
 .connection-bar {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
     margin-bottom: 1rem;
-    padding: 0.5rem 1rem;
-    border-radius: 12px;
-    font-size: 0.85rem;
+}
+
+.connection-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
     font-weight: 600;
     background: rgba(255, 255, 255, 0.92);
     border: 1px solid rgba(15, 23, 36, 0.08);
 }
 
-.connection-bar--connected {
+.connection-item--connected {
     color: #166534;
     background: #dcfce7;
+    border-color: #bbf7d0;
 }
 
-.connection-bar--connecting {
+.connection-item--connecting {
     color: #9a670f;
     background: #fef3c7;
+    border-color: #fde68a;
 }
 
-.connection-bar--disconnected {
+.connection-item--disconnected {
     color: #991b1b;
     background: #fee2e2;
+    border-color: #fecaca;
 }
 
 .connection-dot {
@@ -83,10 +116,5 @@ export default {
     height: 8px;
     border-radius: 50%;
     background: currentColor;
-}
-
-.connection-sublabel {
-    opacity: 0.8;
-    font-weight: 500;
 }
 </style>
