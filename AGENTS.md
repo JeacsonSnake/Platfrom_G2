@@ -471,11 +471,13 @@ idf.py -p COM9 monitor
 
 ### 11.3 前端 MQTT 状态提示与任务确认
 
-文件：`vue_frontend/src/views/Dashboard.vue`、`vue_frontend/src/components/ui/ConnectionBar.vue`、`vue_frontend/src/components/dashboard/OperatorRail.vue`
+文件：`vue_frontend/src/services/mqttMessage.js`、`vue_frontend/src/services/mqttMessage.css`、`vue_frontend/src/views/Dashboard.vue`、`vue_frontend/src/components/ui/ConnectionBar.vue`、`vue_frontend/src/components/dashboard/OperatorRail.vue`
 
-- 使用现有 Bulma 样式实现顶部非阻塞横幅：
-  - MQTT 断开：红色 `is-danger` 横幅，持久显示，右侧带 **刷新连接** 按钮，调用 `POST /api/mqtt/reconnect/` 手动触发后端重连。
-  - MQTT 恢复：绿色 `is-success` 横幅，3 秒后自动消失。
+- 参考 Element UI Message 的服务式调用与顶部下滑动画，使用 `element-plus` 的 `ElMessage` 实现 `mqttMessage` 服务：
+  - `showMqttMessage({ connected, text, onRefresh })` 单例管理，切换状态时会先关闭旧提示。
+  - MQTT 断开：红色错误消息，不自动关闭、无关闭按钮，右侧带 **刷新连接** 按钮，调用 `POST /api/mqtt/reconnect/` 手动触发后端重连。
+  - MQTT 恢复：绿色成功消息，显示 5 秒后自动关闭，可手动关闭。
+- `Dashboard.vue` 删除原 `showMqttBanner` 内联横幅，改为调用 `mqttMessage` 服务。
 - `ConnectionBar` 组件新增 `mqttConnected` 显示。
 - 任务完成/异常时，`LiveEventStream` 显示对应事件，设备状态显示为 `Completed` / `Error`。
 - `OperatorRail` 新增 **Acknowledge Selected** 按钮，用于确认选中设备的完成/异常/急停状态。
