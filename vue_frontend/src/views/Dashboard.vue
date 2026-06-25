@@ -124,6 +124,9 @@ export default {
         if (this.mqttBannerTimer) {
             clearTimeout(this.mqttBannerTimer)
         }
+        if (this.mqttReconnectPollTimer) {
+            clearInterval(this.mqttReconnectPollTimer)
+        }
         // WebSocket 服务作为单例保留，不在这里断开
     },
     data() {
@@ -139,6 +142,7 @@ export default {
             mqttBannerText: '',
             mqttBannerTimer: null,
             mqttRefreshing: false,
+            mqttReconnectPollTimer: null,
             selectedDeviceIds: [],
             expandedDeviceIds: [],
             liveEvents: [],
@@ -523,10 +527,16 @@ export default {
             try {
                 const resp = await devicesApi.mqttReconnect()
                 const result = resp.data || {}
-                if (result.success) {
-                    this.mqttBannerText = 'MQTT 重连请求已发送，请稍候…'
-                    // 后端连接状态变化会通过 WebSocket 推送；2 秒后主动拉取一次作为兜底
-                    setTimeout(() => this.getDeviceList(), 2000)
+                // 立即根据后端返回的最新状态更新 UI（即使尚未真正连上）
+                this.backendMqttConnected = result.connected
+                if (result.connected) {
+                    this.updateMqttBanner(true)
+                } else if (result.success) {
+                    // 202 Accepted：连接握手仍在进行
+                    this.mqttBannerType = 'is-danger'
+                    this.mqttBannerText = 'MQTT 正在重连，请稍候…'
+                    this.showMqttBanner = true
+                    this.startMqttReconnectPolling()
                 } else {
                     this.showErrorMessage(`MQTT 重连失败：${result.error || '未知错误'}`)
                 }
@@ -539,6 +549,19 @@ export default {
                     this.mqttRefreshing = false
                 }, 1000)
             }
+        },
+        startMqttReconnectPolling() {
+            if (this.mqttReconnectPollTimer) return
+            let attempts = 0
+            const maxAttempts = 15 // 最多 15 次 * 2 秒 = 30 秒
+            this.mqttReconnectPollTimer = setInterval(() => {
+                attempts += 1
+                this.getDeviceList()
+                if (this.backendMqttConnected || attempts >= maxAttempts) {
+                    clearInterval(this.mqttReconnectPollTimer)
+                    this.mqttReconnectPollTimer = null
+                }
+            }, 2000)
         },
         addEvent(evt) {
             evt.key = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
