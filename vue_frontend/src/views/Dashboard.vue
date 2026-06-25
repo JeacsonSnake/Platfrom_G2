@@ -4,7 +4,16 @@
 
         <div v-if="showMqttBanner" class="notification mqtt-banner" :class="mqttBannerType">
             <button class="delete" @click="showMqttBanner = false"></button>
-            {{ mqttBannerText }}
+            <span class="mqtt-banner__text">{{ mqttBannerText }}</span>
+            <button
+                v-if="mqttBannerType === 'is-danger'"
+                class="button is-small mqtt-banner__refresh"
+                :class="{ 'is-danger': !mqttRefreshing, 'is-loading': mqttRefreshing }"
+                :disabled="mqttRefreshing"
+                @click="refreshMqttConnection"
+            >
+                {{ mqttRefreshing ? '连接中…' : '刷新连接' }}
+            </button>
         </div>
 
         <header class="command-header">
@@ -129,6 +138,7 @@ export default {
             mqttBannerType: 'is-danger',
             mqttBannerText: '',
             mqttBannerTimer: null,
+            mqttRefreshing: false,
             selectedDeviceIds: [],
             expandedDeviceIds: [],
             liveEvents: [],
@@ -508,6 +518,28 @@ export default {
                 this.showMqttBanner = false
             }
         },
+        async refreshMqttConnection() {
+            this.mqttRefreshing = true
+            try {
+                const resp = await devicesApi.mqttReconnect()
+                const result = resp.data || {}
+                if (result.success) {
+                    this.mqttBannerText = 'MQTT 重连请求已发送，请稍候…'
+                    // 后端连接状态变化会通过 WebSocket 推送；2 秒后主动拉取一次作为兜底
+                    setTimeout(() => this.getDeviceList(), 2000)
+                } else {
+                    this.showErrorMessage(`MQTT 重连失败：${result.error || '未知错误'}`)
+                }
+            } catch (error) {
+                const msg = error.response?.data?.error || error.message || '网络错误'
+                this.showErrorMessage(`MQTT 重连请求失败：${msg}`)
+            } finally {
+                // 按钮 Loading 至少保留 1 秒，避免频繁点击
+                setTimeout(() => {
+                    this.mqttRefreshing = false
+                }, 1000)
+            }
+        },
         addEvent(evt) {
             evt.key = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
             this.liveEvents.unshift(evt)
@@ -734,6 +766,18 @@ export default {
 .mqtt-banner {
     margin-bottom: 1rem;
     border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.mqtt-banner__text {
+    flex: 1;
+}
+
+.mqtt-banner__refresh {
+    flex-shrink: 0;
 }
 
 .mqtt-banner.is-success {

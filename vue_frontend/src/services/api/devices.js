@@ -35,5 +35,9 @@ export default {
       device_ids: deviceIds,
       acknowledged_by: acknowledgedBy
     })
+  },
+
+  mqttReconnect() {
+    return client.post('/api/mqtt/reconnect/')
   }
 }
