@@ -440,3 +440,56 @@ idf.py -p COM9 monitor
 - **急停为软急停**：ESP32 固件没有急停逻辑，当前通过发送 `cmd_X_0_0` 停止电机，并在后端/前端锁定任务下发。真实急停确认（`estop_ack` / `resume` JSON 协议）需要后续固件配合。
 - **温度数据**：MAX31850 当前硬件不稳定，Dashboard UI 已预留位置，显示为 `N/A`。
 - **Channel Layer**：当前仍使用 `InMemoryChannelLayer`，仅支持单进程 Daphne；多 Worker 方案已在 `PLATFORM_G2_FULL_OPTIMIZATION_PLAN.md` 中规划。
+
+---
+
+## 11. 近期架构变更记录（2026-06-25）
+
+### 11.1 后端 MQTT 与 Broker 连接状态可感知
+
+文件：`django_backend/main_page/mqtt.py`、`django_backend/django_backend/consumers.py`、`django_backend/main_page/views.py`
+
+- 新增 `_mqtt_connection_state` 内存状态，由 `on_connect` / `on_disconnect` 回调与 5 秒 watchdog 线程共同维护。
+- WebSocket 新增广播 topic `mqtt_connection_status`，在连接/断开时推送给所有在线前端；`connect()` 时会立即补发一次当前状态。
+- `/api/device_list/` 返回体新增 `mqtt_connected` 字段，供 REST 轮询兜底。
+
+### 11.2 设备任务生命周期前置检查
+
+文件：`django_backend/main_page/mqtt.py`、`django_backend/main_page/views.py`、`django_backend/task_manager.py`
+
+- 新增工具函数 `is_device_online(device_id)` 与 `can_dispatch_to_device(device_id)`，统一判断设备是否在线、是否空闲。
+- `Device.task_status` 新增 `error`（异常待确认）与 `completed`（完成待验收）。
+- 所有下发入口统一前置检查：
+  - `dispatch_motor_task()` / `/api/devices/dispatch_task/` / `/api/devices/dispatch_batch/`
+  - `batch_job_start()`
+  - Communication API 的 `_queue_transport_message()`（当请求显式携带 `device` 时）
+  - `task_manager.py` 定时任务（通过查询 SQLite `main_page_device` 表）
+- 设备在任务期间掉线，`_offline_detector` 会自动调用 `_abort_device_task()` 将其置为 `error`。
+- 任务完成后，设备不再自动回到 `idle`，而是进入 `completed`，需用户确认后方可继续下发。
+- 新增 `acknowledge_device()` 函数与 WebSocket 动作 `acknowledge_device`、REST 端点 `POST /api/devices/acknowledge/`，用于将 `error` / `completed` / `estopped` 恢复为 `idle`。
+
+### 11.3 前端 MQTT 状态提示与任务确认
+
+文件：`vue_frontend/src/views/Dashboard.vue`、`vue_frontend/src/components/ui/ConnectionBar.vue`、`vue_frontend/src/components/dashboard/OperatorRail.vue`
+
+- 使用现有 Bulma 样式实现顶部非阻塞横幅：
+  - MQTT 断开：红色 `is-danger` 横幅，持久显示。
+  - MQTT 恢复：绿色 `is-success` 横幅，3 秒后自动消失。
+- `ConnectionBar` 组件新增 `mqttConnected` 显示。
+- 任务完成/异常时，`LiveEventStream` 显示对应事件，设备状态显示为 `Completed` / `Error`。
+- `OperatorRail` 新增 **Acknowledge Selected** 按钮，用于确认选中设备的完成/异常/急停状态。
+- 下发任务前前端先做在线/空闲拦截；下发失败时顶部显示 5 秒错误提示。
+
+### 11.4 顺带修复
+
+- 修复 `django_backend/main_page/mqtt.py` 中 `_offline_detector` 持锁调用 `_mark_device_offline()` 导致的潜在死锁。
+- 将 `_update_device_heartbeat()` / `_mark_device_offline()` 的数据库写操作移到 `_device_states_lock` 外，避免阻塞 MQTT 消息处理线程。
+
+### 11.5 新增/调整测试
+
+文件：`django_backend/main_page/tests.py`
+
+- `RecipeAndJobApiTests` 的 `setUp` 中增加 `_set_default_device_online()` 辅助函数，确保 Job 启动测试有在线设备可用。
+- `test_job_start_queues_all_pending_steps_and_outbox` / `test_job_status_returns_counts_and_next_step` 增加 `publish_device_command` 与 `mqtt_client_available` 的 Mock，并将断言修正为步骤 `RUNNING`、Outbox `SENT`。
+
+运行命令：`python manage.py test`（当前 17 项测试全部通过）。
