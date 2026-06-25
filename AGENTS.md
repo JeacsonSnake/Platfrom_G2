@@ -452,6 +452,7 @@ idf.py -p COM9 monitor
 - 新增 `_mqtt_connection_state` 内存状态，由 `on_connect` / `on_disconnect` 回调与 5 秒 watchdog 线程共同维护。
 - WebSocket 新增广播 topic `mqtt_connection_status`，在连接/断开时推送给所有在线前端；`connect()` 时会立即补发一次当前状态。
 - `/api/device_list/` 返回体新增 `mqtt_connected` 字段，供 REST 轮询兜底。
+- 新增 `POST /api/mqtt/reconnect/` 端点（同时注册在 v1 路由 `mqtt/reconnect/`），用于手动触发后端 MQTT 客户端重连 Broker。
 
 ### 11.2 设备任务生命周期前置检查
 
@@ -473,7 +474,7 @@ idf.py -p COM9 monitor
 文件：`vue_frontend/src/views/Dashboard.vue`、`vue_frontend/src/components/ui/ConnectionBar.vue`、`vue_frontend/src/components/dashboard/OperatorRail.vue`
 
 - 使用现有 Bulma 样式实现顶部非阻塞横幅：
-  - MQTT 断开：红色 `is-danger` 横幅，持久显示。
+  - MQTT 断开：红色 `is-danger` 横幅，持久显示，右侧带 **刷新连接** 按钮，调用 `POST /api/mqtt/reconnect/` 手动触发后端重连。
   - MQTT 恢复：绿色 `is-success` 横幅，3 秒后自动消失。
 - `ConnectionBar` 组件新增 `mqttConnected` 显示。
 - 任务完成/异常时，`LiveEventStream` 显示对应事件，设备状态显示为 `Completed` / `Error`。
