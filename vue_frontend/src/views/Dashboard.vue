@@ -1,6 +1,6 @@
 <template>
     <section class="operations-dashboard">
-        <ConnectionBar :status="wsStatus" :mqtt-available="mqttAvailable" :mqtt-connected="backendMqttConnected" />
+        <ConnectionBar :status="wsStatus" :mqtt-connected="backendMqttConnected" />
 
         <header class="command-header">
             <div class="command-header__main">
@@ -120,7 +120,6 @@ export default {
             loading: false,
             errorMessage: '',
             wsStatus: 'disconnected',
-            mqttAvailable: null,
             backendMqttConnected: null,
             mqttRefreshing: false,
             mqttReconnectPollTimer: null,
@@ -229,7 +228,6 @@ export default {
             try {
                 const response = await devicesApi.getList()
                 const result = response.data || {}
-                this.mqttAvailable = result.mqtt_available
                 this.backendMqttConnected = result.mqtt_connected
                 this.updateMqttBanner(result.mqtt_connected)
                 const list = result.data || []
@@ -312,7 +310,7 @@ export default {
             })
             const unsubDispatchResult = this.wsService.subscribe('dispatch_result', (payload) => {
                 if (!payload.success && payload.error) {
-                    this.showErrorMessage(`下发失败: ${payload.error}`)
+                    this.showErrorMessage(`Dispatch failed: ${payload.error}`)
                 }
                 this.addEvent({
                     kind: payload.success ? 'dispatch' : 'error',
@@ -487,12 +485,12 @@ export default {
             if (connected === true) {
                 showMqttMessage({
                     connected: true,
-                    text: 'MQTT 已恢复连接'
+                    text: 'MQTT connection restored'
                 })
             } else if (connected === false) {
                 showMqttMessage({
                     connected: false,
-                    text: 'MQTT 已断开，命令将无法下发',
+                    text: 'MQTT disconnected. Commands cannot be dispatched.',
                     onRefresh: () => this.refreshMqttConnection()
                 })
             }
@@ -511,22 +509,22 @@ export default {
                     // 202 Accepted：连接握手仍在进行
                     showMqttMessage({
                         connected: false,
-                        text: 'MQTT 正在重连，请稍候…',
+                        text: 'MQTT reconnecting, please wait…',
                         onRefresh: () => this.refreshMqttConnection()
                     })
                     this.startMqttReconnectPolling()
                 } else {
                     showMqttMessage({
                         connected: false,
-                        text: `MQTT 重连失败：${result.error || '未知错误'}`,
+                        text: `MQTT reconnect failed: ${result.error || 'Unknown error'}`,
                         onRefresh: () => this.refreshMqttConnection()
                     })
                 }
             } catch (error) {
-                const msg = error.response?.data?.error || error.message || '网络错误'
+                const msg = error.response?.data?.error || error.message || 'Network error'
                 showMqttMessage({
                     connected: false,
-                    text: `MQTT 重连请求失败：${msg}`,
+                    text: `MQTT reconnect request failed: ${msg}`,
                     onRefresh: () => this.refreshMqttConnection()
                 })
             } finally {
@@ -569,7 +567,7 @@ export default {
             if (!this.selectedDeviceIds.length) return
             const ackable = this.devices.filter(d => this.selectedDeviceIds.includes(d.id) && ['E-Stopped', 'Error', 'Completed'].includes(d.taskStatus))
             if (!ackable.length) {
-                alert('选中的设备没有需要确认的状态（急停/异常/完成）。')
+                alert('Selected devices have no pending acknowledgement (E-Stopped/Error/Completed).')
                 return
             }
             this.wsService.send({
@@ -581,8 +579,8 @@ export default {
         emergencyStop(scope) {
             if (scope !== 'broadcast' && !this.selectedDeviceIds.length) return
             const ok = confirm(scope === 'broadcast'
-                ? '确认对所有设备执行急停？所有电机会立即停止。'
-                : `确认对选中的 ${this.selectedDeviceIds.length} 个设备执行急停？`)
+                ? 'Confirm emergency stop for all devices? All motors will stop immediately.'
+                : `Confirm emergency stop for ${this.selectedDeviceIds.length} selected devices?`)
             if (!ok) return
 
             this.wsService.send({
@@ -605,7 +603,7 @@ export default {
             if (!this.selectedDeviceIds.length) return
             const notReady = this.devices.filter(d => this.selectedDeviceIds.includes(d.id) && (d.connectionStatus !== 'Online' || d.taskStatus !== 'Idle'))
             if (notReady.length) {
-                alert(`以下设备不在线或不空闲，无法下发任务：${notReady.map(d => `${d.deviceId}(${d.connectionStatus}, ${d.taskStatus})`).join(', ')}`)
+                alert(`The following devices are offline or not idle and cannot receive tasks: ${notReady.map(d => `${d.deviceId}(${d.connectionStatus}, ${d.taskStatus})`).join(', ')}`)
                 return
             }
             this.selectedDeviceIds.forEach(deviceId => {

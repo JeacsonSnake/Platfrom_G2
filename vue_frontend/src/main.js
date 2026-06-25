@@ -21,6 +21,9 @@ import 'vxe-pc-ui/es/style.css'
 import VxeUITable from 'vxe-table'
 import 'vxe-table/es/style.css'
 
+// MQTT message custom styles
+import './services/mqttMessage.css'
+
 const app = createApp(App)
 
 app.component('VueDatePicker', VueDatePicker);

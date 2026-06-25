@@ -5,10 +5,10 @@ import ConnectionBar from '@/components/ui/ConnectionBar.vue'
 describe('ConnectionBar', () => {
   it('renders connected status', () => {
     const wrapper = mount(ConnectionBar, {
-      props: { status: 'connected', mqttAvailable: true }
+      props: { status: 'connected', mqttConnected: true }
     })
     expect(wrapper.text()).toContain('WebSocket Connected')
-    expect(wrapper.text()).toContain('MQTT 可用')
+    expect(wrapper.text()).toContain('MQTT Connected')
     expect(wrapper.find('.connection-bar--connected').exists()).toBe(true)
   })
 
@@ -18,5 +18,14 @@ describe('ConnectionBar', () => {
     })
     expect(wrapper.text()).toContain('WebSocket Disconnected')
     expect(wrapper.text()).not.toContain('MQTT')
+  })
+
+  it('renders mqtt disconnected label', () => {
+    const wrapper = mount(ConnectionBar, {
+      props: { status: 'connected', mqttConnected: false }
+    })
+    expect(wrapper.text()).toContain('WebSocket Connected')
+    expect(wrapper.text()).toContain('MQTT Disconnected')
+    expect(wrapper.find('.connection-bar--connected').exists()).toBe(true)
   })
 })

@@ -9,7 +9,6 @@
 import { h } from 'vue'
 import ElMessage from 'element-plus/es/components/message/index.mjs'
 import 'element-plus/es/components/message/style/css'
-import './mqttMessage.css'
 
 let currentMessageInstance = null
 
@@ -58,7 +57,7 @@ export function showMqttMessage({ connected, text, onRefresh }) {
             }
           },
         },
-        '刷新连接'
+        'Reconnect'
       ),
     ]
   )

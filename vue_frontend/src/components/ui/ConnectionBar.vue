@@ -2,7 +2,7 @@
     <div class="connection-bar" :class="statusClass">
         <span class="connection-dot"></span>
         <span class="connection-label">{{ statusLabel }}</span>
-        <span v-if="mqttAvailable !== null || mqttConnected !== null" class="connection-sublabel">
+        <span v-if="mqttConnected !== null" class="connection-sublabel">
             · {{ mqttLabel }}
         </span>
     </div>
@@ -19,10 +19,6 @@ export default {
                 return ['connected', 'connecting', 'disconnected'].includes(value)
             }
         },
-        mqttAvailable: {
-            type: [Boolean, null],
-            default: null
-        },
         mqttConnected: {
             type: [Boolean, null],
             default: null
@@ -38,11 +34,9 @@ export default {
             return map[this.status] || this.status
         },
         mqttLabel() {
-            if (this.mqttConnected === true) return 'MQTT 已连接'
-            if (this.mqttConnected === false) return 'MQTT 已断开'
-            if (this.mqttAvailable === true) return 'MQTT 可用'
-            if (this.mqttAvailable === false) return 'MQTT 不可用'
-            return 'MQTT 未知'
+            if (this.mqttConnected === true) return 'MQTT Connected'
+            if (this.mqttConnected === false) return 'MQTT Disconnected'
+            return 'MQTT Unknown'
         },
         statusClass() {
             return {

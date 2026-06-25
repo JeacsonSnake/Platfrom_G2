@@ -131,8 +131,8 @@ export default {
         handleEmergencyStop(scope) {
             if (scope !== 'broadcast' && !this.selectedCount) return
             const ok = confirm(scope === 'broadcast'
-                ? '确认对所有设备执行急停？所有电机会立即停止。'
-                : `确认对选中的 ${this.selectedCount} 个设备执行急停？`)
+                ? 'Confirm emergency stop for all devices? All motors will stop immediately.'
+                : `Confirm emergency stop for ${this.selectedCount} selected devices?`)
             if (!ok) return
             this.$emit('emergency-stop', scope)
         },
