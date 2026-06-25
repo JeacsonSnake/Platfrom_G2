@@ -3,15 +3,19 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 
 # 导入同步的 MQTT 操作函数
-from main_page.mqtt import emergency_stop, resume_devices, dispatch_motor_task, get_device_states
+from main_page.mqtt import (
+    emergency_stop, resume_devices, dispatch_motor_task, get_device_states,
+    get_mqtt_connection_state, acknowledge_device,
+)
 
 
 class MyConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.channel_layer.group_add('mqtt_group', self.channel_name)
         await self.accept()
-        # 连接成功后立即推送一次设备状态快照
+        # 连接成功后立即推送一次设备状态快照与后端 MQTT 连接状态
         await self.send_snapshot()
+        await self.send_mqtt_connection_status()
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard('mqtt_group', self.channel_name)
@@ -33,6 +37,8 @@ class MyConsumer(AsyncWebsocketConsumer):
             await self.handle_resume_device(data)
         elif action == 'dispatch_task':
             await self.handle_dispatch_task(data)
+        elif action == 'acknowledge_device':
+            await self.handle_acknowledge_device(data)
         elif action == 'get_snapshot':
             await self.send_snapshot()
         else:
@@ -109,6 +115,31 @@ class MyConsumer(AsyncWebsocketConsumer):
             **result,
         }))
 
+    async def handle_acknowledge_device(self, data):
+        device_ids = data.get('device_ids', [])
+        user = self.scope.get('user')
+        acknowledged_by = data.get(
+            'acknowledged_by',
+            user.username if user and hasattr(user, 'username') else 'websocket_user'
+        )
+
+        if not device_ids:
+            await self.send(text_data=json.dumps({
+                'topic': 'acknowledge_result',
+                'success': False,
+                'error': 'No target devices specified.'
+            }))
+            return
+
+        results = await sync_to_async(acknowledge_device, thread_sensitive=False)(
+            device_ids,
+            acknowledged_by=acknowledged_by
+        )
+        await self.send(text_data=json.dumps({
+            'topic': 'acknowledge_result',
+            'results': results,
+        }))
+
     async def send_snapshot(self):
         """向前端发送当前所有设备的状态快照。"""
         states = await sync_to_async(get_device_states, thread_sensitive=False)()
@@ -124,6 +155,15 @@ class MyConsumer(AsyncWebsocketConsumer):
             'topic': 'device_snapshot',
             'timestamp': '',  # 前端收到后自行填充
             'payload': serializable,
+        }))
+
+    async def send_mqtt_connection_status(self):
+        """向前端发送后端 MQTT 与 Broker 的连接状态。"""
+        state = await sync_to_async(get_mqtt_connection_state, thread_sensitive=False)()
+        await self.send(text_data=json.dumps({
+            'type': 'mqtt_msg_broadcast',
+            'topic': 'mqtt_connection_status',
+            'payload': state,
         }))
 
     async def _get_all_registered_device_ids(self):

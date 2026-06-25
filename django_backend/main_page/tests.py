@@ -12,7 +12,15 @@ from .models import (
     CommandOutbox,
     TelemetryIngest,
 )
-from .mqtt import process_device_reply_envelope
+from .mqtt import process_device_reply_envelope, _ensure_device_state
+
+
+def _set_default_device_online():
+    """测试辅助：将默认目标设备置为在线/空闲（基于内存状态表）。"""
+    state = _ensure_device_state('esp32_1')
+    state['is_online'] = True
+    state['task_status'] = 'idle'
+    state['last_heartbeat'] = __import__('django.utils.timezone').utils.timezone.now()
 
 
 class ExperimentProcessApiTests(APITestCase):
@@ -54,6 +62,7 @@ class ExperimentProcessApiTests(APITestCase):
 
 class RecipeAndJobApiTests(APITestCase):
     def setUp(self):
+        _set_default_device_online()
         self.material = MaterialType.objects.create(name="ZnO", description="Target material")
         self.recipe = MaterialRecipe.objects.create(
             material_type=self.material,
@@ -150,7 +159,9 @@ class RecipeAndJobApiTests(APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("detail", resp.data)
 
-    def test_job_start_queues_all_pending_steps_and_outbox(self):
+    @patch("main_page.views.publish_device_command")
+    @patch("main_page.views.mqtt_client_available", return_value=True)
+    def test_job_start_queues_all_pending_steps_and_outbox(self, _mock_available, mock_publish):
         create_resp = self.client.post("/api/v1/jobs/", {"recipe_id": self.recipe.id}, format="json")
         job_id = create_resp.data["id"]
 
@@ -158,11 +169,14 @@ class RecipeAndJobApiTests(APITestCase):
         self.assertEqual(start_resp.status_code, status.HTTP_200_OK)
         self.assertEqual(start_resp.data["status"], "RUNNING")
 
-        queued_count = BatchStepExecution.objects.filter(job_id=job_id, status="QUEUED").count()
-        self.assertEqual(queued_count, 2)
-        self.assertEqual(CommandOutbox.objects.filter(job_id=job_id, status="QUEUED").count(), 2)
+        running_count = BatchStepExecution.objects.filter(job_id=job_id, status="RUNNING").count()
+        self.assertEqual(running_count, 2)
+        self.assertEqual(CommandOutbox.objects.filter(job_id=job_id, status="SENT").count(), 2)
+        mock_publish.assert_called()
 
-    def test_job_status_returns_counts_and_next_step(self):
+    @patch("main_page.views.publish_device_command")
+    @patch("main_page.views.mqtt_client_available", return_value=True)
+    def test_job_status_returns_counts_and_next_step(self, _mock_available, _mock_publish):
         create_resp = self.client.post("/api/v1/jobs/", {"recipe_id": self.recipe.id}, format="json")
         job_id = create_resp.data["id"]
         self.client.post(f"/api/v1/jobs/{job_id}/start/", {}, format="json")
@@ -170,7 +184,7 @@ class RecipeAndJobApiTests(APITestCase):
         status_resp = self.client.get(f"/api/v1/jobs/{job_id}/status/")
         self.assertEqual(status_resp.status_code, status.HTTP_200_OK)
         self.assertEqual(status_resp.data["job"]["id"], job_id)
-        self.assertEqual(status_resp.data["step_status_counts"]["queued"], 2)
+        self.assertEqual(status_resp.data["step_status_counts"]["running"], 2)
         self.assertIsNotNone(status_resp.data["next_step"])
 
     def test_job_create_maps_step_types_to_interfaces(self):

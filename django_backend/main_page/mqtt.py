@@ -32,7 +32,14 @@ client = None
 _device_states = {}
 _device_states_lock = threading.Lock()
 
+# 后端 MQTT 客户端与 Broker 的连接状态
+_mqtt_connection_state = {'connected': False, 'since': None, 'reason': ''}
+_mqtt_connection_lock = threading.Lock()
+
 HEARTBEAT_TIMEOUT_SECONDS = 90  # 超过此时间未收到心跳则判定为离线
+
+# 会阻塞新任务下发的设备状态
+NON_DISPATCHABLE_STATUSES = ('busy', 'estopped', 'error', 'completed', 'offline')
 
 
 def _get_channel_layer():
@@ -54,6 +61,34 @@ def _broadcast(event_type, payload):
         async_to_sync(channel_layer.group_send)('mqtt_group', package)
     except Exception as exc:
         print(f'WebSocket broadcast failed: {exc}')
+
+
+def _set_mqtt_connection_state(connected, reason=''):
+    """设置后端 MQTT 与 Broker 的连接状态，状态变化时向 WebSocket 广播。"""
+    global _mqtt_connection_state
+    with _mqtt_connection_lock:
+        previous = _mqtt_connection_state.get('connected')
+        if previous == connected:
+            return
+        now = timezone.now()
+        _mqtt_connection_state = {
+            'connected': connected,
+            'since': now.isoformat(),
+            'reason': reason,
+        }
+        print(f"MQTT connection state changed: connected={connected}, reason={reason}")
+
+    _broadcast('mqtt_connection_status', {
+        'connected': connected,
+        'reason': reason,
+        'since': _mqtt_connection_state['since'],
+    })
+
+
+def get_mqtt_connection_state():
+    """返回后端 MQTT 与 Broker 的连接状态副本。"""
+    with _mqtt_connection_lock:
+        return dict(_mqtt_connection_state)
 
 
 def _extract_device_id_from_topic(topic):
@@ -123,17 +158,155 @@ def _ensure_device_state(device_id):
         return _device_states[device_id]
 
 
+def is_device_online(device_id):
+    """判断指定 device_id 当前是否在线（基于内存实时状态）。"""
+    state = _ensure_device_state(device_id)
+    if state is None:
+        return False
+    return state.get('is_online', False)
+
+
+def can_dispatch_to_device(device_id):
+    """
+    判断是否可以向指定 device_id 下发新任务。
+    返回 (ok, reason)。
+    """
+    state = _ensure_device_state(device_id)
+    if state is None:
+        return False, 'Unknown device'
+    if not state.get('is_online', False):
+        return False, 'Device is offline'
+    task_status = state.get('task_status', 'idle')
+    if task_status in NON_DISPATCHABLE_STATUSES:
+        status_label = {
+            'busy': 'Device is busy',
+            'estopped': 'Device is in emergency stop state. Resume before dispatch.',
+            'error': 'Device has an error. Acknowledge before dispatch.',
+            'completed': 'Device has a completed task. Acknowledge before dispatch.',
+            'offline': 'Device is offline',
+        }
+        return False, status_label.get(task_status, f'Device status is {task_status}')
+    return True, ''
+
+
+def _set_device_task_status(device_id, new_status, current_task=None, reason=''):
+    """统一更新设备任务状态并同步到数据库/WebSocket。"""
+    state = _ensure_device_state(device_id)
+    if state is None:
+        return
+    state['task_status'] = new_status
+    if current_task is not None:
+        state['current_task'] = current_task
+    now = timezone.now()
+
+    try:
+        Device = apps.get_model('main_page', 'Device')
+        Device.objects.filter(device_id=device_id).update(
+            task_status=new_status,
+            current_task=state['current_task'],
+            updated_at=now,
+        )
+    except Exception as exc:
+        print(f'Device task status DB update failed: {exc}')
+
+    _broadcast('device_status', {
+        'device_id': device_id,
+        'payload': {
+            'event': new_status,
+            'is_online': state['is_online'],
+            'task_status': new_status,
+            'reason': reason,
+        },
+    })
+
+
+def _abort_device_task(device_id, reason, triggered_by='system'):
+    """中止设备当前任务：发送停止指令、置为 error 状态并广播。"""
+    state = _ensure_device_state(device_id)
+    if state is None:
+        return
+
+    # 向设备发送所有电机的停止指令（软停止）
+    stop_results = []
+    if client is not None and client.is_connected():
+        topic = _device_control_topic(device_id)
+        for motor in range(4):
+            cmd = f'cmd_{motor}_0_0'
+            try:
+                info = client.publish(topic, cmd)
+                stop_results.append({'motor': motor, 'rc': info.rc})
+            except Exception as exc:
+                stop_results.append({'motor': motor, 'error': str(exc)})
+
+    _set_device_task_status(device_id, 'error', current_task={}, reason=reason)
+    print(f'Device {device_id} task aborted: {reason}')
+
+
+def acknowledge_device(device_ids, acknowledged_by=''):
+    """用户确认设备问题已清除或任务已验收，将状态从 error/completed/estopped 恢复为 idle。"""
+    results = []
+    for device_id in device_ids:
+        state = _ensure_device_state(device_id)
+        if state is None:
+            results.append({'device_id': device_id, 'success': False, 'error': 'Unknown device'})
+            continue
+
+        task_status = state.get('task_status', 'idle')
+        if task_status not in ('error', 'completed', 'estopped'):
+            results.append({
+                'device_id': device_id,
+                'success': False,
+                'error': f'Device status is {task_status}, no acknowledgement required.',
+            })
+            continue
+
+        _set_device_task_status(device_id, 'idle', current_task={})
+
+        _broadcast('device_status', {
+            'device_id': device_id,
+            'payload': {
+                'event': 'acknowledged',
+                'is_online': state['is_online'],
+                'task_status': 'idle',
+            },
+        })
+
+        # 同步记录急停日志的 acknowledged（兼容 estopped 场景）
+        if task_status == 'estopped':
+            try:
+                Device = apps.get_model('main_page', 'Device')
+                EmergencyStopLog = apps.get_model('main_page', 'EmergencyStopLog')
+                device_obj = Device.objects.filter(device_id=device_id).first()
+                if device_obj:
+                    EmergencyStopLog.objects.filter(
+                        device=device_obj,
+                        acknowledged_at__isnull=True
+                    ).update(
+                        acknowledged_at=timezone.now(),
+                        acknowledged_by=acknowledged_by,
+                    )
+            except Exception as exc:
+                print(f'Acknowledge emergency stop log failed: {exc}')
+
+        results.append({'device_id': device_id, 'success': True, 'task_status': 'idle'})
+
+    return results
+
+
 def _update_device_heartbeat(device_id):
     """更新设备心跳状态并广播。"""
     state = _ensure_device_state(device_id)
     if state is None:
         return
     now = timezone.now()
-    was_online = state['is_online']
-    state['last_heartbeat'] = now
-    state['is_online'] = True
 
-    # 同步到数据库
+    with _device_states_lock:
+        was_online = state['is_online']
+        state['last_heartbeat'] = now
+        state['is_online'] = True
+        current_task_status = state['task_status']
+
+    # 同步到数据库（在锁外执行，避免阻塞 MQTT 消息线程）
     try:
         Device = apps.get_model('main_page', 'Device')
         Device.objects.filter(device_id=device_id).update(
@@ -147,7 +320,7 @@ def _update_device_heartbeat(device_id):
     if not was_online:
         _broadcast('device_status', {
             'device_id': device_id,
-            'payload': {'event': 'online', 'is_online': True, 'task_status': state['task_status']},
+            'payload': {'event': 'online', 'is_online': True, 'task_status': current_task_status},
         })
 
 
@@ -156,8 +329,11 @@ def _mark_device_offline(device_id):
     state = _ensure_device_state(device_id)
     if state is None:
         return
-    was_online = state['is_online']
-    state['is_online'] = False
+
+    with _device_states_lock:
+        was_online = state['is_online']
+        task_status = state['task_status']
+        state['is_online'] = False
 
     try:
         Device = apps.get_model('main_page', 'Device')
@@ -171,7 +347,7 @@ def _mark_device_offline(device_id):
     if was_online:
         _broadcast('device_status', {
             'device_id': device_id,
-            'payload': {'event': 'offline', 'is_online': False, 'task_status': state['task_status']},
+            'payload': {'event': 'offline', 'is_online': False, 'task_status': task_status},
         })
 
 
@@ -181,11 +357,18 @@ def _offline_detector():
         time.sleep(15)
         try:
             now = timezone.now()
+            offline_candidates = []
             with _device_states_lock:
                 for device_id, state in list(_device_states.items()):
                     last = state.get('last_heartbeat')
                     if last and state.get('is_online') and (now - last).total_seconds() > HEARTBEAT_TIMEOUT_SECONDS:
-                        _mark_device_offline(device_id)
+                        offline_candidates.append((device_id, state.get('task_status')))
+
+            for device_id, task_status in offline_candidates:
+                _mark_device_offline(device_id)
+                # 若设备正在执行任务时掉线，自动中止任务并置为 error
+                if task_status == 'busy':
+                    _abort_device_task(device_id, reason='heartbeat_timeout', triggered_by='system')
         except Exception as exc:
             print(f'Offline detector error: {exc}')
 
@@ -199,12 +382,38 @@ def on_connect(mqtt_client, userdata, flags, rc):
     if rc == 0:
         print("MQTT Connect Success!")
         # 使用通配符订阅所有 esp32_N 设备
-        # 合法通配符：匹配所有 esp32/<mac>/... 设备
         mqtt_client.subscribe('esp32/+/+')
         # 兼容旧设备的硬编码 topic（单台旧 ESP32）
         mqtt_client.subscribe('esp32_1/+')
+        _set_mqtt_connection_state(True)
     else:
         print("Bad Connection Code: ", rc)
+        _set_mqtt_connection_state(False, reason=f'bad_connection_code_{rc}')
+
+
+def on_disconnect(mqtt_client, userdata, rc):
+    reason = f'disconnect_rc_{rc}' if rc is not None else 'unexpected_disconnect'
+    print(f"MQTT Disconnected: {reason}")
+    _set_mqtt_connection_state(False, reason=reason)
+
+
+def _mqtt_connection_watchdog():
+    """守护线程：定期校验 client.is_connected() 与内存状态是否一致。"""
+    while True:
+        time.sleep(5)
+        try:
+            expected = client is not None and client.is_connected()
+            with _mqtt_connection_lock:
+                current = _mqtt_connection_state.get('connected', False)
+            if current != expected:
+                _set_mqtt_connection_state(expected, reason='watchdog_reconcile')
+        except Exception as exc:
+            print(f'MQTT connection watchdog error: {exc}')
+
+
+# 启动 MQTT 连接状态看门狗线程（守护线程）
+_mqtt_watchdog_thread = threading.Thread(target=_mqtt_connection_watchdog, daemon=True)
+_mqtt_watchdog_thread.start()
 
 
 # Django 存储方法
@@ -580,10 +789,15 @@ def on_message(mqtt_client, userdata, msg):
                 if len(parts) >= 1:
                     motor = int(parts[0])
                     device_event_done(effective_device_id, motor)
-                    _update_device_task(effective_device_id, motor, 0, 0, 'finished')
+                    # 任务完成进入 completed 状态，等待用户验收确认后才恢复 idle
+                    _set_device_task_status(effective_device_id, 'completed', current_task={})
                     _broadcast('task_status', {
                         'device_id': effective_device_id,
-                        'payload': {'event': 'task_done', 'motor': motor},
+                        'payload': {
+                            'event': 'task_completed_pending_ack',
+                            'motor': motor,
+                            'message': 'Task completed. Waiting for operator acknowledgement.',
+                        },
                     })
         except Exception as exc:
             print(f'Failed to parse task payload: {payload}, error: {exc}')
@@ -713,21 +927,37 @@ def resume_devices(device_ids, resumed_by=''):
 
 
 def dispatch_motor_task(device_id, motor, speed, duration):
-    """向指定设备下发电机任务；若设备处于 estopped 状态则拒绝。"""
-    state = _ensure_device_state(device_id)
-    if state is None:
-        return {'success': False, 'error': 'Unknown device'}
-    if state.get('task_status') == 'estopped':
-        return {'success': False, 'error': 'Device is in emergency stop state. Resume before dispatch.'}
+    """向指定设备下发电机任务；下发前检查设备在线与空闲状态。"""
+    ok, reason = can_dispatch_to_device(device_id)
+    if not ok:
+        return {'success': False, 'error': reason}
     if client is None or not client.is_connected():
         return {'success': False, 'error': 'MQTT client unavailable'}
 
     topic = _device_control_topic(device_id)
     cmd = f'cmd_{motor}_{speed}_{duration}'
+    now = timezone.now()
+    expected_finished_at = now + timedelta(seconds=duration)
+
+    # 乐观置为 busy，防止并发下发；设备后续上报 task_create 时会再次刷新 current_task
+    _set_device_task_status(
+        device_id,
+        'busy',
+        current_task={
+            'motor': motor,
+            'speed': speed,
+            'duration_sec': duration,
+            'started_at': now.isoformat(),
+            'expected_finished_at': expected_finished_at.isoformat(),
+        },
+    )
+
     try:
         info = client.publish(topic, cmd)
         return {'success': True, 'topic': topic, 'command': cmd, 'rc': info.rc}
     except Exception as exc:
+        # 下发失败回滚为 idle，避免一直占用
+        _set_device_task_status(device_id, 'idle', current_task={})
         return {'success': False, 'error': str(exc)}
 
 
@@ -772,6 +1002,7 @@ if _should_init_mqtt_client():
     try:
         client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION1)
         client.on_connect = on_connect
+        client.on_disconnect = on_disconnect
         client.on_message = on_message
         client.username_pw_set(settings.MQTT_USER, settings.MQTT_PASSWORD)
         client.connect(
@@ -781,4 +1012,5 @@ if _should_init_mqtt_client():
         )
     except (OSError, TimeoutError, socket.error) as exc:
         client = None
+        _set_mqtt_connection_state(False, reason=f'startup_failed_{exc}')
         print(f"MQTT unavailable during Django startup: {exc}")

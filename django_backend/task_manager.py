@@ -42,6 +42,10 @@ def mqtt_on_connect(mqtt_client, userdata, flags, rc):
         print("Bad Connection Code: ", rc)
 
 
+def mqtt_on_disconnect(mqtt_client, userdata, rc):
+    print(f"Task Manager MQTT disconnected (rc={rc}). Will rely on paho auto-reconnect.")
+
+
 def mqtt_on_message(mqtt_client, userdata, msg):
     topic = msg.topic
     payload = msg.payload.decode()
@@ -145,15 +149,32 @@ class Task_Manager():
                     print(timer_trigger)
                     self.mqtt_client.publish('task_manager', timer_trigger)
                     self.task_triggered = True
-                    cmd = 'cmd_' + str(self.first_task[3]) + '_' + str(self.first_task[4]) + '_0'
+
                     # 统一使用 esp32/<mac>/control（与 Django 主进程一致）
                     default_device_id = getattr(settings, 'MQTT_DEFAULT_DEVICE_ID', 'esp32_1')
+
+                    # 检查后端 MQTT 客户端与目标设备状态
+                    if not self.mqtt_client.is_connected():
+                        error_msg = 'Task Manager MQTT client is not connected. Skip dispatch.'
+                        print(error_msg)
+                        self.mqtt_client.publish('task_manager', error_msg)
+                        continue
+
+                    ready, reason = self._check_target_device_ready(default_device_id)
+                    if not ready:
+                        error_msg = f'Skip dispatch to {default_device_id}: {reason}'
+                        print(error_msg)
+                        self.mqtt_client.publish('task_manager', error_msg)
+                        continue
+
+                    cmd = 'cmd_' + str(self.first_task[3]) + '_' + str(self.first_task[4]) + '_0'
                     self.mqtt_client.publish(_device_control_topic(default_device_id), cmd)
 
     # MQTT 初始化方法
     def mqtt_init(self):
         self.mqtt_client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION1)
         self.mqtt_client.on_connect = mqtt_on_connect
+        self.mqtt_client.on_disconnect = mqtt_on_disconnect
         self.mqtt_client.on_message = mqtt_on_message
         self.mqtt_client.username_pw_set('Task_Manager_py', '123456')
         self.mqtt_client.connect(
@@ -161,6 +182,28 @@ class Task_Manager():
             port=MQTT_PORT,
             keepalive=MQTT_KEEPALIVE
         )
+
+    def _check_target_device_ready(self, device_id):
+        """查询 Django Device 表，确认目标设备在线且空闲。"""
+        try:
+            conn = sqlite3.connect('db.sqlite3')
+            cursor = conn.cursor()
+            cursor.execute(
+                'SELECT is_online, task_status FROM main_page_device WHERE device_id = ?',
+                (device_id,)
+            )
+            row = cursor.fetchone()
+            conn.close()
+            if not row:
+                return False, 'Device not registered'
+            is_online, task_status = row
+            if not is_online:
+                return False, 'Device is offline'
+            if task_status != 'idle':
+                return False, f'Device status is {task_status}'
+            return True, ''
+        except Exception as exc:
+            return False, f'Failed to query device status: {exc}'
 
     # MQTT心跳，告知客户端连接状态
     def mqtt_heartbeat(self):

@@ -24,7 +24,8 @@ from django.conf import settings
 from .mqtt import (
     publish_device_command, mqtt_client_available,
     emergency_stop, resume_devices, dispatch_motor_task, get_device_states,
-    _device_control_topic,
+    get_mqtt_connection_state, can_dispatch_to_device, acknowledge_device,
+    _device_control_topic, _extract_device_id_from_topic,
 )
 
 import requests
@@ -259,7 +260,11 @@ def device_list(request):
         }
         merged.append(entry)
 
-    return Response({'data': merged, 'mqtt_available': mqtt_client_available()})
+    return Response({
+        'data': merged,
+        'mqtt_available': mqtt_client_available(),
+        'mqtt_connected': get_mqtt_connection_state().get('connected', False),
+    })
 
 
 @api_view(['GET', 'POST'])
@@ -345,6 +350,25 @@ def device_resume(request):
 
 
 @api_view(['POST'])
+def device_acknowledge(request):
+    """用户确认：将 error / completed / estopped 状态的设备恢复为 idle。"""
+    device_ids = request.data.get('device_ids', [])
+    acknowledged_by = request.data.get(
+        'acknowledged_by',
+        request.user.username if hasattr(request, 'user') else 'unknown'
+    )
+
+    if not device_ids:
+        return Response({'detail': 'No target devices specified.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    results = acknowledge_device(device_ids, acknowledged_by=acknowledged_by)
+    all_success = all(r.get('success') for r in results)
+    return Response({
+        'results': results,
+    }, status=status.HTTP_200_OK if all_success else status.HTTP_207_MULTI_STATUS)
+
+
+@api_view(['POST'])
 def device_dispatch_task(request):
     """向指定设备下发电机任务。"""
     device_id = request.data.get('device_id')
@@ -358,7 +382,13 @@ def device_dispatch_task(request):
     result = dispatch_motor_task(device_id, motor, speed, duration)
     if result.get('success'):
         return Response(result, status=status.HTTP_200_OK)
-    return Response(result, status=status.HTTP_409_CONFLICT if 'estopped' in result.get('error', '').lower() else status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    error = result.get('error', '').lower()
+    if 'offline' in error or 'unavailable' in error:
+        return Response(result, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    if 'estopped' in error or 'error' in error or 'completed' in error or 'busy' in error:
+        return Response(result, status=status.HTTP_409_CONFLICT)
+    return Response(result, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
@@ -663,6 +693,20 @@ def _queue_transport_message(*, topic, payload, interface_type, route_name, job=
     )
 
     dispatch_error = None
+
+    # 若请求中显式指定了设备，先检查设备在线/空闲状态
+    device_id = None
+    if device and isinstance(device, dict):
+        device_id = str(device.get('id') or device.get('device_id') or '')
+    if device_id:
+        ok, reason = can_dispatch_to_device(device_id)
+        if not ok:
+            dispatch_error = reason
+            outbox.status = 'FAILED'
+            outbox.error_message = dispatch_error
+            outbox.save(update_fields=['status', 'error_message', 'updated_at'])
+            return outbox, dispatch_error
+
     if mqtt_client_available():
         try:
             publish_device_command(topic, payload)
@@ -866,6 +910,15 @@ def batch_job_start(request, job_id):
         for step_execution in pending_steps:
             try:
                 dispatch = _resolve_dispatch_command(step_execution)
+
+                # 检查目标设备是否在线且空闲
+                device_id = _extract_device_id_from_topic(dispatch['topic']) or getattr(
+                    settings, 'MQTT_DEFAULT_DEVICE_ID', 'esp32_1'
+                )
+                ok, reason = can_dispatch_to_device(device_id)
+                if not ok:
+                    raise ValueError(reason)
+
                 outbox = CommandOutbox.objects.create(
                     job=job,
                     step_execution=step_execution,

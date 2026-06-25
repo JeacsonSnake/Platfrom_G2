@@ -320,6 +320,8 @@ DEVICE_STATUS_CHOICES = (
     ('busy', 'Busy'),
     ('estopped', 'E-Stopped'),
     ('offline', 'Offline'),
+    ('error', 'Error'),
+    ('completed', 'Completed'),
 )
 
 

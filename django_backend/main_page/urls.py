@@ -23,6 +23,7 @@ urlpatterns = [
     re_path(r'^devices/(?P<device_id>[^/]+)/$', views.device_register_detail, name='device_register_detail'),
     re_path(r'^devices/emergency_stop/$', views.device_emergency_stop, name='device_emergency_stop'),
     re_path(r'^devices/resume/$', views.device_resume, name='device_resume'),
+    re_path(r'^devices/acknowledge/$', views.device_acknowledge, name='device_acknowledge'),
     re_path(r'^devices/dispatch_task/$', views.device_dispatch_task, name='device_dispatch_task'),
     re_path(r'^devices/dispatch_batch/$', views.device_dispatch_batch, name='device_dispatch_batch'),
     re_path(r'^devices/emergency_stop_log/$', views.emergency_stop_log_list, name='emergency_stop_log_list'),
