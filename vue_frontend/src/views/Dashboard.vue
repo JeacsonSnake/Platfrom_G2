@@ -477,7 +477,11 @@ export default {
             })
         },
         handleMqttConnectionStatus(payload) {
-            const connected = payload.payload && payload.payload.connected
+            // mqtt_connection_status 可能来自后端广播（connected 在顶层），
+            // 也可能来自 WebSocket 连接建立时的直接推送（connected 在 payload.payload 中）
+            const statusPayload = payload.payload && typeof payload.payload === 'object' ? payload.payload : payload
+            const connected = statusPayload.connected
+            if (typeof connected !== 'boolean') return
             this.backendMqttConnected = connected
             this.updateMqttBanner(connected)
         },
