@@ -2,20 +2,6 @@
     <section class="operations-dashboard">
         <ConnectionBar :status="wsStatus" :mqtt-available="mqttAvailable" :mqtt-connected="backendMqttConnected" />
 
-        <div v-if="showMqttBanner" class="notification mqtt-banner" :class="mqttBannerType">
-            <button class="delete" @click="showMqttBanner = false"></button>
-            <span class="mqtt-banner__text">{{ mqttBannerText }}</span>
-            <button
-                v-if="mqttBannerType === 'is-danger'"
-                class="button is-small mqtt-banner__refresh"
-                :class="{ 'is-danger': !mqttRefreshing, 'is-loading': mqttRefreshing }"
-                :disabled="mqttRefreshing"
-                @click="refreshMqttConnection"
-            >
-                {{ mqttRefreshing ? '连接中…' : '刷新连接' }}
-            </button>
-        </div>
-
         <header class="command-header">
             <div class="command-header__main">
                 <p class="eyebrow">SmartLab Control Surface</p>
@@ -95,6 +81,7 @@
 <script>
 import WebSocketService from '@/services/websocket.js'
 import devicesApi from '@/services/api/devices.js'
+import { showMqttMessage, closeMqttMessage } from '@/services/mqttMessage.js'
 import ConnectionBar from '@/components/ui/ConnectionBar.vue'
 import FleetSummary from '@/components/dashboard/FleetSummary.vue'
 import PanelHeader from '@/components/ui/PanelHeader.vue'
@@ -121,12 +108,10 @@ export default {
         if (this.countdownTimer) {
             clearInterval(this.countdownTimer)
         }
-        if (this.mqttBannerTimer) {
-            clearTimeout(this.mqttBannerTimer)
-        }
         if (this.mqttReconnectPollTimer) {
             clearInterval(this.mqttReconnectPollTimer)
         }
+        closeMqttMessage()
         // WebSocket 服务作为单例保留，不在这里断开
     },
     data() {
@@ -137,10 +122,6 @@ export default {
             wsStatus: 'disconnected',
             mqttAvailable: null,
             backendMqttConnected: null,
-            showMqttBanner: false,
-            mqttBannerType: 'is-danger',
-            mqttBannerText: '',
-            mqttBannerTimer: null,
             mqttRefreshing: false,
             mqttReconnectPollTimer: null,
             selectedDeviceIds: [],
@@ -503,24 +484,19 @@ export default {
             this.updateMqttBanner(connected)
         },
         updateMqttBanner(connected) {
-            if (this.mqttBannerTimer) {
-                clearTimeout(this.mqttBannerTimer)
-                this.mqttBannerTimer = null
-            }
             if (connected === true) {
-                this.mqttBannerType = 'is-success'
-                this.mqttBannerText = 'MQTT 已恢复连接'
-                this.showMqttBanner = true
-                this.mqttBannerTimer = setTimeout(() => {
-                    this.showMqttBanner = false
-                }, 3000)
+                showMqttMessage({
+                    connected: true,
+                    text: 'MQTT 已恢复连接'
+                })
             } else if (connected === false) {
-                this.mqttBannerType = 'is-danger'
-                this.mqttBannerText = 'MQTT 已断开，命令将无法下发'
-                this.showMqttBanner = true
-            } else {
-                this.showMqttBanner = false
+                showMqttMessage({
+                    connected: false,
+                    text: 'MQTT 已断开，命令将无法下发',
+                    onRefresh: () => this.refreshMqttConnection()
+                })
             }
+            // connected 为 null/undefined 时不主动提示
         },
         async refreshMqttConnection() {
             this.mqttRefreshing = true
@@ -533,16 +509,26 @@ export default {
                     this.updateMqttBanner(true)
                 } else if (result.success) {
                     // 202 Accepted：连接握手仍在进行
-                    this.mqttBannerType = 'is-danger'
-                    this.mqttBannerText = 'MQTT 正在重连，请稍候…'
-                    this.showMqttBanner = true
+                    showMqttMessage({
+                        connected: false,
+                        text: 'MQTT 正在重连，请稍候…',
+                        onRefresh: () => this.refreshMqttConnection()
+                    })
                     this.startMqttReconnectPolling()
                 } else {
-                    this.showErrorMessage(`MQTT 重连失败：${result.error || '未知错误'}`)
+                    showMqttMessage({
+                        connected: false,
+                        text: `MQTT 重连失败：${result.error || '未知错误'}`,
+                        onRefresh: () => this.refreshMqttConnection()
+                    })
                 }
             } catch (error) {
                 const msg = error.response?.data?.error || error.message || '网络错误'
-                this.showErrorMessage(`MQTT 重连请求失败：${msg}`)
+                showMqttMessage({
+                    connected: false,
+                    text: `MQTT 重连请求失败：${msg}`,
+                    onRefresh: () => this.refreshMqttConnection()
+                })
             } finally {
                 // 按钮 Loading 至少保留 1 秒，避免频繁点击
                 setTimeout(() => {
@@ -784,33 +770,6 @@ export default {
     background: #fff6df;
     border: 1px solid #f0dfaa;
     color: #9b6a12;
-}
-
-.mqtt-banner {
-    margin-bottom: 1rem;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-}
-
-.mqtt-banner__text {
-    flex: 1;
-}
-
-.mqtt-banner__refresh {
-    flex-shrink: 0;
-}
-
-.mqtt-banner.is-success {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.mqtt-banner.is-danger {
-    background: #fee2e2;
-    color: #991b1b;
 }
 
 .empty-state {

@@ -1,0 +1,31 @@
+/* MQTT 状态提示（ElMessage 自定义内容）样式 */
+
+.mqtt-message-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 0.75rem;
+}
+
+.mqtt-message-text {
+    flex: 1;
+    line-height: 1.4;
+}
+
+.mqtt-message-content .button {
+    border-radius: 6px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* 错误消息背景为红色，按钮使用白边白字 */
+.mqtt-message--error .mqtt-message-content .button.is-outlined {
+    background-color: transparent;
+    border-color: #ffffff;
+    color: #ffffff;
+}
+
+.mqtt-message--error .mqtt-message-content .button.is-outlined:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
