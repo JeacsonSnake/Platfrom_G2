@@ -154,6 +154,11 @@ MQTT_KEEPALIVE = 60
 MQTT_USER = 'Django'
 MQTT_PASSWORD = '123456'
 
+# MQTT 自动重连退避配置（秒）
+MQTT_AUTO_RECONNECT_MIN_DELAY = 2
+MQTT_AUTO_RECONNECT_MAX_DELAY = 90
+MQTT_AUTO_RECONNECT_MULTIPLIER = 2
+
 # 默认目标设备（用于 task_manager 与未指定设备的 recipe step）
 # 请改成实际 ESP32 的 device_id，例如 esp32_7cdfa1e6d3cc
 MQTT_DEFAULT_DEVICE_ID = os.environ.get('MQTT_DEFAULT_DEVICE_ID', 'esp32_1')

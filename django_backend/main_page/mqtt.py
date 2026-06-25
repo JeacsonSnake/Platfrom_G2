@@ -36,6 +36,19 @@ _device_states_lock = threading.Lock()
 _mqtt_connection_state = {'connected': False, 'since': None, 'reason': ''}
 _mqtt_connection_lock = threading.Lock()
 
+# 后端 MQTT 自动重连配置与状态
+MQTT_AUTO_RECONNECT_MIN_DELAY = getattr(settings, 'MQTT_AUTO_RECONNECT_MIN_DELAY', 2)
+MQTT_AUTO_RECONNECT_MAX_DELAY = getattr(settings, 'MQTT_AUTO_RECONNECT_MAX_DELAY', 90)
+MQTT_AUTO_RECONNECT_MULTIPLIER = getattr(settings, 'MQTT_AUTO_RECONNECT_MULTIPLIER', 2)
+
+_auto_reconnect_state = {
+    'enabled': False,
+    'attempts': 0,
+    'next_attempt_at': None,
+    'in_progress': False,
+}
+_auto_reconnect_lock = threading.Lock()
+
 HEARTBEAT_TIMEOUT_SECONDS = 90  # 超过此时间未收到心跳则判定为离线
 
 # 会阻塞新任务下发的设备状态
@@ -78,11 +91,61 @@ def _set_mqtt_connection_state(connected, reason=''):
         }
         print(f"MQTT connection state changed: connected={connected}, reason={reason}")
 
+    if connected:
+        _reset_auto_reconnect()
+    elif _auto_reconnect_state['enabled']:
+        # 状态由连通变为断开时，启动自动重连退避
+        _schedule_next_auto_reconnect(reason=reason)
+
     _broadcast('mqtt_connection_status', {
         'connected': connected,
         'reason': reason,
         'since': _mqtt_connection_state['since'],
     })
+
+
+def _reset_auto_reconnect():
+    """重置自动重连退避计数器。"""
+    with _auto_reconnect_lock:
+        _auto_reconnect_state['attempts'] = 0
+        _auto_reconnect_state['next_attempt_at'] = None
+        _auto_reconnect_state['in_progress'] = False
+
+
+def _schedule_next_auto_reconnect(reason=''):
+    """安排下一次自动重连尝试，使用指数退避。"""
+    with _auto_reconnect_lock:
+        attempts = _auto_reconnect_state['attempts']
+        delay = min(
+            MQTT_AUTO_RECONNECT_MAX_DELAY,
+            MQTT_AUTO_RECONNECT_MIN_DELAY * (MQTT_AUTO_RECONNECT_MULTIPLIER ** attempts)
+        )
+        _auto_reconnect_state['next_attempt_at'] = time.time() + delay
+        _auto_reconnect_state['attempts'] = attempts + 1
+    print(f"MQTT auto-reconnect scheduled in {delay}s (attempt {attempts + 1}), reason={reason}")
+
+
+def _do_auto_reconnect():
+    """执行一次自动重连尝试，失败则继续安排下一次。"""
+    with _auto_reconnect_lock:
+        if _auto_reconnect_state['in_progress']:
+            return
+        _auto_reconnect_state['in_progress'] = True
+
+    try:
+        print('MQTT auto-reconnect attempting...')
+        result = _perform_reconnect()
+        if result.get('connected'):
+            print('MQTT auto-reconnect succeeded')
+            _reset_auto_reconnect()
+        else:
+            _schedule_next_auto_reconnect(reason='auto_reconnect_attempt_failed')
+    except Exception as exc:
+        print(f'MQTT auto-reconnect attempt failed: {exc}')
+        _schedule_next_auto_reconnect(reason=f'auto_reconnect_exception_{exc}')
+    finally:
+        with _auto_reconnect_lock:
+            _auto_reconnect_state['in_progress'] = False
 
 
 def get_mqtt_connection_state():
@@ -398,7 +461,7 @@ def on_disconnect(mqtt_client, userdata, rc):
 
 
 def _mqtt_connection_watchdog():
-    """守护线程：定期校验 client.is_connected() 与内存状态是否一致。"""
+    """守护线程：定期校验 client.is_connected() 与内存状态是否一致，并在需要时触发自动重连。"""
     while True:
         time.sleep(5)
         try:
@@ -407,6 +470,19 @@ def _mqtt_connection_watchdog():
                 current = _mqtt_connection_state.get('connected', False)
             if current != expected:
                 _set_mqtt_connection_state(expected, reason='watchdog_reconcile')
+
+            # 自动重连：仅在未连接且启用时执行
+            if not expected and _auto_reconnect_state['enabled']:
+                with _auto_reconnect_lock:
+                    next_attempt_at = _auto_reconnect_state['next_attempt_at']
+                    in_progress = _auto_reconnect_state['in_progress']
+
+                if not in_progress:
+                    now = time.time()
+                    if next_attempt_at is None:
+                        _schedule_next_auto_reconnect(reason='watchdog_no_schedule')
+                    elif now >= next_attempt_at:
+                        _do_auto_reconnect()
         except Exception as exc:
             print(f'MQTT connection watchdog error: {exc}')
 
@@ -984,22 +1060,26 @@ def mqtt_client_available():
     return client is not None and client.is_connected()
 
 
-def reconnect_mqtt_client():
-    """手动重连 MQTT Broker；供前端刷新按钮或管理接口调用。"""
+def _perform_reconnect():
+    """实际的 MQTT 重连逻辑（被手动重连与自动重连共用）。"""
     global client
     try:
         if client is not None and client.is_connected():
             return {'success': True, 'connected': True, 'message': 'Already connected'}
 
         if client is not None:
-            # 尝试复用现有 client 进行重连（loop_start 线程应仍在运行）
+            # 复用现有 client，触发 paho 立即重连
             client.reconnect()
         else:
             # client 为 None（如启动失败），重新初始化
-            client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION1)
+            client = mqtt.Client(
+                callback_api_version=mqtt.CallbackAPIVersion.VERSION1,
+                reconnect_on_failure=True,
+            )
             client.on_connect = on_connect
             client.on_disconnect = on_disconnect
             client.on_message = on_message
+            client.reconnect_delay_set(min_delay=1, max_delay=30)
             client.username_pw_set(settings.MQTT_USER, settings.MQTT_PASSWORD)
             client.connect(
                 host=settings.MQTT_SERVER,
@@ -1023,6 +1103,12 @@ def reconnect_mqtt_client():
         return {'success': False, 'connected': False, 'error': str(exc)}
 
 
+def reconnect_mqtt_client():
+    """手动重连 MQTT Broker；供前端刷新按钮或管理接口调用。调用后重置自动重连退避。"""
+    _reset_auto_reconnect()
+    return _perform_reconnect()
+
+
 def _should_init_mqtt_client():
     """判断当前进程是否应该创建 MQTT Client。
 
@@ -1038,18 +1124,30 @@ def _should_init_mqtt_client():
 
 
 if _should_init_mqtt_client():
+    # 先创建 client 对象并注册回调；即使初始连接失败也保留该对象，
+    # 由 apps.py 的 loop_start() 与看门狗的自动重连逻辑在后台继续尝试，
+    # 避免重新创建 client 对象导致其它地方持有的引用失效。
+    client = mqtt.Client(
+        callback_api_version=mqtt.CallbackAPIVersion.VERSION1,
+        reconnect_on_failure=True,
+    )
+    client.on_connect = on_connect
+    client.on_disconnect = on_disconnect
+    client.on_message = on_message
+    client.reconnect_delay_set(min_delay=1, max_delay=30)
+    client.username_pw_set(settings.MQTT_USER, settings.MQTT_PASSWORD)
     try:
-        client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION1)
-        client.on_connect = on_connect
-        client.on_disconnect = on_disconnect
-        client.on_message = on_message
-        client.username_pw_set(settings.MQTT_USER, settings.MQTT_PASSWORD)
         client.connect(
             host=settings.MQTT_SERVER,
             port=settings.MQTT_PORT,
             keepalive=settings.MQTT_KEEPALIVE
         )
     except (OSError, TimeoutError, socket.error) as exc:
-        client = None
         _set_mqtt_connection_state(False, reason=f'startup_failed_{exc}')
-        print(f"MQTT unavailable during Django startup: {exc}")
+        print(f"MQTT unavailable during Django startup, will retry via auto-reconnect: {exc}")
+
+
+# 仅在需要 MQTT 客户端的进程中启用自动重连，避免测试/迁移等进程发起无意义的网络重试
+_auto_reconnect_state['enabled'] = _should_init_mqtt_client()
+if _auto_reconnect_state['enabled'] and (client is None or not client.is_connected()):
+    _schedule_next_auto_reconnect(reason='startup_not_connected')
