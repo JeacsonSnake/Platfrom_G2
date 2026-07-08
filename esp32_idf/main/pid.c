@@ -2,6 +2,20 @@
 
 static const char* TAG = "PID_EVENT";
 
+//////////////////////////////////////////////////////////////
+//////////////////////// PID 可调参数 //////////////////////////
+//////////////////////////////////////////////////////////////
+// 以下参数集中在 pid.c 中定义，避免与 main.h 耦合，便于独立调试与快速回退
+#define PID_KP                  (8.0)   // 比例增益
+#define PID_KI                  (0.02)  // 积分增益
+#define PID_KD                  (0.01)  // 微分增益
+#define PID_MAX_PWM             (8191)  // 13-bit 最大值
+#define PID_MIN_PWM             (0)     // 输出下限（0 对应反相后 duty=8191，即停止）
+#define PID_OUTPUT_MIN_LIMIT    (0)     // PID 输出最小值限制，先保持 0；调研后若需限制最高速可调整
+#define PID_MAX_OUTPUT_DELTA    (500.0) // 每 200ms 周期最大输出变化，平滑 PWM 跳变
+#define PID_SOFTSTART_MAX_INIT  (3000.0)// 软启动初始最大允许输出
+#define PID_SOFTSTART_STEPS     (10)    // 软启动步数（10 * 200ms = 2s）
+
 // 这里的PID控制针对于以下过程
 // -- 转速 --> PID 控制器 --> PWM 控制输入 --> PCNT 转速测量 -->
 //          ^                                     |
@@ -14,59 +28,48 @@ double PID_Calculate(struct PID_params params, struct PID_data *data, double tar
 
     // 比例项
     double Pout = params.Kp * error;
-    
-    // 积分项 - 带抗饱和处理
-    // 条件积分：当输出饱和且误差与输出同方向时，暂停积分
-    double pre_integral = data->integral;
-    data->integral += error;
-    
-    // 限制积分项，防止积分饱和
-    if(data->integral > params.max_pwm)
-    {
-        data->integral = params.max_pwm;
-    }
-    if(data->integral < params.min_pwm)
-    {
-        data->integral = params.min_pwm;
-    }
-    
-    double Iout = params.Ki * data->integral;
 
     // 微分项
     double derivative = (error - data->pre_error);
     double Dout = params.Kd * derivative;
 
+    // 条件积分：预测当前误差加入后是否会加剧饱和
+    // 若不加当前误差时输出已朝饱和方向超出，且误差方向与饱和方向相同，则暂停积分
+    double predicted_output = Pout + params.Ki * data->integral + Dout + data->pre_input;
+    bool saturate_high = (predicted_output > params.max_pwm && error > 0);
+    bool saturate_low  = (predicted_output < params.min_pwm && error < 0);
+
+    if (!saturate_high && !saturate_low) {
+        data->integral += error;
+        // 限制积分项，防止积分过大
+        if (data->integral > params.max_pwm) {
+            data->integral = params.max_pwm;
+        }
+        if (data->integral < params.min_pwm) {
+            data->integral = params.min_pwm;
+        }
+    }
+
+    double Iout = params.Ki * data->integral;
+
     // 计算整体输出
     double output = Pout + Iout + Dout;
     output = data->pre_input + output;
 
-    // 输出限制前的值（用于抗饱和判断）
-    double output_unlimited = output;
-
-    // 限制条件
-    bool is_saturated = false;
-    if(output > params.max_pwm)
-    {
+    // 输出限制
+    if (output > params.max_pwm) {
         output = params.max_pwm;
-        is_saturated = true;
     }
-    else if(output < params.min_pwm)
-    {
+    else if (output < params.min_pwm) {
         output = params.min_pwm;
-        is_saturated = true;
     }
 
-    // 抗饱和处理：如果输出饱和且积分推动了饱和，则回滚积分
-    if (is_saturated) {
-        // 如果当前误差与饱和方向相同，说明积分推动了饱和
-        // 回滚积分累积以防止积分 windup
-        if ((output_unlimited > params.max_pwm && error > 0) ||
-            (output_unlimited < params.min_pwm && error < 0)) {
-            data->integral = pre_integral;
-        }
+    // 若启用输出下限限制（默认不启用），限制最高转速
+    if (PID_OUTPUT_MIN_LIMIT > 0 && output > PID_OUTPUT_MIN_LIMIT) {
+        output = PID_OUTPUT_MIN_LIMIT;
     }
 
-    // 保存本次误差到上次
+    // 保存本次误差与输出到历史
     data->pre_error = error;
     data->pre_input = output;
 
@@ -85,18 +88,18 @@ void PID_init(void* params)
     struct PID_data data = {
         .integral   = 0,
         .pre_error  = 0,
-        .pre_input = 0
+        .pre_input  = 0
     };
 
     // CHB-BLDC2418 PID Parameters
     // Max PCNT = (4500 RPM / 60) * 6 pulses/rotation = 450 pulses/sec
     // Tuned for 200ms sampling interval (5Hz)
     struct PID_params pid_params = {
-        .Kp         = 8,        // Proportional gain
-        .Ki         = 0.02,     // Integral gain (scaled for 5Hz)
-        .Kd         = 0.01,     // Derivative gain
-        .max_pwm    = 8191,     // 13-bit max (full range)
-        .min_pwm    = 0,        // Allow full stop
+        .Kp         = PID_KP,
+        .Ki         = PID_KI,
+        .Kd         = PID_KD,
+        .max_pwm    = PID_MAX_PWM,
+        .min_pwm    = PID_MIN_PWM,
         .max_pcnt   = 450,      // 450 pulses/sec max
         .min_pcnt   = 0
     };
@@ -104,8 +107,9 @@ void PID_init(void* params)
     // Soft start variables
     int startup_phase = 1;  // 1 = in startup, 0 = normal operation
     int startup_counter = 0;
-    double max_pwm_during_startup = 3000;  // Limit initial PWM to prevent overshoot
-    
+    // 跟踪上一周期目标速度，用于检测 0->非零 转换并触发软启动 reset
+    static double prev_target_speed[4] = {0.0, 0.0, 0.0, 0.0};
+
     while(1){
         if(pcnt_updated_list[index] == true)
         {
@@ -114,14 +118,23 @@ void PID_init(void* params)
             // pcnt_count_list is per 200ms, multiply by 5 to get per-second
             double actual_speed_per_sec = pcnt_count_list[index] * 5;
             double new_input = PID_Calculate(pid_params, &data, temp, actual_speed_per_sec);
-            
-            // Soft start: limit max output during first 10 samples (2 seconds)
+
+            // Rate Limiter: 限制相邻周期 PID 输出变化量，平滑 PWM 跳变
+            double delta = new_input - data.pre_input;
+            if (delta > PID_MAX_OUTPUT_DELTA) {
+                new_input = data.pre_input + PID_MAX_OUTPUT_DELTA;
+            }
+            else if (delta < -PID_MAX_OUTPUT_DELTA) {
+                new_input = data.pre_input - PID_MAX_OUTPUT_DELTA;
+            }
+
+            // Soft start: limit max output during first PID_SOFTSTART_STEPS samples
             if (startup_phase) {
                 startup_counter++;
-                if (startup_counter <= 10) {
+                if (startup_counter <= PID_SOFTSTART_STEPS) {
                     // Gradually increase max allowed output
-                    double progress = startup_counter / 10.0;
-                    double current_max = max_pwm_during_startup + (8191 - max_pwm_during_startup) * progress;
+                    double progress = startup_counter / (double)PID_SOFTSTART_STEPS;
+                    double current_max = PID_SOFTSTART_MAX_INIT + (PID_MAX_PWM - PID_SOFTSTART_MAX_INIT) * progress;
                     if (new_input > current_max) {
                         new_input = current_max;
                     }
@@ -129,31 +142,30 @@ void PID_init(void* params)
                     startup_phase = 0;  // End startup phase
                 }
             }
-            
+
             // CHB-BLDC2418: Inverted PWM logic - High=OFF, Low=ON
             // Duty 8191 = Motor OFF, Duty 0 = Motor ON
-            int new_input_int = 8191 - (int)new_input;
-            
+            int new_input_int = PID_MAX_PWM - (int)new_input;
+
             // Additional safety clamp for PWM output
             if (new_input_int < 0) new_input_int = 0;
-            if (new_input_int > 8191) new_input_int = 8191;
-            
+            if (new_input_int > PID_MAX_PWM) new_input_int = PID_MAX_PWM;
+
             pwm_set_duty(new_input_int, index);
-            
+
             ESP_LOGI(TAG, "Motor %d PID: target=%.0f/s, actual=%.0f/s (raw=%d/200ms), pid_out=%.0f, pwm_duty=%d, startup=%d",
                      index, temp, actual_speed_per_sec, pcnt_count_list[index], new_input, new_input_int, startup_counter);
             pcnt_updated_list[index] = false;
-            
+
             // Reset startup phase when motor starts after being stopped
-            // startup_counter > 10 means we've completed a previous soft-start cycle
-            static double prev_target_speed[4] = {0, 0, 0, 0};
+            // startup_counter > PID_SOFTSTART_STEPS means we've completed a previous soft-start cycle
             if (temp > 0 && prev_target_speed[index] == 0) {
                 // Motor is starting (prev was 0, now non-zero)
-                if (!startup_phase || startup_counter > 10) {
+                if (!startup_phase || startup_counter > PID_SOFTSTART_STEPS) {
                     // Either not in startup, or counter shows we've done a full cycle
                     startup_phase = 1;
                     startup_counter = 0;
-                    ESP_LOGI(TAG, "Motor %d soft-start reset (target: %.0f -> %.0f, phase=%d)", 
+                    ESP_LOGI(TAG, "Motor %d soft-start reset (target: %.0f -> %.0f, phase=%d)",
                              index, prev_target_speed[index], temp, startup_phase);
                 }
             }
@@ -193,7 +205,7 @@ void control_cmd(void *params)
     int local_speed = local_params->speed;
     int local_duration = local_params->duration;
     int local_index = local_params->index;
-    
+
     // Free the allocated memory after copying to local variables
     free(local_params);
 
@@ -209,6 +221,3 @@ void control_cmd(void *params)
     esp_mqtt_client_publish(mqtt_client, mqtt_task_topic, buff, strlen(buff), 2, 0);
     vTaskDelete(NULL);
 }
-
-
-
