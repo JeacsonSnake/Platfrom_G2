@@ -121,6 +121,15 @@ void PID_init(void* params)
             double actual_speed_per_sec = pcnt_count_list[index] * 5;
             double new_input = PID_Calculate(pid_params, &data, temp, actual_speed_per_sec);
 
+            // 目标为 0 时强制输出 0（电机停止），并清零 PID 历史状态，
+            // 避免上一条高转速命令的 pre_input/integral 残留到下一条低转速命令。
+            if (temp == 0) {
+                new_input = 0;
+                data.integral = 0;
+                data.pre_error = 0;
+                data.pre_input = 0;
+            }
+
             // Rate Limiter: 限制相邻周期 PID 输出变化量，平滑 PWM 跳变
             double delta = new_input - data.pre_input;
             if (delta > PID_MAX_OUTPUT_DELTA) {
