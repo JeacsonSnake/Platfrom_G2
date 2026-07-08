@@ -168,7 +168,7 @@ void PID_init(void* params)
                      index, temp, actual_speed_per_sec, pcnt_count_list[index], new_input, new_input_int, startup_counter);
             pcnt_updated_list[index] = false;
 
-            // Reset startup phase when motor starts after being stopped
+            // Reset startup phase and PID state when motor starts after being stopped
             // startup_counter > PID_SOFTSTART_STEPS means we've completed a previous soft-start cycle
             if (temp > 0 && prev_target_speed[index] == 0) {
                 // Motor is starting (prev was 0, now non-zero)
@@ -176,6 +176,11 @@ void PID_init(void* params)
                     // Either not in startup, or counter shows we've done a full cycle
                     startup_phase = 1;
                     startup_counter = 0;
+                    // 关键：清零 PID 内部状态，避免上一条高转速命令的 pre_input/integral 残留
+                    // 导致下一条低转速命令启动瞬间输出过高
+                    data.integral = 0;
+                    data.pre_error = 0;
+                    data.pre_input = 0;
                     ESP_LOGI(TAG, "Motor %d soft-start reset (target: %.0f -> %.0f, phase=%d)",
                              index, prev_target_speed[index], temp, startup_phase);
                 }
