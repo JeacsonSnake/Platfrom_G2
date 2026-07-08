@@ -6,15 +6,17 @@ static const char* TAG = "PID_EVENT";
 //////////////////////// PID 可调参数 //////////////////////////
 //////////////////////////////////////////////////////////////
 // 以下参数集中在 pid.c 中定义，避免与 main.h 耦合，便于独立调试与快速回退
-#define PID_KP                  (8.0)   // 比例增益
-#define PID_KI                  (0.02)  // 积分增益
-#define PID_KD                  (0.01)  // 微分增益
+#define PID_KP                  (5.0)   // 比例增益（按调研建议从 8.0 降低）
+#define PID_KI                  (0.005) // 积分增益（按 5Hz 采样率比例从 0.02 缩减）
+#define PID_KD                  (0.03)  // 微分增益（增强阻尼，抑制启动超调）
 #define PID_MAX_PWM             (8191)  // 13-bit 最大值
 #define PID_MIN_PWM             (0)     // 输出下限（0 对应反相后 duty=8191，即停止）
 #define PID_OUTPUT_MIN_LIMIT    (0)     // PID 输出最小值限制，先保持 0；调研后若需限制最高速可调整
 #define PID_MAX_OUTPUT_DELTA    (500.0) // 每 200ms 周期最大输出变化，平滑 PWM 跳变
 #define PID_SOFTSTART_MAX_INIT  (3000.0)// 软启动初始最大允许输出
 #define PID_SOFTSTART_STEPS     (10)    // 软启动步数（10 * 200ms = 2s）
+#define PID_MAX_PCNT            (450)   // 最大 PCNT：4500 RPM / 60 * 6 pulses/rotation
+#define PID_MIN_PCNT            (0)     // 最小 PCNT
 
 // 这里的PID控制针对于以下过程
 // -- 转速 --> PID 控制器 --> PWM 控制输入 --> PCNT 转速测量 -->
@@ -100,8 +102,8 @@ void PID_init(void* params)
         .Kd         = PID_KD,
         .max_pwm    = PID_MAX_PWM,
         .min_pwm    = PID_MIN_PWM,
-        .max_pcnt   = 450,      // 450 pulses/sec max
-        .min_pcnt   = 0
+        .max_pcnt   = PID_MAX_PCNT,
+        .min_pcnt   = PID_MIN_PCNT
     };
 
     // Soft start variables
