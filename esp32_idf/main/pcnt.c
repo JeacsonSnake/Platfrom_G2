@@ -9,6 +9,12 @@ static uint32_t system_boot_time = 0;
 static uint32_t pcnt_zero_count[4] = {0, 0, 0, 0};
 static uint32_t pcnt_total_samples[4] = {0, 0, 0, 0};
 
+// PCNT 中值滤波器状态（用于抑制启动/运行时的脉冲计数噪声，不影响遥测发布频率）
+#define PCNT_FILTER_WINDOW 3
+static int pcnt_filter_buf[4][PCNT_FILTER_WINDOW] = {{0}};
+static int pcnt_filter_idx[4] = {0};
+static bool pcnt_filter_ready[4] = {false};
+
 // PCNT 初始化
 // 注意貌似pcnt_init()这个函数名已经被内部函数占用了，如果命名为pcnt_init()会奇妙的报错
 void pcnt_func_init()
@@ -38,6 +44,36 @@ void pcnt_func_init()
     }
 }
 
+// 三个数取中值（无分支排序）
+static inline int median3(int a, int b, int c)
+{
+    if (a > b) { int t = a; a = b; b = t; }
+    if (b > c) { int t = b; b = c; c = t; }
+    if (a > b) { int t = a; a = b; b = t; }
+    return b;
+}
+
+// 将新采样加入中值滤波窗口并返回中值
+static int pcnt_update_median(int index, int raw)
+{
+    pcnt_filter_buf[index][pcnt_filter_idx[index]] = raw;
+    pcnt_filter_idx[index] = (pcnt_filter_idx[index] + 1) % PCNT_FILTER_WINDOW;
+    if (pcnt_filter_idx[index] == 0) {
+        pcnt_filter_ready[index] = true;
+    }
+    return median3(pcnt_filter_buf[index][0], pcnt_filter_buf[index][1], pcnt_filter_buf[index][2]);
+}
+
+// 重置中值滤波器
+static void pcnt_reset_filter(int index)
+{
+    for (int i = 0; i < PCNT_FILTER_WINDOW; i++) {
+        pcnt_filter_buf[index][i] = 0;
+    }
+    pcnt_filter_idx[index] = 0;
+    pcnt_filter_ready[index] = false;
+}
+
 // PCNT的计数器线程
 void pcnt_monitor(void* params)
 {
@@ -52,6 +88,8 @@ void pcnt_monitor(void* params)
     bool abnormal_check_enabled = false;
     // 启动保护标志：系统启动后的前几秒启用特殊保护
     bool startup_protection_active = true;
+    // 记录上一周期电机是否运行，用于检测启动边沿并重置滤波器
+    bool was_running = false;
     // Max theoretical PCNT per 200ms: 450 pulses/sec * 0.2s = 90
     // Allow some margin: 150 per 200ms (750/s) is max reasonable
     const int MAX_REASONABLE_PCNT_PER_200MS = 150;
@@ -69,9 +107,20 @@ void pcnt_monitor(void* params)
             ESP_LOGI(TAG, "Motor %d startup protection ended, normal PCNT monitoring active", index);
         }
         
+        // 检测电机启动边沿：从停止转为运行时重置中值滤波器，避免旧噪声影响启动
+        if (motor_speed_list[index] != 0 && !was_running) {
+            pcnt_reset_filter(index);
+            was_running = true;
+        } else if (motor_speed_list[index] == 0) {
+            was_running = false;
+        }
+        
         // 获取当前数字，并清除
         pcnt_unit_get_count(unit, &pcnt_count_list[index]);
         pcnt_unit_clear_count(unit);
+        
+        // 对原始值做中值滤波，抑制单点脉冲噪声（不影响遥测发布频率）
+        int median_raw = pcnt_update_median(index, pcnt_count_list[index]);
         
         // 统计PCNT采样数据（用于诊断Motor 3问题）
         pcnt_total_samples[index]++;
@@ -99,18 +148,30 @@ void pcnt_monitor(void* params)
         }
         
         // 异常值检测：电机运行时启用
+        // 检测到超限或突刺时，用中值替换而不是直接清零，避免 PID 误判为停转
         if (abnormal_check_enabled) {
-            if (pcnt_count_list[index] > MAX_REASONABLE_PCNT_PER_200MS || pcnt_count_list[index] < 0) {
-                ESP_LOGW(TAG, "Motor %d PCNT abnormal value detected: %d, resetting to 0", 
-                         index, pcnt_count_list[index]);
-                pcnt_count_list[index] = 0;
+            bool is_abnormal = (pcnt_count_list[index] > MAX_REASONABLE_PCNT_PER_200MS || 
+                                pcnt_count_list[index] < 0);
+            // 额外检测相对突刺：当前值显著大于最近中值（启动期前几个点不启用）
+            if (!is_abnormal && pcnt_filter_ready[index] && 
+                pcnt_count_list[index] > median_raw * 5 + 30 && 
+                pcnt_count_list[index] > 50) {
+                is_abnormal = true;
+            }
+            if (is_abnormal) {
+                ESP_LOGW(TAG, "Motor %d PCNT outlier rejected: raw=%d, using median=%d", 
+                         index, pcnt_count_list[index], median_raw);
             }
         }
+        // 用中值作为控制/遥测使用的计数值
+        pcnt_count_list[index] = median_raw;
         
         // 空闲状态噪声过滤：电机停止时，如果PCNT异常大，视为噪声
         if (motor_speed_list[index] == 0 && idle == false && pcnt_count_list[index] > IDLE_NOISE_THRESHOLD) {
             ESP_LOGW(TAG, "Motor %d idle noise detected: PCNT=%d, filtering", index, pcnt_count_list[index]);
             pcnt_count_list[index] = 0;
+            // 重置滤波器，避免噪声被中值滤波保留
+            pcnt_reset_filter(index);
         }
 
         // 判断是否有转动指令，是否空闲，空闲时不进行测量更新
