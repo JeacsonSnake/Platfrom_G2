@@ -229,14 +229,16 @@ void control_cmd(void *params)
 
     char buff[64];
     sprintf(buff, "task_create_%d_%d_%d", local_index, local_speed, local_duration);
-    esp_mqtt_client_publish(mqtt_client, mqtt_task_topic, buff, strlen(buff), 2, 0);
+    // QoS 0 非阻塞发布，避免任务被删除时卡在 MQTT 握手
+    mqtt_publish_safe(mqtt_task_topic, buff, strlen(buff), 0, 0);
     motor_speed_list[local_index] = local_speed;
     vTaskDelay(local_duration * 1000 / portTICK_PERIOD_MS);
     motor_speed_list[local_index] = 0;
     // CHB-BLDC2418: Duty 8191 = Motor OFF (inverted logic)
     pwm_set_duty(8191, local_index);
     sprintf(buff, "task_finished_%d_%d_%d", local_index, local_speed, local_duration);
-    esp_mqtt_client_publish(mqtt_client, mqtt_task_topic, buff, strlen(buff), 2, 0);
+    // QoS 0 非阻塞发布，避免任务被删除时卡在 MQTT 握手
+    mqtt_publish_safe(mqtt_task_topic, buff, strlen(buff), 0, 0);
 
     // 任务正常结束时清空句柄；仅当本任务仍被记录为当前任务时才清空，
     // 避免在新命令已创建新任务后误把新句柄覆盖为 NULL。

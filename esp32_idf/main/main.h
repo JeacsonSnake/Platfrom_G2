@@ -144,6 +144,8 @@ extern TaskHandle_t cmd_task_handle[4];
 
 // MQTT Connection Function 初始化方法
 void mqtt_init();
+// 非阻塞 MQTT 发布：未连接时直接跳过，避免阻塞调用任务
+int mqtt_publish_safe(const char *topic, const char *data, int len, int qos, int retain);
 // MQTT Heartbeat Task 心跳发送任务
 void mqtt_heartbeat_task(void *pvParameters);
 // MQTT Health Check Task 连接健康检查任务

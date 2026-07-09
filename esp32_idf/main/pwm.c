@@ -42,8 +42,8 @@ void pwm_set_duty(int data, int channel)
     ledc_update_duty(LEDC_MODE, pwm_channels[channel]);
     ESP_LOGI(TAG, "PWM channel %d duty set to %d.", channel, data);
 
-    // MQTT通知
+    // MQTT通知（QoS 0，非阻塞，避免在断连或网络拥塞时阻塞 PWM 设置）
     char buff[64];
     sprintf(buff, "pwm_set_%d_%d", channel, data);
-    esp_mqtt_client_publish(mqtt_client, mqtt_telemetry_topic, buff, strlen(buff), 2, 0);
+    mqtt_publish_safe(mqtt_telemetry_topic, buff, strlen(buff), 0, 0);
 }

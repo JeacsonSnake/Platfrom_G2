@@ -76,6 +76,20 @@ static void set_subscribe_flag(bool flag) {
 // WiFi 连接状态检查（外部声明）
 extern bool wifi_is_connected(void);
 
+// 安全非阻塞 MQTT 发布：未连接时直接跳过，避免调用任务被阻塞
+// 使用 QoS 0 发送遥测/通知类消息，降低 MQTT 任务与网络负载
+int mqtt_publish_safe(const char *topic, const char *data, int len, int qos, int retain)
+{
+    if (mqtt_client == NULL || topic == NULL || data == NULL) {
+        return -1;
+    }
+    if (!get_connect_flag()) {
+        // 未连接时不入队，防止在断连期间阻塞调用任务
+        return -1;
+    }
+    return esp_mqtt_client_publish(mqtt_client, topic, data, len, qos, retain);
+}
+
 // 获取错误类型字符串并更新统计
 static const char* get_error_type_string(esp_mqtt_error_type_t error_type, int esp_tls_last_esp_err, 
                                          int esp_tls_stack_err, int esp_tls_cert_verify_flags, 
@@ -148,7 +162,7 @@ void message_compare(char *msg)
     {
         char buff[64];
         sprintf(buff, "Hello to you too");
-        esp_mqtt_client_publish(mqtt_client, mqtt_control_topic, buff, strlen(buff), 2, 0);
+        mqtt_publish_safe(mqtt_control_topic, buff, strlen(buff), 0, 0);
     }
     else if(strncmp(msg, "cmd_", 4) == 0)
     {
@@ -322,8 +336,8 @@ void mqtt_heartbeat_task(void *pvParameters)
             UBaseType_t uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
             
             // 向mqtt服务器发布主题为heartbeat，payload为buff的数据
-            // 使用QoS=1确保心跳可靠传输，retain=0
-            int msg_id = esp_mqtt_client_publish(mqtt_client, mqtt_heartbeat_topic, buff, strlen(buff), 1, 0);
+            // 使用QoS=1确保心跳可靠传输，retain=0；通过 safe 辅助函数避免断连时阻塞
+            int msg_id = mqtt_publish_safe(mqtt_heartbeat_topic, buff, strlen(buff), 1, 0);
             
             TickType_t publish_elapsed = xTaskGetTickCount() - publish_start;
             uint32_t elapsed_ms = publish_elapsed * portTICK_PERIOD_MS;
@@ -501,20 +515,20 @@ void mqtt_init()
         },
         // 添加会话和网络配置以改善连接稳定性（针对弱信号环境优化）
         .session = {
-            .keepalive = 60,               // 60秒 KeepAlive 间隔，更快检测连接问题
+            .keepalive = 120,              // 120秒 KeepAlive 间隔，降低 PING 频率以减轻网络负载
             .disable_keepalive = false,    // 启用 KeepAlive
-            .disable_clean_session = false, // 禁用清理会话，启用会话恢复减少重连开销
+            .disable_clean_session = true, // 启用清理会话，避免 broker 积压 QoS 消息导致重连风暴
         },
         .network = {
-            .reconnect_timeout_ms = 3000,  // 3秒重连间隔，更快尝试恢复
-            .timeout_ms = 10000,           // 网络操作超时10秒，避免长时间阻塞
+            .reconnect_timeout_ms = 8000,  // 8秒重连间隔，避免断连时频繁重试造成网络风暴
+            .timeout_ms = 15000,           // 网络操作超时15秒，给弱网环境更多恢复时间
         },
         .buffer = {
             .size = 4096,                  // 增加发送缓冲区到4KB
             .out_size = 4096,              // 增加接收缓冲区到4KB
         },
         .task = {
-            .priority = 5,                 // 提高MQTT内部任务优先级
+            .priority = 4,                 // MQTT内部任务优先级适度降低，避免断连重试时过度抢占CPU/日志任务
             .stack_size = 8192,            // 增加MQTT内部任务栈大小到8KB
         }
     };

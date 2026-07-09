@@ -111,7 +111,7 @@ esp32_idf/
 - Keepalive: 60s, Session persistence enabled (`disable_clean_session = false`)
 - Reconnect timeout: 3000ms, Network timeout: 10000ms
 - Buffer size: 4096 bytes (in + out)
-- Internal MQTT task: priority 5, stack 8192
+- Internal MQTT task: priority 4, stack 8192
 - Mutex-protected `connect_flag` and `subscribe_flag`
 - Tracks error types: transport timeout, ping timeout, connection reset, write timeout, connect failed
 
@@ -119,7 +119,7 @@ esp32_idf/
 - LEDC PWM configuration (Timer 0, Low Speed Mode, 13-bit, 5KHz)
 - 4 PWM channels on GPIO 1, 4, 6, 8
 - Duty range: 0-8191 (inverted logic for CHB-BLDC2418: 8191=OFF, 0=ON)
-- Auto-notifies MQTT on duty change (`pwm_set_<channel>_<data>` to `MQTT_DATA_CHANNEL` with QoS 2)
+- Auto-notifies MQTT on duty change (`pwm_set_<channel>_<data>` to `mqtt_telemetry_topic` with QoS 0 via `mqtt_publish_safe`)
 
 ### pcnt.c
 - PCNT unit initialization for 4 channels using ESP-IDF PCNT driver
@@ -369,12 +369,12 @@ python -m esptool --port COM9 --chip esp32s3 read_flash 0x0 0x800000 firmware_du
 - Client ID: `ESP32S3_7cdfa1e6d3cc`
 - Username: `ESP32_1`
 - Password: `123456`
-- Keepalive: 60 seconds
-- Clean session: Disabled (session persistence enabled)
-- Reconnect timeout: 3000ms
-- Network timeout: 10000ms
+- Keepalive: 120 seconds
+- Clean session: Enabled (`disable_clean_session = true`)
+- Reconnect timeout: 8000ms
+- Network timeout: 15000ms
 - Buffer size: 4096 bytes (in + out)
-- Internal task priority: 5, stack: 8192 bytes
+- Internal task priority: 4, stack: 8192 bytes
 
 ### NTP Time Sync
 - Primary: `cn.pool.ntp.org`
@@ -412,7 +412,7 @@ The following is from the custom `partitions.csv` in the repo root. **Note:** Th
 | CMD_TASK | 1 | 4096 | Command execution (dynamic, one per command) |
 | max31850_poll | 1 | 4096 | Temperature polling task (1s interval) |
 
-**Note:** MQTT internal task runs at priority 5 with stack 8192 (configured in `mqtt_init()`).
+**Note:** MQTT internal task runs at priority 4 with stack 8192 (configured in `mqtt_init()`).
 
 ## Initialization Order
 
@@ -516,25 +516,26 @@ For production deployment, enable security features via `menuconfig` and use enc
 
 6. **Time Sync**: SNTP time sync is started automatically after WiFi connection. Monitor logs for `时间同步成功！` message.
 
-7. **Session Persistence**: MQTT is configured with `disable_clean_session = false` to enable session recovery and reduce reconnection overhead.
+7. **Session Persistence**: MQTT is configured with `disable_clean_session = true` (clean session) to avoid broker-side message backlog during reconnect storms. Subscriptions are re-created on every connect.
+8. **Non-blocking Telemetry**: PWM, PCNT, and task lifecycle notifications use `mqtt_publish_safe()` with QoS 0; the helper skips publish when MQTT is disconnected, preventing low-priority tasks from blocking during network outages.
 
-8. **Error Statistics**: MQTT error types are tracked and reported every 5 minutes. Check `mqtt_error_report_task()` for details.
+9. **Error Statistics**: MQTT error types are tracked and reported every 5 minutes. Check `mqtt_error_report_task()` for details.
 
-9. **GPIO Pin Changes**: The PWM and PCNT GPIO pins have been updated from earlier versions. Current configuration uses GPIO 1,4,6,8 for PWM and GPIO 2,5,7,9 for PCNT.
+10. **GPIO Pin Changes**: The PWM and PCNT GPIO pins have been updated from earlier versions. Current configuration uses GPIO 1,4,6,8 for PWM and GPIO 2,5,7,9 for PCNT.
 
-10. **Soft-start Protection**: PID controller implements soft-start to prevent motor overshoot. Initial PWM is limited to 3000 for the first 2 seconds (10 PID iterations) after motor start.
+11. **Soft-start Protection**: PID controller implements soft-start to prevent motor overshoot. Initial PWM is limited to 3000 for the first 2 seconds (10 PID iterations) after motor start.
 
-11. **PCNT Sampling**: PCNT samples every 200ms but converts to per-second rate for PID comparison and MQTT reporting. This provides faster response while maintaining consistent units.
+12. **PCNT Sampling**: PCNT samples every 200ms but converts to per-second rate for PID comparison and MQTT reporting. This provides faster response while maintaining consistent units.
 
-12. **1-Wire Timing Critical**: MAX31850 driver uses critical sections (`portENTER_CRITICAL`) for precise 1-Wire timing. Disable interrupts during bit operations.
+13. **1-Wire Timing Critical**: MAX31850 driver uses critical sections (`portENTER_CRITICAL`) for precise 1-Wire timing. Disable interrupts during bit operations.
 
-13. **MAX31850 Pull-up**: External 4.7KΩ pull-up resistor recommended on GPIO14 for reliable 1-Wire communication. Internal pull-up may be too weak for multiple sensors.
+14. **MAX31850 Pull-up**: External 4.7KΩ pull-up resistor recommended on GPIO14 for reliable 1-Wire communication. Internal pull-up may be too weak for multiple sensors.
 
-14. **CRC Verification**: Always verify ROM CRC and Scratchpad CRC when reading MAX31850 data. Failed CRC indicates bus noise or timing issues.
+15. **CRC Verification**: Always verify ROM CRC and Scratchpad CRC when reading MAX31850 data. Failed CRC indicates bus noise or timing issues.
 
-15. **Fault Detection**: MAX31850 detects thermocouple faults (open circuit, short to GND/VCC). Check fault bits in scratchpad byte 2 (Bit0-2).
+16. **Fault Detection**: MAX31850 detects thermocouple faults (open circuit, short to GND/VCC). Check fault bits in scratchpad byte 2 (Bit0-2).
 
-16. **Partition Table Mismatch**: The custom `partitions.csv` exists in the repo root but is **not active** in the default build. To use it, run `idf.py menuconfig` → Partition Table → Custom partition table, then select `partitions.csv`.
+17. **Partition Table Mismatch**: The custom `partitions.csv` exists in the repo root but is **not active** in the default build. To use it, run `idf.py menuconfig` → Partition Table → Custom partition table, then select `partitions.csv`.
 
 ## Common Issues
 
