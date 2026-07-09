@@ -139,6 +139,9 @@ typedef struct
     int index;
 } cmd_params;
 
+// 每个电机当前运行的 control_cmd 任务句柄，用于防止命令并发覆盖
+extern TaskHandle_t cmd_task_handle[4];
+
 // MQTT Connection Function 初始化方法
 void mqtt_init();
 // MQTT Heartbeat Task 心跳发送任务

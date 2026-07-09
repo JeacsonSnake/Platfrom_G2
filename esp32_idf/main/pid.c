@@ -225,6 +225,8 @@ void control_cmd(void *params)
     // Free the allocated memory after copying to local variables
     free(local_params);
 
+    TaskHandle_t my_handle = xTaskGetCurrentTaskHandle();
+
     char buff[64];
     sprintf(buff, "task_create_%d_%d_%d", local_index, local_speed, local_duration);
     esp_mqtt_client_publish(mqtt_client, mqtt_task_topic, buff, strlen(buff), 2, 0);
@@ -235,5 +237,11 @@ void control_cmd(void *params)
     pwm_set_duty(8191, local_index);
     sprintf(buff, "task_finished_%d_%d_%d", local_index, local_speed, local_duration);
     esp_mqtt_client_publish(mqtt_client, mqtt_task_topic, buff, strlen(buff), 2, 0);
+
+    // 任务正常结束时清空句柄；仅当本任务仍被记录为当前任务时才清空，
+    // 避免在新命令已创建新任务后误把新句柄覆盖为 NULL。
+    if (cmd_task_handle[local_index] == my_handle) {
+        cmd_task_handle[local_index] = NULL;
+    }
     vTaskDelete(NULL);
 }

@@ -11,6 +11,9 @@ static SemaphoreHandle_t subscribe_flag_mutex = NULL; // 互斥锁保护subscrib
 static int reconnect_attempts = 0; // 当前会话重连尝试计数
 static int total_disconnect_count = 0; // 总断开次数计数器（累计所有会话）
 
+// 每个电机当前运行的 control_cmd 任务句柄，收到新命令时先删除旧任务
+TaskHandle_t cmd_task_handle[4] = {NULL};
+
 // 错误类型统计
 static int error_count_transport_timeout = 0;      // 传输层超时
 static int error_count_ping_timeout = 0;           // PING超时
@@ -151,17 +154,33 @@ void message_compare(char *msg)
     {
         int index, speed, duration;
         sscanf(msg, "cmd_%d_%d_%d",  &index, &speed, &duration);
-        
+
+        if (index < 0 || index >= 4) {
+            ESP_LOGE(TAG, "Invalid motor index: %d", index);
+            return;
+        }
+
+        // 先停止同电机的旧命令任务，避免多个任务并发覆盖 motor_speed_list
+        if (cmd_task_handle[index] != NULL) {
+            vTaskDelete(cmd_task_handle[index]);
+            cmd_task_handle[index] = NULL;
+            motor_speed_list[index] = 0;
+            // CHB-BLDC2418: 8191 = 停止（反相逻辑）
+            pwm_set_duty(8191, index);
+            ESP_LOGI(TAG, "Motor %d: old control task deleted by new command", index);
+        }
+
         // Allocate params on heap to ensure lifetime across task creation
         cmd_params *params = malloc(sizeof(cmd_params));
         if (params != NULL) {
             params->speed = speed;
             params->duration = duration;
             params->index = index;
-            
-            if (xTaskCreate(control_cmd, "CMD_TASK", 4096, (void*)params, 1, NULL) != pdPASS) {
+
+            if (xTaskCreate(control_cmd, "CMD_TASK", 4096, (void*)params, 1, &cmd_task_handle[index]) != pdPASS) {
                 ESP_LOGE(TAG, "Failed to create control task");
                 free(params);
+                cmd_task_handle[index] = NULL;
             }
         } else {
             ESP_LOGE(TAG, "Failed to allocate memory for cmd_params");

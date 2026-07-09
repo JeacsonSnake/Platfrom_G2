@@ -105,7 +105,7 @@ esp32_idf/
   - `esp32_1/heartbeat` - Heartbeat messages
   - `esp32_1/data` - Sensor/control data output
 - Command format: `cmd_<index>_<speed>_<duration>`
-- **Known issue**: Each `cmd_` message creates a new `control_cmd` task. Under MQTT broker delay/reordering, multiple tasks for the same motor may run concurrently, causing `motor_speed_list` to be overwritten and producing high→low speed switching overshoot. A fix is tracked in `2026_07_moter_modify/prompt/2026_07_08_fix_mqtt_command_race_condition.md`.
+- **Fixed**: Each `cmd_` message now reuses a per-motor task slot (`cmd_task_handle[4]`). When a new command arrives, the previous `control_cmd` task for that motor is deleted before the new one is created, preventing concurrent tasks from overwriting `motor_speed_list` and eliminating high→low speed switching overshoot. See `2026_07_moter_modify_2/prompt/2026_07_08_fix_mqtt_command_race_condition.md`.
 - Connection health check and error statistics tasks
 - Exponential backoff reconnection strategy
 - Keepalive: 60s, Session persistence enabled (`disable_clean_session = false`)
@@ -550,7 +550,7 @@ For production deployment, enable security features via `menuconfig` and use enc
 | Motor not responding | Verify PWM wiring; check inverted logic (duty 8191=OFF, 0=ON) |
 | PID oscillation | Adjust Kp/Ki/Kd parameters; check PCNT signal quality |
 | Motor overshoot | Soft-start should handle this; verify startup_phase logic |
-| High→low speed switching overshoot | Usually caused by MQTT broker delay/reordering and concurrent `control_cmd` tasks overwriting `motor_speed_list`. See `2026_07_moter_modify/prompt/2026_07_08_fix_mqtt_command_race_condition.md` |
+| High→low speed switching overshoot | Fixed by maintaining one `control_cmd` task per motor (`cmd_task_handle[4]`) and deleting the old task before creating a new one. If the issue persists, verify broker latency and check that the new task is being created successfully. See `2026_07_moter_modify_2/prompt/2026_07_08_fix_mqtt_command_race_condition.md` |
 | MAX31850 not detected | Check GPIO14 wiring; verify 4.7KΩ pull-up; check CRC errors |
 | Temperature reading invalid | Check thermocouple connection; look for fault flags (OC/SCG/SCV) |
 | 1-Wire CRC errors | Check bus capacitance; reduce wire length; verify pull-up resistor |
@@ -562,7 +562,7 @@ For production deployment, enable security features via `menuconfig` and use enc
 - [analyze.md](analyze.md) - ESP32-S3硬件分析报告（Flash 8MB, PSRAM 2MB, Secure Boot禁用等）
 - [Developer_Notes.md](Developer_Notes.md) - 开发者笔记（HTTP功能移除记录）
 - [2026_07_moter_modify/modified_final/2026_07_08_heat_detect_FIN_README.md](2026_07_moter_modify/modified_final/2026_07_08_heat_detect_FIN_README.md) - 电机 PID 调速优化最终总结报告
-- [2026_07_moter_modify/prompt/2026_07_08_fix_mqtt_command_race_condition.md](2026_07_moter_modify/prompt/2026_07_08_fix_mqtt_command_race_condition.md) - 修复 MQTT 命令并发问题的 harness prompt
+- [2026_07_moter_modify_2/prompt/2026_07_08_fix_mqtt_command_race_condition.md](2026_07_moter_modify_2/prompt/2026_07_08_fix_mqtt_command_race_condition.md) - 修复 MQTT 命令并发问题的 harness prompt
 
 ### External Documentation
 - [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/v5.5.2/esp32s3/index.html)
