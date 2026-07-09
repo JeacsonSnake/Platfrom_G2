@@ -182,22 +182,37 @@ struct PID_params{
     double min_pcnt;
 };
 
+// PID 分项输出（调参日志用）
+struct PID_terms{
+    // 比例项
+    double Pout;
+    // 积分项
+    double Iout;
+    // 微分项
+    double Dout;
+    // 误差
+    double error;
+};
+
 // PID 数据参数结构体
 struct PID_data{
     // integral 累计积分
     double integral;
     // 历史误差
     double pre_error;
-    // 上次输入
+    // 上次输入（已废弃，保留以兼容最小改动）
     double pre_input;
-    // 上次测量值（用于微分项）
+    // 上次测量值（微分先行使用，等价于 pre_current）
     double pre_measurement;
-    // 微分滤波状态
+    // 微分滤波状态（保留字段）
     double d_filtered;
+    // 上周期 PID 输出（速率限制器使用）
+    double pre_output;
 };
 
 // PID Calculation 计算方法
-double PID_Calculate(struct PID_params params, struct PID_data *data, double target_speed, double current_speed);
+// terms 为可选输出，传入非 NULL 时返回 P/I/D/error 分项
+double PID_Calculate(struct PID_params params, struct PID_data *data, double target_speed, double current_speed, struct PID_terms *terms);
 // PID Controller Init Function 单控制器初始化方法
 void PID_init(void* params);
 // PID Process Init Function 线程初始化

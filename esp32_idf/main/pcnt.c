@@ -90,9 +90,9 @@ void pcnt_monitor(void* params)
     bool startup_protection_active = true;
     // 记录上一周期电机是否运行，用于检测启动边沿并重置滤波器
     bool was_running = false;
-    // Max theoretical PCNT per 200ms: 450 pulses/sec * 0.2s = 90
-    // Allow some margin: 150 per 200ms (750/s) is max reasonable
-    const int MAX_REASONABLE_PCNT_PER_200MS = 150;
+    // Max theoretical PCNT per 200ms: 900 pulses/sec * 0.2s = 180
+    // Allow some margin: 250 per 200ms (1250/s) is max reasonable
+    const int MAX_REASONABLE_PCNT_PER_200MS = 250;
     // 启动保护期：3秒（等待12V电源稳定）
     const uint32_t STARTUP_PROTECTION_MS = 3000;
     // 空闲时的噪声阈值：电机停止时，PCNT超过此值视为噪声
@@ -154,8 +154,8 @@ void pcnt_monitor(void* params)
                                 pcnt_count_list[index] < 0);
             // 额外检测相对突刺：当前值显著大于最近中值（启动期前几个点不启用）
             if (!is_abnormal && pcnt_filter_ready[index] && 
-                pcnt_count_list[index] > median_raw * 5 + 30 && 
-                pcnt_count_list[index] > 50) {
+                pcnt_count_list[index] > median_raw * 8 + 50 && 
+                pcnt_count_list[index] > 100) {
                 is_abnormal = true;
             }
             if (is_abnormal) {
