@@ -9,6 +9,8 @@ This is an ESP32-S3 based motor control system with IoT capabilities, built usin
 **Key Features:**
 - 4-channel motor control with PWM output (GPIO 1, 4, 6, 8)
 - PID closed-loop speed control with anti-windup protection
+- PID Rate Limiter and conditional-integration anti-windup
+- PID state reset on `target=0` and on 0→non-zero transitions to prevent speed residual
 - Encoder feedback via PCNT (Pulse Counter) on GPIO 2, 5, 7, 9
 - 4-channel MAX31850KATB+ temperature sensor monitoring (GPIO 14, 1-Wire protocol)
 - WiFi station mode connectivity
@@ -103,6 +105,7 @@ esp32_idf/
   - `esp32_1/heartbeat` - Heartbeat messages
   - `esp32_1/data` - Sensor/control data output
 - Command format: `cmd_<index>_<speed>_<duration>`
+- **Known issue**: Each `cmd_` message creates a new `control_cmd` task. Under MQTT broker delay/reordering, multiple tasks for the same motor may run concurrently, causing `motor_speed_list` to be overwritten and producing high→low speed switching overshoot. A fix is tracked in `2026_07_moter_modify/prompt/2026_07_08_fix_mqtt_command_race_condition.md`.
 - Connection health check and error statistics tasks
 - Exponential backoff reconnection strategy
 - Keepalive: 60s, Session persistence enabled (`disable_clean_session = false`)
@@ -131,13 +134,15 @@ esp32_idf/
 
 ### pid.c
 - PID algorithm implementation with anti-windup protection
-- Default parameters: Kp=8, Ki=0.02, Kd=0.01
+- **Default parameters**: Kp=7.0, Ki=0.005, Kd=0.03
 - 4 independent PID controllers (one per motor)
-- Control period: ~10ms when PCNT data updated (`pcnt_updated_list` flag)
+- Control period: ~200ms synchronized with 5Hz PCNT sampling
 - Inverted PWM output (`8191 - (int)new_input`) for CHB-BLDC2418
+- **Rate Limiter**: `PID_MAX_OUTPUT_DELTA = 500.0`, limits per-cycle PID output change
+- **Conditional integration anti-windup**: pauses integral accumulation when predicted output would saturate in the same direction as the error
+- **PID state reset**: `data.integral`, `data.pre_error`, `data.pre_input` are cleared when `motor_speed_list[index] == 0` and when `target` transitions from 0 to non-zero, preventing residual high-speed output from affecting the next low-speed command
 - Soft-start protection: limits max PWM to 3000 for first 10 samples (~2 seconds), linearly ramping to 8191
 - Command execution task creation (`control_cmd`)
-- Integral windup prevention: conditionally rolls back integral if output saturates and error pushes same direction
 
 ### led.c
 - WS2812 RGB LED control via RMT peripheral
@@ -437,6 +442,7 @@ Testing is performed manually via:
 - Serial monitor observation at 115200 baud
 - MQTT client tools (`mosquitto_pub`, `mosquitto_sub`)
 - Python test scripts found in `2026_02_to_04_develop_detail/` (historical development records)
+- `2026_07_moter_modify/analyze_motor_log.py` — parses PID/PCNT serial logs and generates `低速区可控性调研报告.md` with speed-PWM curves and transient plots
 - LED status visual verification
 - `motor_test_client.py` — a Python MQTT client using `paho-mqtt` for motor integration testing
 
@@ -544,6 +550,7 @@ For production deployment, enable security features via `menuconfig` and use enc
 | Motor not responding | Verify PWM wiring; check inverted logic (duty 8191=OFF, 0=ON) |
 | PID oscillation | Adjust Kp/Ki/Kd parameters; check PCNT signal quality |
 | Motor overshoot | Soft-start should handle this; verify startup_phase logic |
+| High→low speed switching overshoot | Usually caused by MQTT broker delay/reordering and concurrent `control_cmd` tasks overwriting `motor_speed_list`. See `2026_07_moter_modify/prompt/2026_07_08_fix_mqtt_command_race_condition.md` |
 | MAX31850 not detected | Check GPIO14 wiring; verify 4.7KΩ pull-up; check CRC errors |
 | Temperature reading invalid | Check thermocouple connection; look for fault flags (OC/SCG/SCV) |
 | 1-Wire CRC errors | Check bus capacitance; reduce wire length; verify pull-up resistor |
@@ -554,6 +561,8 @@ For production deployment, enable security features via `menuconfig` and use enc
 - [CHB-BLDC2418-Motor-Configuration.md](hardware_info/CHB-BLDC2418-Motor-Configuration.md) - CHB-BLDC2418电机完整配置文档（规格参数、GPIO定义、PID设置）
 - [analyze.md](analyze.md) - ESP32-S3硬件分析报告（Flash 8MB, PSRAM 2MB, Secure Boot禁用等）
 - [Developer_Notes.md](Developer_Notes.md) - 开发者笔记（HTTP功能移除记录）
+- [2026_07_moter_modify/modified_final/2026_07_08_heat_detect_FIN_README.md](2026_07_moter_modify/modified_final/2026_07_08_heat_detect_FIN_README.md) - 电机 PID 调速优化最终总结报告
+- [2026_07_moter_modify/prompt/2026_07_08_fix_mqtt_command_race_condition.md](2026_07_moter_modify/prompt/2026_07_08_fix_mqtt_command_race_condition.md) - 修复 MQTT 命令并发问题的 harness prompt
 
 ### External Documentation
 - [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/v5.5.2/esp32s3/index.html)
