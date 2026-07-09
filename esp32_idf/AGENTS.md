@@ -106,10 +106,11 @@ esp32_idf/
   - `esp32_1/data` - Sensor/control data output
 - Command format: `cmd_<index>_<speed>_<duration>`
 - **Fixed**: Each `cmd_` message now reuses a per-motor task slot (`cmd_task_handle[4]`). When a new command arrives, the previous `control_cmd` task for that motor is deleted before the new one is created, preventing concurrent tasks from overwriting `motor_speed_list` and eliminating high→low speed switching overshoot. See `2026_07_moter_modify_2/prompt/2026_07_08_fix_mqtt_command_race_condition.md`.
+- **Non-blocking publish helper**: `mqtt_publish_safe()` skips `esp_mqtt_client_publish()` when MQTT is not connected, preventing caller tasks (PWM, PCNT, PID, heartbeat) from blocking during network outages.
 - Connection health check and error statistics tasks
 - Exponential backoff reconnection strategy
-- Keepalive: 60s, Session persistence enabled (`disable_clean_session = false`)
-- Reconnect timeout: 3000ms, Network timeout: 10000ms
+- Keepalive: 120s, Clean session (`disable_clean_session = true`)
+- Reconnect timeout: 8000ms, Network timeout: 15000ms
 - Buffer size: 4096 bytes (in + out)
 - Internal MQTT task: priority 4, stack 8192
 - Mutex-protected `connect_flag` and `subscribe_flag`
@@ -128,7 +129,8 @@ esp32_idf/
 - Count range: -10000 to +10000
 - Idle detection for motor stop state
 - Startup protection: 3-second noise filtering after boot
-- Abnormal value detection: >150 counts/200ms is reset to 0
+- **Median filter**: 3-sample median filter per channel to suppress single-sample pulse noise; outliers are replaced with the median instead of reset to 0, avoiding false stop detection by the PID loop
+- Abnormal value detection: raw values >150 counts/200ms or sudden spikes (>5x median + 30) are logged and replaced with the median
 - Idle noise threshold: 50 counts/200ms when `motor_speed_list[index] == 0`
 - Per-motor diagnostic statistics: zero-rate percentage logged every 50 samples (~10s) if >80%
 
@@ -563,6 +565,7 @@ For production deployment, enable security features via `menuconfig` and use enc
 - [analyze.md](analyze.md) - ESP32-S3硬件分析报告（Flash 8MB, PSRAM 2MB, Secure Boot禁用等）
 - [Developer_Notes.md](Developer_Notes.md) - 开发者笔记（HTTP功能移除记录）
 - [2026_07_moter_modify/modified_final/2026_07_08_heat_detect_FIN_README.md](2026_07_moter_modify/modified_final/2026_07_08_heat_detect_FIN_README.md) - 电机 PID 调速优化最终总结报告
+- [2026_07_moter_modify_2/2026-07-09-mqtt-stability-and-pcnt-median-filter_README.md](2026_07_moter_modify_2/2026-07-09-mqtt-stability-and-pcnt-median-filter_README.md) - MQTT 长时稳定性与 PCNT 中值滤波优化记录
 - [2026_07_moter_modify_2/prompt/2026_07_08_fix_mqtt_command_race_condition.md](2026_07_moter_modify_2/prompt/2026_07_08_fix_mqtt_command_race_condition.md) - 修复 MQTT 命令并发问题的 harness prompt
 
 ### External Documentation
