@@ -3,7 +3,8 @@
 **Date**: 2026-03-11  
 **Branch**: `feature/motor-control-config`  
 **Motor Model**: CHB-BLDC2418 Permanent Magnet Brushless DC Motor  
-**Motor Spec**: 12V, 9000 RPM (no-load) / 7750 RPM (rated), Power Supply 6V~12V  
+**Motor Spec**: 12V, 4500 RPM (no-load at 12V), Power Supply 6V~12V  
+> **注意**：电机参数表/铭牌可能标注 24V/9000 RPM，但在当前 12V 供电下实测空载转速约为 4500 RPM，因此 PID 量程按 4500 RPM 配置。  
 
 ---
 
@@ -15,8 +16,8 @@
 |-----------|-------|------|
 | Model | CHB-BLDC2418 | - |
 | Voltage | 12 | V |
-| No-load Speed | 9000 ± 10% | RPM |
-| Rated Speed | 7750 ± 10% | RPM |
+| No-load Speed | 4500 ± 10% | RPM (12V 实测空载) |
+| Rated Speed | 7750 ± 10% | RPM (24V 规格，不适用于 12V) |
 | Max Current | 0.16 | A |
 | Power Supply Range | 6~12 | V |
 
@@ -32,8 +33,8 @@
 | Direction | Motor -> ESP32 | - | FG is OUTPUT for motor |
 
 **Note**: 6 pulses per rotation means:
-- At 9000 RPM: 9000 × 6 = 54000 pulses/min = 900 pulses/sec
-- At 7750 RPM: 7750 × 6 = 46500 pulses/min = 775 pulses/sec
+- At 4500 RPM (12V 实测空载): 4500 × 6 = 27000 pulses/min = 450 pulses/sec
+- At 9000 RPM (24V 规格): 9000 × 6 = 54000 pulses/min = 900 pulses/sec
 
 ### 1.3 PWM Speed Control Specifications
 
@@ -129,10 +130,10 @@ With 6 pulses per rotation and 1-second sampling:
 ```
 PCNT count per second = (RPM / 60) × 6
 
-Max PCNT count at 9000 RPM (no-load):
-PCNT_max = (9000 / 60) × 6 = 900 pulses/second
+Max PCNT count at 4500 RPM (12V no-load):
+PCNT_max = (4500 / 60) × 6 = 450 pulses/second
 
-Recommended PID max_pcnt: 900
+Recommended PID max_pcnt: 450
 ```
 
 ### 3.4 PID Configuration
@@ -144,7 +145,7 @@ struct PID_params {
     .Kd         = 0.01,     // Derivative gain
     .max_pwm    = 8191,     // Maximum PWM duty
     .min_pwm    = 0,        // Minimum PWM duty
-    .max_pcnt   = 900,      // Max PCNT count (9000 RPM no-load)
+    .max_pcnt   = 450,      // Max PCNT count (4500 RPM at 12V)
     .min_pcnt   = 0         // Min PCNT count
 };
 ```
@@ -183,7 +184,7 @@ struct PID_params {
 | PWM Frequency | 20KHz | 5KHz | ESP32-S3 13-bit resolution constraint |
 | PWM Logic | Normal | Inverted | High = OFF, Low = ON |
 | FG Pulses/Rev | N/A | 6 | Motor specification |
-| Max PCNT | 435/450 | 900 | 9000 RPM × 6 / 60 = 900 |
+| Max PCNT | 900 | 450 | 12V 实测空载约 4500 RPM × 6 / 60 = 450 |
 
 ---
 
@@ -194,8 +195,8 @@ struct PID_params {
 - [ ] PWM frequency = 5KHz
 - [ ] Inverted PWM logic implemented
 - [ ] FG signal reading (6 pulses/rotation)
-- [ ] PID controller with max_pcnt = 900
-- [ ] Speed control range: 0~9000 RPM
+- [ ] PID controller with max_pcnt = 450
+- [ ] Speed control range: 0~4500 RPM
 
 ---
 

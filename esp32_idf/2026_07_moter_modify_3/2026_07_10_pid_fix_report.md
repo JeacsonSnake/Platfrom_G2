@@ -1,4 +1,4 @@
-# 2026-07-10 PID 结构修复与 9000 RPM 量程适配报告
+# 2026-07-10 PID 结构修复与 4500 RPM 量程适配报告
 
 ## 1. 诊断摘要
 
@@ -6,10 +6,10 @@
 
 | # | 问题 | 代码位置 | 现象/风险 |
 |---|------|----------|-----------|
-| 1 | 量程错误：`PID_MAX_PCNT` 仅 450 | `main/pid.c:18` | 按旧 4500 RPM 标定，9000 RPM 时空载会饱和 |
+| 1 | 量程错误：`PID_MAX_PCNT` 曾被误改为 900 | `main/pid.c:18` | 按 9000 RPM（24V）标定，12V 实际空载约 4500 RPM，900 量程导致目标值与实际速度严重不符 |
 | 2 | 位置式与增量式混合 | `main/pid.c:59` `output = data->pre_input + output;` | 积分/历史输出被累加两次，振荡与超调根源 |
 | 3 | 微分项对设定值突变敏感 | `main/pid.c:35` `derivative = (error - data->pre_error);` | 目标突变时产生 Derivative Kick |
-| 4 | PCNT 异常阈值过低 | `main/pcnt.c:95` `MAX_REASONABLE_PCNT_PER_200MS = 150;` | 9000 RPM 时 200ms 正常脉冲约 180，会被误判异常 |
+| 4 | PCNT 异常阈值过低 | `main/pcnt.c:95` `MAX_REASONABLE_PCNT_PER_200MS = 150;` | 4500 RPM 时 200ms 正常脉冲约 90，150 阈值偏紧 |
 | 5 | 积分限幅不精确 | `main/pid.c:47-52` 用 `±max_pwm` 限幅 `integral` | Ki 很小时积分 clamp 过保守 |
 | 6 | 软启动与状态重置耦合混乱 | `main/pid.c:142-155` 绝对上限软启动；`main/pid.c:173-187` 边沿检测在 PWM 输出后才清零 | `pre_input` 残留影响下一次启动 |
 
@@ -19,7 +19,7 @@
 
 | 决策项 | 用户确认结果 | 实现说明 |
 |--------|--------------|----------|
-| 电机规格 | 12V / 9000 RPM（空载）/ 7750 RPM（额定），供电 6V~12V | `PID_MAX_PCNT` 改为 900，文档同步更新 |
+| 电机规格 | 12V / 4500 RPM（空载实测），供电 6V~12V；9000 RPM 为 24V 规格 | `PID_MAX_PCNT` 改回 450，文档同步更新 |
 | PWM 频率 | 维持 5kHz 不变 | `pwm.c` / `main.h` 不改动 |
 | `PID_data` 结构体 | 最小改动 | 保留 `pre_input`/`d_filtered`，新增 `pre_output`，复用 `pre_measurement` 作为 `pre_current` |
 | PID 初始参数 | 保持当前 `Kp=7.0, Ki=0.005, Kd=0.03` | 仅做结构修复，参数作为「待整定」起点 |
@@ -33,7 +33,7 @@
 - `main/pid.c`：重写 `PID_Calculate` 为纯位置式 + 微分先行 + 条件积分 + 积分限幅 `±max_pwm/Ki`；`PID_init` 改为 Rate Limiter 软启动；启动/停止边沿清零状态；新增 `pid_log_terms()` 解耦日志。
 - `main/pcnt.c`：异常阈值 150 → 250；突刺检测 `5x+30/50` → `8x+50/100`。
 - `main/pwm.c`：**无改动**。已在 `pid.c` 的 `PID_data.pre_output` 中维护上周期输出，避免重复逻辑。
-- `hardware_info/CHB-BLDC2418-Motor-Configuration.md`：更新为 12V/9000 RPM 规格，同步 PWM 频率说明、FG 脉冲计算、PID `max_pcnt`、校验清单。
+- `hardware_info/CHB-BLDC2418-Motor-Configuration.md`：更新为 12V/4500 RPM 实测规格，说明 9000 RPM 为 24V 规格，同步 FG 脉冲计算、PID `max_pcnt`、校验清单。
 - `AGENTS.md`：同步电机规格与 Max PCNT 描述。
 
 ---
@@ -51,7 +51,7 @@ static const char* TAG = "PID_EVENT";
 //////////////////////// PID 可调参数 //////////////////////////
 //////////////////////////////////////////////////////////////
 // 以下参数集中在 pid.c 中定义，避免与 main.h 耦合，便于独立调试与快速回退。
-// 注意：当前 Kp/Ki/Kd 为结构修复前的经验起点，在 9000 RPM 量程下建议重新整定。
+// 注意：当前 Kp/Ki/Kd 为结构修复前的经验起点，在 4500 RPM 量程下建议重新整定。
 #define PID_KP                  (7.0)   // 比例增益（待整定）
 #define PID_KI                  (0.005) // 积分增益（待整定）
 #define PID_KD                  (0.03)  // 微分增益（待整定）
@@ -61,7 +61,7 @@ static const char* TAG = "PID_EVENT";
 #define PID_MAX_OUTPUT_DELTA    (450.0) // 正常运行每 200ms 最大输出变化
 #define PID_SOFTSTART_OUTPUT_DELTA (300.0) // 软启动阶段每 200ms 最大输出增加量
 #define PID_SOFTSTART_STEPS     (10)    // 软启动步数（10 * 200ms = 2s）
-#define PID_MAX_PCNT            (900)   // 最大 PCNT：9000 RPM / 60 * 6 pulses/rotation
+#define PID_MAX_PCNT            (450)   // 最大 PCNT：12V 供电下实际空载约 4500 RPM / 60 * 6 pulses/rotation
 #define PID_MIN_PCNT            (0)     // 最小 PCNT
 
 // 位置式 PID + 微分先行（Derivative on Measurement）+ 条件积分
@@ -156,7 +156,8 @@ void PID_init(void* params)
     };
 
     // CHB-BLDC2418 PID Parameters
-    // Max PCNT = (9000 RPM / 60) * 6 pulses/rotation = 900 pulses/sec
+    // 电机参数表可能标注 24V/9000 RPM，但当前 12V 供电下实际空载转速约 4500 RPM。
+    // Max PCNT = (4500 RPM / 60) * 6 pulses/rotation = 450 pulses/sec
     // Tuned for 200ms sampling interval (5Hz)
     struct PID_params pid_params = {
         .Kp         = PID_KP,
@@ -308,7 +309,7 @@ void control_cmd(void *params)
 ### 4.2 `main/pcnt.c` 修改片段
 
 ```c
-    // Max theoretical PCNT per 200ms: 900 pulses/sec * 0.2s = 180
+    // Max theoretical PCNT per 200ms: 450 pulses/sec * 0.2s = 90
     // Allow some margin: 250 per 200ms (1250/s) is max reasonable
     const int MAX_REASONABLE_PCNT_PER_200MS = 250;
 ```
@@ -333,7 +334,7 @@ void control_cmd(void *params)
 ### 5.1 关键公式
 
 - 转速换算：`RPM = pulses/sec × 60 / 6 = pulses/sec × 10`
-- 目标值范围：`0 ~ 900 pulses/sec`，对应 `0 ~ 9000 RPM`（空载）
+- 目标值范围：`0 ~ 450 pulses/sec`，对应 `0 ~ 4500 RPM`（12V 空载实测）
 - 每 200ms 原始计数：`raw = pulses/sec / 5`
 
 ### 5.2 当前代码中的起点参数
@@ -344,7 +345,7 @@ void control_cmd(void *params)
 #define PID_KD  (0.03)  // 待整定
 ```
 
-> **注意**：这些参数是结构修复前在 4500 RPM 量程下的经验值。由于算法结构已改为纯位置式 + 微分先行，相同数值在 9000 RPM 量程下的表现会不同，**务必重新整定**。
+> **注意**：这些参数是结构修复前在 4500 RPM 量程下的经验值。由于算法结构已改为纯位置式 + 微分先行，实际表现会不同，**务必重新整定**。
 
 ### 5.3 推荐手动整定流程
 
@@ -409,8 +410,8 @@ idf.py -p COM9 monitor
 
 - [ ] `idf.py build` 通过，无编译警告/错误。
 - [ ] 串口日志中 `Motor X PID: ...` 出现 `P=... I=... D=... err=...` 分项。
-- [ ] 发送 `cmd_0_900_10`（目标 9000 RPM）后电机能接近空载上限。
-- [ ] 发送 `cmd_0_90_10`（目标 900 RPM）后低速运行平稳，无抖动。
+- [ ] 发送 `cmd_0_450_10`（目标 4500 RPM）后电机能接近空载上限。
+- [ ] 发送 `cmd_0_45_10`（目标 450 RPM）后低速运行平稳，无抖动。
 - [ ] 高→低目标切换时无 residual 超速。
 - [ ] PCNT 日志无 `outlier rejected` 误报。
 

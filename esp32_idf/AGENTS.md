@@ -307,7 +307,7 @@ python -m esptool --port COM9 --chip esp32s3 read_flash 0x0 0x800000 firmware_du
 - **Inverted PWM logic**: High level = Motor OFF, Low level = Motor ON
 - **PWM Frequency**: 5KHz (compromise between noise and ESP32-S3 hardware limits)
 - **Recommended**: 15K~25KHz for noise reduction (but ESP32-S3 cannot achieve 20KHz + 13-bit simultaneously)
-- **Max PCNT**: 900 counts/sec at 9000 RPM no-load / 775 counts/sec at 7750 RPM rated (6 pulses per rotation)
+- **Max PCNT**: 450 counts/sec at 4500 RPM (12V no-load actual) / 900 counts/sec at 9000 RPM (24V datasheet) (6 pulses per rotation)
 - **Soft-start**: Initial PWM limited to 3000 for 2 seconds to prevent overshoot
 
 #### Motor Specifications Summary
@@ -315,10 +315,10 @@ python -m esptool --port COM9 --chip esp32s3 read_flash 0x0 0x800000 firmware_du
 | Parameter | Value | Description |
 |-----------|-------|-------------|
 | Model | CHB-BLDC2418 | 12V Permanent Magnet Brushless DC Motor (6V~12V supply) |
-| No-load Speed | 9000 ± 10% RPM | No-load rotation speed |
-| Rated Speed | 7750 ± 10% RPM | Rated rotation speed |
+| No-load Speed | 4500 ± 10% RPM | Actual no-load speed at 12V |
+| Rated Speed | 7750 ± 10% RPM | 24V datasheet rated speed |
 | Max Current | 0.16A | Per motor current consumption |
-| FG Signal | 6 pulses/rotation | Tachometer output (900 pulses/sec at 9000 RPM) |
+| FG Signal | 6 pulses/rotation | Tachometer output (450 pulses/sec at 4500 RPM, 12V) |
 | PWM Logic | Inverted | Duty 8191=OFF (stop), 0=ON (full speed) |
 | PWM Frequency | 15K~25KHz | Recommended for noise reduction |
 

@@ -90,7 +90,7 @@ void pcnt_monitor(void* params)
     bool startup_protection_active = true;
     // 记录上一周期电机是否运行，用于检测启动边沿并重置滤波器
     bool was_running = false;
-    // Max theoretical PCNT per 200ms: 900 pulses/sec * 0.2s = 180
+    // Max theoretical PCNT per 200ms: 450 pulses/sec * 0.2s = 90
     // Allow some margin: 250 per 200ms (1250/s) is max reasonable
     const int MAX_REASONABLE_PCNT_PER_200MS = 250;
     // 启动保护期：3秒（等待12V电源稳定）

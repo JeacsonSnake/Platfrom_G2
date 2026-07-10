@@ -16,7 +16,7 @@ static const char* TAG = "PID_EVENT";
 #define PID_MAX_OUTPUT_DELTA    (450.0) // 正常运行每 200ms 最大输出变化
 #define PID_SOFTSTART_OUTPUT_DELTA (300.0) // 软启动阶段每 200ms 最大输出增加量
 #define PID_SOFTSTART_STEPS     (10)    // 软启动步数（10 * 200ms = 2s）
-#define PID_MAX_PCNT            (900)   // 最大 PCNT：9000 RPM / 60 * 6 pulses/rotation
+#define PID_MAX_PCNT            (450)   // 最大 PCNT：12V 供电下实际空载约 4500 RPM / 60 * 6 pulses/rotation
 #define PID_MIN_PCNT            (0)     // 最小 PCNT
 
 // 位置式 PID + 微分先行（Derivative on Measurement）+ 条件积分
@@ -111,7 +111,8 @@ void PID_init(void* params)
     };
 
     // CHB-BLDC2418 PID Parameters
-    // Max PCNT = (9000 RPM / 60) * 6 pulses/rotation = 900 pulses/sec
+    // 电机参数表可能标注 24V/9000 RPM，但当前 12V 供电下实际空载转速约 4500 RPM。
+    // Max PCNT = (4500 RPM / 60) * 6 pulses/rotation = 450 pulses/sec
     // Tuned for 200ms sampling interval (5Hz)
     struct PID_params pid_params = {
         .Kp         = PID_KP,
