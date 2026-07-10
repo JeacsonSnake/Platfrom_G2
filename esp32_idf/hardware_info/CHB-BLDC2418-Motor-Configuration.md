@@ -131,9 +131,9 @@ With 6 pulses per rotation and 1-second sampling:
 PCNT count per second = (RPM / 60) × 6
 
 Max PCNT count at 4500 RPM (12V no-load):
-PCNT_max = (4500 / 60) × 6 = 450 pulses/second
+PCNT_max = (4500 / 60) × 6 = 450 pulses/second = 4500 RPM
 
-Recommended PID max_pcnt: 450
+Recommended PID max_pcnt: 4500 when using RPM as the control/telemetry unit (450 if using pulses/second)
 ```
 
 ### 3.4 PID Configuration
@@ -145,7 +145,7 @@ struct PID_params {
     .Kd         = 0.01,     // Derivative gain
     .max_pwm    = 8191,     // Maximum PWM duty
     .min_pwm    = 0,        // Minimum PWM duty
-    .max_pcnt   = 450,      // Max PCNT count (4500 RPM at 12V)
+    .max_pcnt   = 4500,     // Max target speed in RPM (4500 RPM at 12V no-load; equivalent to 450 pulses/second)
     .min_pcnt   = 0         // Min PCNT count
 };
 ```
@@ -184,7 +184,7 @@ struct PID_params {
 | PWM Frequency | 20KHz | 5KHz | ESP32-S3 13-bit resolution constraint |
 | PWM Logic | Normal | Inverted | High = OFF, Low = ON |
 | FG Pulses/Rev | N/A | 6 | Motor specification |
-| Max PCNT | 900 | 450 | 12V 实测空载约 4500 RPM × 6 / 60 = 450 |
+| Max PCNT | 900 (pulses/sec) | 4500 RPM (450 pulses/sec) | 12V 实测空载约 4500 RPM；控制/遥测单位已统一为 RPM |
 
 ---
 
@@ -195,7 +195,7 @@ struct PID_params {
 - [ ] PWM frequency = 5KHz
 - [ ] Inverted PWM logic implemented
 - [ ] FG signal reading (6 pulses/rotation)
-- [ ] PID controller with max_pcnt = 450
+- [ ] PID controller with max_pcnt = 4500 RPM (450 pulses/sec)
 - [ ] Speed control range: 0~4500 RPM
 
 ---

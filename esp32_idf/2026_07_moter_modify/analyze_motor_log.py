@@ -45,8 +45,8 @@ else:
 # 正则表达式
 PID_RE = re.compile(
     r"\[(?P<ts>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})\].*?"
-    r"PID_EVENT: Motor (?P<motor>\d+) PID: target=(?P<target>\d+)/s, "
-    r"actual=(?P<actual>-?\d+)/s \(raw=(?P<raw>-?\d+)/200ms\), "
+    r"PID_EVENT: Motor (?P<motor>\d+) PID: target=(?P<target>\d+) RPM, "
+    r"actual=(?P<actual>-?\d+) RPM \(raw=(?P<raw>-?\d+)/200ms\), "
     r"(?:err=[\d.-]+, P=[\d.-]+, I=[\d.-]+, D=[\d.-]+, )?"
     r"pid_out=(?P<pid_out>[\d.]+), pwm_duty=(?P<pwm_duty>\d+), (?:ss|startup)=(?P<startup>\d+)"
 )
@@ -105,12 +105,12 @@ def classify_segment(seg, prev_seg=None):
         is_from_zero = True
 
     has_initial_inertia = False
-    OUTLIER_THRESHOLD = 540
+    OUTLIER_THRESHOLD = 5400
     if is_from_zero and len(seg) >= 3:
         first_n = seg[:3]
-        # 过滤异常值后再判断；若前 3 个点任一速度超过目标 50%（且大于 10 pulses/sec），认为带惯性
+        # 过滤异常值后再判断；若前 3 个点任一速度超过目标 50%（且大于 100 RPM），认为带惯性
         valid_actuals = [r["actual"] for r in first_n if r["actual"] <= OUTLIER_THRESHOLD]
-        if valid_actuals and max(valid_actuals) > max(target * 0.5, 10):
+        if valid_actuals and max(valid_actuals) > max(target * 0.5, 100):
             has_initial_inertia = True
 
     return is_from_zero, has_initial_inertia
@@ -126,9 +126,9 @@ def analyze_segment(seg, is_from_zero=True, has_initial_inertia=False):
     duties = [r["pwm_duty"] for r in seg]
     pid_outs = [r["pid_out"] for r in seg]
 
-    # 过滤异常值：超过电机物理上限 120%（540 pulses/sec）的单点视为 PCNT 计数异常，
+    # 过滤异常值：超过电机物理上限 120%（5400 RPM）的单点视为 PCNT 计数异常，
     # 不参与稳态、超调等统计，但保留原始数据用于绘图。
-    OUTLIER_THRESHOLD = 540
+    OUTLIER_THRESHOLD = 5400
     filtered_actuals = [a for a in actuals if a <= OUTLIER_THRESHOLD]
     filtered_records = [r for r in seg if r["actual"] <= OUTLIER_THRESHOLD]
 
@@ -252,8 +252,8 @@ def plot_results(results, motor_id):
                     [t * 0.9 for t in targets],
                     [t * 1.1 for t in targets],
                     color='green', alpha=0.1, label='±10% error band')
-    ax.set_xlabel('Target Speed (pulses/sec)')
-    ax.set_ylabel('Steady Actual Speed (pulses/sec)')
+    ax.set_xlabel('Target Speed (RPM)')
+    ax.set_ylabel('Steady Actual Speed (RPM)')
     ax.set_title(f'Motor {motor_id}: Target vs Steady Actual Speed')
     ax.legend()
     ax.grid(True, alpha=0.3)
@@ -262,7 +262,7 @@ def plot_results(results, motor_id):
     ax = axes[1]
     ax.plot(targets, avg_duties, 'r-o', label='Average PWM duty', markersize=6)
     ax.axhline(y=0, color='gray', linestyle='--', linewidth=1)
-    ax.set_xlabel('Target Speed (pulses/sec)')
+    ax.set_xlabel('Target Speed (RPM)')
     ax.set_ylabel('PWM duty (8191=OFF, 0=ON)')
     ax.set_title(f'Motor {motor_id}: Target vs Steady PWM Duty')
     ax.legend()
@@ -281,8 +281,8 @@ def plot_transient(seg_results, motor_id):
     if not zero_start:
         return None
 
-    # 选一个有明显过冲的低速段：target=50
-    candidate = next((r for r in zero_start if r["target"] == 50), None)
+    # 选一个有明显过冲的低速段：target=500 RPM
+    candidate = next((r for r in zero_start if r["target"] == 500), None)
     if candidate is None:
         candidate = zero_start[0]
 
@@ -316,7 +316,7 @@ def plot_transient(seg_results, motor_id):
     ax1.plot(times, actuals, 'b-o', label='Actual speed', markersize=4)
     ax1.axhline(y=target, color='g', linestyle='--', label=f'Target {target}')
     ax1.set_xlabel('Time (s)')
-    ax1.set_ylabel('Actual Speed (pulses/sec)', color='b')
+    ax1.set_ylabel('Actual Speed (RPM)', color='b')
     ax1.tick_params(axis='y', labelcolor='b')
     ax1.legend(loc='upper left')
     ax1.grid(True, alpha=0.3)
@@ -364,7 +364,7 @@ def generate_report(results, seg_results, motor_id, fig_path, transient_path):
     lines.append("- 超调量 = max(0, 最大实际速度 - 目标速度)，反映启动或切换时的速度尖峰；")
     lines.append("  对于从 0 启动但前 3 个点仍带明显残余速度的段，从速度首次回落到目标值之后开始计算超调，避免把上一条命令的惯性误判为本次启动过冲。")
     lines.append("- 稳定时间（从 0 启动段）= 首次进入目标 ±10% 且后续不再越界的时间点。")
-    lines.append("- 异常值过滤：单点速度超过 540 pulses/sec（电机物理上限 450 的 120%）视为 PCNT 计数异常，不参与统计；")
+    lines.append("- 异常值过滤：单点速度超过 5400 RPM（电机物理上限 4500 的 120%）视为 PCNT 计数异常，不参与统计；")
     lines.append("  过滤后若稳态样本不足，该目标稳态值可能受异常点后的恢复期影响而偏低。")
     lines.append("")
     lines.append("## 2. 数据汇总表")
@@ -416,7 +416,7 @@ def generate_report(results, seg_results, motor_id, fig_path, transient_path):
         else:
             seg_type = "切换段"
         remark = ""
-        if not r["is_from_zero"] and r["overshoot"] > 50:
+        if not r["is_from_zero"] and r["overshoot"] > 500:
             remark = "切换惯性导致超速"
         elif r["is_from_zero"] and r["has_initial_inertia"]:
             remark = "初始速度为上一命令残余，已排除在超调外"
@@ -432,50 +432,50 @@ def generate_report(results, seg_results, motor_id, fig_path, transient_path):
     lines.append("## 6. 关键发现")
     lines.append("")
 
-    # 计算稳态误差：排除 target<=10、稳态为 0、以及样本不足（<20）的目标
-    valid_results = [r for r in results if r["target"] > 10 and r["avg_actual"] > 0 and r["total_samples"] >= 20]
+    # 计算稳态误差：排除 target<=100、稳态为 0、以及样本不足（<20）的目标
+    valid_results = [r for r in results if r["target"] > 100 and r["avg_actual"] > 0 and r["total_samples"] >= 20]
     if valid_results:
         max_error = max(abs((r["avg_actual"] - r["target"]) / r["target"] * 100) for r in valid_results)
         within_3pct = sum(1 for r in valid_results if abs((r["avg_actual"] - r["target"]) / r["target"] * 100) <= 3)
         lines.append(f"- **稳态控制精度**：target > 10 且样本充足的目标中，稳态最大误差约 {max_error:.1f}%，{within_3pct}/{len(valid_results)} 个目标误差在 ±3% 以内。")
 
-    switch_overshoot = [r for r in seg_results if not r["is_from_zero"] and r["overshoot"] > 50]
+    switch_overshoot = [r for r in seg_results if not r["is_from_zero"] and r["overshoot"] > 500]
     if switch_overshoot:
         max_over = max(r["overshoot"] for r in switch_overshoot)
-        lines.append(f"- **切换过冲**：共有 {len(switch_overshoot)} 个切换段出现超速（最大达 {max_over} pulses/sec）。")
+        lines.append(f"- **切换过冲**：共有 {len(switch_overshoot)} 个切换段出现超速（最大达 {max_over} RPM）。")
         lines.append("  - 原因：从上一条高目标命令切换到低目标时，电机未先停止，惯性导致实际速度远高于新目标。")
         lines.append("  - 该现象在本次测试中较普遍，因为多数命令是连续发送的，未等待电机完全停止。")
 
     inertia_segments = [r for r in seg_results if r["is_from_zero"] and r["has_initial_inertia"]]
     if inertia_segments:
-        lines.append(f"- **带惯性的从0启动段**：共检测到 {len(inertia_segments)} 个从 0 启动段在开始时仍带有上一条命令的残余速度（最大初始残余速度 {max(r['max_actual'] for r in inertia_segments):.0f} pulses/sec）。")
+        lines.append(f"- **带惯性的从0启动段**：共检测到 {len(inertia_segments)} 个从 0 启动段在开始时仍带有上一条命令的残余速度（最大初始残余速度 {max(r['max_actual'] for r in inertia_segments):.0f} RPM）。")
         lines.append("  - 这些段的超调已按首次回落到目标值之后重新计算，未把残余速度计入当前命令的超调。")
 
     zero_overshoot = [r for r in seg_results if r["is_from_zero"] and not r["has_initial_inertia"] and r["overshoot_pct"] > 20]
     if zero_overshoot:
         lines.append(f"- **启动过冲**：排除带惯性段后，有 {len(zero_overshoot)} 个真正从 0 启动的段出现 > 20% 超调。")
 
-    extreme = [r for r in seg_results if r["raw_max_actual"] > 540]
+    extreme = [r for r in seg_results if r["raw_max_actual"] > 5400]
     if extreme:
-        lines.append(f"- **PCNT 异常值**：检测到 {len(extreme)} 个 segment 中存在超过 540 pulses/sec 的单点计数，最大达 {max(r['raw_max_actual'] for r in extreme):.0f} pulses/sec；")
+        lines.append(f"- **PCNT 异常值**：检测到 {len(extreme)} 个 segment 中存在超过 5400 RPM 的单点计数，最大达 {max(r['raw_max_actual'] for r in extreme):.0f} RPM；")
         lines.append("  - 这些点可能是计数器溢出或电磁干扰导致的脉冲，已从统计中剔除。")
 
-    high_speed = [r for r in results if r["target"] >= 450]
+    high_speed = [r for r in results if r["target"] >= 4500]
     if high_speed:
         avg_high = statistics.mean(r["avg_actual"] for r in high_speed)
-        lines.append(f"- **高速区饱和**：目标 ≥ 450 pulses/sec 时，实际稳态速度平均约为 {avg_high:.1f} pulses/sec，已接近电机物理上限。")
+        lines.append(f"- **高速区饱和**：目标 ≥ 4500 RPM 时，实际稳态速度平均约为 {avg_high:.1f} RPM，已接近电机物理上限。")
 
     lines.append("")
     lines.append("## 7. 采样频率评估")
     lines.append("")
     lines.append("- 当前 PCNT 采样频率为 5Hz（200ms）。")
     lines.append("- 电机 FG 信号为 6 pulses/rotation，在 4500 RPM 时约为 450 pulses/sec。")
-    lines.append("- 200ms 窗口内最大计数约为 90，单个脉冲对应 5 pulses/sec，稳态速度分辨率约 1.1%。")
+    lines.append("- 200ms 窗口内最大计数约为 90，单个脉冲对应 50 RPM，稳态速度分辨率约 1.1%。")
     lines.append("- 从本日志的稳态数据看，5Hz 已能满足 ±3% 的控制精度，未出现因采样率不足导致的系统性失控。")
     lines.append("- **香农采样定理角度**：电机机械时间常数较大，速度信号带宽远低于 2.5Hz，5Hz 采样在理论上是足够的。")
     lines.append("- **是否提高采样率**：")
     lines.append("  - 若目标仅为稳态精度：当前 5Hz 足够，无需改动。")
-    lines.append("  - 若需进一步精细化启动/切换瞬态：可提高到 10Hz（100ms），但会牺牲分辨率（单脉冲对应 10 pulses/sec）。")
+    lines.append("  - 若需进一步精细化启动/切换瞬态：可提高到 10Hz（100ms），但会牺牲分辨率（单脉冲对应 100 RPM）。")
     lines.append("  - 不建议超过 10Hz，否则 PCNT 量化误差显著增大，反而影响低速控制。")
     lines.append("")
     lines.append("## 8. 结论与 Phase 2 实施记录")
@@ -498,25 +498,25 @@ def generate_report(results, seg_results, motor_id, fig_path, transient_path):
     max_switch = max((r["overshoot"] for r in seg_results if not r["is_from_zero"]), default=0)
     max_zero_clean = max((r["overshoot"] for r in seg_results if r["is_from_zero"] and not r["has_initial_inertia"]), default=0)
     max_zero_inertia = max((r["overshoot"] for r in seg_results if r["is_from_zero"] and r["has_initial_inertia"]), default=0)
-    lines.append(f"| 最大切换过冲 | {max_switch:.0f} pulses/sec | 高→低目标切换时惯性未散尽 |")
-    lines.append(f"| 真正从0启动最大过冲 | {max_zero_clean:.0f} pulses/sec | 排除带惯性段后 |")
-    lines.append(f"| 带惯性从0启动最大过冲 | {max_zero_inertia:.0f} pulses/sec | 已从残余速度之后重新计算 |")
-    # target=5 表现
-    target5_result = next((r for r in results if r["target"] == 5), None)
-    if target5_result:
-        if target5_result["avg_actual"] < 1:
-            lines.append("| target=5 表现 | 无法启动 | 从 0 启动段稳态实际速度接近 0 |")
+    lines.append(f"| 最大切换过冲 | {max_switch:.0f} RPM | 高→低目标切换时惯性未散尽 |")
+    lines.append(f"| 真正从0启动最大过冲 | {max_zero_clean:.0f} RPM | 排除带惯性段后 |")
+    lines.append(f"| 带惯性从0启动最大过冲 | {max_zero_inertia:.0f} RPM | 已从残余速度之后重新计算 |")
+    # target=50 表现
+    target50_result = next((r for r in results if r["target"] == 50), None)
+    if target50_result:
+        if target50_result["avg_actual"] < 10:
+            lines.append("| target=50 表现 | 无法启动 | 从 0 启动段稳态实际速度接近 0 |")
         else:
-            lines.append(f"| target=5 表现 | 可启动 | 稳态实际速度约 {target5_result['avg_actual']:.1f} pulses/sec |")
-    lines.append("| 高速饱和 | ~445 pulses/sec | 目标 ≥ 450 时接近电机物理上限 |")
+            lines.append(f"| target=50 表现 | 可启动 | 稳态实际速度约 {target50_result['avg_actual']:.1f} RPM |")
+    lines.append("| 高速饱和 | ~4450 RPM | 目标 ≥ 4500 时接近电机物理上限 |")
     lines.append("")
     lines.append("### 8.3 结论")
     lines.append("")
-    lines.append("1. **稳态可控性**：Motor 2 在 15~475 pulses/sec 范围内仍保持较好稳态精度。")
+    lines.append("1. **稳态可控性**：Motor 2 在 150~4750 RPM 范围内仍保持较好稳态精度。")
     lines.append("2. **瞬态表现**：真正从 0 启动的过冲较小；带惯性启动和切换段的\"超调\"主要是上一条命令的残余速度，通常与 MQTT broker 传输延迟或命令间隔不足有关。")
     lines.append("3. **高转速缓存问题**：在 `target=0` 时未清零 PID 的 `pre_input` 会导致下一条低转速命令启动瞬间输出过高；已在代码中修复：target=0 时强制输出 0 并清零 integral/pre_error/pre_input。")
-    lines.append("4. **PCNT 异常值**：发现个别超过 540 pulses/sec 的脉冲计数，可能是计数器溢出或干扰，已从统计中剔除。")
-    lines.append("5. **下一步建议**：若 target=5 仍无法启动，可进一步对 target < 10 设置独立启动 PWM 下限，或继续微调 Kp。")
+    lines.append("4. **PCNT 异常值**：发现个别超过 5400 RPM 的单点计数，可能是计数器溢出或干扰，已从统计中剔除。")
+    lines.append("5. **下一步建议**：若 target=50 仍无法启动，可进一步对 target < 100 设置独立启动 PWM 下限，或继续微调 Kp。")
     lines.append("")
     lines.append("---")
     lines.append("")

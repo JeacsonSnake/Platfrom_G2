@@ -104,7 +104,7 @@ esp32_idf/
   - `esp32_1/control` - Command reception
   - `esp32_1/heartbeat` - Heartbeat messages
   - `esp32_1/data` - Sensor/control data output
-- Command format: `cmd_<index>_<speed>_<duration>`
+- Command format: `cmd_<index>_<speed_rpm>_<duration>` — `speed_rpm` is the target motor speed in RPM (e.g. `cmd_2_800_10` sets motor 2 to 800 RPM for 10 seconds)
 - **Fixed**: Each `cmd_` message now reuses a per-motor task slot (`cmd_task_handle[4]`). When a new command arrives, the previous `control_cmd` task for that motor is deleted before the new one is created, preventing concurrent tasks from overwriting `motor_speed_list` and eliminating high→low speed switching overshoot. See `2026_07_moter_modify_2/prompt/2026_07_08_fix_mqtt_command_race_condition.md`.
 - **Non-blocking publish helper**: `mqtt_publish_safe()` skips `esp_mqtt_client_publish()` when MQTT is not connected, preventing caller tasks (PWM, PCNT, PID, heartbeat) from blocking during network outages.
 - Connection health check and error statistics tasks
@@ -307,7 +307,7 @@ python -m esptool --port COM9 --chip esp32s3 read_flash 0x0 0x800000 firmware_du
 - **Inverted PWM logic**: High level = Motor OFF, Low level = Motor ON
 - **PWM Frequency**: 5KHz (compromise between noise and ESP32-S3 hardware limits)
 - **Recommended**: 15K~25KHz for noise reduction (but ESP32-S3 cannot achieve 20KHz + 13-bit simultaneously)
-- **Max PCNT**: 450 counts/sec at 4500 RPM (12V no-load actual) / 900 counts/sec at 9000 RPM (24V datasheet) (6 pulses per rotation)
+- **Max PCNT**: 450 pulses/sec at 4500 RPM (12V no-load actual) / 900 pulses/sec at 9000 RPM (24V datasheet); 6 pulses/rotation. Control commands and telemetry use **RPM** (`RPM = pulses/sec × 10`).
 - **Soft-start**: Initial PWM limited to 3000 for 2 seconds to prevent overshoot
 
 #### Motor Specifications Summary
@@ -318,7 +318,7 @@ python -m esptool --port COM9 --chip esp32s3 read_flash 0x0 0x800000 firmware_du
 | No-load Speed | 4500 ± 10% RPM | Actual no-load speed at 12V |
 | Rated Speed | 7750 ± 10% RPM | 24V datasheet rated speed |
 | Max Current | 0.16A | Per motor current consumption |
-| FG Signal | 6 pulses/rotation | Tachometer output (450 pulses/sec at 4500 RPM, 12V) |
+| FG Signal | 6 pulses/rotation | Tachometer output (450 pulses/sec = 4500 RPM at 12V no-load) |
 | PWM Logic | Inverted | Duty 8191=OFF (stop), 0=ON (full speed) |
 | PWM Frequency | 15K~25KHz | Recommended for noise reduction |
 
@@ -473,9 +473,9 @@ Testing is performed manually via:
    # Subscribe to data channel
    mosquitto_sub -h 192.168.110.31 -t "esp32_1/data"
 
-   # Send control command
-   mosquitto_pub -h 192.168.110.31 -t "esp32_1/control" -m "cmd_0_100_5"
-   # Format: cmd_<motor_index>_<speed>_<duration_seconds>
+   # Send control command (speed is in RPM; 800 RPM is a common stirring speed)
+   mosquitto_pub -h 192.168.110.31 -t "esp32_1/control" -m "cmd_0_800_5"
+   # Format: cmd_<motor_index>_<speed_rpm>_<duration_seconds>
    ```
 
 3. **Monitor Test:**

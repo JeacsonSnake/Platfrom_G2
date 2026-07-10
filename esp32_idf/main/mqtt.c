@@ -166,6 +166,8 @@ void message_compare(char *msg)
     }
     else if(strncmp(msg, "cmd_", 4) == 0)
     {
+        // 命令格式: cmd_<motor_index>_<speed_rpm>_<duration_seconds>
+        // 例如 cmd_2_800_10 表示电机2以 800 RPM 运行 10 秒
         int index, speed, duration;
         sscanf(msg, "cmd_%d_%d_%d",  &index, &speed, &duration);
 

@@ -90,8 +90,8 @@ void pcnt_monitor(void* params)
     bool startup_protection_active = true;
     // 记录上一周期电机是否运行，用于检测启动边沿并重置滤波器
     bool was_running = false;
-    // Max theoretical PCNT per 200ms: 450 pulses/sec * 0.2s = 90
-    // Allow some margin: 250 per 200ms (1250/s) is max reasonable
+    // Max theoretical PCNT per 200ms: 450 pulses/sec * 0.2s = 90 (对应 4500 RPM)
+    // Allow some margin: 250 per 200ms is max reasonable
     const int MAX_REASONABLE_PCNT_PER_200MS = 250;
     // 启动保护期：3秒（等待12V电源稳定）
     const uint32_t STARTUP_PROTECTION_MS = 3000;
@@ -197,17 +197,17 @@ void pcnt_monitor(void* params)
             abnormal_check_enabled = true;
             
             // 如果不空闲则开始测量
-            // 将200ms原始值转换为每秒值，保持与旧版1秒采样相同的数值范围
-            int actual_per_sec = pcnt_count_list[index] * 5;
-            int target_per_sec = (int)motor_speed_list[index];
+            // 将200ms原始值转换为 RPM: RPM = pulses/200ms * 5 * (60/6) = pulses/200ms * 50
+            int actual_rpm = pcnt_count_list[index] * 50;
+            int target_rpm = (int)motor_speed_list[index];
             
             char buff[64];
-            // MQTT发布每秒值（0-450范围），与1秒采样时格式一致（QoS 0，非阻塞）
-            sprintf(buff, "pcnt_count_%d_%d", index, actual_per_sec);
+            // MQTT发布 RPM 值（0-4500范围）（QoS 0，非阻塞）
+            sprintf(buff, "pcnt_rpm_%d_%d", index, actual_rpm);
             mqtt_publish_safe(mqtt_telemetry_topic, buff, strlen(buff), 0, 0);
             
-            ESP_LOGI(TAG, "Motor %d running, PCNT=%d/s (raw=%d/200ms), target=%d/s", 
-                     index, actual_per_sec, pcnt_count_list[index], target_per_sec);
+            ESP_LOGI(TAG, "Motor %d running, PCNT=%d RPM (raw=%d/200ms), target=%d RPM", 
+                     index, actual_rpm, pcnt_count_list[index], target_rpm);
             idle = false;
             pcnt_updated_list[index] = true;
         }

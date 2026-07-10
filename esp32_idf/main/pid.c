@@ -17,7 +17,7 @@ static const char* TAG = "PID_EVENT";
 #define PID_MAX_BRAKING_DELTA   (900.0) // 正常运行每 200ms 最大输出减少量（减速/制动限制，允许更快刹车）
 #define PID_SOFTSTART_OUTPUT_DELTA (300.0) // 软启动阶段每 200ms 最大输出增加量
 #define PID_SOFTSTART_STEPS     (10)    // 软启动步数（10 * 200ms = 2s）
-#define PID_MAX_PCNT            (450)   // 最大 PCNT：12V 供电下实际空载约 4500 RPM / 60 * 6 pulses/rotation
+#define PID_MAX_PCNT            (4500)  // 最大转速：12V 供电下实际空载约 4500 RPM
 #define PID_MIN_PCNT            (0)     // 最小 PCNT
 
 // 位置式 PID + 微分先行（Derivative on Measurement）+ 条件积分
@@ -87,8 +87,8 @@ double PID_Calculate(struct PID_params params, struct PID_data *data, double tar
 // PID 分项日志解耦函数（开环测试期间暂不使用）
 // static void pid_log_terms(int index, double target, double actual, struct PID_terms *terms, double output, int pwm_duty, int startup_counter)
 // {
-//     ESP_LOGI(TAG, "Motor %d PID: target=%.0f/s, actual=%.0f/s (raw=%d/200ms), err=%.1f, P=%.1f, I=%.1f, D=%.1f, pid_out=%.0f, pwm_duty=%d, ss=%d",
-//              index, target, actual, pcnt_count_list[index],
+//     ESP_LOGI(TAG, "Motor %d PID: target=%.0f RPM, actual=%.0f RPM (raw=%d/200ms), err=%.1f, P=%.1f, I=%.1f, D=%.1f, pid_out=%.0f, pwm_duty=%d, ss=%d",
+//              index, target_rpm, actual_rpm, pcnt_count_list[index],
 //              terms->error, terms->Pout, terms->Iout, terms->Dout,
 //              output, pwm_duty, startup_counter);
 // }
@@ -111,9 +111,9 @@ void PID_init(void* params)
         .pre_output     = 0
     };
 
-    // CHB-BLDC2418 PID Parameters（开环测试期间暂不使用）
+    // CHB-BLDC2418 转速参数（开环测试期间暂不使用 PID 参数）
     // 电机参数表可能标注 24V/9000 RPM，但当前 12V 供电下实际空载转速约 4500 RPM。
-    // Max PCNT = (4500 RPM / 60) * 6 pulses/rotation = 450 pulses/sec
+    // 转速单位：RPM（cmd_2_800_10 表示 800 RPM）
     // Tuned for 200ms sampling interval (5Hz)
     // struct PID_params pid_params = {
     //     .Kp         = PID_KP,
@@ -135,9 +135,10 @@ void PID_init(void* params)
         if(pcnt_updated_list[index] == true)
         {
             double temp = motor_speed_list[index];
-            // Convert 200ms PCNT count to per-second rate for PID comparison
-            // pcnt_count_list is per 200ms, multiply by 5 to get per-second
-            double actual_speed_per_sec = pcnt_count_list[index] * 5;
+            // Convert 200ms PCNT raw count to RPM
+            // 6 PPR => RPM = pulses/sec * 60/6 = pulses/sec * 10
+            // pcnt_count_list is raw pulses per 200ms; RPM = pulses/200ms * 5 * 10 = pulses/200ms * 50
+            double actual_rpm = pcnt_count_list[index] * 50.0;
 
             // 启动边沿检测：从停止转为运行时重新启用软启动（速率限制）
             if (temp > 0 && prev_target_speed[index] == 0) {
@@ -197,8 +198,8 @@ void PID_init(void* params)
             pwm_set_duty(new_input_int, index);
 
             // 保持与 analyze_motor_log.py 兼容的日志格式
-            ESP_LOGI(TAG, "Motor %d PID: target=%.0f/s, actual=%.0f/s (raw=%d/200ms), pid_out=%.0f, pwm_duty=%d, ss=%d",
-                     index, temp, actual_speed_per_sec, pcnt_count_list[index], new_input, new_input_int, startup_counter);
+            ESP_LOGI(TAG, "Motor %d PID: target=%.0f RPM, actual=%.0f RPM (raw=%d/200ms), pid_out=%.0f, pwm_duty=%d, ss=%d",
+                     index, temp, actual_rpm, pcnt_count_list[index], new_input, new_input_int, startup_counter);
             pcnt_updated_list[index] = false;
 
             // 更新上周期目标速度
