@@ -46,8 +46,9 @@ else:
 PID_RE = re.compile(
     r"\[(?P<ts>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})\].*?"
     r"PID_EVENT: Motor (?P<motor>\d+) PID: target=(?P<target>\d+)/s, "
-    r"actual=(?P<actual>\d+)/s \(raw=(?P<raw>-?\d+)/200ms\), "
-    r"pid_out=(?P<pid_out>[\d.]+), pwm_duty=(?P<pwm_duty>\d+), startup=(?P<startup>\d+)"
+    r"actual=(?P<actual>-?\d+)/s \(raw=(?P<raw>-?\d+)/200ms\), "
+    r"(?:err=[\d.-]+, P=[\d.-]+, I=[\d.-]+, D=[\d.-]+, )?"
+    r"pid_out=(?P<pid_out>[\d.]+), pwm_duty=(?P<pwm_duty>\d+), (?:ss|startup)=(?P<startup>\d+)"
 )
 
 
