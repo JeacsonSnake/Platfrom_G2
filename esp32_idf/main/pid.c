@@ -13,7 +13,8 @@ static const char* TAG = "PID_EVENT";
 #define PID_MAX_PWM             (8191)  // 13-bit 最大值
 #define PID_MIN_PWM             (0)     // 输出下限（0 对应反相后 duty=8191，即停止）
 #define PID_OUTPUT_MIN_LIMIT    (0)     // PID 输出最小值限制，先保持 0；调研后若需限制最高速可调整
-#define PID_MAX_OUTPUT_DELTA    (450.0) // 正常运行每 200ms 最大输出变化
+#define PID_MAX_OUTPUT_DELTA    (450.0) // 正常运行每 200ms 最大输出增加量（加速限制）
+#define PID_MAX_BRAKING_DELTA   (900.0) // 正常运行每 200ms 最大输出减少量（减速/制动限制，允许更快刹车）
 #define PID_SOFTSTART_OUTPUT_DELTA (300.0) // 软启动阶段每 200ms 最大输出增加量
 #define PID_SOFTSTART_STEPS     (10)    // 软启动步数（10 * 200ms = 2s）
 #define PID_MAX_PCNT            (450)   // 最大 PCNT：12V 供电下实际空载约 4500 RPM / 60 * 6 pulses/rotation
@@ -164,13 +165,14 @@ void PID_init(void* params)
 
             // Rate Limiter: 限制相邻周期 PID 输出变化量，平滑 PWM 跳变
             // 软启动阶段使用更小的变化上限，防止启动过冲
+            // 正常运行时允许减速比加速更快，抑制高→低目标切换时的惯性过冲
             double delta = new_input - data.pre_output;
             double max_pos_delta = startup_phase ? PID_SOFTSTART_OUTPUT_DELTA : PID_MAX_OUTPUT_DELTA;
             if (delta > max_pos_delta) {
                 new_input = data.pre_output + max_pos_delta;
             }
-            else if (delta < -PID_MAX_OUTPUT_DELTA) {
-                new_input = data.pre_output - PID_MAX_OUTPUT_DELTA;
+            else if (delta < -PID_MAX_BRAKING_DELTA) {
+                new_input = data.pre_output - PID_MAX_BRAKING_DELTA;
             }
 
             // 软启动计数
