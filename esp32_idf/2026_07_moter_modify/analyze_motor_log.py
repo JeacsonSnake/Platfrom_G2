@@ -437,7 +437,7 @@ def generate_report(results, seg_results, motor_id, fig_path, transient_path):
     if valid_results:
         max_error = max(abs((r["avg_actual"] - r["target"]) / r["target"] * 100) for r in valid_results)
         within_3pct = sum(1 for r in valid_results if abs((r["avg_actual"] - r["target"]) / r["target"] * 100) <= 3)
-        lines.append(f"- **稳态控制精度**：target > 10 且样本充足的目标中，稳态最大误差约 {max_error:.1f}%，{within_3pct}/{len(valid_results)} 个目标误差在 ±3% 以内。")
+        lines.append(f"- **稳态控制精度**：target > 100 且样本充足的目标中，稳态最大误差约 {max_error:.1f}%，{within_3pct}/{len(valid_results)} 个目标误差在 ±3% 以内。")
 
     switch_overshoot = [r for r in seg_results if not r["is_from_zero"] and r["overshoot"] > 500]
     if switch_overshoot:
