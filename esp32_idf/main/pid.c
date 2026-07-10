@@ -6,14 +6,14 @@ static const char* TAG = "PID_EVENT";
 //////////////////////// PID 可调参数 //////////////////////////
 //////////////////////////////////////////////////////////////
 // 以下参数集中在 pid.c 中定义，避免与 main.h 耦合，便于独立调试与快速回退。
-// 注意：当前 Kp/Ki/Kd 为结构修复前的经验起点，在 9000 RPM 量程下建议重新整定。
+// 注意：当前 Kp/Ki/Kd 在开环测试期间暂不使用；4500 RPM 量程下建议重新整定。
 #define PID_KP                  (50.0)  // 比例增益（待整定；2026-07-10 基于实测数据上调）
 #define PID_KI                  (0.50)  // 积分增益（待整定；2026-07-10 基于实测数据大幅上调）
 #define PID_KD                  (0.30)  // 微分增益（待整定；2026-07-10 基于 200ms 采样周期上调）
 #define PID_MAX_PWM             (8191)  // 13-bit 最大值
 #define PID_MIN_PWM             (0)     // 输出下限（0 对应反相后 duty=8191，即停止）
 #define PID_OUTPUT_MIN_LIMIT    (0)     // PID 输出最小值限制，先保持 0；调研后若需限制最高速可调整
-#define PID_MAX_OUTPUT_DELTA    (450.0) // 正常运行每 200ms 最大输出增加量（加速限制）
+#define PID_MAX_OUTPUT_DELTA    (500.0) // 正常运行每 200ms 最大输出增加量（加速限制）
 #define PID_MAX_BRAKING_DELTA   (900.0) // 正常运行每 200ms 最大输出减少量（减速/制动限制，允许更快刹车）
 #define PID_SOFTSTART_OUTPUT_DELTA (300.0) // 软启动阶段每 200ms 最大输出增加量
 #define PID_SOFTSTART_STEPS     (10)    // 软启动步数（10 * 200ms = 2s）
@@ -84,14 +84,14 @@ double PID_Calculate(struct PID_params params, struct PID_data *data, double tar
     return output;
 }
 
-// PID 分项日志解耦函数
-static void pid_log_terms(int index, double target, double actual, struct PID_terms *terms, double output, int pwm_duty, int startup_counter)
-{
-    ESP_LOGI(TAG, "Motor %d PID: target=%.0f/s, actual=%.0f/s (raw=%d/200ms), err=%.1f, P=%.1f, I=%.1f, D=%.1f, pid_out=%.0f, pwm_duty=%d, ss=%d",
-             index, target, actual, pcnt_count_list[index],
-             terms->error, terms->Pout, terms->Iout, terms->Dout,
-             output, pwm_duty, startup_counter);
-}
+// PID 分项日志解耦函数（开环测试期间暂不使用）
+// static void pid_log_terms(int index, double target, double actual, struct PID_terms *terms, double output, int pwm_duty, int startup_counter)
+// {
+//     ESP_LOGI(TAG, "Motor %d PID: target=%.0f/s, actual=%.0f/s (raw=%d/200ms), err=%.1f, P=%.1f, I=%.1f, D=%.1f, pid_out=%.0f, pwm_duty=%d, ss=%d",
+//              index, target, actual, pcnt_count_list[index],
+//              terms->error, terms->Pout, terms->Iout, terms->Dout,
+//              output, pwm_duty, startup_counter);
+// }
 
 // 初始化PID控制器
 void PID_init(void* params)
@@ -111,19 +111,19 @@ void PID_init(void* params)
         .pre_output     = 0
     };
 
-    // CHB-BLDC2418 PID Parameters
+    // CHB-BLDC2418 PID Parameters（开环测试期间暂不使用）
     // 电机参数表可能标注 24V/9000 RPM，但当前 12V 供电下实际空载转速约 4500 RPM。
     // Max PCNT = (4500 RPM / 60) * 6 pulses/rotation = 450 pulses/sec
     // Tuned for 200ms sampling interval (5Hz)
-    struct PID_params pid_params = {
-        .Kp         = PID_KP,
-        .Ki         = PID_KI,
-        .Kd         = PID_KD,
-        .max_pwm    = PID_MAX_PWM,
-        .min_pwm    = PID_MIN_PWM,
-        .max_pcnt   = PID_MAX_PCNT,
-        .min_pcnt   = PID_MIN_PCNT
-    };
+    // struct PID_params pid_params = {
+    //     .Kp         = PID_KP,
+    //     .Ki         = PID_KI,
+    //     .Kd         = PID_KD,
+    //     .max_pwm    = PID_MAX_PWM,
+    //     .min_pwm    = PID_MIN_PWM,
+    //     .max_pcnt   = PID_MAX_PCNT,
+    //     .min_pcnt   = PID_MIN_PCNT
+    // };
 
     // 软启动状态
     bool startup_phase = true;  // true = 处于软启动阶段
@@ -139,31 +139,31 @@ void PID_init(void* params)
             // pcnt_count_list is per 200ms, multiply by 5 to get per-second
             double actual_speed_per_sec = pcnt_count_list[index] * 5;
 
-            // 启动边沿检测：从停止转为运行时，清零 PID 历史状态并重新软启动
-            // 防止上一条高转速命令的积分/历史输出残留影响下一条低转速命令
+            // 启动边沿检测：从停止转为运行时重新启用软启动（速率限制）
             if (temp > 0 && prev_target_speed[index] == 0) {
                 startup_phase = true;
                 startup_counter = 0;
-                data.integral = 0;
-                data.pre_error = 0;
-                data.pre_measurement = 0;
                 data.pre_output = 0;
-                ESP_LOGI(TAG, "Motor %d soft-start reset (target: 0 -> %.0f)", index, temp);
+                ESP_LOGI(TAG, "Motor %d open-loop soft-start reset (target: 0 -> %.0f)", index, temp);
             }
 
-            struct PID_terms terms = {0};
-            double new_input = PID_Calculate(pid_params, &data, temp, actual_speed_per_sec, &terms);
-
-            // 目标为 0 时强制输出 0（电机停止），并清零 PID 历史状态
-            if (temp == 0) {
-                new_input = 0;
-                data.integral = 0;
-                data.pre_error = 0;
-                data.pre_measurement = 0;
-                data.pre_output = 0;
+            // ========== 开环测试 ==========
+            //  hypothesis: CHB-BLDC2418 驱动板内部可能已经做了速度闭环，
+            //  因此 ESP32 侧不需要再跑 PID，直接把目标速度线性映射成 PWM 占空比即可。
+            //  target=0 -> output=0 (duty=8191, OFF)
+            //  target=PID_MAX_PCNT -> output=PID_MAX_PWM (duty=0, ON)
+            double new_input = 0.0;
+            if (temp > 0) {
+                new_input = temp * (PID_MAX_PWM / (double)PID_MAX_PCNT);
+                if (new_input > PID_MAX_PWM) {
+                    new_input = PID_MAX_PWM;
+                }
+                if (new_input < PID_MIN_PWM) {
+                    new_input = PID_MIN_PWM;
+                }
             }
 
-            // Rate Limiter: 限制相邻周期 PID 输出变化量，平滑 PWM 跳变
+            // Rate Limiter: 限制相邻周期 PWM 输出变化量，平滑跳变
             // 软启动阶段使用更小的变化上限，防止启动过冲
             // 正常运行时允许减速比加速更快，抑制高→低目标切换时的惯性过冲
             double delta = new_input - data.pre_output;
@@ -193,7 +193,9 @@ void PID_init(void* params)
 
             pwm_set_duty(new_input_int, index);
 
-            pid_log_terms(index, temp, actual_speed_per_sec, &terms, new_input, new_input_int, startup_counter);
+            // 保持与 analyze_motor_log.py 兼容的日志格式
+            ESP_LOGI(TAG, "Motor %d PID: target=%.0f/s, actual=%.0f/s (raw=%d/200ms), pid_out=%.0f, pwm_duty=%d, ss=%d",
+                     index, temp, actual_speed_per_sec, pcnt_count_list[index], new_input, new_input_int, startup_counter);
             pcnt_updated_list[index] = false;
 
             // 更新上周期目标速度
