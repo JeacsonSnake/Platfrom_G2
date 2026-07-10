@@ -147,14 +147,17 @@ void PID_init(void* params)
                 ESP_LOGI(TAG, "Motor %d open-loop soft-start reset (target: 0 -> %.0f)", index, temp);
             }
 
-            // ========== 开环测试 ==========
-            //  hypothesis: CHB-BLDC2418 驱动板内部可能已经做了速度闭环，
-            //  因此 ESP32 侧不需要再跑 PID，直接把目标速度线性映射成 PWM 占空比即可。
+            // ========== 开环控制 + 死区补偿 ==========
+            //  电机驱动板内部疑似已有速度闭环，ESP32 侧采用开环映射即可。
+            //  实测发现电机在输出 < ~300 时不转动（静摩擦死区），
+            //  因此当 target > 0 时加入一个最小输出偏移量，低速区目标才能真实对应转速。
             //  target=0 -> output=0 (duty=8191, OFF)
             //  target=PID_MAX_PCNT -> output=PID_MAX_PWM (duty=0, ON)
+            #define PID_OPENLOOP_OFFSET     (300.0)  // 死区补偿偏移量（待整定）
             double new_input = 0.0;
             if (temp > 0) {
-                new_input = temp * (PID_MAX_PWM / (double)PID_MAX_PCNT);
+                double slope = (PID_MAX_PWM - PID_OPENLOOP_OFFSET) / (double)PID_MAX_PCNT;
+                new_input = PID_OPENLOOP_OFFSET + temp * slope;
                 if (new_input > PID_MAX_PWM) {
                     new_input = PID_MAX_PWM;
                 }
