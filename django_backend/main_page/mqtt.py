@@ -14,7 +14,7 @@ import sys
 import json
 import threading
 import time
-from datetime import timedelta
+from datetime import datetime, timedelta
 from django.utils import timezone
 
 from django.apps import apps
@@ -230,6 +230,27 @@ def is_device_online(device_id):
     return state.get('is_online', False)
 
 
+def _auto_release_stale_busy_state(device_id, grace_seconds=30):
+    """若设备长期处于 busy 且已远超预期完成时间，自动释放为 idle，避免状态死锁。"""
+    state = _ensure_device_state(device_id)
+    if state is None:
+        return
+    if state.get('task_status') != 'busy':
+        return
+    current_task = state.get('current_task') or {}
+    expected_finished_at = current_task.get('expected_finished_at')
+    if not expected_finished_at:
+        return
+    try:
+        expected = datetime.fromisoformat(expected_finished_at)
+    except Exception:
+        return
+    if timezone.now() > expected + timedelta(seconds=grace_seconds):
+        print(f'Auto-release stale busy state for {device_id} (expected finished at {expected_finished_at})')
+        _set_device_task_status(device_id, 'idle', current_task={})
+        state['active_motors'] = set()
+
+
 def can_dispatch_to_device(device_id):
     """
     判断是否可以向指定 device_id 下发新任务。
@@ -238,6 +259,8 @@ def can_dispatch_to_device(device_id):
     state = _ensure_device_state(device_id)
     if state is None:
         return False, 'Unknown device'
+    # 防御性清理：若 busy 状态已过期，先自动释放
+    _auto_release_stale_busy_state(device_id)
     if not state.get('is_online', False):
         return False, 'Device is offline'
     task_status = state.get('task_status', 'idle')
@@ -261,6 +284,7 @@ def resolve_dispatchable_device_id(preferred_device_id=None):
     若都没有，则回退到 settings.MQTT_DEFAULT_DEVICE_ID。
     """
     if preferred_device_id:
+        _auto_release_stale_busy_state(preferred_device_id)
         ok, _ = can_dispatch_to_device(preferred_device_id)
         if ok:
             return preferred_device_id
@@ -269,6 +293,7 @@ def resolve_dispatchable_device_id(preferred_device_id=None):
         Device = apps.get_model('main_page', 'Device')
         # 遍历所有已注册设备，使用实时内存状态判断，而不是仅依赖 DB 的 is_online 字段
         for device in Device.objects.all().order_by('device_id'):
+            _auto_release_stale_busy_state(device.device_id)
             ok, _ = can_dispatch_to_device(device.device_id)
             if ok:
                 return device.device_id
@@ -1146,11 +1171,16 @@ def resume_devices(device_ids, resumed_by=''):
     return results
 
 
-def dispatch_motor_task(device_id, motor, speed, duration):
-    """向指定设备下发电机任务；下发前检查设备在线与空闲状态。"""
-    ok, reason = can_dispatch_to_device(device_id)
-    if not ok:
-        return {'success': False, 'error': reason}
+def dispatch_motor_task(device_id, motor, speed, duration, check_dispatch=True):
+    """向指定设备下发电机任务。
+
+    参数 check_dispatch：默认 True，下发前检查设备在线与空闲状态；
+    用于多电机调度时，首个电机已确认可下发，后续电机直接发布命令。
+    """
+    if check_dispatch:
+        ok, reason = can_dispatch_to_device(device_id)
+        if not ok:
+            return {'success': False, 'error': reason}
     if client is None or not client.is_connected():
         return {'success': False, 'error': 'MQTT client unavailable'}
 
@@ -1184,7 +1214,15 @@ def dispatch_motor_task(device_id, motor, speed, duration):
 def get_device_states():
     """获取当前所有设备的内存状态快照（用于 API 和 WebSocket 初始化）。"""
     with _device_states_lock:
-        return dict(_device_states)
+        states = dict(_device_states)
+    # 将不可 JSON 序列化的 set 转换为 list，避免 WebSocket/API 序列化失败
+    serializable = {}
+    for device_id, state in states.items():
+        copy = dict(state)
+        if isinstance(copy.get('active_motors'), set):
+            copy['active_motors'] = sorted(copy['active_motors'])
+        serializable[device_id] = copy
+    return serializable
 
 
 def publish_device_command(topic, payload):

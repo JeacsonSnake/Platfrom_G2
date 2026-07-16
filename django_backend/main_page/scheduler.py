@@ -99,12 +99,15 @@ class SpinningScheduler:
 
             dispatched_commands = []
             first_error = None
-            for motor in motors:
+            for index, motor in enumerate(motors):
+                # 多电机任务中，首个电机已通过 resolve_dispatchable_device_id 校验设备可用，
+                # 后续电机直接发布命令，避免被 can_dispatch_to_device 的 busy 状态拦截。
                 result = dispatch_motor_task(
                     device_id,
                     motor.motor_index,
                     task.motor_speed,
                     task.duration_sec,
+                    check_dispatch=(index == 0),
                 )
                 if result.get('success'):
                     dispatched_commands.append(result.get('command'))
