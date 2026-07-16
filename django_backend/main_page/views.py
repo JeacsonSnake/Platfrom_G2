@@ -255,6 +255,32 @@ def spinning_clear(request):
     return Response({'deleted': deleted_count}, status=status.HTTP_200_OK)
 
 
+@api_view(['POST'])
+def check_schedule_time(request):
+    """校验前端所选预约时间与服务端当前时间的偏差。"""
+    if not token_auth(request.data.get('token')):
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    scheduled_time_str = request.data.get('scheduled_time')
+    if not scheduled_time_str:
+        return Response({'detail': 'scheduled_time is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        naive_time = datetime.strptime(scheduled_time_str, '%Y-%m-%dT%H:%M:%S')
+    except ValueError:
+        return Response({'detail': 'Invalid scheduled_time format.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    scheduled_time = naive_time.replace(tzinfo=ZoneInfo(settings.TIME_ZONE))
+    server_now = timezone.now()
+    diff_seconds = (server_now - scheduled_time).total_seconds()
+
+    return Response({
+        'server_now': server_now.strftime('%Y-%m-%dT%H:%M:%S'),
+        'diff_seconds': diff_seconds,
+        'expired': diff_seconds > 0,
+    })
+
+
 @api_view(['GET', 'POST'])
 def test(request):
     records = []

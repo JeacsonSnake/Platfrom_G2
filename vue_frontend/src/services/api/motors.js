@@ -28,6 +28,10 @@ export default {
     return client.post('/api/spinning/clear/', { token })
   },
 
+  checkScheduleTime(token, scheduledTime) {
+    return client.post('/api/spinning/check_time/', { token, scheduled_time: scheduledTime })
+  },
+
   sendMqttMsg(topic, msg) {
     return client.post('/api/mqtt_msg/', { topic, msg })
   },

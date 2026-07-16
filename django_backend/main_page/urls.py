@@ -18,6 +18,7 @@ urlpatterns = [
     re_path(r'^spinning/cancel/$', views.spinning_cancel, name='spinning_cancel'),
     re_path(r'^spinning/delete/$', views.spinning_delete, name='spinning_delete'),
     re_path(r'^spinning/clear/$', views.spinning_clear, name='spinning_clear'),
+    re_path(r'^spinning/check_time/$', views.check_schedule_time, name='check_schedule_time'),
     re_path(r'^mqtt_msg/$', views.mqtt_msg, name='mqtt_msg'),
     re_path(r'^mqtt/reconnect/$', views.mqtt_reconnect, name='mqtt_reconnect'),
 

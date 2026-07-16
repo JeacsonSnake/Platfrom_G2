@@ -50,8 +50,9 @@
 
 <script>
 import motorsApi from '@/services/api/motors.js'
-import { ElMessageBox } from 'element-plus'
+import { ElMessageBox, ElMessage } from 'element-plus'
 import 'element-plus/es/components/message-box/style/css'
+import 'element-plus/es/components/message/style/css'
 import 'element-plus/theme-chalk/base.css'
 import ConsoleHeader from '@/components/ui/ConsoleHeader.vue'
 import MetricCard from '@/components/ui/MetricCard.vue'
@@ -117,27 +118,47 @@ export default {
             this.errors = []
             let scheduledTime = this.scheduleForm.scheduled_time
 
-            // 如果时间早于当前时间超过 30 秒，询问用户是否立即执行
+            // 以服务端当前时间为基准，根据偏差决定行为
             if (scheduledTime) {
-                const selected = new Date(scheduledTime.replace('T', ' '))
-                const now = new Date()
-                if (!isNaN(selected.getTime()) && (now - selected) > 30000) {
-                    try {
-                        await ElMessageBox.confirm(
-                            '预约时间已早于当前时间超过 30 秒，是否立即执行？',
-                            '时间过期',
-                            {
-                                confirmButtonText: '立即执行',
-                                cancelButtonText: '重新调整时间',
-                                type: 'warning',
-                                closeOnClickModal: false
-                            }
-                        )
-                        // 用户选择“立即执行”
-                        scheduledTime = this.formatDateTime(now)
-                    } catch {
-                        // 用户选择“重新调整时间”：取消发送，不执行任何操作
-                        return
+                let checkResult
+                try {
+                    const response = await motorsApi.checkScheduleTime(
+                        this.$store.state.token,
+                        scheduledTime
+                    )
+                    checkResult = response.data
+                } catch (error) {
+                    this.handleApiError(error)
+                    return
+                }
+
+                if (checkResult.expired) {
+                    if (checkResult.diff_seconds > 30) {
+                        // 超过 30 秒：询问用户是否立即执行
+                        try {
+                            await ElMessageBox.confirm(
+                                '预约时间已早于服务端当前时间超过 30 秒，是否立即执行？',
+                                '时间过期',
+                                {
+                                    confirmButtonText: '立即执行',
+                                    cancelButtonText: '重新调整时间（取消发送指令）',
+                                    type: 'warning',
+                                    closeOnClickModal: false
+                                }
+                            )
+                            // 用户选择“立即执行”
+                            scheduledTime = checkResult.server_now
+                        } catch {
+                            // 用户选择“重新调整时间”：取消发送，不执行任何操作
+                            return
+                        }
+                    } else {
+                        // 30 秒以内：自动调整为当前时间并立即执行
+                        ElMessage({
+                            message: '预约时间已略早于服务端当前时间，已自动调整为当前时间并立即执行',
+                            type: 'info'
+                        })
+                        scheduledTime = checkResult.server_now
                     }
                 }
             }
