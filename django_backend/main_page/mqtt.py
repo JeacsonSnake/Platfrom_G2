@@ -249,6 +249,19 @@ def _auto_release_stale_busy_state(device_id, grace_seconds=30):
         print(f'Auto-release stale busy state for {device_id} (expected finished at {expected_finished_at})')
         _set_device_task_status(device_id, 'idle', current_task={})
         state['active_motors'] = set()
+        # 任务已超时但未收到 task_finished，清零所有电机的 RPM 与健康状态
+        for motor_key in state.get('telemetry', {}):
+            state['telemetry'][motor_key]['rpm'] = 0
+            state['telemetry'][motor_key]['health_status'] = 'idle'
+            state['telemetry'][motor_key]['zero_samples'] = 0
+        try:
+            Device = apps.get_model('main_page', 'Device')
+            Device.objects.filter(device_id=device_id).update(
+                telemetry=state['telemetry'],
+                updated_at=timezone.now(),
+            )
+        except Exception as exc:
+            print(f'Auto-release telemetry DB update failed: {exc}')
 
 
 def can_dispatch_to_device(device_id):
