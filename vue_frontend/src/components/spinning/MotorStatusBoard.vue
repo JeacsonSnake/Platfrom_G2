@@ -111,12 +111,12 @@ export default {
             return map[status] || status
         },
         formatMac(device) {
-            const mac = device.mac_address || device.device_id || ''
-            const normalized = mac.toLowerCase().replace(/[^0-9a-f]/g, '')
+            const raw = device.mac_address || device.device_id || ''
+            const normalized = String(raw).toLowerCase().replace(/[^0-9a-f]/g, '')
             if (normalized.length === 12) {
-                return normalized.match(/.{1,2}/g).join(':')
+                return `esp32_${normalized}`
             }
-            return mac || device.device_id
+            return device.device_id || raw
         },
         selectDevice(deviceId) {
             if (deviceId !== this.selectedDeviceId) {

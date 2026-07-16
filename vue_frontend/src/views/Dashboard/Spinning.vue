@@ -36,7 +36,6 @@
                     :devices="devices"
                     :motors="motors"
                     v-model="scheduleForm"
-                    :errors="errors"
                     @submit="submitSchedule"
                 />
             </section>
@@ -112,7 +111,6 @@ export default {
                 duration_sec: 0
             },
             records: [],
-            errors: [],
             refreshInterval: null,
             loadingStatus: false
         }
@@ -125,13 +123,13 @@ export default {
             const device = this.selectedDevice
             if (!device) return ''
             if (device.label && device.label !== device.device_id) {
-                return `${device.label} (${this.formatMac(device)})`
+                return `${device.label} (${this.formatDeviceId(device)})`
             }
-            return this.formatMac(device)
+            return this.formatDeviceId(device)
         },
         selectedMotorDisplay() {
             if (!this.scheduleForm.motor_names.length) return ''
-            return this.scheduleForm.motor_names.join(', ')
+            return this.sortMotorsByIndex(this.scheduleForm.motor_names).join(', ')
         }
     },
     methods: {
@@ -186,15 +184,14 @@ export default {
             ElMessage({ message: 'Motor status refreshed', type: 'success' })
         },
         async submitSchedule() {
-            this.errors = []
             const { device_id, motor_names, scheduled_time, motor_speed, duration_sec } = this.scheduleForm
 
             if (!device_id) {
-                this.errors.push('Please select a device.')
+                ElMessage.error('Please select a device.')
                 return
             }
             if (!motor_names.length) {
-                this.errors.push('Please select at least one motor.')
+                ElMessage.error('Please select at least one motor.')
                 return
             }
 
@@ -259,31 +256,33 @@ export default {
                     ElMessage({ message: 'Schedule created', type: 'success' })
                 })
                 .catch(error => {
-                    if (error.response) {
-                        for (const property in error.response.data) {
-                            this.errors.push(`${property}: ${error.response.data[property]}`)
-                        }
-                    } else if (error.message) {
-                        this.errors.push(`Error:${error.message}`)
-                    } else {
-                        console.log(JSON.stringify(error))
-                    }
+                    this.handleApiError(error)
                 })
         },
         formatDateTime(date) {
             const pad = (n) => String(n).padStart(2, '0')
             return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
         },
-        formatMac(device) {
-            const mac = device.mac_address || device.device_id || ''
-            const normalized = String(mac).toLowerCase().replace(/[^0-9a-f]/g, '')
+        formatDeviceId(device) {
+            const raw = device.mac_address || device.device_id || ''
+            const normalized = String(raw).toLowerCase().replace(/[^0-9a-f]/g, '')
             if (normalized.length === 12) {
-                return normalized.match(/.{1,2}/g).join(':')
+                return `esp32_${normalized}`
             }
-            return mac
+            return device.device_id || raw
+        },
+        sortMotorsByIndex(names) {
+            return names.slice().sort((a, b) => {
+                const indexA = this.motorIndexFromName(a)
+                const indexB = this.motorIndexFromName(b)
+                return indexA - indexB
+            })
+        },
+        motorIndexFromName(name) {
+            const match = String(name).match(/(\d+)$/)
+            return match ? parseInt(match[1], 10) : 0
         },
         cancelSchedule(id) {
-            this.errors = []
             motorsApi
                 .cancelSchedule(this.$store.state.token, id)
                 .then(() => {
@@ -292,7 +291,6 @@ export default {
                 .catch(this.handleApiError)
         },
         deleteSchedule(id) {
-            this.errors = []
             motorsApi
                 .deleteSchedules(this.$store.state.token, [id])
                 .then(() => {
@@ -301,7 +299,6 @@ export default {
                 .catch(this.handleApiError)
         },
         deleteSelected(ids) {
-            this.errors = []
             motorsApi
                 .deleteSchedules(this.$store.state.token, ids)
                 .then(() => {
@@ -310,7 +307,6 @@ export default {
                 .catch(this.handleApiError)
         },
         clearSchedules() {
-            this.errors = []
             if (!confirm('Are you sure you want to clear all scheduled records?')) {
                 return
             }
@@ -322,15 +318,17 @@ export default {
                 .catch(this.handleApiError)
         },
         handleApiError(error) {
+            let messages = []
             if (error.response) {
                 for (const property in error.response.data) {
-                    this.errors.push(`${property}: ${error.response.data[property]}`)
+                    messages.push(`${property}: ${error.response.data[property]}`)
                 }
             } else if (error.message) {
-                this.errors.push(`Error:${error.message}`)
+                messages.push(`Error: ${error.message}`)
             } else {
                 console.log(JSON.stringify(error))
             }
+            messages.forEach(msg => ElMessage.error(msg))
         }
     }
 }

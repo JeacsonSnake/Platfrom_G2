@@ -67,9 +67,7 @@
         <button class="button is-dark" :disabled="!canSubmit" @click="$emit('submit')">Create Schedule</button>
     </div>
 
-    <div v-if="errors.length" class="console-message console-message--error">
-        <p v-for="error in errors" :key="error">{{ error }}</p>
-    </div>
+
 </template>
 
 <script>
@@ -97,10 +95,6 @@ export default {
                 motor_speed: 0,
                 duration_sec: 0
             })
-        },
-        errors: {
-            type: Array,
-            default: () => []
         }
     },
     emits: ['update:model-value', 'submit'],
@@ -138,7 +132,20 @@ export default {
             } else {
                 current.delete(motorName)
             }
-            this.updateField('motor_names', Array.from(current))
+            // 按电机索引从小到大排序
+            const sorted = this.sortMotorsByIndex(Array.from(current))
+            this.updateField('motor_names', sorted)
+        },
+        sortMotorsByIndex(names) {
+            return names.slice().sort((a, b) => {
+                const indexA = this.motorIndexFromName(a)
+                const indexB = this.motorIndexFromName(b)
+                return indexA - indexB
+            })
+        },
+        motorIndexFromName(name) {
+            const match = String(name).match(/(\d+)$/)
+            return match ? parseInt(match[1], 10) : 0
         },
         setImmediate() {
             this.updateField('scheduled_time', this.formatDateTime(new Date()))
@@ -148,19 +155,19 @@ export default {
             return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
         },
         formatDeviceLabel(device) {
-            const mac = this.formatMac(device.mac_address || device.device_id)
+            const id = this.formatDeviceId(device)
             if (device.label && device.label !== device.device_id) {
-                return `${device.label} (${mac})`
+                return `${device.label} (${id})`
             }
-            return mac
+            return id
         },
-        formatMac(value) {
-            if (!value) return ''
-            const normalized = String(value).toLowerCase().replace(/[^0-9a-f]/g, '')
+        formatDeviceId(device) {
+            const raw = device.mac_address || device.device_id || ''
+            const normalized = String(raw).toLowerCase().replace(/[^0-9a-f]/g, '')
             if (normalized.length === 12) {
-                return normalized.match(/.{1,2}/g).join(':')
+                return `esp32_${normalized}`
             }
-            return value
+            return device.device_id || raw
         }
     }
 }
@@ -290,15 +297,6 @@ export default {
 
 .button.is-light:hover {
     background: #f1f5f9;
-}
-
-.console-message {
-    margin-top: 1rem;
-    padding: 0.85rem 1rem;
-    border-radius: 14px;
-    background: #fff2f2;
-    border: 1px solid #f5d0d0;
-    color: #a13b3b;
 }
 
 @media screen and (max-width: 960px) {

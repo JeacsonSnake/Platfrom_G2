@@ -202,6 +202,7 @@ def _ensure_device_state(device_id):
                 'is_online': False,
                 'task_status': 'idle',
                 'current_task': {},
+                'active_motors': set(),
                 'telemetry': {},
                 'client_id': '',
             }
@@ -327,6 +328,9 @@ def _abort_device_task(device_id, reason, triggered_by='system'):
                 stop_results.append({'motor': motor, 'error': str(exc)})
 
     _set_device_task_status(device_id, 'error', current_task={}, reason=reason)
+    state = _ensure_device_state(device_id)
+    if state is not None:
+        state['active_motors'] = set()
     print(f'Device {device_id} task aborted: {reason}')
 
 
@@ -349,6 +353,7 @@ def acknowledge_device(device_ids, acknowledged_by=''):
             continue
 
         _set_device_task_status(device_id, 'idle', current_task={})
+        state['active_motors'] = set()
 
         _broadcast('device_status', {
             'device_id': device_id,
@@ -647,12 +652,19 @@ def _update_motor_health(device_id, motor, rpm):
 
 
 def _update_device_task(device_id, motor, speed, duration, event_type):
-    """更新内存中的设备任务状态并同步到数据库。"""
+    """更新内存中的设备任务状态并同步到数据库。
+
+    支持多电机并发：使用 active_motors 集合跟踪当前仍在运行的电机，
+    仅当所有电机都完成任务后才将设备状态恢复为 idle。
+    """
     state = _ensure_device_state(device_id)
     if state is None:
         return
     now = timezone.now()
+    active_motors = state.setdefault('active_motors', set())
+
     if event_type == 'create':
+        active_motors.add(motor)
         state['task_status'] = 'busy'
         state['current_task'] = {
             'motor': motor,
@@ -662,8 +674,11 @@ def _update_device_task(device_id, motor, speed, duration, event_type):
             'expected_finished_at': (now + timedelta(seconds=duration)).isoformat(),
         }
     elif event_type == 'finished':
-        state['task_status'] = 'idle'
-        state['current_task'] = {}
+        active_motors.discard(motor)
+        if not active_motors:
+            state['task_status'] = 'idle'
+            state['current_task'] = {}
+        # 若仍有电机在运行，保持 busy 与 current_task 不变
 
     # 同步数据库
     try:
@@ -994,8 +1009,7 @@ def on_message(mqtt_client, userdata, msg):
                     speed = int(parts[1])
                     duration = int(parts[2])
                     device_event_done(effective_device_id, motor)
-                    # 任务完成进入 completed 状态，等待用户验收确认后才恢复 idle
-                    _set_device_task_status(effective_device_id, 'completed', current_task={})
+                    # _update_device_task 已根据 active_motors 自动决定恢复 idle 或保持 busy
                     _update_spinning_status(effective_device_id, motor, speed, duration, 'FINISHED')
                     _broadcast('task_status', {
                         'device_id': effective_device_id,
