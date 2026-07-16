@@ -13,7 +13,20 @@
 
         <div class="field">
             <label class="label">Scheduled Time</label>
-            <VueDatePicker :model-value="date" @update:model-value="onDateChange" />
+            <div class="datetime-row">
+                <el-date-picker
+                    :model-value="modelValue.scheduled_time"
+                    type="datetime"
+                    placeholder="Select date and time"
+                    value-format="YYYY-MM-DDTHH:mm:ss"
+                    format="YYYY-MM-DD HH:mm:ss"
+                    style="flex: 1;"
+                    @update:model-value="updateField('scheduled_time', $event)"
+                />
+                <button class="button is-light" @click="setImmediate">
+                    立即执行
+                </button>
+            </div>
         </div>
 
         <div class="field">
@@ -37,13 +50,8 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue'
-import VueDatePicker from '@vuepic/vue-datepicker'
-import '@vuepic/vue-datepicker/dist/main.css'
-
 export default {
     name: 'ScheduleForm',
-    components: { VueDatePicker },
     props: {
         motors: {
             type: Array,
@@ -64,39 +72,22 @@ export default {
         }
     },
     emits: ['update:model-value', 'submit'],
-    setup(props, { emit }) {
-        const date = ref(props.modelValue.scheduled_time ? new Date(props.modelValue.scheduled_time) : undefined)
-
-        watch(() => props.modelValue.scheduled_time, (newVal) => {
-            date.value = newVal ? new Date(newVal) : undefined
-        })
-
-        return { date }
+    mounted() {
+        // 默认 Scheduled Time 为“立即执行”（当前本地时间）
+        if (!this.modelValue.scheduled_time) {
+            this.setImmediate()
+        }
     },
     methods: {
         updateField(key, value) {
             this.$emit('update:model-value', { ...this.modelValue, [key]: value })
         },
-        onDateChange(newDate) {
-            this.date = newDate
-            const formatted = newDate ? this.datetimeFormatter(newDate) : ''
-            this.updateField('scheduled_time', formatted)
+        setImmediate() {
+            this.updateField('scheduled_time', this.formatDateTime(new Date()))
         },
-        datetimeFormatter(date) {
-            const data = {
-                year: date.getFullYear(),
-                month: date.getMonth() + 1,
-                date: date.getDate(),
-                hours: date.getHours(),
-                minutes: date.getMinutes(),
-                seconds: date.getSeconds()
-            }
-            data.month = data.month >= 10 ? data.month : `0${data.month}`
-            data.date = data.date >= 10 ? data.date : `0${data.date}`
-            data.hours = data.hours >= 10 ? data.hours : `0${data.hours}`
-            data.minutes = data.minutes >= 10 ? data.minutes : `0${data.minutes}`
-            data.seconds = data.seconds >= 10 ? data.seconds : `0${data.seconds}`
-            return `${data.year}-${data.month}-${data.date}T${data.hours}:${data.minutes}:${data.seconds}`
+        formatDateTime(date) {
+            const pad = (n) => String(n).padStart(2, '0')
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
         }
     }
 }
@@ -107,6 +98,12 @@ export default {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.9rem;
+}
+
+.datetime-row {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
 }
 
 .action-row {
@@ -124,9 +121,29 @@ export default {
     color: #a13b3b;
 }
 
+.button.is-light {
+    padding: 0.55rem 0.9rem;
+    border-radius: 10px;
+    border: 1px solid rgba(15, 23, 36, 0.12);
+    background: #f8fafc;
+    color: #334155;
+    cursor: pointer;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.button.is-light:hover {
+    background: #f1f5f9;
+}
+
 @media screen and (max-width: 960px) {
     .form-grid {
         grid-template-columns: 1fr;
+    }
+
+    .datetime-row {
+        flex-direction: column;
+        align-items: stretch;
     }
 }
 </style>

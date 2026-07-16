@@ -10,9 +10,9 @@ import axios from 'axios'
 axios.defaults.baseURL = 'http://127.0.0.1:8000'
 // axios.defaults.baseURL = 'http://192.168.31.74:8000'
 
-// date picker
-import VueDatePicker from '@vuepic/vue-datepicker'
-import '@vuepic/vue-datepicker/dist/main.css'
+// ElementPlus
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
 
 import VxeUIAll from 'vxe-pc-ui'
 import 'vxe-pc-ui/es/style.css'
@@ -26,7 +26,7 @@ import './services/mqttMessage.css'
 
 const app = createApp(App)
 
-app.component('VueDatePicker', VueDatePicker);
+app.use(ElementPlus)
 
 app.use(router, axios)
 
