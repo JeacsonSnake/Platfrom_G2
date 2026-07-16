@@ -14,6 +14,7 @@ urlpatterns = [
     path('users/me/password/', views.change_password, name='users_me_password'),
     path('motors/', views.get_motors, name='motors'),
     path('spinning-jobs/', views.spinning, name='spinning_jobs'),
+    path('spinning-jobs/<int:job_id>/cancel/', views.spinning_cancel, name='spinning_jobs_cancel'),
     path('mqtt/messages/', views.mqtt_msg, name='mqtt_messages'),
     path('mqtt/reconnect/', views.mqtt_reconnect, name='mqtt_reconnect'),
     path('devices/', views.device_list, name='devices'),

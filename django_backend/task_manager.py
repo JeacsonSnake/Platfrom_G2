@@ -224,5 +224,10 @@ class Task_Manager():
 
 
 if __name__ == '__main__':
-    tm = Task_Manager()
-    tm.manager_init()
+    print(
+        'DEPRECATED: task_manager.py standalone scheduler is replaced by '
+        'main_page.scheduler.SpinningScheduler running inside the Django process. '
+        'Start Django (runserver / daphne) instead.'
+    )
+    # tm = Task_Manager()
+    # tm.manager_init()

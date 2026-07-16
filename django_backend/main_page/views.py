@@ -16,6 +16,7 @@ from .serializer import TaskSerializer, MotorControlSerializer, UserSerializer, 
 from django.contrib.auth.hashers import make_password, check_password
 from django.http import JsonResponse
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from django.utils import timezone
 
 from .token import create_token, check_token, token_auth
@@ -138,25 +139,61 @@ def get_motors(request):
 @api_view(['POST'])
 def spinning(request):
     if token_auth(request.data['token']):
-        if request.data['data']:
+        if request.data.get('data'):
             spin_instance = request.data['data']
             print(spin_instance)
-            if spin_instance['motor_name']:
-                spin_instance['scheduled_time'] = datetime.strptime(spin_instance['scheduled_time'],
-                                                                    '%Y-%m-%dT%H:%M:%S')
-                # print(spin_instance)
+            if spin_instance.get('motor_name'):
+                # 前端无时区字符串按 Django 配置的本地时区解析
+                naive_time = datetime.strptime(
+                    spin_instance['scheduled_time'],
+                    '%Y-%m-%dT%H:%M:%S',
+                )
+                spin_instance['scheduled_time'] = naive_time.replace(
+                    tzinfo=ZoneInfo(settings.TIME_ZONE)
+                )
                 spin_ser = SpinningSerializer(data=spin_instance)
                 if spin_ser.is_valid():
                     spin_ser.save()
                     return Response(status.HTTP_200_OK)
+                return Response(spin_ser.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response(status.HTTP_400_BAD_REQUEST)
         else:
             records = []
-            for record in Spinning.objects.all().values():
-                records.append(record)
+            for record in Spinning.objects.all().order_by('-scheduled_time').values():
                 record['scheduled_time'] = timezone.localtime(record['scheduled_time'])
-                # print(record)
+                if record.get('dispatched_at'):
+                    record['dispatched_at'] = timezone.localtime(record['dispatched_at'])
+                if record.get('completed_at'):
+                    record['completed_at'] = timezone.localtime(record['completed_at'])
+                records.append(record)
             return Response({'record_list': records}, status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def spinning_cancel(request, job_id=None):
+    """取消状态为 PENDING 的预约任务。"""
+    if not token_auth(request.data.get('token')):
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    record_id = job_id or request.data.get('id')
+    if not record_id:
+        return Response({'detail': 'id is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        spinning_record = Spinning.objects.get(id=record_id)
+    except Spinning.DoesNotExist:
+        return Response({'detail': 'Record not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    if spinning_record.status != 'PENDING':
+        return Response(
+            {'detail': f'Cannot cancel task with status {spinning_record.status}.'},
+            status=status.HTTP_409_CONFLICT,
+        )
+
+    spinning_record.status = 'CANCELLED'
+    spinning_record.save(update_fields=['status', 'updated_at'])
+    serializer = SpinningSerializer(spinning_record)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET', 'POST'])

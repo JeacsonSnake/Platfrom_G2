@@ -38,7 +38,7 @@
                     title="Registration List"
                     :badge="records.length + ' Item' + (records.length === 1 ? '' : 's')"
                 />
-                <ScheduleQueue :records="records" />
+                <ScheduleQueue :records="records" @cancel="cancelSchedule" />
             </section>
 
             <section class="panel-card">
@@ -78,9 +78,11 @@ export default {
     mounted() {
         this.getMotors()
         this.getRecords()
+        this.refreshInterval = setInterval(() => this.getRecords(), 5000)
     },
     beforeRouteLeave() {
         clearInterval(this.listener)
+        clearInterval(this.refreshInterval)
     },
     data() {
         return {
@@ -96,7 +98,8 @@ export default {
             real_speed: 0,
             target_speed: 0,
             listen_started: false,
-            listener: null
+            listener: null,
+            refreshInterval: null
         }
     },
     methods: {
@@ -122,11 +125,30 @@ export default {
             const payload = {
                 motor_name: this.scheduleForm.motor_name,
                 scheduled_time: this.scheduleForm.scheduled_time,
-                motor_speed: this.scheduleForm.motor_speed,
-                duration_sec: this.scheduleForm.duration_sec
+                motor_speed: Number(this.scheduleForm.motor_speed),
+                duration_sec: Number(this.scheduleForm.duration_sec)
             }
             motorsApi
                 .createSchedule(this.$store.state.token, payload)
+                .then(() => {
+                    this.getRecords()
+                })
+                .catch(error => {
+                    if (error.response) {
+                        for (const property in error.response.data) {
+                            this.errors.push(`${property}: ${error.response.data[property]}`)
+                        }
+                    } else if (error.message) {
+                        this.errors.push(`Error:${error.message}`)
+                    } else {
+                        console.log(JSON.stringify(error))
+                    }
+                })
+        },
+        cancelSchedule(id) {
+            this.errors = []
+            motorsApi
+                .cancelSchedule(this.$store.state.token, id)
                 .then(() => {
                     this.getRecords()
                 })

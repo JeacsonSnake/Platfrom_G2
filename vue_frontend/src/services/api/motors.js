@@ -16,6 +16,10 @@ export default {
     })
   },
 
+  cancelSchedule(token, id) {
+    return client.post('/api/spinning/cancel/', { token, id })
+  },
+
   sendMqttMsg(topic, msg) {
     return client.post('/api/mqtt_msg/', { topic, msg })
   },

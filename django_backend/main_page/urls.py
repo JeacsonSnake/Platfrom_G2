@@ -15,6 +15,7 @@ urlpatterns = [
     re_path(r'^get_motors/$', views.get_motors, name='get_motors'),
     re_path(r'^test/$', views.test, name='test'),
     re_path(r'^spinning/$', views.spinning, name='spinning'),
+    re_path(r'^spinning/cancel/$', views.spinning_cancel, name='spinning_cancel'),
     re_path(r'^mqtt_msg/$', views.mqtt_msg, name='mqtt_msg'),
     re_path(r'^mqtt/reconnect/$', views.mqtt_reconnect, name='mqtt_reconnect'),
 

@@ -1,6 +1,7 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
 
 # Create your models here.
 
@@ -32,6 +33,11 @@ class LoginRecord(models.Model):
 class Motor(models.Model):
     id = models.AutoField(primary_key=True, null=False)
     name = models.CharField(max_length=64, null=False)
+    motor_index = models.PositiveSmallIntegerField(
+        default=0,
+        validators=[MinValueValidator(0), MaxValueValidator(3)],
+        help_text='对应 ESP32 的电机索引 0-3'
+    )
     avaliable = models.BooleanField(default=True)
     description = models.CharField(max_length=256)
 
@@ -81,12 +87,38 @@ class MotorData(models.Model):
     data = models.IntegerField(null=False)
 
 
+SPINNING_STATUS_CHOICES = (
+    ('PENDING', 'Pending'),
+    ('SENT', 'Sent'),
+    ('FAILED', 'Failed'),
+    ('COMPLETED', 'Completed'),
+    ('CANCELLED', 'Cancelled'),
+)
+DEFAULT_SPINNING_STATUS = 'PENDING'
+
+
 class Spinning(models.Model):
     id = models.AutoField(primary_key=True, null=False)
     motor_name = models.CharField(max_length=128, null=False)
     scheduled_time = models.DateTimeField(null=False)
     motor_speed = models.IntegerField(null=False)
     duration_sec = models.IntegerField(null=False)
+    status = models.CharField(
+        max_length=16,
+        choices=SPINNING_STATUS_CHOICES,
+        default=DEFAULT_SPINNING_STATUS,
+        db_index=True,
+    )
+    device_id = models.CharField(
+        max_length=32,
+        default=getattr(settings, 'MQTT_DEFAULT_DEVICE_ID', 'esp32_1'),
+        help_text='目标设备逻辑标识，如 esp32_1',
+    )
+    dispatched_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    error_message = models.CharField(max_length=256, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
 # class UpdateRecord(models.Model):
 #     id = models.AutoField(primary_key=True, null=False)
