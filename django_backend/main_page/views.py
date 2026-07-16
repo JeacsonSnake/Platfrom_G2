@@ -27,6 +27,7 @@ from .mqtt import (
     emergency_stop, resume_devices, dispatch_motor_task, get_device_states,
     get_mqtt_connection_state, can_dispatch_to_device, acknowledge_device,
     _device_control_topic, _extract_device_id_from_topic, _broadcast,
+    resolve_dispatchable_device_id,
 )
 
 import requests
@@ -129,8 +130,14 @@ def change_password(request):
 @api_view(['POST'])
 def get_motors(request):
     if token_auth(request.data['token']):
+        target_device_id = resolve_dispatchable_device_id()
+        ok, _ = can_dispatch_to_device(target_device_id)
+        device_dispatchable = ok
+
         motors = []
-        for motor in Motor.objects.all().values():
+        for motor in Motor.objects.all().order_by('motor_index').values():
+            # 实际可用性由当前在线且可下发的设备决定，而非数据库默认值
+            motor['avaliable'] = device_dispatchable
             motors.append(motor)
         return Response({'motor_list': motors}, status.HTTP_200_OK)
     return Response(status=status.HTTP_403_FORBIDDEN)
@@ -151,6 +158,8 @@ def spinning(request):
                 spin_instance['scheduled_time'] = naive_time.replace(
                     tzinfo=ZoneInfo(settings.TIME_ZONE)
                 )
+                # 自动选择当前可下发的实际设备（优先在线的 ESP32 MAC 设备）
+                spin_instance['device_id'] = resolve_dispatchable_device_id()
                 spin_ser = SpinningSerializer(data=spin_instance)
                 if spin_ser.is_valid():
                     spin_ser.save()
@@ -194,6 +203,34 @@ def spinning_cancel(request, job_id=None):
     spinning_record.save(update_fields=['status', 'updated_at'])
     serializer = SpinningSerializer(spinning_record)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def spinning_delete(request):
+    """根据 id 列表删除预约记录。"""
+    if not token_auth(request.data.get('token')):
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    ids = request.data.get('ids')
+    if not ids or not isinstance(ids, list):
+        return Response({'detail': 'ids list is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    cleaned_ids = [i for i in ids if isinstance(i, int)]
+    if not cleaned_ids:
+        return Response({'detail': 'No valid ids provided.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    deleted_count, _ = Spinning.objects.filter(id__in=cleaned_ids).delete()
+    return Response({'deleted': deleted_count}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def spinning_clear(request):
+    """清空所有预约记录。"""
+    if not token_auth(request.data.get('token')):
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    deleted_count, _ = Spinning.objects.all().delete()
+    return Response({'deleted': deleted_count}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET', 'POST'])

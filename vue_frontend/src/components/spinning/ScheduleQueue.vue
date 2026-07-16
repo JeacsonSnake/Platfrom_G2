@@ -1,35 +1,70 @@
 <template>
-    <div v-if="records.length" class="board-table">
-        <div class="board-table__head board-table__head--records">
-            <span>ID</span>
-            <span>Motor</span>
-            <span>Scheduled Time</span>
-            <span>Speed</span>
-            <span>Duration</span>
-            <span>Status</span>
-            <span>Action</span>
-        </div>
-        <article class="board-row board-row--records" v-for="record in records" :key="record.id">
-            <div class="board-cell board-cell--strong">{{ record.id }}</div>
-            <div class="board-cell">{{ record.motor_name }}</div>
-            <div class="board-cell">{{ record.scheduled_time }}</div>
-            <div class="board-cell">{{ record.motor_speed }}</div>
-            <div class="board-cell">{{ record.duration_sec }}</div>
-            <div class="board-cell">
-                <span class="status-badge" :class="`status-badge--${record.status.toLowerCase()}`">
-                    {{ record.status }}
-                </span>
-            </div>
-            <div class="board-cell">
+    <div v-if="records.length" class="queue-panel">
+        <div class="queue-toolbar">
+            <label class="select-all">
+                <input
+                    type="checkbox"
+                    :checked="allSelected"
+                    @change="toggleSelectAll"
+                />
+                <span>Select All</span>
+            </label>
+            <div class="bulk-actions">
                 <button
-                    v-if="record.status === 'PENDING'"
                     class="button is-small is-danger is-outlined"
-                    @click="$emit('cancel', record.id)"
+                    :disabled="selectedIds.length === 0"
+                    @click="$emit('delete-selected', selectedIds)"
                 >
-                    Cancel
+                    Delete Selected
+                </button>
+                <button
+                    class="button is-small is-danger is-outlined"
+                    @click="$emit('clear-all')"
+                >
+                    Clear All
                 </button>
             </div>
-        </article>
+        </div>
+
+        <div class="board-table">
+            <div class="board-table__head board-table__head--records">
+                <span></span>
+                <span>ID</span>
+                <span>Motor</span>
+                <span>Scheduled Time</span>
+                <span>Speed</span>
+                <span>Duration</span>
+                <span>Status</span>
+                <span>Action</span>
+            </div>
+            <article class="board-row board-row--records" v-for="record in records" :key="record.id">
+                <div class="board-cell board-cell--center">
+                    <input
+                        type="checkbox"
+                        :value="record.id"
+                        v-model="selectedIds"
+                    />
+                </div>
+                <div class="board-cell board-cell--strong">{{ record.id }}</div>
+                <div class="board-cell">{{ record.motor_name }}</div>
+                <div class="board-cell">{{ record.scheduled_time }}</div>
+                <div class="board-cell">{{ record.motor_speed }}</div>
+                <div class="board-cell">{{ record.duration_sec }}</div>
+                <div class="board-cell">
+                    <span class="status-badge" :class="`status-badge--${record.status.toLowerCase()}`">
+                        {{ record.status }}
+                    </span>
+                </div>
+                <div class="board-cell">
+                    <button
+                        class="button is-small is-danger is-outlined"
+                        @click="$emit('delete', record.id)"
+                    >
+                        Delete
+                    </button>
+                </div>
+            </article>
+        </div>
     </div>
 
     <div v-else class="empty-state">
@@ -46,11 +81,67 @@ export default {
             default: () => []
         }
     },
-    emits: ['cancel']
+    emits: ['delete', 'delete-selected', 'clear-all'],
+    data() {
+        return {
+            selectedIds: []
+        }
+    },
+    computed: {
+        allSelected() {
+            return this.records.length > 0 && this.selectedIds.length === this.records.length
+        }
+    },
+    watch: {
+        records() {
+            // 删除已不存在的记录的选中状态
+            const existingIds = new Set(this.records.map(r => r.id))
+            this.selectedIds = this.selectedIds.filter(id => existingIds.has(id))
+        }
+    },
+    methods: {
+        toggleSelectAll(event) {
+            if (event.target.checked) {
+                this.selectedIds = this.records.map(r => r.id)
+            } else {
+                this.selectedIds = []
+            }
+        }
+    }
 }
 </script>
 
 <style scoped>
+.queue-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.queue-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0.8rem;
+    background: #f8fafc;
+    border: 1px solid rgba(15, 23, 36, 0.08);
+    border-radius: 12px;
+}
+
+.select-all {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: #334155;
+    cursor: pointer;
+}
+
+.bulk-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
 .board-table {
     border-radius: 18px;
     overflow: hidden;
@@ -62,13 +153,13 @@ export default {
     display: grid;
     grid-template-columns: 0.4fr 0.8fr 0.8fr 1.6fr;
     gap: 0.75rem;
-    align-items: start;
+    align-items: center;
     padding: 0.95rem 1rem;
 }
 
 .board-table__head--records,
 .board-row--records {
-    grid-template-columns: 0.35fr 0.75fr 1.2fr 0.5fr 0.5fr 0.7fr 0.7fr;
+    grid-template-columns: 0.35fr 0.3fr 0.65fr 1.1fr 0.45fr 0.45fr 0.65fr 0.6fr;
 }
 
 .board-table__head {
@@ -97,6 +188,11 @@ export default {
 .board-cell--strong {
     font-weight: 700;
     color: #111827;
+}
+
+.board-cell--center {
+    display: flex;
+    justify-content: center;
 }
 
 .status-badge {
@@ -150,8 +246,13 @@ export default {
     border-color: #fca5a5;
 }
 
-.button.is-danger:hover {
+.button.is-danger:hover:not(:disabled) {
     background: #fee2e2;
+}
+
+.button.is-danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .empty-state {
@@ -168,6 +269,12 @@ export default {
     .board-table__head--records,
     .board-row--records {
         grid-template-columns: 1fr;
+    }
+
+    .queue-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
     }
 }
 </style>

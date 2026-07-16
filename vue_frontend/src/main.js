@@ -10,10 +10,6 @@ import axios from 'axios'
 axios.defaults.baseURL = 'http://127.0.0.1:8000'
 // axios.defaults.baseURL = 'http://192.168.31.74:8000'
 
-// ElementPlus
-import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
-
 import VxeUIAll from 'vxe-pc-ui'
 import 'vxe-pc-ui/es/style.css'
 
@@ -25,8 +21,6 @@ import 'vxe-table/es/style.css'
 import './services/mqttMessage.css'
 
 const app = createApp(App)
-
-app.use(ElementPlus)
 
 app.use(router, axios)
 

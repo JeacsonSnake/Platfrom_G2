@@ -3,12 +3,11 @@ import threading
 import time
 from datetime import timedelta
 
-from django.conf import settings
 from django.db import close_old_connections
 from django.utils import timezone
 
 from .models import Motor, Spinning
-from .mqtt import dispatch_motor_task
+from .mqtt import dispatch_motor_task, resolve_dispatchable_device_id
 
 logger = logging.getLogger(__name__)
 
@@ -89,9 +88,7 @@ class SpinningScheduler:
             if motor is None:
                 raise ValueError(f'Motor "{task.motor_name}" not found')
 
-            device_id = task.device_id or getattr(
-                settings, 'MQTT_DEFAULT_DEVICE_ID', 'esp32_1'
-            )
+            device_id = resolve_dispatchable_device_id(task.device_id)
 
             result = dispatch_motor_task(
                 device_id,

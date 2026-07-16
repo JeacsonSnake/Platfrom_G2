@@ -20,6 +20,14 @@ export default {
     return client.post('/api/spinning/cancel/', { token, id })
   },
 
+  deleteSchedules(token, ids) {
+    return client.post('/api/spinning/delete/', { token, ids })
+  },
+
+  clearSchedules(token) {
+    return client.post('/api/spinning/clear/', { token })
+  },
+
   sendMqttMsg(topic, msg) {
     return client.post('/api/mqtt_msg/', { topic, msg })
   },

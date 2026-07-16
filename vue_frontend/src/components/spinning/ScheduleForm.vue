@@ -50,8 +50,12 @@
 </template>
 
 <script>
+import { ElDatePicker } from 'element-plus'
+import 'element-plus/es/components/date-picker/style/css'
+
 export default {
     name: 'ScheduleForm',
+    components: { ElDatePicker },
     props: {
         motors: {
             type: Array,

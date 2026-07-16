@@ -38,7 +38,13 @@
                     title="Registration List"
                     :badge="records.length + ' Item' + (records.length === 1 ? '' : 's')"
                 />
-                <ScheduleQueue :records="records" @cancel="cancelSchedule" />
+                <ScheduleQueue
+                    :records="records"
+                    @cancel="cancelSchedule"
+                    @delete="deleteSchedule"
+                    @delete-selected="deleteSelected"
+                    @clear-all="clearSchedules"
+                />
             </section>
 
             <section class="panel-card">
@@ -152,17 +158,48 @@ export default {
                 .then(() => {
                     this.getRecords()
                 })
-                .catch(error => {
-                    if (error.response) {
-                        for (const property in error.response.data) {
-                            this.errors.push(`${property}: ${error.response.data[property]}`)
-                        }
-                    } else if (error.message) {
-                        this.errors.push(`Error:${error.message}`)
-                    } else {
-                        console.log(JSON.stringify(error))
-                    }
+                .catch(this.handleApiError)
+        },
+        deleteSchedule(id) {
+            this.errors = []
+            motorsApi
+                .deleteSchedules(this.$store.state.token, [id])
+                .then(() => {
+                    this.getRecords()
                 })
+                .catch(this.handleApiError)
+        },
+        deleteSelected(ids) {
+            this.errors = []
+            motorsApi
+                .deleteSchedules(this.$store.state.token, ids)
+                .then(() => {
+                    this.getRecords()
+                })
+                .catch(this.handleApiError)
+        },
+        clearSchedules() {
+            this.errors = []
+            if (!confirm('Are you sure you want to clear all scheduled records?')) {
+                return
+            }
+            motorsApi
+                .clearSchedules(this.$store.state.token)
+                .then(() => {
+                    this.getRecords()
+                })
+                .catch(this.handleApiError)
+        },
+        handleApiError(error) {
+            if (error.response) {
+                for (const property in error.response.data) {
+                    this.errors.push(`${property}: ${error.response.data[property]}`)
+                }
+            } else if (error.message) {
+                this.errors.push(`Error:${error.message}`)
+            } else {
+                console.log(JSON.stringify(error))
+            }
         },
         set_speed() {
             this.errors = []

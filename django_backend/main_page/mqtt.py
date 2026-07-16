@@ -252,6 +252,30 @@ def can_dispatch_to_device(device_id):
     return True, ''
 
 
+def resolve_dispatchable_device_id(preferred_device_id=None):
+    """
+    解析当前可用于下发任务的设备 ID。
+    优先使用 preferred_device_id；若其不可下发，则返回第一个在线且空闲的已注册设备；
+    若都没有，则回退到 settings.MQTT_DEFAULT_DEVICE_ID。
+    """
+    if preferred_device_id:
+        ok, _ = can_dispatch_to_device(preferred_device_id)
+        if ok:
+            return preferred_device_id
+
+    try:
+        Device = apps.get_model('main_page', 'Device')
+        online_devices = Device.objects.filter(is_online=True).order_by('device_id')
+        for device in online_devices:
+            ok, _ = can_dispatch_to_device(device.device_id)
+            if ok:
+                return device.device_id
+    except Exception as exc:
+        print(f'Resolve dispatchable device failed: {exc}')
+
+    return getattr(settings, 'MQTT_DEFAULT_DEVICE_ID', 'esp32_1')
+
+
 def _set_device_task_status(device_id, new_status, current_task=None, reason=''):
     """统一更新设备任务状态并同步到数据库/WebSocket。"""
     state = _ensure_device_state(device_id)
