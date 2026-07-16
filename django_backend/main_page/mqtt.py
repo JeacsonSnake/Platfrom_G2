@@ -231,7 +231,7 @@ def is_device_online(device_id):
     return state.get('is_online', False)
 
 
-def _auto_release_stale_busy_state(device_id, grace_seconds=30):
+def _auto_release_stale_busy_state(device_id, grace_seconds=5):
     """若设备长期处于 busy 且已远超预期完成时间，自动释放为 idle，避免状态死锁。"""
     state = _ensure_device_state(device_id)
     if state is None:
