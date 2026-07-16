@@ -50,6 +50,9 @@
 
 <script>
 import motorsApi from '@/services/api/motors.js'
+import { ElMessageBox } from 'element-plus'
+import 'element-plus/es/components/message-box/style/css'
+import 'element-plus/theme-chalk/base.css'
 import ConsoleHeader from '@/components/ui/ConsoleHeader.vue'
 import MetricCard from '@/components/ui/MetricCard.vue'
 import PanelHeader from '@/components/ui/PanelHeader.vue'
@@ -110,11 +113,38 @@ export default {
                     this.records = response.data.record_list
                 })
         },
-        submitSchedule() {
+        async submitSchedule() {
             this.errors = []
+            let scheduledTime = this.scheduleForm.scheduled_time
+
+            // 如果时间早于当前时间超过 30 秒，询问用户是否立即执行
+            if (scheduledTime) {
+                const selected = new Date(scheduledTime.replace('T', ' '))
+                const now = new Date()
+                if (!isNaN(selected.getTime()) && (now - selected) > 30000) {
+                    try {
+                        await ElMessageBox.confirm(
+                            '预约时间已早于当前时间超过 30 秒，是否立即执行？',
+                            '时间过期',
+                            {
+                                confirmButtonText: '立即执行',
+                                cancelButtonText: '重新调整时间',
+                                type: 'warning',
+                                closeOnClickModal: false
+                            }
+                        )
+                        // 用户选择“立即执行”
+                        scheduledTime = this.formatDateTime(now)
+                    } catch {
+                        // 用户选择“重新调整时间”：取消发送，不执行任何操作
+                        return
+                    }
+                }
+            }
+
             const payload = {
                 motor_name: this.scheduleForm.motor_name,
-                scheduled_time: this.scheduleForm.scheduled_time,
+                scheduled_time: scheduledTime,
                 motor_speed: Number(this.scheduleForm.motor_speed),
                 duration_sec: Number(this.scheduleForm.duration_sec)
             }
@@ -134,6 +164,10 @@ export default {
                         console.log(JSON.stringify(error))
                     }
                 })
+        },
+        formatDateTime(date) {
+            const pad = (n) => String(n).padStart(2, '0')
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
         },
         cancelSchedule(id) {
             this.errors = []
