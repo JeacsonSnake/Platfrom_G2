@@ -255,7 +255,8 @@ def can_dispatch_to_device(device_id):
 def resolve_dispatchable_device_id(preferred_device_id=None):
     """
     解析当前可用于下发任务的设备 ID。
-    优先使用 preferred_device_id；若其不可下发，则返回第一个在线且空闲的已注册设备；
+    优先使用 preferred_device_id；若其不可下发，则遍历所有已注册设备，
+    通过实时内存状态 (can_dispatch_to_device) 找到第一个在线且空闲的设备；
     若都没有，则回退到 settings.MQTT_DEFAULT_DEVICE_ID。
     """
     if preferred_device_id:
@@ -265,8 +266,8 @@ def resolve_dispatchable_device_id(preferred_device_id=None):
 
     try:
         Device = apps.get_model('main_page', 'Device')
-        online_devices = Device.objects.filter(is_online=True).order_by('device_id')
-        for device in online_devices:
+        # 遍历所有已注册设备，使用实时内存状态判断，而不是仅依赖 DB 的 is_online 字段
+        for device in Device.objects.all().order_by('device_id'):
             ok, _ = can_dispatch_to_device(device.device_id)
             if ok:
                 return device.device_id

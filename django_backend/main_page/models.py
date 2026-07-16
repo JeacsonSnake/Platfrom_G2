@@ -41,14 +41,6 @@ class Motor(models.Model):
     avaliable = models.BooleanField(default=True)
     description = models.CharField(max_length=256)
 
-DEVICE_CHOICES = (
-    (1, 'ESP32S3_1'),
-    (2, 'ESP32S3_2'),
-    (3, 'ESP32S3_3'),
-    (4, 'ESP32S3_4')
-)
-DEFAULT_DEVICE = 1
-
 EVENT_STATUS = (
     (1, 'Active'),
     (2, 'Done')
@@ -58,7 +50,11 @@ DEFAULT_EVENT_STATUS = 1
 class MotorEvent(models.Model):
     id = models.AutoField(primary_key=True, null=False)
     timestamp = models.DateTimeField(auto_now_add=True, null=False)
-    device_id = models.IntegerField(choices=DEVICE_CHOICES, default=DEFAULT_DEVICE)
+    device_id = models.CharField(
+        max_length=32,
+        default=getattr(settings, 'MQTT_DEFAULT_DEVICE_ID', 'esp32_1'),
+        help_text='ESP32 设备逻辑标识，如 esp32_7cdfa1e6d3cc',
+    )
     motor = models.IntegerField(null=False)
     speed = models.IntegerField(null=False)
     time  = models.IntegerField(null=False)
@@ -66,12 +62,12 @@ class MotorEvent(models.Model):
 
 
 MOTOR_CHOICES = (
-    (1, 'Motor_0'),
-    (2, 'Motor_1'),
-    (3, 'Motor_2'),
-    (4, 'Motor_3'),
+    (0, 'Motor_0'),
+    (1, 'Motor_1'),
+    (2, 'Motor_2'),
+    (3, 'Motor_3'),
 )
-DEFAULT_MOTOR = 1
+DEFAULT_MOTOR = 0
 MOTOR_DATA_TYPE = (
     (1, 'PCNT'),
     (2, 'PWM')
