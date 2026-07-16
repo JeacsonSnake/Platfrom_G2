@@ -98,6 +98,11 @@ DEFAULT_SPINNING_STATUS = 'PENDING'
 class Spinning(models.Model):
     id = models.AutoField(primary_key=True, null=False)
     motor_name = models.CharField(max_length=128, null=False)
+    motor_names = models.JSONField(
+        default=list,
+        blank=True,
+        help_text='多电机调度时存储选中的电机名称列表',
+    )
     scheduled_time = models.DateTimeField(null=False)
     motor_speed = models.IntegerField(null=False)
     duration_sec = models.IntegerField(null=False)
@@ -119,6 +124,12 @@ class Spinning(models.Model):
     error_message = models.CharField(max_length=256, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    def effective_motor_names(self):
+        """返回有效的电机名称列表；兼容旧版单电机记录。"""
+        if self.motor_names:
+            return list(self.motor_names)
+        return [self.motor_name] if self.motor_name else []
 
 # class UpdateRecord(models.Model):
 #     id = models.AutoField(primary_key=True, null=False)

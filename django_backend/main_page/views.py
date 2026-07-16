@@ -127,10 +127,28 @@ def change_password(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+def _format_device_mac(device_id_or_mac):
+    """统一把 device_id 或裸 MAC 格式化为标准 MAC 地址显示。"""
+    if not device_id_or_mac:
+        return ''
+    raw = str(device_id_or_mac).lower().replace(':', '').replace('-', '').replace('_', '')
+    # 兼容 esp32_<mac> 形式
+    if raw.startswith('esp32'):
+        raw = raw[5:]
+    if len(raw) == 12 and all(c in '0123456789abcdef' for c in raw):
+        return ':'.join(raw[i:i + 2] for i in range(0, 12, 2))
+    return device_id_or_mac
+
+
 @api_view(['POST'])
 def get_motors(request):
     if token_auth(request.data['token']):
-        target_device_id = resolve_dispatchable_device_id()
+        requested_device_id = request.data.get('device_id')
+        if requested_device_id:
+            target_device_id = requested_device_id
+        else:
+            target_device_id = resolve_dispatchable_device_id()
+
         live_states = get_device_states()
         state = live_states.get(target_device_id, {})
         device_online = state.get('is_online', False)
@@ -157,7 +175,10 @@ def get_motors(request):
             motor['target_speed'] = target_speed
             motor['actual_speed'] = actual_speed
             motors.append(motor)
-        return Response({'motor_list': motors}, status.HTTP_200_OK)
+        return Response({
+            'device_id': target_device_id,
+            'motor_list': motors,
+        }, status.HTTP_200_OK)
     return Response(status=status.HTTP_403_FORBIDDEN)
 
 
@@ -167,28 +188,61 @@ def spinning(request):
         if request.data.get('data'):
             spin_instance = request.data['data']
             print(spin_instance)
-            if spin_instance.get('motor_name'):
-                # 前端无时区字符串按 Django 配置的本地时区解析
-                naive_time = datetime.strptime(
-                    spin_instance['scheduled_time'],
-                    '%Y-%m-%dT%H:%M:%S',
+
+            # 支持单电机（旧版）或多电机（新版）
+            motor_names = spin_instance.get('motor_names') or []
+            if isinstance(motor_names, str):
+                motor_names = [motor_names]
+            if not motor_names and spin_instance.get('motor_name'):
+                motor_names = [spin_instance['motor_name']]
+            if not motor_names:
+                return Response(
+                    {'detail': 'motor_names or motor_name is required.'},
+                    status=status.HTTP_400_BAD_REQUEST
                 )
-                scheduled_time = naive_time.replace(
-                    tzinfo=ZoneInfo(settings.TIME_ZONE)
+
+            # 校验所有电机名称均存在于 Motor 表
+            existing_motor_names = set(
+                Motor.objects.filter(name__in=motor_names).values_list('name', flat=True)
+            )
+            missing = [name for name in motor_names if name not in existing_motor_names]
+            if missing:
+                return Response(
+                    {'detail': f'Motor(s) not found: {", ".join(missing)}'},
+                    status=status.HTTP_400_BAD_REQUEST
                 )
-                # 过去时间保护：若早于当前时间，则设为立即执行
-                if scheduled_time < timezone.now():
-                    scheduled_time = timezone.now()
-                spin_instance['scheduled_time'] = scheduled_time
-                # 自动选择当前可下发的实际设备（优先在线的 ESP32 MAC 设备）
-                spin_instance['device_id'] = resolve_dispatchable_device_id()
-                spin_ser = SpinningSerializer(data=spin_instance)
-                if spin_ser.is_valid():
-                    spin_ser.save()
-                    return Response(status.HTTP_200_OK)
-                return Response(spin_ser.errors, status=status.HTTP_400_BAD_REQUEST)
-            return Response(status.HTTP_400_BAD_REQUEST)
+
+            # 兼容旧字段：motor_name 取列表第一个
+            spin_instance['motor_names'] = motor_names
+            spin_instance['motor_name'] = motor_names[0]
+
+            # 解析目标设备：前端显式传入优先，否则自动选择
+            requested_device_id = spin_instance.get('device_id')
+            spin_instance['device_id'] = resolve_dispatchable_device_id(requested_device_id)
+
+            # 前端无时区字符串按 Django 配置的本地时区解析
+            naive_time = datetime.strptime(
+                spin_instance['scheduled_time'],
+                '%Y-%m-%dT%H:%M:%S',
+            )
+            scheduled_time = naive_time.replace(
+                tzinfo=ZoneInfo(settings.TIME_ZONE)
+            )
+            # 过去时间保护：若早于当前时间，则设为立即执行
+            if scheduled_time < timezone.now():
+                scheduled_time = timezone.now()
+            spin_instance['scheduled_time'] = scheduled_time
+
+            spin_ser = SpinningSerializer(data=spin_instance)
+            if spin_ser.is_valid():
+                spin_ser.save()
+                return Response(status.HTTP_200_OK)
+            return Response(spin_ser.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
+            # 预取设备信息用于补充 MAC/标签显示
+            device_map = {
+                d.device_id: d for d in Device.objects.all()
+            }
             records = []
             for record in Spinning.objects.all().order_by('-scheduled_time').values():
                 record['scheduled_time'] = timezone.localtime(record['scheduled_time'])
@@ -196,6 +250,19 @@ def spinning(request):
                     record['dispatched_at'] = timezone.localtime(record['dispatched_at'])
                 if record.get('completed_at'):
                     record['completed_at'] = timezone.localtime(record['completed_at'])
+
+                device_id = record.get('device_id', '')
+                device = device_map.get(device_id)
+                record['mac_address'] = _format_device_mac(
+                    device.mac_address if device and device.mac_address else device_id
+                )
+                record['device_label'] = device.label if device and device.label else device_id
+
+                motor_names = record.get('motor_names') or []
+                if not motor_names:
+                    motor_names = [record.get('motor_name')] if record.get('motor_name') else []
+                record['motor_display'] = ', '.join(str(m) for m in motor_names)
+
                 records.append(record)
             return Response({'record_list': records}, status.HTTP_200_OK)
 

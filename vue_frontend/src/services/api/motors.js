@@ -1,8 +1,12 @@
 import client from './client'
 
 export default {
-  getList(token) {
-    return client.post('/api/get_motors/', { token })
+  getList(token, deviceId = null) {
+    const payload = { token }
+    if (deviceId) {
+      payload.device_id = deviceId
+    }
+    return client.post('/api/get_motors/', payload)
   },
 
   getRecords(token) {

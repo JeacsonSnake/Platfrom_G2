@@ -36,6 +36,10 @@ class SpinningSerializer(serializers.ModelSerializer):
     class Meta:
         model = Spinning
         fields = '__all__'
+        extra_kwargs = {
+            'motor_name': {'required': False, 'allow_blank': True},
+            'motor_names': {'required': False},
+        }
 
 class MotorEventSerializer(serializers.ModelSerializer):
     class Meta:

@@ -30,7 +30,8 @@
             <div class="board-table__head board-table__head--records">
                 <span></span>
                 <span>ID</span>
-                <span>Motor</span>
+                <span>Device</span>
+                <span>Motors</span>
                 <span>Scheduled Time</span>
                 <span>Speed</span>
                 <span>Duration</span>
@@ -46,7 +47,8 @@
                     />
                 </div>
                 <div class="board-cell board-cell--strong">{{ record.id }}</div>
-                <div class="board-cell">{{ record.motor_name }}</div>
+                <div class="board-cell">{{ record.device_label || record.device_id }}</div>
+                <div class="board-cell">{{ record.motor_display || record.motor_name }}</div>
                 <div class="board-cell">{{ record.scheduled_time }}</div>
                 <div class="board-cell">{{ record.motor_speed }}</div>
                 <div class="board-cell">{{ record.duration_sec }}</div>
@@ -159,7 +161,7 @@ export default {
 
 .board-table__head--records,
 .board-row--records {
-    grid-template-columns: 0.35fr 0.3fr 0.65fr 1.1fr 0.45fr 0.45fr 0.65fr 0.6fr;
+    grid-template-columns: 0.3fr 0.25fr 0.75fr 0.75fr 1.1fr 0.4fr 0.4fr 0.6fr 0.55fr;
 }
 
 .board-table__head {

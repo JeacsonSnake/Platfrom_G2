@@ -4,23 +4,36 @@
             eyebrow="Motor Control Console"
             title="Spinning Operations"
             copy="Schedule spin tasks, inspect actuator availability, and observe live motor speed from a single operator workspace."
-            :status-items="[{ label: 'Motors', value: motors.length }, { label: 'Scheduled Jobs', value: records.length }]"
+            :status-items="[
+                { label: 'Devices', value: devices.length },
+                { label: 'Motors', value: motors.length },
+                { label: 'Scheduled Jobs', value: records.length }
+            ]"
         />
 
         <section class="metric-row">
-            <MetricCard label="Selected Motor" :value="scheduleForm.motor_name || 'Not selected'" />
+            <MetricCard label="Selected Device" :value="selectedDeviceLabel || 'Not selected'" />
+            <MetricCard label="Selected Motors" :value="selectedMotorDisplay || 'None'" />
             <MetricCard label="Schedule Queue" :value="records.length" accent />
         </section>
 
         <div class="console-grid">
             <section class="panel-card">
                 <PanelHeader kicker="Fleet" title="Motor Status Board" badge="Inventory" />
-                <MotorStatusBoard :motors="motors" />
+                <MotorStatusBoard
+                    :motors="motors"
+                    :devices="devices"
+                    :selected-device-id="selectedDeviceId"
+                    :loading="loadingStatus"
+                    @select-device="onSelectDevice"
+                    @refresh="refreshMotors"
+                />
             </section>
 
             <section class="panel-card">
                 <PanelHeader kicker="Scheduling" title="Register Spin Task" badge="Operator Entry" />
                 <ScheduleForm
+                    :devices="devices"
                     :motors="motors"
                     v-model="scheduleForm"
                     :errors="errors"
@@ -50,6 +63,7 @@
 
 <script>
 import motorsApi from '@/services/api/motors.js'
+import devicesApi from '@/services/api/devices.js'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import 'element-plus/es/components/message-box/style/css'
 import 'element-plus/es/components/message/style/css'
@@ -72,7 +86,9 @@ export default {
         ScheduleQueue
     },
     mounted() {
-        this.getMotors()
+        this.getDevices().then(() => {
+            this.getMotors()
+        })
         this.getRecords()
         this.refreshInterval = setInterval(() => {
             this.getMotors()
@@ -84,39 +100,105 @@ export default {
     },
     data() {
         return {
+            devices: [],
+            selectedDeviceId: '',
+            deviceMotors: {},
             motors: [],
             scheduleForm: {
-                motor_name: '',
+                device_id: '',
+                motor_names: [],
                 scheduled_time: '',
                 motor_speed: 0,
                 duration_sec: 0
             },
             records: [],
             errors: [],
-            refreshInterval: null
+            refreshInterval: null,
+            loadingStatus: false
+        }
+    },
+    computed: {
+        selectedDevice() {
+            return this.devices.find(d => d.device_id === this.selectedDeviceId) || null
+        },
+        selectedDeviceLabel() {
+            const device = this.selectedDevice
+            if (!device) return ''
+            if (device.label && device.label !== device.device_id) {
+                return `${device.label} (${this.formatMac(device)})`
+            }
+            return this.formatMac(device)
+        },
+        selectedMotorDisplay() {
+            if (!this.scheduleForm.motor_names.length) return ''
+            return this.scheduleForm.motor_names.join(', ')
         }
     },
     methods: {
+        async getDevices() {
+            try {
+                const response = await devicesApi.getList()
+                this.devices = response.data.data || []
+                if (this.devices.length) {
+                    // 默认选中第一个在线设备，否则第一个设备
+                    const online = this.devices.find(d => d.is_online)
+                    this.selectedDeviceId = online ? online.device_id : this.devices[0].device_id
+                    this.scheduleForm.device_id = this.selectedDeviceId
+                }
+            } catch (error) {
+                this.handleApiError(error)
+            }
+        },
         getMotors() {
+            if (!this.selectedDeviceId) return
+            this.loadingStatus = true
             motorsApi
-                .getList(this.$store.state.token)
+                .getList(this.$store.state.token, this.selectedDeviceId)
                 .then(response => {
-                    this.motors = response.data.motor_list
-                    if (this.motors.length && !this.scheduleForm.motor_name) {
-                        this.scheduleForm.motor_name = this.motors[0].name
-                    }
+                    const list = response.data.motor_list || []
+                    this.deviceMotors = { ...this.deviceMotors, [this.selectedDeviceId]: list }
+                    this.motors = list
+                })
+                .catch(this.handleApiError)
+                .finally(() => {
+                    this.loadingStatus = false
                 })
         },
         getRecords() {
             motorsApi
                 .getRecords(this.$store.state.token)
                 .then(response => {
-                    this.records = response.data.record_list
+                    this.records = response.data.record_list || []
                 })
+                .catch(this.handleApiError)
+        },
+        onSelectDevice(deviceId) {
+            this.selectedDeviceId = deviceId
+            this.scheduleForm.device_id = deviceId
+            this.scheduleForm.motor_names = []
+            if (this.deviceMotors[deviceId]) {
+                this.motors = this.deviceMotors[deviceId]
+            }
+            this.getMotors()
+        },
+        refreshMotors() {
+            this.getMotors()
+            ElMessage({ message: 'Motor status refreshed', type: 'success' })
         },
         async submitSchedule() {
             this.errors = []
-            let scheduledTime = this.scheduleForm.scheduled_time
+            const { device_id, motor_names, scheduled_time, motor_speed, duration_sec } = this.scheduleForm
+
+            if (!device_id) {
+                this.errors.push('Please select a device.')
+                return
+            }
+            if (!motor_names.length) {
+                this.errors.push('Please select at least one motor.')
+                return
+            }
+
+            let scheduledTime = scheduled_time
 
             // 以服务端当前时间为基准，根据偏差决定行为
             if (scheduledTime) {
@@ -164,15 +246,17 @@ export default {
             }
 
             const payload = {
-                motor_name: this.scheduleForm.motor_name,
+                device_id,
+                motor_names,
                 scheduled_time: scheduledTime,
-                motor_speed: Number(this.scheduleForm.motor_speed),
-                duration_sec: Number(this.scheduleForm.duration_sec)
+                motor_speed: Number(motor_speed),
+                duration_sec: Number(duration_sec)
             }
             motorsApi
                 .createSchedule(this.$store.state.token, payload)
                 .then(() => {
                     this.getRecords()
+                    ElMessage({ message: 'Schedule created', type: 'success' })
                 })
                 .catch(error => {
                     if (error.response) {
@@ -189,6 +273,14 @@ export default {
         formatDateTime(date) {
             const pad = (n) => String(n).padStart(2, '0')
             return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+        },
+        formatMac(device) {
+            const mac = device.mac_address || device.device_id || ''
+            const normalized = String(mac).toLowerCase().replace(/[^0-9a-f]/g, '')
+            if (normalized.length === 12) {
+                return normalized.match(/.{1,2}/g).join(':')
+            }
+            return mac
         },
         cancelSchedule(id) {
             this.errors = []
@@ -254,7 +346,7 @@ export default {
 
 .metric-row {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.85rem;
     margin-bottom: 1.4rem;
 }

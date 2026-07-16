@@ -3,10 +3,20 @@ import motorsApi from '@/services/api/motors'
 import client from '@/services/api/client'
 
 describe('api/motors', () => {
-  it('getList calls /api/get_motors/ with token', async () => {
+  it('getList calls /api/get_motors/ with token only', async () => {
     const spy = vi.spyOn(client, 'post').mockResolvedValue({ data: {} })
     await motorsApi.getList('token123')
     expect(spy).toHaveBeenCalledWith('/api/get_motors/', { token: 'token123' })
+    spy.mockRestore()
+  })
+
+  it('getList calls /api/get_motors/ with token and device_id', async () => {
+    const spy = vi.spyOn(client, 'post').mockResolvedValue({ data: {} })
+    await motorsApi.getList('token123', 'esp32_7cdfa1e6d3cc')
+    expect(spy).toHaveBeenCalledWith('/api/get_motors/', {
+      token: 'token123',
+      device_id: 'esp32_7cdfa1e6d3cc'
+    })
     spy.mockRestore()
   })
 
@@ -19,7 +29,13 @@ describe('api/motors', () => {
 
   it('createSchedule wraps payload with token', async () => {
     const spy = vi.spyOn(client, 'post').mockResolvedValue({ data: {} })
-    const payload = { motor_name: 'M1', scheduled_time: '2026-01-01T00:00:00', motor_speed: 100, duration_sec: 10 }
+    const payload = {
+      device_id: 'esp32_7cdfa1e6d3cc',
+      motor_names: ['Motor 0', 'Motor 2'],
+      scheduled_time: '2026-01-01T00:00:00',
+      motor_speed: 100,
+      duration_sec: 10
+    }
     await motorsApi.createSchedule('token123', payload)
     expect(spy).toHaveBeenCalledWith('/api/spinning/', { token: 'token123', data: payload })
     spy.mockRestore()

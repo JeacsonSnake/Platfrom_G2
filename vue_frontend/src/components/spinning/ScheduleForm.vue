@@ -1,14 +1,37 @@
 <template>
     <div class="form-grid">
-        <div class="field">
-            <label class="label">Motor Selection</label>
+        <div class="field field--full">
+            <label class="label">Device Selection</label>
             <div class="select is-fullwidth">
-                <select :value="modelValue.motor_name" @change="updateField('motor_name', $event.target.value)">
-                    <option v-for="motor in motors" :key="motor.id" :value="motor.name">
-                        {{ motor.name }}
+                <select :value="modelValue.device_id" @change="updateDevice($event.target.value)">
+                    <option value="" disabled>Select a device</option>
+                    <option v-for="device in devices" :key="device.device_id" :value="device.device_id">
+                        {{ formatDeviceLabel(device) }}
                     </option>
                 </select>
             </div>
+        </div>
+
+        <div class="field field--full">
+            <label class="label">Motor Selection</label>
+            <div class="motor-checklist">
+                <label
+                    v-for="motor in motors"
+                    :key="motor.id"
+                    class="motor-checkbox"
+                    :class="{ 'motor-checkbox--disabled': !modelValue.device_id }"
+                >
+                    <input
+                        type="checkbox"
+                        :value="motor.name"
+                        :checked="modelValue.motor_names.includes(motor.name)"
+                        :disabled="!modelValue.device_id"
+                        @change="toggleMotor(motor.name, $event.target.checked)"
+                    />
+                    <span>{{ motor.name }}</span>
+                </label>
+            </div>
+            <p v-if="!modelValue.device_id" class="field-hint">Please select a device first.</p>
         </div>
 
         <div class="field">
@@ -41,7 +64,7 @@
     </div>
 
     <div class="action-row">
-        <button class="button is-dark" @click="$emit('submit')">Create Schedule</button>
+        <button class="button is-dark" :disabled="!canSubmit" @click="$emit('submit')">Create Schedule</button>
     </div>
 
     <div v-if="errors.length" class="console-message console-message--error">
@@ -57,6 +80,10 @@ export default {
     name: 'ScheduleForm',
     components: { ElDatePicker },
     props: {
+        devices: {
+            type: Array,
+            default: () => []
+        },
         motors: {
             type: Array,
             default: () => []
@@ -64,7 +91,8 @@ export default {
         modelValue: {
             type: Object,
             default: () => ({
-                motor_name: '',
+                device_id: '',
+                motor_names: [],
                 scheduled_time: '',
                 motor_speed: 0,
                 duration_sec: 0
@@ -76,6 +104,16 @@ export default {
         }
     },
     emits: ['update:model-value', 'submit'],
+    computed: {
+        canSubmit() {
+            return (
+                this.modelValue.device_id &&
+                this.modelValue.motor_names.length > 0 &&
+                this.modelValue.motor_speed > 0 &&
+                this.modelValue.duration_sec > 0
+            )
+        }
+    },
     mounted() {
         // 默认 Scheduled Time 为“立即执行”（当前本地时间）
         if (!this.modelValue.scheduled_time) {
@@ -86,12 +124,43 @@ export default {
         updateField(key, value) {
             this.$emit('update:model-value', { ...this.modelValue, [key]: value })
         },
+        updateDevice(deviceId) {
+            this.$emit('update:model-value', {
+                ...this.modelValue,
+                device_id: deviceId,
+                motor_names: []
+            })
+        },
+        toggleMotor(motorName, checked) {
+            const current = new Set(this.modelValue.motor_names)
+            if (checked) {
+                current.add(motorName)
+            } else {
+                current.delete(motorName)
+            }
+            this.updateField('motor_names', Array.from(current))
+        },
         setImmediate() {
             this.updateField('scheduled_time', this.formatDateTime(new Date()))
         },
         formatDateTime(date) {
             const pad = (n) => String(n).padStart(2, '0')
             return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+        },
+        formatDeviceLabel(device) {
+            const mac = this.formatMac(device.mac_address || device.device_id)
+            if (device.label && device.label !== device.device_id) {
+                return `${device.label} (${mac})`
+            }
+            return mac
+        },
+        formatMac(value) {
+            if (!value) return ''
+            const normalized = String(value).toLowerCase().replace(/[^0-9a-f]/g, '')
+            if (normalized.length === 12) {
+                return normalized.match(/.{1,2}/g).join(':')
+            }
+            return value
         }
     }
 }
@@ -102,6 +171,78 @@ export default {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.9rem;
+}
+
+.field--full {
+    grid-column: 1 / -1;
+}
+
+.label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.select select,
+.input {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    border-radius: 10px;
+    border: 1px solid rgba(15, 23, 36, 0.12);
+    background: #ffffff;
+    color: #1f2937;
+    font-size: 0.9rem;
+}
+
+.select select:disabled,
+.input:disabled {
+    background: #f1f5f9;
+    color: #94a3b8;
+}
+
+.motor-checklist {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    padding: 0.6rem;
+    background: #f8fafc;
+    border: 1px solid rgba(15, 23, 36, 0.08);
+    border-radius: 12px;
+}
+
+.motor-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    color: #1f2937;
+    transition: background 0.15s ease;
+}
+
+.motor-checkbox:hover:not(.motor-checkbox--disabled) {
+    background: #f1f5f9;
+}
+
+.motor-checkbox--disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.motor-checkbox input[type='checkbox'] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: #0f172a;
+}
+
+.field-hint {
+    margin: 0.4rem 0 0;
+    font-size: 0.78rem;
+    color: #64748b;
 }
 
 .datetime-row {
@@ -116,13 +257,24 @@ export default {
     margin-top: 1rem;
 }
 
-.console-message {
-    margin-top: 1rem;
-    padding: 0.85rem 1rem;
-    border-radius: 14px;
-    background: #fff2f2;
-    border: 1px solid #f5d0d0;
-    color: #a13b3b;
+.button.is-dark {
+    padding: 0.65rem 1.2rem;
+    border-radius: 10px;
+    border: none;
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.button.is-dark:hover:not(:disabled) {
+    background: #1e293b;
+}
+
+.button.is-dark:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
 }
 
 .button.is-light {
@@ -140,6 +292,15 @@ export default {
     background: #f1f5f9;
 }
 
+.console-message {
+    margin-top: 1rem;
+    padding: 0.85rem 1rem;
+    border-radius: 14px;
+    background: #fff2f2;
+    border: 1px solid #f5d0d0;
+    color: #a13b3b;
+}
+
 @media screen and (max-width: 960px) {
     .form-grid {
         grid-template-columns: 1fr;
@@ -148,6 +309,10 @@ export default {
     .datetime-row {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .motor-checklist {
+        grid-template-columns: 1fr;
     }
 }
 </style>

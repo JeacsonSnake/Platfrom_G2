@@ -67,7 +67,10 @@ class SpinningScheduler:
 
     @classmethod
     def _dispatch_task(cls, task):
-        """尝试下发单条任务，并在数据库中记录结果。"""
+        """尝试下发单条任务，并在数据库中记录结果。
+
+        支持多电机：一条 Spinning 记录可包含多个电机名称，依次向同一设备下发。
+        """
         # 先原子地将状态从 PENDING 改为 SENDING，防止并发重复触发
         claimed = Spinning.objects.filter(
             id=task.id,
@@ -82,31 +85,43 @@ class SpinningScheduler:
         task = Spinning.objects.get(id=task.id)
 
         try:
-            motor = Motor.objects.filter(name=task.motor_name).first()
-            if motor is None:
-                raise ValueError(f'Motor "{task.motor_name}" not found')
+            motor_names = task.effective_motor_names()
+            if not motor_names:
+                raise ValueError('No motor assigned to this task')
+
+            motors = list(Motor.objects.filter(name__in=motor_names))
+            if len(motors) != len(motor_names):
+                found_names = {m.name for m in motors}
+                missing = [name for name in motor_names if name not in found_names]
+                raise ValueError(f'Motor(s) not found: {", ".join(missing)}')
 
             device_id = resolve_dispatchable_device_id(task.device_id)
 
-            result = dispatch_motor_task(
-                device_id,
-                motor.motor_index,
-                task.motor_speed,
-                task.duration_sec,
-            )
+            dispatched_commands = []
+            first_error = None
+            for motor in motors:
+                result = dispatch_motor_task(
+                    device_id,
+                    motor.motor_index,
+                    task.motor_speed,
+                    task.duration_sec,
+                )
+                if result.get('success'):
+                    dispatched_commands.append(result.get('command'))
+                else:
+                    first_error = result.get('error', 'Unknown dispatch error')
+                    break
 
-            if result.get('success'):
+            if not first_error:
                 Spinning.objects.filter(id=task.id).update(
                     status='SENT',
                     dispatched_at=timezone.now(),
                     error_message='',
                     updated_at=timezone.now(),
                 )
-                print(f"Dispatched scheduled task {task.id}: {result.get('command')}")
+                print(f"Dispatched scheduled task {task.id}: {dispatched_commands}")
             else:
-                raise RuntimeError(
-                    result.get('error', 'Unknown dispatch error')
-                )
+                raise RuntimeError(first_error)
         except Exception as exc:
             error_text = str(exc)[:256]
             Spinning.objects.filter(id=task.id).update(
