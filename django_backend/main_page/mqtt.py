@@ -708,6 +708,8 @@ def _update_motor_health(device_id, motor, rpm):
     else:
         telemetry['zero_samples'] = 0
         telemetry['health_status'] = 'idle'
+        # 非目标电机收到转速消息时清零 RPM，避免任务结束后仍显示旧值
+        telemetry['rpm'] = 0
 
     try:
         Device = apps.get_model('main_page', 'Device')
@@ -1085,7 +1087,8 @@ def on_message(mqtt_client, userdata, msg):
                     speed = int(parts[1])
                     duration = int(parts[2])
                     device_event_done(effective_device_id, motor)
-                    # _update_device_task 已根据 active_motors 自动决定恢复 idle 或保持 busy
+                    # 更新设备任务状态、active_motors，并清零该电机的 RPM
+                    _update_device_task(effective_device_id, motor, speed, duration, 'finished')
                     _update_spinning_status(effective_device_id, motor, speed, duration, 'FINISHED')
                     _broadcast('task_status', {
                         'device_id': effective_device_id,

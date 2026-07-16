@@ -89,13 +89,13 @@ export default {
             this.getMotors()
         })
         this.getRecords()
-        this.refreshInterval = setInterval(() => {
-            this.getMotors()
+        this.recordsTimer = setInterval(() => {
             this.getRecords()
         }, 5000)
     },
     beforeRouteLeave() {
-        clearInterval(this.refreshInterval)
+        clearInterval(this.recordsTimer)
+        clearTimeout(this.motorsTimer)
     },
     data() {
         return {
@@ -111,7 +111,9 @@ export default {
                 duration_sec: 0
             },
             records: [],
-            refreshInterval: null,
+            currentTask: {},
+            recordsTimer: null,
+            motorsTimer: null,
             loadingStatus: false
         }
     },
@@ -156,11 +158,42 @@ export default {
                     const list = response.data.motor_list || []
                     this.deviceMotors = { ...this.deviceMotors, [this.selectedDeviceId]: list }
                     this.motors = list
+                    this.currentTask = response.data.current_task || {}
                 })
                 .catch(this.handleApiError)
                 .finally(() => {
                     this.loadingStatus = false
+                    this.scheduleNextRefresh()
                 })
+        },
+        scheduleNextRefresh() {
+            clearTimeout(this.motorsTimer)
+            const interval = this.computeRefreshInterval()
+            this.motorsTimer = setTimeout(() => {
+                this.getMotors()
+            }, interval)
+        },
+        computeRefreshInterval() {
+            const task = this.currentTask
+            if (!task || !task.started_at || !task.expected_finished_at) {
+                return 5000
+            }
+            const now = Date.now()
+            const start = new Date(task.started_at).getTime()
+            const end = new Date(task.expected_finished_at).getTime()
+            const durationSec = (end - start) / 1000
+            // 整体运行时长短于 15 秒，全程 10Hz
+            if (durationSec < 15) {
+                return 100
+            }
+            const elapsedSec = (now - start) / 1000
+            const remainingSec = (end - now) / 1000
+            // 下发后前 5 秒与结束前前 5 秒使用 10Hz
+            if (elapsedSec <= 5 || remainingSec <= 5) {
+                return 100
+            }
+            // 其余时间 1Hz
+            return 1000
         },
         getRecords() {
             motorsApi

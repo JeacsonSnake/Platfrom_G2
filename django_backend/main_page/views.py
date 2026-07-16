@@ -177,6 +177,9 @@ def get_motors(request):
             motors.append(motor)
         return Response({
             'device_id': target_device_id,
+            'task_status': state.get('task_status', 'idle'),
+            'current_task': state.get('current_task', {}),
+            'active_motors': sorted(state.get('active_motors', set())),
             'motor_list': motors,
         }, status.HTTP_200_OK)
     return Response(status=status.HTTP_403_FORBIDDEN)
