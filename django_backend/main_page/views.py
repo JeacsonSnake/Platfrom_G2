@@ -25,7 +25,7 @@ from django.conf import settings
 from .mqtt import (
     publish_device_command, mqtt_client_available, reconnect_mqtt_client,
     emergency_stop, resume_devices, dispatch_motor_task, get_device_states,
-    get_mqtt_connection_state, can_dispatch_to_device, acknowledge_device,
+    get_mqtt_connection_state, can_dispatch_to_device, can_dispatch_motor, acknowledge_device,
     _device_control_topic, _extract_device_id_from_topic, _broadcast,
     resolve_dispatchable_device_id,
 )
@@ -168,7 +168,7 @@ def get_motors(request):
                 motor['avaliable'] = False
                 motor['status'] = 'offline'
             else:
-                ok, _ = can_dispatch_to_device(target_device_id)
+                ok, _ = can_dispatch_motor(target_device_id, motor_index)
                 motor['avaliable'] = ok
                 motor['status'] = health_status if health_status in ('running', 'fault') else 'idle'
 

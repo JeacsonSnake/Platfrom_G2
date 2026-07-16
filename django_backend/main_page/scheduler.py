@@ -95,13 +95,14 @@ class SpinningScheduler:
                 missing = [name for name in motor_names if name not in found_names]
                 raise ValueError(f'Motor(s) not found: {", ".join(missing)}')
 
-            device_id = resolve_dispatchable_device_id(task.device_id)
+            # 使用首个电机的电机级可用性解析目标设备，确保同一设备下其他空闲电机仍可被选中
+            device_id = resolve_dispatchable_device_id(task.device_id, motors[0].motor_index)
 
             dispatched_commands = []
             first_error = None
             for index, motor in enumerate(motors):
-                # 多电机任务中，首个电机已通过 resolve_dispatchable_device_id 校验设备可用，
-                # 后续电机直接发布命令，避免被 can_dispatch_to_device 的 busy 状态拦截。
+                # 多电机任务中，首个电机已通过 resolve_dispatchable_device_id 校验可用，
+                # 后续电机直接发布命令，避免被设备级 busy 状态拦截。
                 result = dispatch_motor_task(
                     device_id,
                     motor.motor_index,

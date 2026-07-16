@@ -253,7 +253,7 @@ def _auto_release_stale_busy_state(device_id, grace_seconds=30):
 
 def can_dispatch_to_device(device_id):
     """
-    判断是否可以向指定 device_id 下发新任务。
+    判断是否可以向指定 device_id 下发新任务（设备级）。
     返回 (ok, reason)。
     """
     state = _ensure_device_state(device_id)
@@ -276,16 +276,49 @@ def can_dispatch_to_device(device_id):
     return True, ''
 
 
-def resolve_dispatchable_device_id(preferred_device_id=None):
+def can_dispatch_motor(device_id, motor_index):
+    """
+    判断是否可以向指定设备的指定电机下发新任务（电机级）。
+    当设备处于 busy 状态时，只要目标电机本身不在 active_motors 中，仍然可下发。
+    返回 (ok, reason)。
+    """
+    state = _ensure_device_state(device_id)
+    if state is None:
+        return False, 'Unknown device'
+    _auto_release_stale_busy_state(device_id)
+    if not state.get('is_online', False):
+        return False, 'Device is offline'
+    task_status = state.get('task_status', 'idle')
+    if task_status in ('estopped', 'error', 'completed', 'offline'):
+        status_label = {
+            'estopped': 'Device is in emergency stop state. Resume before dispatch.',
+            'error': 'Device has an error. Acknowledge before dispatch.',
+            'completed': 'Device has a completed task. Acknowledge before dispatch.',
+            'offline': 'Device is offline',
+        }
+        return False, status_label.get(task_status, f'Device status is {task_status}')
+    if task_status == 'busy':
+        active_motors = state.get('active_motors', set())
+        if motor_index in active_motors:
+            return False, f'Motor {motor_index} is busy'
+    return True, ''
+
+
+def resolve_dispatchable_device_id(preferred_device_id=None, motor_index=None):
     """
     解析当前可用于下发任务的设备 ID。
-    优先使用 preferred_device_id；若其不可下发，则遍历所有已注册设备，
-    通过实时内存状态 (can_dispatch_to_device) 找到第一个在线且空闲的设备；
+    优先使用 preferred_device_id；若 motor_index 提供，则按电机级可用性判断；
+    否则按设备级可用性判断。若首选不可用，则遍历所有已注册设备寻找可用设备；
     若都没有，则回退到 settings.MQTT_DEFAULT_DEVICE_ID。
     """
+    dispatch_check = can_dispatch_motor if motor_index is not None else can_dispatch_to_device
+
     if preferred_device_id:
         _auto_release_stale_busy_state(preferred_device_id)
-        ok, _ = can_dispatch_to_device(preferred_device_id)
+        if motor_index is not None:
+            ok, _ = can_dispatch_motor(preferred_device_id, motor_index)
+        else:
+            ok, _ = can_dispatch_to_device(preferred_device_id)
         if ok:
             return preferred_device_id
 
@@ -452,11 +485,17 @@ def _mark_device_offline(device_id):
         was_online = state['is_online']
         task_status = state['task_status']
         state['is_online'] = False
+        # 离线时清零所有电机的 RPM 与健康状态，避免前端显示过期数据
+        for motor_key in state.get('telemetry', {}):
+            state['telemetry'][motor_key]['rpm'] = 0
+            state['telemetry'][motor_key]['health_status'] = 'idle'
+            state['telemetry'][motor_key]['zero_samples'] = 0
 
     try:
         Device = apps.get_model('main_page', 'Device')
         Device.objects.filter(device_id=device_id).update(
             is_online=False,
+            telemetry=state.get('telemetry', {}),
             updated_at=timezone.now(),
         )
     except Exception as exc:
@@ -641,15 +680,19 @@ def _update_spinning_status(device_id, motor_index, speed, duration, new_status)
 
 
 def _update_motor_health(device_id, motor, rpm):
-    """根据目标转速与实际转速判断电机健康状态（idle / running / fault）。"""
+    """根据目标转速与实际转速判断电机健康状态（idle / running / fault）。
+
+    使用 active_motors 集合判断电机是否处于目标运行状态，支持多电机并发。
+    """
     state = _ensure_device_state(device_id)
     if state is None:
         return
     motor_key = f'motor_{motor}'
     telemetry = state.setdefault('telemetry', {}).setdefault(motor_key, {})
     current_task = state.get('current_task') or {}
+    active_motors = state.get('active_motors', set())
 
-    is_target_motor = current_task.get('motor') == motor
+    is_target_motor = motor in active_motors
     target_speed = int(current_task.get('speed', 0)) if is_target_motor else 0
 
     if is_target_motor and target_speed > 0:
@@ -704,6 +747,14 @@ def _update_device_task(device_id, motor, speed, duration, event_type):
             state['task_status'] = 'idle'
             state['current_task'] = {}
         # 若仍有电机在运行，保持 busy 与 current_task 不变
+
+        # 任务结束：将该电机的 RPM 清零并标记为 idle，避免前端显示旧值
+        telemetry = state.setdefault('telemetry', {})
+        motor_key = f'motor_{motor}'
+        if motor_key in telemetry:
+            telemetry[motor_key]['rpm'] = 0
+            telemetry[motor_key]['health_status'] = 'idle'
+            telemetry[motor_key]['zero_samples'] = 0
 
     # 同步数据库
     try:
@@ -1174,11 +1225,11 @@ def resume_devices(device_ids, resumed_by=''):
 def dispatch_motor_task(device_id, motor, speed, duration, check_dispatch=True):
     """向指定设备下发电机任务。
 
-    参数 check_dispatch：默认 True，下发前检查设备在线与空闲状态；
+    参数 check_dispatch：默认 True，下发前检查设备在线与电机空闲状态；
     用于多电机调度时，首个电机已确认可下发，后续电机直接发布命令。
     """
     if check_dispatch:
-        ok, reason = can_dispatch_to_device(device_id)
+        ok, reason = can_dispatch_motor(device_id, motor)
         if not ok:
             return {'success': False, 'error': reason}
     if client is None or not client.is_connected():
@@ -1202,12 +1253,19 @@ def dispatch_motor_task(device_id, motor, speed, duration, check_dispatch=True):
         },
     )
 
+    # 乐观加入 active_motors，防止任务创建消息到达前重复下发同一电机
+    state = _ensure_device_state(device_id)
+    if state is not None:
+        state.setdefault('active_motors', set()).add(motor)
+
     try:
         info = client.publish(topic, cmd)
         return {'success': True, 'topic': topic, 'command': cmd, 'rc': info.rc}
     except Exception as exc:
-        # 下发失败回滚为 idle，避免一直占用
+        # 下发失败回滚为 idle 并移出 active_motors，避免一直占用
         _set_device_task_status(device_id, 'idle', current_task={})
+        if state is not None:
+            state['active_motors'].discard(motor)
         return {'success': False, 'error': str(exc)}
 
 
