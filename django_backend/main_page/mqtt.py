@@ -18,6 +18,7 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 
 from django.apps import apps
+from django.db import models
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
@@ -247,6 +248,7 @@ def _auto_release_stale_busy_state(device_id, grace_seconds=30):
         return
     if timezone.now() > expected + timedelta(seconds=grace_seconds):
         print(f'Auto-release stale busy state for {device_id} (expected finished at {expected_finished_at})')
+        running_motors = set(state.get('active_motors', set()))
         _set_device_task_status(device_id, 'idle', current_task={})
         state['active_motors'] = set()
         # 任务已超时但未收到 task_finished，清零所有电机的 RPM 与健康状态
@@ -262,6 +264,8 @@ def _auto_release_stale_busy_state(device_id, grace_seconds=30):
             )
         except Exception as exc:
             print(f'Auto-release telemetry DB update failed: {exc}')
+        # 同步将仍处于 SENT/RUNNING 的 Spinning 记录置为 FINISHED，避免 Registration List 卡死
+        _finish_stale_spinning_records(device_id, running_motors, reason='auto_release')
 
 
 def can_dispatch_to_device(device_id):
@@ -690,6 +694,37 @@ def _update_spinning_status(device_id, motor_index, speed, duration, new_status)
 
     Spinning.objects.filter(id=record.id).update(**update_fields)
     print(f'Spinning record {record.id} status updated to {new_status}')
+
+
+def _finish_stale_spinning_records(device_id, running_motors, reason='auto_release'):
+    """当设备 busy 状态超时被自动释放时，将关联的 SENT/RUNNING Spinning 记录置为 FINISHED。"""
+    try:
+        motor_names = set()
+        for motor_index in running_motors:
+            motor = Motor.objects.filter(motor_index=motor_index).first()
+            if motor:
+                motor_names.add(motor.name)
+        if not motor_names:
+            return
+
+        now = timezone.now()
+        records = Spinning.objects.filter(
+            device_id=device_id,
+            status__in=('SENT', 'RUNNING'),
+        ).filter(
+            models.Q(motor_name__in=motor_names) |
+            models.Q(motor_names__overlap=list(motor_names))
+        )
+        updated = records.update(
+            status='FINISHED',
+            finished_at=now,
+            error_message=f'Finished by {reason}: task_finished not received within timeout',
+            updated_at=now,
+        )
+        if updated:
+            print(f'Finished {updated} stale Spinning record(s) for {device_id}')
+    except Exception as exc:
+        print(f'Finish stale spinning records failed: {exc}')
 
 
 def _update_motor_health(device_id, motor, rpm):
