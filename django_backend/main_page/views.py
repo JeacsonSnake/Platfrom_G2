@@ -131,13 +131,31 @@ def change_password(request):
 def get_motors(request):
     if token_auth(request.data['token']):
         target_device_id = resolve_dispatchable_device_id()
-        ok, _ = can_dispatch_to_device(target_device_id)
-        device_dispatchable = ok
+        live_states = get_device_states()
+        state = live_states.get(target_device_id, {})
+        device_online = state.get('is_online', False)
 
         motors = []
         for motor in Motor.objects.all().order_by('motor_index').values():
-            # 实际可用性由当前在线且可下发的设备决定，而非数据库默认值
-            motor['avaliable'] = device_dispatchable
+            motor_index = motor['motor_index']
+            motor_telemetry = state.get('telemetry', {}).get(f'motor_{motor_index}', {})
+            current_task = state.get('current_task', {})
+            is_target_motor = current_task.get('motor') == motor_index
+
+            target_speed = int(current_task.get('speed', 0)) if is_target_motor else 0
+            actual_speed = int(motor_telemetry.get('rpm', 0))
+            health_status = motor_telemetry.get('health_status', 'idle')
+
+            if not device_online:
+                motor['avaliable'] = False
+                motor['status'] = 'offline'
+            else:
+                ok, _ = can_dispatch_to_device(target_device_id)
+                motor['avaliable'] = ok
+                motor['status'] = health_status if health_status in ('running', 'fault') else 'idle'
+
+            motor['target_speed'] = target_speed
+            motor['actual_speed'] = actual_speed
             motors.append(motor)
         return Response({'motor_list': motors}, status.HTTP_200_OK)
     return Response(status=status.HTTP_403_FORBIDDEN)
@@ -155,9 +173,13 @@ def spinning(request):
                     spin_instance['scheduled_time'],
                     '%Y-%m-%dT%H:%M:%S',
                 )
-                spin_instance['scheduled_time'] = naive_time.replace(
+                scheduled_time = naive_time.replace(
                     tzinfo=ZoneInfo(settings.TIME_ZONE)
                 )
+                # 过去时间保护：若早于当前时间，则设为立即执行
+                if scheduled_time < timezone.now():
+                    scheduled_time = timezone.now()
+                spin_instance['scheduled_time'] = scheduled_time
                 # 自动选择当前可下发的实际设备（优先在线的 ESP32 MAC 设备）
                 spin_instance['device_id'] = resolve_dispatchable_device_id()
                 spin_ser = SpinningSerializer(data=spin_instance)

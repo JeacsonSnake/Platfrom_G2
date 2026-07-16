@@ -1,100 +1,95 @@
-# 计划：前端 → 后端 → MQTT 定时电机旋转
+# 计划：Spinning 任务状态、时间保护、Motor Status Board 与界面精简
 
 ## 目标
-实现用户在前端 `Spinning.vue` 预约“指定时间 + 指定电机 + 指定转速 + 指定时长”的旋转任务，后端在指定时间通过 MQTT 向 ESP32-S3 下发标准指令 `cmd_<motor_index>_<speed_rpm>_<duration_sec>`，并能在前端查看任务状态与取消未执行任务。
+仅修改前后端代码，解决以下四个问题：
+1. **过去时间保护**：`Scheduled Time` 早于当前时间时，自动设为当前时间再执行。
+2. **状态跟随 ESP32 实际生命周期**：`PENDING → SENT → RUNNING → FINISHED`。
+3. **Motor Status Board 展示实时运行数据**：显示可用性、idle/running/fault 状态、目标转速、实际转速；移除 Description 列。
+4. **删除 Spinning.vue 的 Operating Information 栏**：其功能已并入 Register Spin Task。
 
 ## 已确认的需求
-1. **调度执行方式**：将调度逻辑集成进 Django 主进程，不再需要单独运行 `task_manager.py`。
-2. **电机索引映射**：给 `Motor` 模型增加 `motor_index` 字段（0–3），通过迁移写入当前 `Motor 1/2/3` 对应的索引 `0/1/2`。
-3. **命令格式**：使用 `Spinning.duration_sec` 作为 MQTT 命令第三个参数；前端传来的 `scheduled_time` 按 `Asia/Hong_Kong`（东八区）本地时间理解。
-4. **状态管理**：给 `Spinning` 模型增加状态字段，前端队列显示状态并支持取消未执行的预约。
+- 状态流转保留 `SENT` 中间状态。
+- Motor Status Board 字段：运行状态（available/unavailable、idle/running/fault）、目标转速、实际转速；不显示 PWM。
+- 目标转速非零但实际转速连续为 0 时，状态标记为 `fault/stall`。
 
 ## 关键设计
 
-### 1. 后端模型变更（`django_backend/main_page/models.py`）
-- `Motor`：新增 `motor_index = PositiveSmallIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(3)])`。
-- `Spinning`：新增字段：
-  - `status = CharField(max_length=16, choices=SPINNING_STATUS_CHOICES, default='PENDING')`
-  - `device_id = CharField(max_length=32, default=settings.MQTT_DEFAULT_DEVICE_ID)`
-  - `dispatched_at = DateTimeField(null=True, blank=True)`
-  - `completed_at = DateTimeField(null=True, blank=True)`
-  - `error_message = CharField(max_length=256, null=True, blank=True)`
-  - `created_at / updated_at`（可选，便于审计）
-- 状态选项：`PENDING` / `SENT` / `FAILED` / `COMPLETED` / `CANCELLED`。
+### 1. 过去时间保护（后端 `main_page/views.py`）
+- `spinning` 视图创建任务时：
+  ```python
+  if scheduled_time < timezone.now():
+      scheduled_time = timezone.now()
+  ```
+- 这样即使前端默认“立即执行”的时间略有滞后，也不会因“已过期”导致调度器跳过或误判。
 
-### 2. 迁移文件
-- `0030_motor_motor_index.py`：添加字段并写入现有数据 `motor_index = id - 1`。
-- `0031_spinning_status_and_metadata.py`：添加状态及元数据字段，默认现有记录状态为 `PENDING`。
+### 2. 任务状态跟随 ESP32 生命周期
 
-### 3. 序列化器（`django_backend/main_page/serializer.py`）
-- `MotorSerializer`：暴露 `motor_index`。
-- `SpinningSerializer`：暴露新字段；`scheduled_time` 保持 ISO-8601 输出。
+#### 模型扩展（`main_page/models.py`）
+- `SPINNING_STATUS_CHOICES` 增加 `('RUNNING', 'Running')`、`('FINISHED', 'Finished')`。
+- `Spinning` 增加 `started_at`、`finished_at`（DateTimeField, null=True, blank=True）。
+- 生成迁移 `0033_spinning_status_running_finished.py`。
 
-### 4. 调度器（新建 `django_backend/main_page/scheduler.py`）
-- `SpinningScheduler` 守护线程：
-  - 启动间隔 500ms 轮询。
-  - 查询 `status='PENDING'` 且 `scheduled_time <= timezone.now()` 的记录。
-  - 对每条记录：
-    1. 查找对应 `Motor`，获取 `motor_index`；找不到则标记 `FAILED`。
-    2. 取 `device_id`（默认 `settings.MQTT_DEFAULT_DEVICE_ID`）。
-    3. 使用 `mqtt.can_dispatch_to_device(device_id)` 检查设备在线且空闲。
-    4. 调用 `mqtt.dispatch_motor_task(device_id, motor_index, speed, duration)` 下发命令。
-    5. 成功：更新 `status='SENT'`, `dispatched_at=now`。
-    6. 失败：更新 `status='FAILED'`, `error_message=reason`。
-  - 同时检查 `status='SENT'` 且 `scheduled_time + duration_sec <= now` 的记录，标记为 `COMPLETED`。
-- 线程安全：使用 `select_for_update()` 或原子地将状态改为 `SENDING` 再下发，避免多进程/多线程重复触发。
+#### 调度器与 MQTT 回调（`main_page/scheduler.py`、`main_page/mqtt.py`）
+- 调度器成功下发后，状态设为 `SENT`（已有逻辑）。
+- `mqtt.py` 的 `on_message` 中：
+  - 解析到 `task_create_<motor>_<speed>_<duration>` 时，调用 `_match_spinning_record(device_id, motor, speed, duration, expected_status='SENT')`，找到最新匹配的记录，更新为 `RUNNING` 并设置 `started_at`。
+  - 解析到 `task_finished_<motor>_<speed>_<duration>` 时，调用 `_match_spinning_record(..., expected_status='RUNNING')`，更新为 `FINISHED` 并设置 `finished_at`。
+- 匹配规则：按 `device_id`、`motor_name` 对应的 `motor_index`、`motor_speed`、`duration_sec`、期望状态过滤，取 `scheduled_time` 最新的一条。避免纯按 ID 找不到（因为 ESP32 不返回任务 ID）。
 
-### 5. Django 启动（`django_backend/main_page/apps.py`）
-- 在 `ready()` 中，若 `mqtt._should_init_mqtt_client()` 为真，则在 `client.loop_start()` 之后启动 `SpinningScheduler`。
+#### 前端状态展示（`ScheduleQueue.vue`）
+- 增加 `RUNNING`、`FINISHED` 的 status-badge 样式。
 
-### 6. 视图与接口（`django_backend/main_page/views.py` + `urls.py`）
-- `spinning` 视图：
-  - 创建时：将前端无时区字符串 `YYYY-MM-DDTHH:MM:SS` 按 `Asia/Hong_Kong` 解析为 aware datetime 再保存。
-  - 列表时：将 `scheduled_time` 转换为本地时间返回。
-- 新增 `POST /api/spinning/cancel/`：接收 `{id}`，仅允许取消 `PENDING` 状态记录，更新为 `CANCELLED`。
-- `urls_v1.py` 同步增加 `path('spinning-jobs/<int:job_id>/cancel/', ...)` 或等效路径（保持 v1 一致）。
+### 3. Motor Status Board 实时数据
 
-### 7. 前端（`vue_frontend/src/views/Dashboard/Spinning.vue` 等）
-- `motors.js`：增加 `cancelSchedule(token, id)`。
-- `ScheduleQueue.vue`：
-  - 增加 “Status” 列。
-  - 对 `PENDING` 记录显示 “Cancel” 按钮，调用取消接口并刷新列表。
-- `Spinning.vue`：
-  - 创建成功后刷新列表。
-  - 增加定时刷新（如每 5s）以便观察 `PENDING → SENT → COMPLETED/FAILED`。
+#### 后端实时数据（`main_page/mqtt.py`、`main_page/views.py`）
+- `mqtt.py` 的 `on_message` 新增解析 `pcnt_rpm_<motor>_<rpm>`，调用 `_update_device_telemetry(device_id, motor, 'rpm', rpm)`。
+- 新增 `_update_motor_health(device_id, motor, rpm)`：
+  - 若设备 `current_task.motor == motor` 且 `speed > 0`：
+    - `rpm == 0` 则累加 `zero_samples`；达到 3 次（约 600ms）后状态为 `fault`。
+    - `rpm > 0` 则重置 `zero_samples`，状态为 `running`。
+  - 否则状态为 `idle`。
+  - 将 `health_status` 和 `zero_samples` 写入该电机的 telemetry。
+- `get_motors` 视图返回每个电机的：
+  - `avaliable`：设备是否在线且可下发。
+  - `status`：`idle` / `running` / `fault` / `offline`。
+  - `target_speed`：来自 `current_task.speed`（若当前任务是该电机）。
+  - `actual_speed`：来自 telemetry 的 `rpm`。
 
-### 8. 时区处理
-- 前端 `ScheduleForm` 使用浏览器本地时间（已在中国区运行），输出无偏移字符串。
-- 后端使用 `zoneinfo.ZoneInfo('Asia/Hong_Kong')` 将其 aware 化；数据库统一存 UTC；比较时用 `timezone.now()`。
+#### 前端展示（`MotorStatusBoard.vue`）
+- 移除 Description 列。
+- 列改为：ID、Name、Availability、Status、Target RPM、Actual RPM。
+- 根据状态显示不同 pill 颜色。
 
-### 9. 代码文件清单
-新增：
-- `django_backend/main_page/scheduler.py`
-- `django_backend/main_page/migrations/0030_motor_motor_index.py`
-- `django_backend/main_page/migrations/0031_spinning_status_and_metadata.py`
+### 4. 删除 Operating Information 栏
+- `vue_frontend/src/views/Dashboard/Spinning.vue`：
+  - 移除 `QuickControl` 组件引用、import、模板中的 Operating Information panel。
+  - 移除 `real_speed`、`target_speed`、`listen_started`、`listener` 等不再使用的 data 和 `set_speed`、`get_speed` 方法。
 
+## 文件清单
 修改：
 - `django_backend/main_page/models.py`
-- `django_backend/main_page/serializer.py`
 - `django_backend/main_page/views.py`
-- `django_backend/main_page/urls.py`
-- `django_backend/main_page/urls_v1.py`
-- `django_backend/main_page/apps.py`
-- `vue_frontend/src/services/api/motors.js`
-- `vue_frontend/src/components/spinning/ScheduleQueue.vue`
+- `django_backend/main_page/mqtt.py`
+- `django_backend/main_page/scheduler.py`（小调整，新增 started/finished 字段写入）
 - `vue_frontend/src/views/Dashboard/Spinning.vue`
+- `vue_frontend/src/components/spinning/MotorStatusBoard.vue`
+- `vue_frontend/src/components/spinning/ScheduleQueue.vue`
 
-## 验证步骤
-1. `cd /e/Platform_G2/django_backend && python manage.py makemigrations && python manage.py migrate`
-2. 启动 Django（`python manage.py runserver` 或 daphne），确认日志出现调度器启动信息。
-3. 前端创建预约任务，确认数据库记录 `status=PENDING`，`motor_index` 正确。
-4. 到达指定时间，确认 MQTT 发布 `cmd_<index>_<speed>_<duration>`，记录变为 `SENT`。
-5. 设备执行完成后，记录变为 `COMPLETED`；若设备离线/忙碌，记录变为 `FAILED` 并带原因。
-6. 取消未执行的 `PENDING` 任务，确认状态变为 `CANCELLED` 且不会被触发。
+新增：
+- `django_backend/main_page/migrations/0033_spinning_status_running_finished.py`
+
+## 验证
+1. `python manage.py makemigrations && python manage.py migrate`
+2. `python manage.py check`
+3. `npm run build`
+4. 手动验证：
+   - 选择过去时间创建任务，数据库中 `scheduled_time` 被重置为当前时间。
+   - 下发后状态 `SENT`；收到 `task_create` 后变为 `RUNNING`；收到 `task_finished` 后变为 `FINISHED`。
+   - Motor Status Board 显示目标/实际转速和状态。
 
 ## 提交
 - 排除 `django_backend/db.sqlite3`。
-- Commit message 建议：`feat: integrate Spinning scheduler into Django with motor_index, duration and status`
+- Commit message 建议：`feat(Spinning): task lifecycle states, past-time guard, live motor status board`
 
 ## 计划副本
 批准后，本计划将复制一份到 `2026_06_to_07_develop_detail/07_16/plan.md`。

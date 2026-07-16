@@ -22,7 +22,7 @@ from django.apps import apps
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
-from .models import MotorEvent, MotorData, BatchJob, BatchStepExecution, CommandOutbox, TelemetryIngest
+from .models import Motor, MotorEvent, MotorData, BatchJob, BatchStepExecution, CommandOutbox, TelemetryIngest, Spinning
 
 ongoing_events = []
 client = None
@@ -563,6 +563,89 @@ def device_event_done(device_id, motor):
     ongoing_events = tmp_array
 
 
+MOTOR_HEALTH_ZERO_THRESHOLD = 3
+
+
+def _match_spinning_record(device_id, motor_index, speed, duration, expected_status):
+    """根据设备、电机索引、速度、时长和期望状态匹配最新的 Spinning 记录。"""
+    try:
+        motor = Motor.objects.filter(motor_index=motor_index).first()
+        motor_name = motor.name if motor else ''
+        filters = {
+            'device_id': device_id,
+            'motor_name': motor_name,
+            'motor_speed': speed,
+            'duration_sec': duration,
+        }
+        if isinstance(expected_status, (tuple, list)):
+            filters['status__in'] = expected_status
+        else:
+            filters['status'] = expected_status
+        return Spinning.objects.filter(**filters).order_by('-scheduled_time').first()
+    except Exception as exc:
+        print(f'Match spinning record failed: {exc}')
+        return None
+
+
+def _update_spinning_status(device_id, motor_index, speed, duration, new_status):
+    """把对应 Spinning 记录更新为 RUNNING 或 FINISHED。"""
+    expected_map = {
+        'RUNNING': 'SENT',
+        'FINISHED': ('RUNNING', 'SENT'),
+    }
+    record = _match_spinning_record(
+        device_id, motor_index, speed, duration, expected_map.get(new_status, new_status)
+    )
+    if record is None:
+        return
+
+    now = timezone.now()
+    update_fields = {'status': new_status, 'updated_at': now}
+    if new_status == 'RUNNING':
+        update_fields['started_at'] = now
+    elif new_status == 'FINISHED':
+        update_fields['finished_at'] = now
+
+    Spinning.objects.filter(id=record.id).update(**update_fields)
+    print(f'Spinning record {record.id} status updated to {new_status}')
+
+
+def _update_motor_health(device_id, motor, rpm):
+    """根据目标转速与实际转速判断电机健康状态（idle / running / fault）。"""
+    state = _ensure_device_state(device_id)
+    if state is None:
+        return
+    motor_key = f'motor_{motor}'
+    telemetry = state.setdefault('telemetry', {}).setdefault(motor_key, {})
+    current_task = state.get('current_task') or {}
+
+    is_target_motor = current_task.get('motor') == motor
+    target_speed = int(current_task.get('speed', 0)) if is_target_motor else 0
+
+    if is_target_motor and target_speed > 0:
+        if rpm == 0:
+            telemetry['zero_samples'] = telemetry.get('zero_samples', 0) + 1
+        else:
+            telemetry['zero_samples'] = 0
+
+        if telemetry.get('zero_samples', 0) >= MOTOR_HEALTH_ZERO_THRESHOLD:
+            telemetry['health_status'] = 'fault'
+        else:
+            telemetry['health_status'] = 'running'
+    else:
+        telemetry['zero_samples'] = 0
+        telemetry['health_status'] = 'idle'
+
+    try:
+        Device = apps.get_model('main_page', 'Device')
+        Device.objects.filter(device_id=device_id).update(
+            telemetry=state['telemetry'],
+            updated_at=timezone.now(),
+        )
+    except Exception as exc:
+        print(f'Device health telemetry DB update failed: {exc}')
+
+
 def _update_device_task(device_id, motor, speed, duration, event_type):
     """更新内存中的设备任务状态并同步到数据库。"""
     state = _ensure_device_state(device_id)
@@ -841,6 +924,24 @@ def on_message(mqtt_client, userdata, msg):
         except Exception as exc:
             print(f'Failed to parse pcnt payload: {payload}, error: {exc}')
 
+    # ESP32反馈PCNT转速: pcnt_rpm_motor_rpm
+    elif payload.startswith('pcnt_rpm_'):
+        try:
+            inner = payload.replace('pcnt_rpm_', '').strip()
+            parts = inner.split('_')
+            if len(parts) >= 2:
+                motor = int(parts[0])
+                rpm = int(parts[1])
+                effective_device_id = device_id or 'esp32_1'
+                _update_device_telemetry(effective_device_id, motor, 'rpm', rpm)
+                _update_motor_health(effective_device_id, motor, rpm)
+                _broadcast('telemetry', {
+                    'device_id': effective_device_id,
+                    'payload': {'motor': motor, 'rpm': rpm, 'telemetry_type': 'rpm'},
+                })
+        except Exception as exc:
+            print(f'Failed to parse pcnt_rpm payload: {payload}, error: {exc}')
+
     # ESP32反馈PWM数据: pwm_set_motor_data
     elif payload.startswith('pwm_set_'):
         try:
@@ -875,6 +976,7 @@ def on_message(mqtt_client, userdata, msg):
                     duration = int(parts[2])
                     device_event_start(effective_device_id, motor, speed, duration)
                     _update_device_task(effective_device_id, motor, speed, duration, 'create')
+                    _update_spinning_status(effective_device_id, motor, speed, duration, 'RUNNING')
                     _broadcast('task_status', {
                         'device_id': effective_device_id,
                         'payload': {
@@ -887,11 +989,14 @@ def on_message(mqtt_client, userdata, msg):
             elif inner.startswith('finished_'):
                 inner = inner.replace('finished_', '').strip()
                 parts = inner.split('_')
-                if len(parts) >= 1:
+                if len(parts) >= 3:
                     motor = int(parts[0])
+                    speed = int(parts[1])
+                    duration = int(parts[2])
                     device_event_done(effective_device_id, motor)
                     # 任务完成进入 completed 状态，等待用户验收确认后才恢复 idle
                     _set_device_task_status(effective_device_id, 'completed', current_task={})
+                    _update_spinning_status(effective_device_id, motor, speed, duration, 'FINISHED')
                     _broadcast('task_status', {
                         'device_id': effective_device_id,
                         'payload': {

@@ -9,8 +9,6 @@
 
         <section class="metric-row">
             <MetricCard label="Selected Motor" :value="scheduleForm.motor_name || 'Not selected'" />
-            <MetricCard label="Current Speed" :value="real_speed || 0" />
-            <MetricCard label="Target Speed" :value="target_speed || 0" />
             <MetricCard label="Schedule Queue" :value="records.length" accent />
         </section>
 
@@ -46,16 +44,6 @@
                     @clear-all="clearSchedules"
                 />
             </section>
-
-            <section class="panel-card">
-                <PanelHeader kicker="Live Control" title="Operating Information" badge="Realtime" />
-                <QuickControl
-                    :real-speed="real_speed"
-                    :target-speed="target_speed"
-                    @update:target-speed="target_speed = $event"
-                    @send="set_speed"
-                />
-            </section>
         </div>
     </section>
 </template>
@@ -68,7 +56,6 @@ import PanelHeader from '@/components/ui/PanelHeader.vue'
 import MotorStatusBoard from '@/components/spinning/MotorStatusBoard.vue'
 import ScheduleForm from '@/components/spinning/ScheduleForm.vue'
 import ScheduleQueue from '@/components/spinning/ScheduleQueue.vue'
-import QuickControl from '@/components/spinning/QuickControl.vue'
 
 export default {
     name: 'SpinningView',
@@ -78,16 +65,17 @@ export default {
         PanelHeader,
         MotorStatusBoard,
         ScheduleForm,
-        ScheduleQueue,
-        QuickControl
+        ScheduleQueue
     },
     mounted() {
         this.getMotors()
         this.getRecords()
-        this.refreshInterval = setInterval(() => this.getRecords(), 5000)
+        this.refreshInterval = setInterval(() => {
+            this.getMotors()
+            this.getRecords()
+        }, 5000)
     },
     beforeRouteLeave() {
-        clearInterval(this.listener)
         clearInterval(this.refreshInterval)
     },
     data() {
@@ -101,10 +89,6 @@ export default {
             },
             records: [],
             errors: [],
-            real_speed: 0,
-            target_speed: 0,
-            listen_started: false,
-            listener: null,
             refreshInterval: null
         }
     },
@@ -114,7 +98,7 @@ export default {
                 .getList(this.$store.state.token)
                 .then(response => {
                     this.motors = response.data.motor_list
-                    if (this.motors.length) {
+                    if (this.motors.length && !this.scheduleForm.motor_name) {
                         this.scheduleForm.motor_name = this.motors[0].name
                     }
                 })
@@ -200,45 +184,6 @@ export default {
             } else {
                 console.log(JSON.stringify(error))
             }
-        },
-        set_speed() {
-            this.errors = []
-            motorsApi
-                .sendMqttMsg('control', this.target_speed)
-                .then(() => {
-                    if (this.target_speed == 0) {
-                        clearInterval(this.listener)
-                        this.listen_started = false
-                        this.real_speed = 0
-                    }
-                })
-                .catch(error => {
-                    if (error.response) {
-                        for (const property in error.response.data) {
-                            this.errors.push(`${property}: ${error.response.data[property]}`)
-                        }
-                    } else if (error.message) {
-                        this.errors.push(`Error:${error.message}`)
-                    } else {
-                        console.log(JSON.stringify(error))
-                    }
-                })
-            this.get_speed()
-        },
-        get_speed() {
-            if (this.listen_started == false) {
-                this.listener = setInterval(() => {
-                    motorsApi
-                        .getMqttMsg()
-                        .then(response => {
-                            this.real_speed = response.data.speed
-                        })
-                        .catch(error => {
-                            console.log(error)
-                        })
-                }, 1000)
-                this.listen_started = true
-            }
         }
     }
 }
@@ -254,7 +199,7 @@ export default {
 
 .metric-row {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.85rem;
     margin-bottom: 1.4rem;
 }

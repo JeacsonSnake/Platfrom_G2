@@ -232,6 +232,16 @@ export default {
     color: #4b5563;
 }
 
+.status-badge--running {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-badge--finished {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
 .button.is-small {
     padding: 0.35rem 0.7rem;
     font-size: 0.78rem;

@@ -1,7 +1,6 @@
 import logging
 import threading
 import time
-from datetime import timedelta
 
 from django.db import close_old_connections
 from django.utils import timezone
@@ -50,7 +49,6 @@ class SpinningScheduler:
             close_old_connections()
             try:
                 cls._process_due_tasks()
-                cls._process_completed_tasks()
             except Exception as exc:
                 logger.exception('SpinningScheduler error: %s', exc)
             time.sleep(POLL_INTERVAL_SECONDS)
@@ -117,18 +115,3 @@ class SpinningScheduler:
                 updated_at=timezone.now(),
             )
             print(f"Failed to dispatch scheduled task {task.id}: {exc}")
-
-    @classmethod
-    def _process_completed_tasks(cls):
-        """将已运行到期的 SENT 任务标记为 COMPLETED。"""
-        now = timezone.now()
-        sent_tasks = Spinning.objects.filter(status='SENT')
-        for task in sent_tasks:
-            finish_time = task.scheduled_time + timedelta(seconds=task.duration_sec)
-            if now >= finish_time:
-                Spinning.objects.filter(id=task.id).update(
-                    status='COMPLETED',
-                    completed_at=now,
-                    updated_at=now,
-                )
-                print(f"Scheduled task {task.id} marked COMPLETED")

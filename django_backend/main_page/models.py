@@ -86,6 +86,8 @@ class MotorData(models.Model):
 SPINNING_STATUS_CHOICES = (
     ('PENDING', 'Pending'),
     ('SENT', 'Sent'),
+    ('RUNNING', 'Running'),
+    ('FINISHED', 'Finished'),
     ('FAILED', 'Failed'),
     ('COMPLETED', 'Completed'),
     ('CANCELLED', 'Cancelled'),
@@ -111,6 +113,8 @@ class Spinning(models.Model):
         help_text='目标设备逻辑标识，如 esp32_1',
     )
     dispatched_at = models.DateTimeField(null=True, blank=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    finished_at = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
     error_message = models.CharField(max_length=256, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)

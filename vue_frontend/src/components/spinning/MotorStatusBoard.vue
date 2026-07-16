@@ -4,7 +4,9 @@
             <span>ID</span>
             <span>Name</span>
             <span>Availability</span>
-            <span>Description</span>
+            <span>Status</span>
+            <span>Target RPM</span>
+            <span>Actual RPM</span>
         </div>
         <article class="board-row" v-for="motor in motors" :key="motor.id">
             <div class="board-cell board-cell--strong">{{ motor.id }}</div>
@@ -14,7 +16,13 @@
                     {{ motor.avaliable ? 'Available' : 'Unavailable' }}
                 </span>
             </div>
-            <div class="board-cell">{{ motor.description }}</div>
+            <div class="board-cell">
+                <span class="status-pill" :class="`status-pill--${motor.status}`">
+                    {{ formatStatus(motor.status) }}
+                </span>
+            </div>
+            <div class="board-cell">{{ motor.target_speed ?? 0 }}</div>
+            <div class="board-cell">{{ motor.actual_speed ?? 0 }}</div>
         </article>
     </div>
 
@@ -31,6 +39,17 @@ export default {
             type: Array,
             default: () => []
         }
+    },
+    methods: {
+        formatStatus(status) {
+            const map = {
+                idle: 'Idle',
+                running: 'Running',
+                fault: 'Fault',
+                offline: 'Offline'
+            }
+            return map[status] || status
+        }
     }
 }
 </script>
@@ -45,9 +64,9 @@ export default {
 .board-table__head,
 .board-row {
     display: grid;
-    grid-template-columns: 0.4fr 0.8fr 0.8fr 1.6fr;
+    grid-template-columns: 0.4fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr;
     gap: 0.75rem;
-    align-items: start;
+    align-items: center;
     padding: 0.95rem 1rem;
 }
 
@@ -98,6 +117,40 @@ export default {
 .availability-pill--bad {
     background: #fee2e2;
     color: #991b1b;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 72px;
+    padding: 0.28rem 0.72rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: capitalize;
+    background: #e2e8f0;
+    color: #334155;
+}
+
+.status-pill--idle {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.status-pill--running {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-pill--fault {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status-pill--offline {
+    background: #f3f4f6;
+    color: #6b7280;
 }
 
 .empty-state {
