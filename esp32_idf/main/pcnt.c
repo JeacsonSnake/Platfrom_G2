@@ -17,6 +17,8 @@ static bool pcnt_filter_ready[4] = {false};
 
 // PCNT 初始化
 // 注意貌似pcnt_init()这个函数名已经被内部函数占用了，如果命名为pcnt_init()会奇妙的报错
+static void pcnt_capture_init(void);
+
 void pcnt_func_init()
 {
     // 记录系统启动时间
