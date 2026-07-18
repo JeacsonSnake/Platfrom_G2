@@ -29,8 +29,7 @@ import threading
 # 配置参数
 DEFAULT_PORT = "COM9"
 DEFAULT_BAUD = 115200
-# 以脚本所在目录为基准，避免依赖运行时的 CWD
-LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "network_connect_log")
+LOG_DIR = "network_connect_log"
 
 # 错误模式定义 (用于实时统计)
 ERROR_PATTERNS = {
@@ -55,12 +54,9 @@ EVENT_PATTERNS = {
 class ESP32SerialLogger:
     """ESP32 串口日志记录器"""
     
-    def __init__(self, port=DEFAULT_PORT, baud=DEFAULT_BAUD, dtr=False, rts=False):
+    def __init__(self, port=DEFAULT_PORT, baud=DEFAULT_BAUD):
         self.port = port
         self.baud = baud
-        # 显式控制 DTR/RTS，防止 CP210x 驱动在 open() 后默认拉高，导致 ESP32 被复位或按住 BOOT
-        self.dtr = dtr
-        self.rts = rts
         self.serial_conn = None
         self.running = False
         self.log_file = None
@@ -216,23 +212,16 @@ ESP32-S3 串口日志记录
                 rtscts=False,
                 dsrdtr=False
             )
-
-            # 显式设置 DTR/RTS，避免 CP210x 驱动重装后默认电平变化导致 ESP32 无输出
-            self.serial_conn.dtr = self.dtr
-            self.serial_conn.rts = self.rts
-            # 等待 ESP32 从可能的复位状态稳定启动
-            time.sleep(0.2)
-
-            print(f"[INFO] 串口连接成功: {self.port} (DTR={self.dtr}, RTS={self.rts})")
+            
+            print(f"[INFO] 串口连接成功: {self.port}")
             return True
             
         except serial.SerialException as e:
             print(f"[ERROR] 串口连接失败: {e}")
             print(f"[HINT] 请检查:")
             print(f"       1. ESP32 是否已连接到 {self.port}")
-            print(f"       2. 是否有其他程序占用了该串口 (如 idf.py monitor、另一个 Python 实例、串口调试助手)")
-            print(f"       3. 驱动程序是否正确安装 (当前设备管理器显示: Silicon Labs CP210x USB to UART Bridge)")
-            print(f"       4. 是否有足够的权限访问 {self.port}")
+            print(f"       2. 是否有其他程序占用了该串口")
+            print(f"       3. 驱动程序是否正确安装")
             return False
         except Exception as e:
             print(f"[ERROR] 未知错误: {e}")
@@ -255,23 +244,15 @@ ESP32-S3 串口日志记录
                     # 读取一行数据
                     try:
                         raw_data = self.serial_conn.readline()
-
-                        if not raw_data:
-                            continue
-
-                        # 尝试多种编码解码，使用 replace 策略避免异常中断
-                        line = None
-                        for enc in ('utf-8', 'gbk', 'latin-1'):
+                        
+                        # 尝试多种编码解码
+                        try:
+                            line = raw_data.decode('utf-8').rstrip()
+                        except UnicodeDecodeError:
                             try:
-                                line = raw_data.decode(enc, errors='replace').rstrip()
-                                break
+                                line = raw_data.decode('gbk').rstrip()
                             except UnicodeDecodeError:
-                                continue
-
-                        if line is None:
-                            # 兜底：以 repr 形式记录原始字节，便于排查
-                            line = f"<RAW_BYTES: {repr(raw_data)}>"
-                            print(f"[WARN] 无法解码的串口数据: {line}")
+                                line = raw_data.decode('latin-1').rstrip()
                         
                         # 添加时间戳
                         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
@@ -284,15 +265,13 @@ ESP32-S3 串口日志记录
                         # 分析内容
                         self._analyze_line(line)
                         self.stats["total_lines"] += 1
-
+                        
                         # 实时打印到控制台（可选，可以注释掉减少刷屏）
                         print(log_line)
                         
                         # 定期打印状态
                         self._print_status()
                         
-                    except UnicodeDecodeError as e:
-                        print(f"[ERROR] 解码异常: {e}, raw_data={repr(raw_data)}")
                     except Exception as e:
                         print(f"[ERROR] 读取数据时出错: {e}")
                 
@@ -340,21 +319,11 @@ def main():
                         default=DEFAULT_PORT,
                         help=f'串口号 (默认: {DEFAULT_PORT})')
     
-    parser.add_argument('--baud', '-b',
-                        type=int,
+    parser.add_argument('--baud', '-b', 
+                        type=int, 
                         default=DEFAULT_BAUD,
                         help=f'波特率 (默认: {DEFAULT_BAUD})')
-
-    parser.add_argument('--dtr',
-                        action='store_true',
-                        default=False,
-                        help='打开串口后置位 DTR (默认: False，防止 ESP32 被复位)')
-
-    parser.add_argument('--rts',
-                        action='store_true',
-                        default=False,
-                        help='打开串口后置位 RTS (默认: False，防止 ESP32 进入 BOOT 模式)')
-
+    
     args = parser.parse_args()
     
     print("=" * 60)
@@ -364,7 +333,7 @@ def main():
     print("-" * 60)
     
     # 创建并运行记录器
-    logger = ESP32SerialLogger(port=args.port, baud=args.baud, dtr=args.dtr, rts=args.rts)
+    logger = ESP32SerialLogger(port=args.port, baud=args.baud)
     success = logger.run()
     
     if success:
