@@ -8,18 +8,20 @@ static const char* TAG = "PID_EVENT";
 // 以下参数集中在 pid.c 中定义，避免与 main.h 耦合，便于独立调试与快速回退。
 // 当前采用：前馈（开环映射）+ 闭环 PID 修正。PID 参数用于修正环，
 // 因此 Kp/Ki/Kd 数值比纯 PID 直接输出要小，修正量由 PID_CORR_MAX/MIN 限制。
-#define PID_KP                  (3.0)   // 闭环修正比例增益（初始值，待实测微调）
-#define PID_KI                  (0.1)   // 闭环修正积分增益（消除稳态误差）
-#define PID_KD                  (0.3)   // 闭环修正微分增益（抑制抖动，derivative on measurement）
+// PID 控制周期为 100ms（10Hz），与高精度周期捕获读数匹配。
+#define PID_PERIOD_MS           (100)   // PID 控制周期（ms）
+#define PID_KP                  (3.0)   // 闭环修正比例增益（100ms 周期）
+#define PID_KI                  (0.05)  // 闭环修正积分增益（100ms 周期，等效 200ms 时 0.1）
+#define PID_KD                  (0.6)   // 闭环修正微分增益（100ms 周期，等效 200ms 时 0.3）
 #define PID_CORR_MAX            (300.0) // 闭环修正上限（PWM），防止前馈被大幅偏离
 #define PID_CORR_MIN            (-300.0)// 闭环修正下限（PWM）
 #define PID_MAX_PWM             (8191)  // 13-bit 最大值
 #define PID_MIN_PWM             (0)     // 输出下限（0 对应反相后 duty=8191，即停止）
 #define PID_OUTPUT_MIN_LIMIT    (0)     // PID 输出最小值限制，先保持 0；调研后若需限制最高速可调整
-#define PID_MAX_OUTPUT_DELTA    (500.0) // 正常运行每 200ms 最大输出增加量（加速限制）
-#define PID_MAX_BRAKING_DELTA   (900.0) // 正常运行每 200ms 最大输出减少量（减速/制动限制，允许更快刹车）
-#define PID_SOFTSTART_OUTPUT_DELTA (300.0) // 软启动阶段每 200ms 最大输出增加量
-#define PID_SOFTSTART_STEPS     (10)    // 软启动步数（10 * 200ms = 2s）
+#define PID_MAX_OUTPUT_DELTA    (250.0) // 100ms 周期最大输出增加量（等效 500/200ms）
+#define PID_MAX_BRAKING_DELTA   (450.0) // 100ms 周期最大输出减少量（等效 900/200ms）
+#define PID_SOFTSTART_OUTPUT_DELTA (150.0) // 100ms 软启动每周期最大增加量（等效 300/200ms）
+#define PID_SOFTSTART_STEPS     (20)    // 软启动步数（20 * 100ms = 2s）
 #define PID_MAX_PCNT            (4500)  // 最大转速：12V 供电下实际空载约 4500 RPM
 #define PID_MIN_PCNT            (0)     // 最小 PCNT
 #define PID_OPENLOOP_OFFSET     (300.0) // 死区补偿偏移量：输出低于此值电机不转
@@ -115,9 +117,9 @@ void PID_init(void* params)
 
     // CHB-BLDC2418 转速参数
     // 采用前馈（开环映射）+ 闭环 PID 修正架构。前馈提供基准 PWM，
-    // PID 修正根据 target 与 actual 的误差进行微调，并保留 Rate Limiter / 软启动 / 条件积分。
+    // PID 修正根据 target 与 actual 的误差计算 PWM 修正量，并保留 Rate Limiter / 软启动 / 条件积分。
     // 转速单位：RPM（cmd_2_800_10 表示 800 RPM）
-    // Tuned for 200ms sampling interval (5Hz)
+    // Tuned for 100ms sampling interval (10Hz)
     struct PID_params pid_params = {
         .Kp         = PID_KP,
         .Ki         = PID_KI,
@@ -135,15 +137,15 @@ void PID_init(void* params)
     static double prev_target_speed[4] = {0.0, 0.0, 0.0, 0.0};
 
     while(1){
-        if(pcnt_updated_list[index] == true)
-        {
-            double temp = motor_speed_list[index];
+        double temp = motor_speed_list[index];
+
+        if (temp > 0) {
             // 使用 GPIO 中断捕获的脉冲周期计算高精度 RPM（6 PPR => RPM = 10,000,000 / period_us）
             // 保留 PCNT 原始计数作为兼容字段 raw=.../200ms 显示
             double actual_rpm = pcnt_get_rpm_highres(index);
 
             // 启动边沿检测：从停止转为运行时重新启用软启动（速率限制）并清零 PID 状态
-            if (temp > 0 && prev_target_speed[index] == 0) {
+            if (prev_target_speed[index] == 0) {
                 startup_phase = true;
                 startup_counter = 0;
                 data.pre_output = 0;
@@ -155,18 +157,17 @@ void PID_init(void* params)
 
             // ========== 前馈 + 闭环 PID 修正 ==========
             // 前馈：基于开环标定给出基准 PWM（解决死区与近似线性区）
-            double feedforward = 0.0;
-            if (temp > 0) {
-                double slope = (PID_MAX_PWM - PID_OPENLOOP_OFFSET) / (double)PID_MAX_PCNT;
-                feedforward = PID_OPENLOOP_OFFSET + temp * slope;
-                if (feedforward > PID_MAX_PWM) feedforward = PID_MAX_PWM;
-                if (feedforward < PID_MIN_PWM) feedforward = PID_MIN_PWM;
-            }
+            double slope = (PID_MAX_PWM - PID_OPENLOOP_OFFSET) / (double)PID_MAX_PCNT;
+            double feedforward = PID_OPENLOOP_OFFSET + temp * slope;
+            if (feedforward > PID_MAX_PWM) feedforward = PID_MAX_PWM;
+            if (feedforward < PID_MIN_PWM) feedforward = PID_MIN_PWM;
 
             // 闭环 PID 修正：根据 actual 与 target 的误差微调 PWM
             // 保留微分先行（derivative on measurement）与条件积分抗饱和
             struct PID_terms terms;
             double pid_correction = PID_Calculate(pid_params, &data, temp, actual_rpm, &terms);
+
+            double new_input = feedforward + pid_correction;
 
             // Rate Limiter: 限制相邻周期 PWM 输出变化量，平滑跳变
             // 软启动阶段使用更小的变化上限，防止启动过冲
@@ -203,16 +204,26 @@ void PID_init(void* params)
                      index, temp, actual_rpm, pcnt_count_list[index],
                      terms.error, terms.Pout, terms.Iout, terms.Dout,
                      feedforward, pid_correction, new_input, new_input_int, startup_counter);
-            pcnt_updated_list[index] = false;
 
             // 更新上周期目标速度
             prev_target_speed[index] = temp;
             // 更新上周期输出（用于下一周期速率限制）
             data.pre_output = new_input;
         }
-        else{
-            vTaskDelay(10 / portTICK_PERIOD_MS);
+        else {
+            // 电机停止：确保 PWM 关闭，并在刚从运行态切换时复位状态
+            if (prev_target_speed[index] != 0) {
+                data.pre_output = 0;
+                data.integral = 0;
+                data.pre_error = 0;
+                data.pre_measurement = 0;
+                ESP_LOGI(TAG, "Motor %d stopped, PID state reset", index);
+            }
+            pwm_set_duty(8191, index);
+            prev_target_speed[index] = 0;
         }
+
+        vTaskDelay(PID_PERIOD_MS / portTICK_PERIOD_MS);
     }
 }
 
