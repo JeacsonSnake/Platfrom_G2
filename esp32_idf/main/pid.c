@@ -211,15 +211,15 @@ void PID_init(void* params)
             data.pre_output = new_input;
         }
         else {
-            // 电机停止：确保 PWM 关闭，并在刚从运行态切换时复位状态
+            // 电机停止：仅在刚从运行态切换时关闭 PWM 并复位 PID 状态，避免重复打印日志
             if (prev_target_speed[index] != 0) {
                 data.pre_output = 0;
                 data.integral = 0;
                 data.pre_error = 0;
                 data.pre_measurement = 0;
+                pwm_set_duty(8191, index);
                 ESP_LOGI(TAG, "Motor %d stopped, PID state reset", index);
             }
-            pwm_set_duty(8191, index);
             prev_target_speed[index] = 0;
         }
 
