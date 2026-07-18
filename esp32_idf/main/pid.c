@@ -6,13 +6,14 @@ static const char* TAG = "PID_EVENT";
 //////////////////////// PID 可调参数 //////////////////////////
 //////////////////////////////////////////////////////////////
 // 以下参数集中在 pid.c 中定义，避免与 main.h 耦合，便于独立调试与快速回退。
-// 当前采用：前馈（开环映射）+ 闭环 PID 修正。PID 参数用于修正环，
-// 因此 Kp/Ki/Kd 数值比纯 PID 直接输出要小，修正量由 PID_CORR_MAX/MIN 限制。
+// 当前采用：前馈（开环映射）+ 弱闭环 PID 修正。Kp/Ki/Kd 已大幅调低，并关闭 Kd、
+// 加入死区，以抑制电机自身转速波动导致的周期性抖动。修正量由 PID_CORR_MAX/MIN 限制。
 // PID 控制周期为 100ms（10Hz），与高精度周期捕获读数匹配。
 #define PID_PERIOD_MS           (100)   // PID 控制周期（ms）
-#define PID_KP                  (3.0)   // 闭环修正比例增益（100ms 周期）
-#define PID_KI                  (0.05)  // 闭环修正积分增益（100ms 周期，等效 200ms 时 0.1）
-#define PID_KD                  (0.6)   // 闭环修正微分增益（100ms 周期，等效 200ms 时 0.3）
+#define PID_KP                  (0.3)   // 闭环修正比例增益（100ms 周期，大幅降低以抑制抖动）
+#define PID_KI                  (0.02)  // 闭环修正积分增益（100ms 周期，低速稳态误差补偿）
+#define PID_KD                  (0.0)   // 闭环修正微分增益（暂时关闭，避免放大噪声）
+#define PID_DEADBAND            (15.0)  // 转速死区（RPM）：误差在此范围内不修正，抑制小幅度波动
 #define PID_CORR_MAX            (300.0) // 闭环修正上限（PWM），防止前馈被大幅偏离
 #define PID_CORR_MIN            (-300.0)// 闭环修正下限（PWM）
 #define PID_MAX_PWM             (8191)  // 13-bit 最大值
@@ -164,8 +165,15 @@ void PID_init(void* params)
 
             // 闭环 PID 修正：根据 actual 与 target 的误差微调 PWM
             // 保留微分先行（derivative on measurement）与条件积分抗饱和
+            // 死区：当误差较小时把目标视为 actual，避免前馈基线附近反复修正导致抖动
+            double pid_target = temp;
+            double err_abs = temp - actual_rpm;
+            if (err_abs < 0) err_abs = -err_abs;
+            if (err_abs < PID_DEADBAND) {
+                pid_target = actual_rpm;
+            }
             struct PID_terms terms;
-            double pid_correction = PID_Calculate(pid_params, &data, temp, actual_rpm, &terms);
+            double pid_correction = PID_Calculate(pid_params, &data, pid_target, actual_rpm, &terms);
 
             double new_input = feedforward + pid_correction;
 
