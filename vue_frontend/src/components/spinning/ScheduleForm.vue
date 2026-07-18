@@ -53,7 +53,7 @@
         </div>
 
         <div class="field">
-            <label class="label">Spinning Speed</label>
+            <label class="label">Spinning Speed (RPM)</label>
             <input type="number" class="input" :value="modelValue.motor_speed" @input="updateField('motor_speed', Number($event.target.value))">
         </div>
 

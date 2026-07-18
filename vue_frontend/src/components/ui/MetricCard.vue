@@ -37,9 +37,9 @@ export default {
     box-shadow: 0 10px 24px rgba(15, 23, 36, 0.08);
 }
 
-.metric-card--accent {
+/* .metric-card--accent {
     border-left: 4px solid #325891;
-}
+} */
 
 .metric-card__label {
     color: #64748b;
