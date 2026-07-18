@@ -135,10 +135,9 @@ void PID_init(void* params)
         if(pcnt_updated_list[index] == true)
         {
             double temp = motor_speed_list[index];
-            // Convert 200ms PCNT raw count to RPM
-            // 6 PPR => RPM = pulses/sec * 60/6 = pulses/sec * 10
-            // pcnt_count_list is raw pulses per 200ms; RPM = pulses/200ms * 5 * 10 = pulses/200ms * 50
-            double actual_rpm = pcnt_count_list[index] * 50.0;
+            // 使用 GPIO 中断捕获的脉冲周期计算高精度 RPM（6 PPR => RPM = 10,000,000 / period_us）
+            // 保留 PCNT 原始计数作为兼容字段 raw=.../200ms 显示
+            double actual_rpm = pcnt_get_rpm_highres(index);
 
             // 启动边沿检测：从停止转为运行时重新启用软启动（速率限制）
             if (temp > 0 && prev_target_speed[index] == 0) {
@@ -197,8 +196,8 @@ void PID_init(void* params)
 
             pwm_set_duty(new_input_int, index);
 
-            // 保持与 analyze_motor_log.py 兼容的日志格式
-            ESP_LOGI(TAG, "Motor %d PID: target=%.0f RPM, actual=%.0f RPM (raw=%d/200ms), pid_out=%.0f, pwm_duty=%d, ss=%d",
+            // 保持与 analyze_motor_log.py 兼容的日志格式；actual 改为 %.1f 以显示 0.1 RPM 精度
+            ESP_LOGI(TAG, "Motor %d PID: target=%.0f RPM, actual=%.1f RPM (raw=%d/200ms), pid_out=%.0f, pwm_duty=%d, ss=%d",
                      index, temp, actual_rpm, pcnt_count_list[index], new_input, new_input_int, startup_counter);
             pcnt_updated_list[index] = false;
 

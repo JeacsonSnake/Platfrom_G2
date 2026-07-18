@@ -46,7 +46,7 @@ else:
 PID_RE = re.compile(
     r"\[(?P<ts>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})\].*?"
     r"PID_EVENT: Motor (?P<motor>\d+) PID: target=(?P<target>\d+) RPM, "
-    r"actual=(?P<actual>-?\d+) RPM \(raw=(?P<raw>-?\d+)/200ms\), "
+    r"actual=(?P<actual>-?\d+(?:\.\d+)?) RPM \(raw=(?P<raw>-?\d+)/200ms\), "
     r"(?:err=[\d.-]+, P=[\d.-]+, I=[\d.-]+, D=[\d.-]+, )?"
     r"pid_out=(?P<pid_out>[\d.]+), pwm_duty=(?P<pwm_duty>\d+), (?:ss|startup)=(?P<startup>\d+)"
 )
@@ -66,7 +66,7 @@ def parse_log(path):
                     "ts": parse_ts(m.group("ts")),
                     "motor": int(m.group("motor")),
                     "target": int(m.group("target")),
-                    "actual": int(m.group("actual")),
+                    "actual": float(m.group("actual")),
                     "raw": int(m.group("raw")),
                     "pid_out": float(m.group("pid_out")),
                     "pwm_duty": int(m.group("pwm_duty")),

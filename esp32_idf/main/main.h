@@ -115,6 +115,20 @@ void pcnt_monitor_init();
 // PCNT Counter 计数器线程
 void pcnt_monitor(void* params);
 
+//////////////////////////////////////////////////////////////
+//////////////////////// PCNT 周期捕获 ////////////////////////
+//////////////////////////////////////////////////////////////
+// 高精度转速测量：在 PCNT 计数基础上，通过 GPIO 中断捕获 FG 脉冲周期
+// CHB-BLDC2418 电机 6 PPR => RPM = 60 / (period_seconds * 6) = 10 / period_seconds
+// period 单位为 us => RPM = 10,000,000 / period_us
+extern volatile uint32_t pcnt_period_us[4];      // 最新脉冲周期（us）
+extern volatile uint64_t pcnt_last_edge_us[4];   // 最近脉冲边沿时间戳（us）
+extern volatile bool pcnt_period_valid[4];       // 周期是否有效
+extern volatile uint32_t pcnt_edge_count[4];     // 边沿计数（调试）
+
+// 获取指定电机的高精度 RPM（基于脉冲周期测量，1 个脉冲周期内即可达到 <1 RPM 分辨率）
+double pcnt_get_rpm_highres(int index);
+
 
 //////////////////////////////////////////////////////////////
 //////////////////////// MQTT ////////////////////////////////

@@ -25,6 +25,12 @@ int pcnt_count_list[4] = PCNT_COUNT;
 // PCNT 更新数组初始化
 bool pcnt_updated_list[4] = PCNT_UPDATE;
 
+// PCNT 周期捕获数据（高精度转速测量）
+volatile uint32_t pcnt_period_us[4] = {0, 0, 0, 0};
+volatile uint64_t pcnt_last_edge_us[4] = {0, 0, 0, 0};
+volatile bool pcnt_period_valid[4] = {false, false, false, false};
+volatile uint32_t pcnt_edge_count[4] = {0, 0, 0, 0};
+
 // 主函数
 void app_main(void){
     // 从硬件读取 MAC 地址，生成 device_id 与 MQTT topic
